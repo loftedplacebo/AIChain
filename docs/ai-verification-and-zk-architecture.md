@@ -1,0 +1,210 @@
+# AI Verification & ZK Architecture
+
+| Field | Value |
+|---|---|
+| Status | Living design document |
+| Document version | 0.1 |
+| Last updated | 2026-08-16 |
+| Protocol/schema version | **TBD** |
+| Decision state | Product direction agreed; unresolved items are marked **TBD** |
+| Companion document | [Core L1 Architecture and Tooling](./core-l1-architecture-and-tooling.md) |
+
+## 1. Purpose
+
+The **AI Verification Receipt (AVR) layer is the core product**. It provides a standard way to commit to, attest to, timestamp, and optionally prove defined facts about AI activity on the independent L1.
+
+AI inference and agent execution remain off-chain. The chain records the verification anchor and verifies supported ZK proofs; it does not rerun the AI workload.
+
+## 2. Agreed Direction
+
+| Area | Direction | Status |
+|---|---|---|
+| Product focus | AI Verification Receipts | Agreed |
+| AI execution | Off-chain | Agreed |
+| Evidence | Commitments/hashes, execution attestations, and timestamps | Agreed; exact formats TBD |
+| Committed context | Model, provider, configuration, and policy; input/output artifacts as applicable | Agreed direction; schema TBD |
+| ZK proofs | Optional; individual and aggregated proofs may be supported | Agreed direction; design TBD |
+| Proof generation | Off-chain | Agreed |
+| Proof verification | On-chain | Agreed; verifier interface TBD |
+| Privacy | Minimize public data and keep sensitive AI content off-chain | Agreed principle |
+| Candidate ZK stacks | RISC Zero, SP1, and Halo2 | Evaluation items only; none selected |
+
+## 3. Logical Flow
+
+```mermaid
+flowchart TD
+    REQUEST["AI request or agent task"] --> EXEC["Off-chain AI execution"]
+    EXEC --> PRIVATE["Private inputs, outputs, and execution data<br/>remain off-chain"]
+    EXEC --> COMMIT["Canonicalize selected artifacts<br/>and create commitments / hashes"]
+    COMMIT --> AVR["AI Verification Receipt<br/>commitments + attestation + timestamps"]
+    AVR --> SUBMIT["Submit receipt anchor to the independent L1"]
+    AVR -. optional .-> PROVE["Off-chain ZK proof generation<br/>individual or aggregated"]
+    PROVE --> VERIFY["On-chain proof verification"]
+    VERIFY --> SUBMIT
+    SUBMIT --> CONSUMERS["Auditors, applications, agents,<br/>and policy systems"]
+```
+
+The exact division between transaction input, contract or protocol state, logs/events, and external data references is **TBD**.
+
+## 4. AI Verification Receipt
+
+An AVR binds an AI execution to a defined set of evidence. The final schema and verification rules remain open.
+
+### 4.1 Logical Content
+
+| Item | Purpose | Design state |
+|---|---|---|
+| Input commitment | Binds the receipt to a request, prompt, context, or other execution input | Exact scope and encoding TBD |
+| Output commitment | Binds it to a response, action, or artifact | Exact scope and encoding TBD |
+| Model commitment | Binds it to the declared model identity, version, or model artifact | Encoding and disclosure policy TBD |
+| Provider commitment | Binds it to the declared provider or execution service | Encoding and disclosure policy TBD |
+| Configuration commitment | Binds parameters, tools, runtime settings, or other relevant configuration | Contents TBD |
+| Policy commitment | Binds the policy or rule set associated with execution | Contents TBD |
+| Execution attestation | Identifies who or what attests that execution occurred | Trust and signature model TBD |
+| Execution timestamp | Records a claimed execution time and its source | Source and semantics TBD |
+| ZK proof data/reference | Optionally associates an individual or aggregated proof | Format and storage TBD |
+| Chain anchor | Adds transaction and block inclusion details after submission | Format TBD |
+
+The canonical encoding, required versus optional fields, hash or commitment construction, field sizes, and receipt identifier derivation are all **TBD**.
+
+### 4.2 Assurance Boundaries
+
+A receipt is evidence for explicitly defined claims. It is not automatically proof that:
+
+- an AI output is correct, safe, or high quality;
+- a declared provider or model was genuinely used;
+- an attester is trustworthy;
+- a claimed execution timestamp is independently authoritative; or
+- private data satisfies a policy.
+
+Those claims need an appropriate attestation trust model, a precisely defined ZK statement, or both. Verification policy must distinguish an unproved receipt, an individually proved receipt, and a receipt covered by an aggregate proof.
+
+## 5. Commitments, Attestations, and Time
+
+Commitments bind a receipt to off-chain artifacts without publishing those artifacts. Model, provider, configuration, and policy commitments should remain logically distinct so verifiers can reason about each claim.
+
+A commitment is not encryption. Predictable or low-entropy values may be guessable, so canonicalization, domain separation, salting or blinding, and disclosure rules must be defined before the schema is finalized.
+
+An execution attestation associates an issuer with the receipt. The issuer identity model, signature scheme, authorization rules, revocation approach, and trust assumptions are **TBD**.
+
+The design distinguishes three times:
+
+| Time | Meaning |
+|---|---|
+| Execution time | Claimed by an attester or another time source; trust model TBD |
+| Submission time | When the receipt is submitted to the network |
+| Inclusion time | Derived from the block containing the receipt |
+
+A block timestamp establishes inclusion under the chain's rules; by itself, it does not prove when the off-chain execution occurred.
+
+## 6. ZK Architecture
+
+### 6.1 Generation and Verification
+
+| Stage | Location | Responsibility |
+|---|---|---|
+| Proof generation | Off-chain | Use private witness data to prove a versioned statement over defined public inputs; may produce an individual or aggregated proof |
+| Proof verification | On-chain | Verify a supported proof against its public inputs and record the result without rerunning the AI workload |
+
+A ZK proof establishes only the statement encoded by its program or circuit and the inputs bound to that statement. It does not establish broader AI correctness unless that property is explicitly represented and proved.
+
+Receipts without proofs remain possible, but have a different assurance level. The prover role, proof statement, public inputs, verifier interface, aggregation design, limits, and upgrade policy are **TBD**.
+
+### 6.2 Candidate Stacks
+
+These are evaluation candidates, not selected components:
+
+| Candidate | Category | Status |
+|---|---|---|
+| RISC Zero | zkVM candidate | Evaluate |
+| SP1 | zkVM candidate | Evaluate |
+| Halo2 | Circuit/proving-framework candidate | Evaluate |
+
+Evaluation should cover proof-generation performance, on-chain verification cost, aggregation or recursion support, developer complexity, security maturity, tooling, and L1/EVM integration. No candidate should be presented as chosen until an explicit decision is recorded.
+
+## 7. Privacy Principles
+
+- Keep raw prompts, private context, outputs, credentials, and proprietary policy material off-chain.
+- Publish only the commitments and public inputs needed for the intended verification claim.
+- Treat commitments as binding references, not confidentiality guarantees.
+- Use appropriate salting, blinding, or hiding commitments where predictable values could be guessed; the exact construction is TBD.
+- Make every disclosed field intentional because on-chain data is persistent.
+- Keep private artifact storage, access control, availability, and retention separate from the chain anchor.
+- Define exactly what each proof reveals before deployment.
+- Do not claim privacy, provenance, or correctness beyond what the chosen commitment, attestation, and proof design establishes.
+
+## 8. Illustrative Verification Receipt
+
+This sample is **non-normative**. It shows the intended information categories only. Field names, encodings, required fields, and storage locations are **TBD**.
+
+```json
+{
+  "schema": "ai-verification-receipt",
+  "schema_version": "TBD",
+  "receipt_id": "<derivation TBD>",
+  "commitments": {
+    "input": "<commitment>",
+    "output": "<commitment>",
+    "model": "<commitment>",
+    "provider": "<commitment>",
+    "configuration": "<commitment>",
+    "policy": "<commitment>"
+  },
+  "execution": {
+    "claimed_at": "<ISO-8601 timestamp>",
+    "timestamp_source": "<TBD>"
+  },
+  "attestation": {
+    "issuer": "<identity or key reference>",
+    "scheme": "<TBD>",
+    "signature": "<signature>"
+  },
+  "zk": {
+    "mode": "aggregate",
+    "system": "<TBD>",
+    "statement_version": "<TBD>",
+    "batch_id": "<batch identifier>",
+    "proof": "<inline proof or reference; TBD>",
+    "public_inputs": "<TBD>"
+  },
+  "chain_anchor": {
+    "transaction_hash": "<set after submission>",
+    "block_number": "<set after inclusion>",
+    "included_at": "<chain timestamp>"
+  }
+}
+```
+
+For an unproved receipt, the `zk` section may be absent or may explicitly state that no proof is attached. The final convention is **TBD**.
+
+## 9. Open Decisions
+
+| ID | Decision | Status |
+|---|---|---|
+| AVR-001 | Canonical receipt schema and required versus optional fields | TBD |
+| AVR-002 | Canonical serialization and receipt identifier derivation | TBD |
+| AVR-003 | Hash/commitment scheme, domain separation, and salting or blinding rules | TBD |
+| AVR-004 | Attester identity, signature, authorization, revocation, and trust model | TBD |
+| AVR-005 | Timestamp sources and verification semantics | TBD |
+| AVR-006 | On-chain anchor format, events/indexing, and external data references | TBD |
+| ZK-001 | Exact statements and public inputs to prove | TBD |
+| ZK-002 | ZK stack selection: RISC Zero, SP1, Halo2, or another evaluated option | TBD |
+| ZK-003 | Individual and aggregate proof design | TBD |
+| ZK-004 | On-chain verifier integration, cost limits, upgrades, and security review | TBD |
+| PRIV-001 | Disclosure profiles and off-chain storage, access, and retention model | TBD |
+
+## 10. Maintenance Rules
+
+- Keep document versioning separate from the future AVR protocol/schema version.
+- When an open decision is resolved, update the relevant architecture section and decision row together.
+- Record the decision reference and date in the change log.
+- Keep agreed choices separate from candidates and evaluation items.
+- Preserve assurance and privacy boundaries as implementation details evolve.
+
+## 11. Change Log
+
+| Version | Date | Change | Decision reference |
+|---|---|---|---|
+| 0.1 | 2026-08-16 | Initial AVR and ZK architecture baseline | Agreed core product direction |
+| X.Y | YYYY-MM-DD | Describe the change | Decision ID or link |
+
