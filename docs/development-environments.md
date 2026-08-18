@@ -76,12 +76,12 @@ When mining starts for the first time, Ethash creates a large local dataset. The
 Provision the pinned Linux build using the committed script:
 
 ```bash
-git clone --recurse-submodules https://github.com/loftedplacebo/AIChain.git /opt/aichain
+git clone https://github.com/loftedplacebo/AIChain.git /opt/aichain
 cd /opt/aichain
 sudo ./scripts/provision-vps.sh
 ```
 
-The script supports apt-based Linux systems, installs the project-pinned Go `1.21.13` toolchain after checksum verification, builds the Core-Geth submodule, and does not alter SSH, firewall, or RPC exposure. Do not copy Windows `core-geth.exe` to Linux.
+The script supports apt-based Linux systems, initializes the pinned Core-Geth source (without its optional nested test-fixture repositories), installs the project-pinned Go `1.21.13` toolchain after checksum verification, builds the node, and does not alter SSH, firewall, or RPC exposure. Do not copy Windows `core-geth.exe` to Linux.
 
 Create the mining account interactively on the VPS so its password is never placed in a command, repository, or chat:
 

@@ -28,9 +28,12 @@ if [[ -e "$project_dir/.git" ]]; then
   git -C "$project_dir" checkout main
   git -C "$project_dir" pull --ff-only origin main
 else
-  git clone --recurse-submodules https://github.com/loftedplacebo/AIChain.git "$project_dir"
+  git clone https://github.com/loftedplacebo/AIChain.git "$project_dir"
 fi
-git -C "$project_dir" submodule update --init --recursive
+# The client source is required for a node build. Its nested upstream test-fixture
+# repositories are intentionally not cloned on this VPS; they are not needed for
+# Phase 1A operation and materially increase one-time provisioning time and disk use.
+git -C "$project_dir" submodule update --init node/core-geth
 
 toolchain_dir="$project_dir/.toolchains/go${go_version}"
 if [[ ! -x "$toolchain_dir/go/bin/go" ]]; then
