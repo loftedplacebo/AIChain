@@ -56,6 +56,8 @@ While the tunnel is active, local tools can use `http://127.0.0.1:8545`. Do not 
 
 These values do **not** select the eventual GPU-friendly PoW algorithm, its quantum-resilience posture, final chain ID, block policy, token economics, or public-testnet configuration.
 
+The VPS host firewall permits `30303/TCP` and `30303/UDP` for P2P traffic. Any cloud-provider firewall must also permit those ports before a laptop can connect directly. Do **not** expose port `8545`; use the SSH tunnel in section 3 for RPC.
+
 ## 5. Local Node Workflow
 
 Build the node as described in the [README](../README.md), then create an account for development funding:
