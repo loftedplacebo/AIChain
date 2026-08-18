@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Living operations guide |
-| Document version | 0.1 |
+| Document version | 0.2 |
 | Last updated | 2026-08-18 |
 | Scope | Local development network and remote development-node access |
 | Network status | Private, development-only; not a public testnet |
@@ -13,9 +13,13 @@
 | Service | Location | Use | Status |
 |---|---|---|---|
 | Source repository | [github.com/loftedplacebo/AIChain](https://github.com/loftedplacebo/AIChain) | Public source, documentation, and change history | Configured project remote |
-| Remote devnet host | `62.171.161.32` | Persistent remote development node | Reachable by SSH as of 2026-08-18 |
+| Remote devnet host | `62.171.161.32` | Persistent remote development node | Baseline deployed; node running as of 2026-08-18 |
 
 The VPS is **not** a public RPC service, public testnet, or production environment. It must hold only development data and development keys.
+
+### Deployed Development State
+
+The VPS currently runs the pinned Core-Geth `v1.12.23` baseline on the Phase 1A genesis (chain ID `20260818`). Its RPC endpoint is bound to `127.0.0.1:8545`, and it is intentionally **not mining** until an operator creates a private mining account. This node has no pre-funded account and has produced no blocks yet.
 
 ## 2. SSH Access
 
@@ -108,3 +112,4 @@ VPS service management, firewall rules, and user hardening remain explicit opera
 | Version | Date | Change |
 |---|---|---|
 | 0.1 | 2026-08-18 | Added public repository and private devnet/VPS operating guide |
+| 0.2 | 2026-08-18 | Recorded deployed VPS baseline and non-mining devnet node state |
