@@ -6,7 +6,7 @@ param(
 $ErrorActionPreference = 'Stop'
 
 $projectRoot = Split-Path -Parent $PSScriptRoot
-$goExe = Join-Path $projectRoot '.toolchains\go\bin\go.exe'
+$goExe = Join-Path $projectRoot '.toolchains\go1.21.13\go\bin\go.exe'
 $compiler = Join-Path $projectRoot '.toolchains\llvm-mingw-20260616-ucrt-x86_64\bin\x86_64-w64-mingw32-clang.exe'
 $nodeRoot = Join-Path $projectRoot 'node\core-geth'
 $buildRoot = Join-Path $projectRoot 'build'
@@ -26,7 +26,8 @@ if (-not (Test-Path -LiteralPath $nodeRoot)) {
 $env:GOCACHE = Join-Path $projectRoot '.gocache'
 $env:GOMODCACHE = Join-Path $projectRoot '.gomodcache'
 $env:CGO_ENABLED = '1'
-$env:CC = $compiler
+$env:PATH = "$(Split-Path -Parent $compiler);$env:PATH"
+$env:CC = 'x86_64-w64-mingw32-clang.exe'
 New-Item -ItemType Directory -Path $env:GOCACHE -Force | Out-Null
 New-Item -ItemType Directory -Path $env:GOMODCACHE -Force | Out-Null
 New-Item -ItemType Directory -Path $buildRoot -Force | Out-Null
@@ -36,7 +37,7 @@ try {
     & $goExe mod download
     if ($LASTEXITCODE -ne 0) { throw 'Core-Geth module download failed.' }
 
-    & $goExe build -trimpath -o (Join-Path $buildRoot 'core-geth.exe') './cmd/geth'
+    & $goExe build -buildvcs=false -trimpath -o (Join-Path $buildRoot 'core-geth.exe') './cmd/geth'
     if ($LASTEXITCODE -ne 0) { throw 'Core-Geth build failed.' }
 
     if ($RunTests) {

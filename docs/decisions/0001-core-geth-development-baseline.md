@@ -44,6 +44,17 @@ Development changes will be made on a dedicated local branch from this pinned co
 - A repeatable upstream security-review and patch process is required before any public network.
 - The baseline-selection portion of **L1-002** is complete; the required protocol-change boundary remains **TBD**.
 
+## Baseline Build Validation
+
+- Platform: Windows AMD64.
+- Go toolchain: `go1.21.13`, matching the source's `go 1.21` requirement.
+- CGO compiler: portable LLVM-MinGW `20260616` (LLVM `22.1.8`).
+- Result: the pinned source builds successfully as `Core 1.12.23-stable`.
+- Focused test result: `go test ./params ./core/vm` passes.
+- Build output intentionally disables Go's automatic VCS stamping. The authoritative source identity is the submodule pin `96b2afc`, not the parent project's commit.
+
+The newer Go 1.26 toolchain is not used for this baseline because the source's pinned `memsize` dependency references a runtime symbol removed by that toolchain.
+
 ## References
 
 - [Core-Geth repository](https://github.com/etclabscore/core-geth)
