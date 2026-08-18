@@ -3,8 +3,8 @@
 | Field | Value |
 |---|---|
 | Status | Living design document |
-| Document version | 0.1 |
-| Last updated | 2026-08-16 |
+| Document version | 0.2 |
+| Last updated | 2026-08-18 |
 | Decision state | Core architecture agreed; unresolved items are marked **TBD** |
 | Scope | Base-layer architecture, protocol foundation, and primary tooling |
 | Companion document | [AI Verification & ZK Architecture](./ai-verification-and-zk-architecture.md) |
@@ -24,7 +24,7 @@ The implementation will begin as a **fork of Core-Geth**, retain the **Ethereum 
 | Node implementation | Go | Matches the Core-Geth codebase | Agreed |
 | Execution | EVM | Solidity contracts and Ethereum-compatible tooling | Agreed |
 | Consensus | Proof of Work | Secures the independent network | Agreed |
-| Mining algorithm | GPU-friendly PoW | Permissionless GPU-based block production | **TBD: exact algorithm** |
+| Mining algorithm | GPU-friendly PoW | Permissionless GPU-based block production with a documented quantum-resilience assessment | **TBD: exact algorithm and security posture** |
 | Native asset | Native L1 coin | Gas and mining rewards | Agreed; economics TBD |
 | Smart contracts | Solidity | Application contract language | Agreed |
 | Contract development | Foundry | Build, test, and deploy Solidity contracts | Agreed |
@@ -52,7 +52,7 @@ flowchart LR
         NODE --> EVM["EVM execution"]
         NODE --> AVR["AI Verification Receipt layer"]
         NODE --> ZK["ZK verification"]
-        NODE --> POW["Proof-of-Work consensus<br/>GPU-friendly algorithm: TBD"]
+        NODE --> POW["Proof-of-Work consensus<br/>GPU-friendly; quantum-resilience criterion<br/>Exact algorithm: TBD"]
         POW --> LEDGER["Independent L1 ledger<br/>Native coin: gas + mining rewards"]
     end
 ```
@@ -70,7 +70,8 @@ Simplified transaction flow:
 - **Independent settlement:** Ethereum-compatible technology does not make the network an Ethereum L2.
 - **EVM scope:** The EVM provides Solidity execution and compatibility with established Ethereum tooling.
 - **AI execution:** AI workloads run off-chain. The chain anchors and verifies receipts, commitments, attestations, and supported proofs; it does not run the AI workload.
-- **Mining:** Proof of Work is agreed. The exact GPU-friendly mining algorithm is not selected.
+- **Mining:** Proof of Work is agreed. The exact GPU-friendly mining algorithm is not selected. Selection must include a documented quantum-threat assessment and quantum-resilience rationale.
+- **Quantum-resilience boundary:** This requirement currently applies to mining-algorithm selection. It does not, by itself, make wallet or account signatures quantum-resistant; the broader cryptographic migration posture remains a separate future decision.
 - **Native coin:** Use for gas and mining rewards is agreed. Supply, issuance, reward schedule, denomination, and other economic parameters are TBD.
 - **API compatibility:** Ethereum JSON-RPC plus AI extensions is agreed. Exact extension methods, parameters, and lifecycle rules are TBD.
 - **ZK implementation:** ZK verification is part of the architecture. The proof system and verifier design remain evaluation items in the companion document.
@@ -79,7 +80,7 @@ Simplified transaction flow:
 
 | ID | Decision | Status | Notes |
 |---|---|---|---|
-| L1-001 | Select the GPU-friendly PoW algorithm | TBD | No mining algorithm has been chosen |
+| L1-001 | Select the GPU-friendly PoW algorithm | TBD | No algorithm has been chosen; selection requires a documented quantum-threat assessment and quantum-resilience rationale |
 | L1-002 | Select the Core-Geth fork baseline and define required protocol changes | TBD | Core-Geth is agreed; exact baseline is not |
 | L1-003 | Define genesis and network parameters | TBD | Includes chain ID, block timing, gas parameters, and related settings |
 | L1-004 | Define native coin economics | TBD | Only its gas and mining-reward roles are agreed |
@@ -99,6 +100,6 @@ No option should be treated as selected until it is explicitly recorded as an ag
 
 | Version | Date | Change | Decision reference |
 |---|---|---|---|
+| 0.2 | 2026-08-18 | Added quantum-resilience requirement to PoW selection | L1-001 |
 | 0.1 | 2026-08-16 | Initial architecture and tooling baseline | Agreed core product direction |
 | X.Y | YYYY-MM-DD | Describe the change | Decision ID or link |
-

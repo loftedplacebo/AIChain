@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Living delivery plan |
-| Document version | 0.1 |
+| Document version | 0.2 |
 | Last updated | 2026-08-18 |
 | Architecture inputs | [Core L1 Architecture and Tooling](./core-l1-architecture-and-tooling.md); [AI Verification & ZK Architecture](./ai-verification-and-zk-architecture.md) |
 | Schedule | Dates, durations, staffing, and owners are **TBD** |
@@ -23,6 +23,7 @@ This plan does **not** select the mining algorithm, Core-Geth baseline, chain pa
 - **Deterministic across implementations:** Go, Python, TypeScript, and Solidity components must share canonical test vectors where they process the same data.
 - **Privacy and security throughout:** Threat modelling, data-disclosure review, fuzzing, and adversarial tests are continuous workstreams, not final-stage checks.
 - **Evidence-based decisions:** Benchmarks and prototypes inform choices, but a temporary configuration does not close a decision gate.
+- **Quantum-resilience requirement:** The PoW selection must include a documented quantum-threat assessment and rationale. This is distinct from any future decision on wallet/account signature migration.
 - **Version everything public:** Receipt schemas, proof statements, verifier interfaces, RPC extensions, SDKs, and network releases require explicit versions.
 
 ## 3. Target End-to-End Product Slice
@@ -129,14 +130,15 @@ Security, privacy, compatibility, documentation, and operations run across every
 
 **Primary outputs**
 
-- GPU-friendly PoW candidate criteria, prototypes, benchmarks, and recommendation.
+- GPU-friendly PoW candidate criteria, prototypes, benchmarks, and recommendation, including a documented quantum-threat assessment and quantum-resilience rationale.
 - Difficulty/work, fork-choice, reorganization, timestamp, pool/centralization, and denial-of-service analysis.
+- Analysis of anticipated quantum speedups, security assumptions, and any required future upgrade or migration posture for the selected PoW design.
 - Candidate genesis, chain, gas, issuance, and mining-reward specifications.
 - Consensus vectors, invalid-block tests, reward/supply invariants, and mining workflow.
 
 **Exit gate**
 
-- **L1-001** is resolved before the mining algorithm is treated as final.
+- **L1-001** is resolved before the mining algorithm is treated as final; its decision record must include the quantum-threat assessment and rationale.
 - **L1-003** and **L1-004** are resolved before non-development network and economic parameters are frozen.
 - Valid work and rewards are accepted consistently; invalid work, rewards, and transitions are rejected deterministically.
 - Competing-chain, reorganization, restart, and synchronization behavior passes the agreed tests.
@@ -249,7 +251,7 @@ Security, privacy, compatibility, documentation, and operations run across every
 |---|---|---|
 | DG-1 | **L1-002** Core-Geth baseline and change boundary | Core client development diverges from the baseline |
 | DG-2 | **AVR-001–006** and **PRIV-001** | Stable AVR schema, SDK contracts, and anchoring behavior |
-| DG-3 | **L1-001** mining algorithm | Consensus configuration is frozen |
+| DG-3 | **L1-001** mining algorithm and quantum-resilience assessment | Consensus configuration is frozen |
 | DG-4 | **L1-003** and **L1-004** network/genesis and economics | A non-development genesis candidate is frozen |
 | DG-5 | **L1-005** AI RPC methods | Public AI API and SDK interfaces are frozen |
 | DG-6 | **ZK-001** proof statements and public inputs | Candidate implementations are described as product proofs |
@@ -278,7 +280,7 @@ The first implementation increment should:
 2. Establish reproducible builds, automated baseline tests, and a decision-record process.
 3. Draft AVR v0 semantics, canonical serialization, and shared test vectors.
 4. Build a contract/event-based AVR prototype on a local EVM network without treating that placement as final.
-5. Define the PoW evaluation criteria and candidate benchmark harness without selecting an algorithm prematurely.
+5. Define the PoW evaluation criteria and candidate benchmark harness, including quantum-threat assessment criteria, without selecting an algorithm prematurely.
 6. Define the first useful ZK claim and public inputs before comparing candidate stacks.
 
 ## 9. Definition of Done for Every Phase
@@ -300,5 +302,6 @@ The first implementation increment should:
 
 | Version | Date | Change | Reference |
 |---|---|---|---|
+| 0.2 | 2026-08-18 | Added quantum-resilience requirement to PoW evaluation and decision gate | L1-001 |
 | 0.1 | 2026-08-18 | Initial phased development plan | Architecture documents v0.1 |
 | X.Y | YYYY-MM-DD | Describe the change | Decision ID or link |
