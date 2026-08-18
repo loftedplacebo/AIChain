@@ -73,11 +73,27 @@ When mining starts for the first time, Ethash creates a large local dataset. The
 
 ## 6. VPS Node Workflow
 
-Before deployment, build a Linux Core-Geth executable from the pinned submodule on the VPS or deliver a reproducibly built Linux artifact. Do not copy Windows `core-geth.exe` to Linux.
+Provision the pinned Linux build using the committed script:
+
+```bash
+git clone --recurse-submodules https://github.com/loftedplacebo/AIChain.git /opt/aichain
+cd /opt/aichain
+sudo ./scripts/provision-vps.sh
+```
+
+The script supports apt-based Linux systems, installs the project-pinned Go `1.21.13` toolchain after checksum verification, builds the Core-Geth submodule, and does not alter SSH, firewall, or RPC exposure. Do not copy Windows `core-geth.exe` to Linux.
+
+Create the mining account interactively on the VPS so its password is never placed in a command, repository, or chat:
+
+```bash
+/opt/aichain/bin/core-geth account new --datadir /opt/aichain/devnet/node-1
+```
+
+Record its public address privately, then initialize and start the node. The address may be used as `MINER_ETHERBASE`; it need not be pre-funded to receive mining rewards.
 
 On the VPS, clone the repository, initialize its submodule, build the pinned source, initialize a **new** VPS data directory with the same committed genesis, and start the node with JSON-RPC restricted to localhost. Exchange the VPS node's enode through an authenticated channel before connecting a local second node.
 
-VPS package installation, service management, firewall rules, and user hardening remain explicit operations decisions. They will be recorded once the host's operating-system baseline and access policy are reviewed.
+VPS service management, firewall rules, and user hardening remain explicit operations decisions. They will be recorded once the host's operating-system baseline and access policy are reviewed.
 
 ## 7. Phase 1A Checks
 
