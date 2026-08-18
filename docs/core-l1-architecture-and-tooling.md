@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Living design document |
-| Document version | 0.2 |
+| Document version | 0.3 |
 | Last updated | 2026-08-18 |
 | Decision state | Core architecture agreed; unresolved items are marked **TBD** |
 | Scope | Base-layer architecture, protocol foundation, and primary tooling |
@@ -20,7 +20,7 @@ The implementation will begin as a **fork of Core-Geth**, retain the **Ethereum 
 | Area | Choice | Purpose | Status |
 |---|---|---|---|
 | Network classification | Independent Layer 1 | Independent consensus and settlement | Agreed |
-| Node foundation | Core-Geth fork | Starting point for the L1 client | Agreed |
+| Node foundation | Core-Geth fork, pinned to `v1.12.23` (`96b2afc`) for development | Starting point for the L1 client | Agreed for development; fork changes TBD |
 | Node implementation | Go | Matches the Core-Geth codebase | Agreed |
 | Execution | EVM | Solidity contracts and Ethereum-compatible tooling | Agreed |
 | Consensus | Proof of Work | Secures the independent network | Agreed |
@@ -81,7 +81,7 @@ Simplified transaction flow:
 | ID | Decision | Status | Notes |
 |---|---|---|---|
 | L1-001 | Select the GPU-friendly PoW algorithm | TBD | No algorithm has been chosen; selection requires a documented quantum-threat assessment and quantum-resilience rationale |
-| L1-002 | Select the Core-Geth fork baseline and define required protocol changes | TBD | Core-Geth is agreed; exact baseline is not |
+| L1-002 | Select the Core-Geth fork baseline and define required protocol changes | Partially resolved | `v1.12.23` (`96b2afc`) is the development baseline; required protocol changes remain TBD. See [ADR-0001](./decisions/0001-core-geth-development-baseline.md). |
 | L1-003 | Define genesis and network parameters | TBD | Includes chain ID, block timing, gas parameters, and related settings |
 | L1-004 | Define native coin economics | TBD | Only its gas and mining-reward roles are agreed |
 | L1-005 | Define AI-specific JSON-RPC methods | TBD | Must follow the AVR architecture |
@@ -100,6 +100,7 @@ No option should be treated as selected until it is explicitly recorded as an ag
 
 | Version | Date | Change | Decision reference |
 |---|---|---|---|
+| 0.3 | 2026-08-18 | Pinned Core-Geth development baseline | L1-002; ADR-0001 |
 | 0.2 | 2026-08-18 | Added quantum-resilience requirement to PoW selection | L1-001 |
 | 0.1 | 2026-08-16 | Initial architecture and tooling baseline | Agreed core product direction |
 | X.Y | YYYY-MM-DD | Describe the change | Decision ID or link |

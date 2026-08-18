@@ -1,0 +1,16 @@
+# Local toolchains and Go caches
+.toolchains/
+.gocache/
+.gomodcache/
+
+# Build outputs
+bin/
+build/
+
+# Local network state and secrets
+devnet/
+*.key
+*.keystore
+
+# Editor settings
+.vscode/
