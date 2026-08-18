@@ -28,9 +28,23 @@ To run the upstream test suite after the build succeeds:
 
 The local Go toolchain, Go caches, build outputs, and future devnet state are intentionally ignored by Git.
 
+## Repository and Development Environment
+
+- Public source repository: [loftedplacebo/AIChain](https://github.com/loftedplacebo/AIChain)
+- Remote development node: documented in [Development Environments](./docs/development-environments.md)
+
+The remote node is for the private development network only. Its JSON-RPC endpoint must remain bound to localhost; use an SSH tunnel for remote access. Do not commit credentials, private keys, keystores, or node data.
+
+## Development Devnet
+
+The committed genesis file and helper scripts create a deliberately temporary Ethash PoW network for Phase 1A validation. This is not the final mining-algorithm decision and is not a public testnet.
+
+See [Development Environments](./docs/development-environments.md) for the initialization, local-node, VPS-node, and SSH-tunnel workflows.
+
 ## Project Documentation
 
 - [Core L1 Architecture and Tooling](./docs/core-l1-architecture-and-tooling.md)
 - [AI Verification & ZK Architecture](./docs/ai-verification-and-zk-architecture.md)
 - [Development Plan](./docs/development-plan.md)
+- [Development Environments](./docs/development-environments.md)
 - [ADR-0001: Core-Geth Development Baseline](./docs/decisions/0001-core-geth-development-baseline.md)

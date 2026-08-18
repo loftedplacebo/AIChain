@@ -8,7 +8,7 @@ bin/
 build/
 
 # Local network state and secrets
-devnet/
+/devnet/
 *.key
 *.keystore
 
