@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Living operations guide |
-| Document version | 1.2 |
+| Document version | 1.3 |
 | Last updated | 2026-08-19 |
 | Scope | Local development network and remote development-node access |
 | Network status | Private, development-only; not a public testnet |
@@ -103,6 +103,19 @@ The second demo receipt has a verified attestation sidecar:
 | Status | Created and cryptographically verified on the VPS, 2026-08-19 |
 
 The signature is public verification data, not a private key. The encrypted keystore and password remain only on the VPS.
+
+### Phase 1B AuthorityRegistry Deployment
+
+| Item | Value |
+|---|---|
+| Network | Private Phase 1A devnet, chain ID `20260818` |
+| Contract | `AuthorityRegistry` Phase 1B prototype |
+| Contract address | `0xd04D61a6A88f73400933F13A02c7974CE8d877a6` |
+| Deployment transaction | `0x330e9221e3221cef3a67fa2f1f215feeb0fa02474ed693e33b0bd4bc9ab7b145` |
+| Deployer | `0xccF9f75DdbDC548eaDeF8aC3CA5EA18B10fD71CE` |
+| Status | Deployed 2026-08-19; development-only and unaudited |
+
+The registry has not yet been populated. Any forthcoming organisation ID, agent address, authority commitment, and validity interval are test data until an identity, credential, delegation, and authority model is explicitly agreed.
 
 #### First Anchored Sample Receipt
 
@@ -227,3 +240,4 @@ VPS service management, firewall rules, and user hardening remain explicit opera
 | 1.0 | 2026-08-19 | Recorded successful data-driven submission of the second demonstration receipt |
 | 1.1 | 2026-08-19 | Added optional prototype issuer-attestation workflow |
 | 1.2 | 2026-08-19 | Recorded verified issuer attestation for the second demonstration receipt |
+| 1.3 | 2026-08-19 | Recorded Phase 1B AuthorityRegistry deployment |
