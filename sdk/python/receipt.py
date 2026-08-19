@@ -48,3 +48,14 @@ def verify_receipt_against_anchor(receipt: dict, anchor: dict) -> dict:
         for key in ("receiptIdMatches", "commitmentsRootMatches", "schemaVersionMatches", "issuerMatches")
     )
     return result
+
+
+def prepare_anchor(receipt: dict) -> dict:
+    """Prepare the versioned fields accepted by the prototype anchor contract."""
+    derived = derive_receipt(receipt)
+    return {
+        "receiptId": derived["receiptId"],
+        "commitmentsRoot": derived["commitmentsRoot"],
+        "schemaVersion": receipt["schemaVersion"],
+        "claimedIssuer": receipt.get("issuer"),
+    }

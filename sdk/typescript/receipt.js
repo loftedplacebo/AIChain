@@ -41,4 +41,14 @@ function verifyReceiptAgainstAnchor(receipt, anchor) {
   return { ...result, valid: result.receiptIdMatches && result.commitmentsRootMatches && result.schemaVersionMatches && result.issuerMatches };
 }
 
-module.exports = { canonicalize, deriveReceipt, verifyReceiptAgainstAnchor };
+function prepareAnchor(receipt) {
+  const derived = deriveReceipt(receipt);
+  return {
+    receiptId: derived.receiptId,
+    commitmentsRoot: derived.commitmentsRoot,
+    schemaVersion: receipt.schemaVersion,
+    claimedIssuer: receipt.issuer
+  };
+}
+
+module.exports = { canonicalize, deriveReceipt, prepareAnchor, verifyReceiptAgainstAnchor };

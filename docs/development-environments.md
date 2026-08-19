@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Living operations guide |
-| Document version | 0.7 |
+| Document version | 0.8 |
 | Last updated | 2026-08-19 |
 | Scope | Local development network and remote development-node access |
 | Network status | Private, development-only; not a public testnet |
@@ -47,6 +47,15 @@ bash ./scripts/anchor-sample-avr.sh
 The script submits the fixture at `fixtures/avr/receipt-v0.1.0-draft.json` to the contract above. It prompts privately for the existing devnet keystore password, creates a mode-600 temporary password file only for Foundry, and removes it on exit. Do not enter a raw private key, paste a password into chat, or expose the localhost RPC endpoint.
 
 This fixture is intentionally public and carries the `unproved` assurance level. A successful transaction demonstrates receipt anchoring only; it does not prove an AI execution or settle the final AVR schema.
+
+To anchor a different prototype receipt JSON, run:
+
+```bash
+cd /opt/aichain
+bash ./scripts/anchor-avr.sh /absolute/path/to/receipt.json
+```
+
+The script derives the anchor values from the JSON through the Python SDK before it signs. The claimed receipt issuer must match the signing devnet account whenever issuer identity is part of the intended assurance claim; the current prototype reports but does not enforce that rule.
 
 #### First Anchored Sample Receipt
 
@@ -166,3 +175,4 @@ VPS service management, firewall rules, and user hardening remain explicit opera
 | 0.4 | 2026-08-19 | Recorded Phase 1B AVR anchor deployment on the private devnet |
 | 0.5 | 2026-08-19 | Added repeatable sample-receipt anchoring workflow and recorded the first confirmed sample anchor |
 | 0.7 | 2026-08-19 | Added read-only anchor retrieval and SDK verification workflow |
+| 0.8 | 2026-08-19 | Added data-driven receipt submission workflow |

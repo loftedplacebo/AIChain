@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Phase 1B prototype specification |
-| Document version | 0.2 |
+| Document version | 0.3 |
 | Last updated | 2026-08-19 |
 | Receipt schema version | `0.1.0-draft` |
 | Protocol status | Non-final; does not settle AVR protocol decisions |
@@ -76,9 +76,11 @@ The common fixture is at `fixtures/avr/receipt-v0.1.0-draft.json`. Python and Ty
 
 ### 6.1 Retrieval and Local Verification
 
-The Python and TypeScript prototypes expose `verify_receipt_against_anchor` / `verifyReceiptAgainstAnchor`. Given a locally held receipt and a retrieved anchor, each implementation compares the derived receipt ID and commitments root plus the schema version and, where supplied, issuer address. A changed committed value must fail verification against the original anchor.
+The Python and TypeScript prototypes expose `prepare_anchor` / `prepareAnchor`, which derive the exact `receiptId`, `commitmentsRoot`, and `schemaVersion` accepted by the contract from any prototype receipt. They also expose `verify_receipt_against_anchor` / `verifyReceiptAgainstAnchor`. Given a locally held receipt and a retrieved anchor, each implementation compares the derived receipt ID and commitments root plus the schema version and, where supplied, issuer address. A changed committed value must fail verification against the original anchor.
 
 `scripts/read-sample-avr-anchor.sh` performs a read-only `getAnchor` call for the first sample receipt using localhost RPC. It does not require a password or sign a transaction.
+
+`scripts/anchor-avr.sh path/to/receipt.json` derives anchor fields through the Python SDK and submits any prototype receipt using the encrypted VPS keystore. The contract records the signing account as issuer; applications must ensure this matches the receipt's claimed issuer whenever that claim is relied upon. This prototype does not yet enforce that relationship in the contract.
 
 ## 7. Change Log
 
@@ -86,3 +88,4 @@ The Python and TypeScript prototypes expose `verify_receipt_against_anchor` / `v
 |---|---|---|
 | 0.1 | 2026-08-19 | Initial Phase 1B prototype specification |
 | 0.2 | 2026-08-19 | Added local anchor-verification behavior and read-only retrieval workflow |
+| 0.3 | 2026-08-19 | Added data-driven SDK anchor preparation and submission workflow |

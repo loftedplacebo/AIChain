@@ -2,7 +2,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const test = require("node:test");
-const { deriveReceipt, verifyReceiptAgainstAnchor } = require("./receipt");
+const { deriveReceipt, prepareAnchor, verifyReceiptAgainstAnchor } = require("./receipt");
 
 const fixturePath = path.join(__dirname, "..", "..", "fixtures", "avr", "receipt-v0.1.0-draft.json");
 const fixture = JSON.parse(fs.readFileSync(fixturePath, "utf8"));
@@ -32,4 +32,13 @@ test("verifies a matching anchor and rejects a changed receipt", () => {
   const changed = structuredClone(fixture);
   changed.commitments.policy = `0x${"bb".repeat(32)}`;
   assert.equal(verifyReceiptAgainstAnchor(changed, anchor).valid, false);
+});
+
+test("prepares the contract anchor fields from a receipt", () => {
+  assert.deepEqual(prepareAnchor(fixture), {
+    receiptId: fixture.expected.receiptId,
+    commitmentsRoot: fixture.expected.commitmentsRoot,
+    schemaVersion: fixture.schemaVersion,
+    claimedIssuer: fixture.issuer
+  });
 });
