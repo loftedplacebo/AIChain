@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Living operations guide |
-| Document version | 1.6 |
+| Document version | 1.7 |
 | Last updated | 2026-08-19 |
 | Scope | Local development network and remote development-node access |
 | Network status | Private, development-only; not a public testnet |
@@ -183,6 +183,21 @@ KEYSTORE_DIR=/opt/aichain/devnet/agent-1/keystore \
 
 All values are development demonstration data. Do not use the resulting signature, delegation, or anchor as evidence of real-world authorization.
 
+The authorised-agent demonstration completed successfully:
+
+| Evidence | Value |
+|---|---|
+| Controller funding transaction | `0xb2eb3b71fa4aabe222bcfbe7d716517e98fe7e84d52b5345c2871c9c5d575726` in block `8261` |
+| Agent receipt ID | `0x17efa109dccbbb3275cf30a87fab1d19cd2b86913808b66fd29dcf0daa88b331` |
+| Agent attestation scheme | `eip191-personal-sign` |
+| Agent attestation signature | `0x47b53a518cff28b487499aff2dba1fabdf51084aca2b6a18939598df40cd714c23de7e003ffd0dd2e1ad70604a66697588852f5f354db78d66a0aed4a09b35001b` |
+| Signature verification | Passed for agent `0x82F0165D1b77C69978E4127d347023680f685365` |
+| Receipt anchor transaction | `0x70bc1e4c42ff8d67c757540eb775b5823b85868f8b498fea0054c88fcebe48a5` in block `8264` |
+| Anchor issuer | Agent `0x82F0165D1b77C69978E4127d347023680f685365` |
+| Current registry `isActive` result | `true` |
+
+The evidence establishes only the prototype claims: the agent wallet signed the defined receipt-ID message; that wallet submitted the anchor; and the registry currently reports its demonstration delegation active. It does not independently prove the claimed execution time, real-world identity, policy compliance, or legal authority.
+
 #### First Anchored Sample Receipt
 
 | Item | Value |
@@ -310,3 +325,4 @@ VPS service management, firewall rules, and user hardening remain explicit opera
 | 1.4 | 2026-08-19 | Added distinct demo agent wallet and repeatable controller-delegation workflow |
 | 1.5 | 2026-08-19 | Recorded successful demo organisation registration and active agent delegation |
 | 1.6 | 2026-08-19 | Added funding and agent-issued receipt workflow for the active demo delegation |
+| 1.7 | 2026-08-19 | Recorded the completed agent-signed, agent-anchored, actively delegated demonstration |
