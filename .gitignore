@@ -3,6 +3,7 @@
 .gocache/
 .gomodcache/
 .npm-cache/
+__pycache__/
 
 # Build outputs
 bin/
