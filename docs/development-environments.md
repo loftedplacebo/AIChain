@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Living operations guide |
-| Document version | 1.5 |
+| Document version | 1.6 |
 | Last updated | 2026-08-19 |
 | Scope | Local development network and remote development-node access |
 | Network status | Private, development-only; not a public testnet |
@@ -150,6 +150,39 @@ The demo delegation was successfully created and confirmed active:
 
 The `true` result means the registry has an unrevoked delegation for the agent and current chain time lies within its recorded validity window. It does not establish real-world identity, policy compliance, or authority beyond the prototype contract's defined semantics.
 
+#### Agent-Issued Demonstration Receipt
+
+`fixtures/avr/receipt-v0.1.0-draft-agent-demo-3.json` is a non-sensitive receipt whose claimed issuer is the separately delegated agent wallet. The active delegation is a current-state check, not a proof of the receipt's claimed execution time. Its expected values are:
+
+| Item | Value |
+|---|---|
+| Receipt ID | `0x17efa109dccbbb3275cf30a87fab1d19cd2b86913808b66fd29dcf0daa88b331` |
+| Commitments root | `0xc649fcd6380e4ba3a564f27d18ca80b235f2f70bf349b9001be7f22d4714672f` |
+| Claimed issuer | `0x82F0165D1b77C69978E4127d347023680f685365` |
+
+The agent needs a small temporary balance to submit its own anchor transaction. The controller funds it, then the agent signs and anchors its own receipt:
+
+```bash
+cd /opt/aichain
+git pull --ff-only
+
+# Prompts for the controller password.
+bash ./scripts/fund-demo-agent.sh
+
+# Prompts for the separate agent password.
+KEYSTORE_DIR=/opt/aichain/devnet/agent-1/keystore \
+  bash ./scripts/sign-avr-attestation.sh \
+  ./fixtures/avr/receipt-v0.1.0-draft-agent-demo-3.json \
+  /opt/aichain/devnet/agent-demo-3.attestation.json
+
+# Prompts for the separate agent password again.
+KEYSTORE_DIR=/opt/aichain/devnet/agent-1/keystore \
+  bash ./scripts/anchor-avr.sh \
+  ./fixtures/avr/receipt-v0.1.0-draft-agent-demo-3.json
+```
+
+All values are development demonstration data. Do not use the resulting signature, delegation, or anchor as evidence of real-world authorization.
+
 #### First Anchored Sample Receipt
 
 | Item | Value |
@@ -276,3 +309,4 @@ VPS service management, firewall rules, and user hardening remain explicit opera
 | 1.3 | 2026-08-19 | Recorded Phase 1B AuthorityRegistry deployment |
 | 1.4 | 2026-08-19 | Added distinct demo agent wallet and repeatable controller-delegation workflow |
 | 1.5 | 2026-08-19 | Recorded successful demo organisation registration and active agent delegation |
+| 1.6 | 2026-08-19 | Added funding and agent-issued receipt workflow for the active demo delegation |

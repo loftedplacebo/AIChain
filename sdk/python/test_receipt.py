@@ -5,6 +5,7 @@ from receipt import derive_receipt, prepare_anchor, prepare_attestation, verify_
 
 FIXTURE = Path(__file__).parents[2] / "fixtures" / "avr" / "receipt-v0.1.0-draft.json"
 DEMO_FIXTURE = Path(__file__).parents[2] / "fixtures" / "avr" / "receipt-v0.1.0-draft-demo-2.json"
+AGENT_DEMO_FIXTURE = Path(__file__).parents[2] / "fixtures" / "avr" / "receipt-v0.1.0-draft-agent-demo-3.json"
 
 
 def test_fixture_identifiers():
@@ -16,6 +17,13 @@ def test_fixture_identifiers():
 
 def test_second_demo_fixture_identifiers():
     fixture = json.loads(DEMO_FIXTURE.read_text(encoding="utf-8"))
+    derived = derive_receipt(fixture)
+    assert derived["receiptId"] == fixture["expected"]["receiptId"]
+    assert derived["commitmentsRoot"] == fixture["expected"]["commitmentsRoot"]
+
+
+def test_delegated_agent_demo_fixture_identifiers():
+    fixture = json.loads(AGENT_DEMO_FIXTURE.read_text(encoding="utf-8"))
     derived = derive_receipt(fixture)
     assert derived["receiptId"] == fixture["expected"]["receiptId"]
     assert derived["commitmentsRoot"] == fixture["expected"]["commitmentsRoot"]
