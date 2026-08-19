@@ -47,6 +47,7 @@ See [Development Environments](./docs/development-environments.md) for the initi
 - [AI Verification & ZK Architecture](./docs/ai-verification-and-zk-architecture.md)
 - [Autonomous Machines Product Vision](./docs/autonomous-machines-product-vision.md)
 - [AVR Prototype Specification](./docs/avr-prototype-specification.md)
+- [Identity and Authority Prototype](./docs/identity-and-authority-prototype.md)
 - [Development Plan](./docs/development-plan.md)
 - [Development Environments](./docs/development-environments.md)
 - [ADR-0001: Core-Geth Development Baseline](./docs/decisions/0001-core-geth-development-baseline.md)

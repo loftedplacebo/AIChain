@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Living design document |
-| Document version | 0.3 |
+| Document version | 0.4 |
 | Last updated | 2026-08-19 |
 | Protocol/schema version | **TBD** |
 | Decision state | Product direction agreed; unresolved items are marked **TBD** |
@@ -94,6 +94,10 @@ Commitments bind a receipt to off-chain artifacts without publishing those artif
 A commitment is not encryption. Predictable or low-entropy values may be guessable, so canonicalization, domain separation, salting or blinding, and disclosure rules must be defined before the schema is finalized.
 
 An execution attestation associates an issuer with the receipt. The issuer identity model, signature scheme, authorization rules, revocation approach, and trust assumptions are **TBD**.
+
+### 5.1 Identity and Authority Prototype Boundary
+
+`AuthorityRegistry` is a Phase 1B contract-level experiment that registers an opaque organisation ID to a controller EVM wallet, then lets that controller create or revoke time-bounded agent-wallet delegations with opaque authority commitments. It does not resolve the identity, credential, delegation, revocation, or authority decisions in this document, and it is not yet bound to AVR receipt validation. See [Identity and Authority Prototype](./identity-and-authority-prototype.md).
 
 The design distinguishes three times:
 
@@ -230,4 +234,5 @@ For an unproved receipt, the `zk` section may be absent or may explicitly state 
 | 0.1 | 2026-08-16 | Initial AVR and ZK architecture baseline | Agreed core product direction |
 | 0.2 | 2026-08-19 | Recorded versioned, contract-level Phase 1B prototype boundary | Prototype only; AVR decisions remain TBD |
 | 0.3 | 2026-08-19 | Expanded product scope to autonomous-machine receipt profiles and identity/authority use cases | Product direction; decisions remain TBD |
+| 0.4 | 2026-08-19 | Recorded contract-level identity and authority prototype boundary | ID-001–003 and AVR-004 remain TBD |
 | X.Y | YYYY-MM-DD | Describe the change | Decision ID or link |
