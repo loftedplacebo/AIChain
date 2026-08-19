@@ -3,8 +3,8 @@
 | Field | Value |
 |---|---|
 | Status | Living operations guide |
-| Document version | 0.3 |
-| Last updated | 2026-08-18 |
+| Document version | 0.4 |
+| Last updated | 2026-08-19 |
 | Scope | Local development network and remote development-node access |
 | Network status | Private, development-only; not a public testnet |
 
@@ -19,7 +19,20 @@ The VPS is **not** a public RPC service, public testnet, or production environme
 
 ### Deployed Development State
 
-The VPS currently runs the pinned Core-Geth `v1.12.23` baseline on the Phase 1A genesis (chain ID `20260818`). Its RPC endpoint is bound to `127.0.0.1:8545`. Development mining is enabled with an operator-created reward address; the node has produced its first block. The address is not recorded here because it is operational data, not a protocol decision.
+The VPS currently runs the pinned Core-Geth `v1.12.23` baseline on the Phase 1A genesis (chain ID `20260818`). Its RPC endpoint is bound to `127.0.0.1:8545`. Development mining is enabled with an operator-created reward address; the node has produced blocks. The address is not recorded here because it is operational data, not a protocol decision.
+
+### Phase 1B AVR Prototype Deployment
+
+| Item | Value |
+|---|---|
+| Network | Private Phase 1A devnet, chain ID `20260818` |
+| Contract | `AVRAnchor` Phase 1B prototype |
+| Contract address | `0xd2997572F0Ec774B7ae8e936ae440D66a15B8372` |
+| Deployment transaction | `0x86a51f2530f9959f06d7141a8bba44e0a3a64daf2e576bf3588f7ac5fd40b92e` |
+| Deployer | `0xccF9f75DdbDC548eaDeF8aC3CA5EA18B10fD71CE` |
+| Status | Deployed 2026-08-19; development-only; not audited or a protocol decision |
+
+The contract anchors only a receipt identifier, commitments root, schema version, issuer account, and inclusion time. It does not validate AI execution, identity authority, signatures, timestamps, or ZK proofs. See the [AVR Prototype Specification](./avr-prototype-specification.md).
 
 ## 2. SSH Access
 
@@ -116,3 +129,4 @@ VPS service management, firewall rules, and user hardening remain explicit opera
 | 0.1 | 2026-08-18 | Added public repository and private devnet/VPS operating guide |
 | 0.2 | 2026-08-18 | Recorded deployed VPS baseline and non-mining devnet node state |
 | 0.3 | 2026-08-18 | Recorded start of development mining and first produced block |
+| 0.4 | 2026-08-19 | Recorded Phase 1B AVR anchor deployment on the private devnet |
