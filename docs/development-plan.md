@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Living delivery plan |
-| Document version | 0.3 |
+| Document version | 0.4 |
 | Last updated | 2026-08-18 |
 | Architecture inputs | [Core L1 Architecture and Tooling](./core-l1-architecture-and-tooling.md); [AI Verification & ZK Architecture](./ai-verification-and-zk-architecture.md) |
 | Schedule | Dates, durations, staffing, and owners are **TBD** |
@@ -26,6 +26,7 @@ This plan does **not** select the mining algorithm, Core-Geth baseline, chain pa
 - **Quantum-resilience requirement:** The PoW selection must include a documented quantum-threat assessment and rationale. This is distinct from any future decision on wallet/account signature migration.
 - **Version everything public:** Receipt schemas, proof statements, verifier interfaces, RPC extensions, SDKs, and network releases require explicit versions.
 - **Profile before expansion:** Each new domain—such as agents, robots, vehicles, drones, or content provenance—requires an explicit receipt profile, assurance boundary, privacy review, and threat model before implementation.
+- **Capacity by design:** Every phase must address receipt-submission volume, transaction batching or rollups, confirmation latency, block and state growth, indexing, and proof aggregation where applicable. No throughput claim is accepted without a documented workload, measurements, and security/cost trade-offs.
 
 ## 3. Target End-to-End Product Slice
 
@@ -73,6 +74,7 @@ Security, privacy, compatibility, documentation, and operations run across every
 - Baseline EVM and Ethereum JSON-RPC compatibility results.
 - Initial threat model, privacy review checklist, performance baselines, and risk register.
 - Traceable backlog mapped to the open-decision IDs in the architecture documents.
+- Initial capacity model: target workloads, receipt sizes, submission/confirmation latency definitions, batching candidates, storage/indexing growth assumptions, and benchmark method. All quantitative targets remain **TBD** until agreed.
 
 **Exit gate**
 
@@ -94,6 +96,7 @@ Security, privacy, compatibility, documentation, and operations run across every
 - MetaMask-compatible connection and transaction workflow.
 - Initial Blockscout compatibility spike.
 - Clearly labelled development-only mining, gas, reward, and network parameters.
+- Baseline measurements for block production, transaction acceptance, simple EVM execution, propagation, synchronization, and chain-data growth under controlled receipt-like transaction loads.
 
 **Exit gate**
 
@@ -117,6 +120,7 @@ Security, privacy, compatibility, documentation, and operations run across every
 - Python and TypeScript prototypes for receipt creation, submission, lookup, and local verification.
 - End-to-end flow from off-chain execution fixture to chain inclusion and retrieval.
 - Profile-design criteria for identity, authority, configuration, policy, approval, and machine evidence; no registry or credential system is presumed by this phase.
+- Receipt-ingestion and batching design exploration: individual anchors, batch roots, transaction payload limits, indexer behavior, and the assurance trade-off between direct inclusion and batched inclusion.
 
 **Exit gate**
 
@@ -137,6 +141,7 @@ Security, privacy, compatibility, documentation, and operations run across every
 - Analysis of anticipated quantum speedups, security assumptions, and any required future upgrade or migration posture for the selected PoW design.
 - Candidate genesis, chain, gas, issuance, and mining-reward specifications.
 - Consensus vectors, invalid-block tests, reward/supply invariants, and mining workflow.
+- Measured effects of candidate PoW/block parameters on confirmation latency, propagation, orphan/reorganization behavior, hardware requirements, and sustainable receipt throughput.
 
 **Exit gate**
 
@@ -157,6 +162,7 @@ Security, privacy, compatibility, documentation, and operations run across every
 - Recorded stack recommendation and rationale.
 - Off-chain prover and on-chain verifier prototype bound to an AVR.
 - Aggregation design or an explicit decision to defer it from the initial release.
+- Receipt-batch, aggregation, and recursion benchmarks, including prover cost/latency, verifier cost, queueing behavior, public-input sizes, and failure/retry semantics.
 
 **Exit gate**
 
@@ -180,6 +186,7 @@ Security, privacy, compatibility, documentation, and operations run across every
 - Initial supported ZK prover/verifier path.
 - MetaMask, Foundry, and Blockscout integration.
 - End-to-end examples for both proved and unproved receipts.
+- End-to-end capacity test using a declared mix of individual anchors, batches, proof submissions, reads, and indexer queries; publish measured limits rather than extrapolated claims.
 
 **Exit gate**
 
@@ -202,6 +209,7 @@ Security, privacy, compatibility, documentation, and operations run across every
 - Privacy review of all on-chain fields and ZK public inputs.
 - Monitoring, incident response, backup/recovery, and key-handling runbooks.
 - External security-review scope and release acceptance targets.
+- Sustained-load and burst-load exercises for receipt ingestion, batch construction, proof queues, P2P propagation, block/state growth, reorganization recovery, and explorer/indexer lag.
 
 **Exit gate**
 
@@ -221,6 +229,7 @@ Security, privacy, compatibility, documentation, and operations run across every
 - Monitoring, support, incident, upgrade, and explicit testnet-reset procedures.
 - Public compatibility and migration tests for supported receipt and proof versions.
 - External security assessment and remediation cycle.
+- Published testnet capacity report covering observed submission rate, confirmation distribution, batch/rollup behavior, proof cost, node hardware/network requirements, and known bottlenecks.
 
 **Exit gate**
 
@@ -240,6 +249,7 @@ Security, privacy, compatibility, documentation, and operations run across every
 - Reproducible builds, checksums, release notes, and operator/user documentation.
 - Security-review outcomes, known limitations, risk acceptance, upgrade/rollback procedures, and launch checklist.
 - Documented governance and authority boundaries for upgrades and verifier changes; exact model is **TBD**.
+- Capacity and scaling acceptance report: agreed workload, measured sustainable and burst behavior, confirmation expectations, batching/aggregation limits, cost model, state-growth forecast, and operator requirements.
 
 **Exit gate**
 
@@ -261,6 +271,7 @@ Security, privacy, compatibility, documentation, and operations run across every
 | DG-7 | **ZK-002–004** stack, aggregation scope, verifier, and upgrades | ZK release scope is frozen |
 | DG-8 | Testnet targets, supported versions, security findings, and residual risks | Mainnet release-candidate approval |
 | DG-9 | **ID-001–003**, **AVR-007**, and applicable domain threat model | A machine-identity/authority or autonomous-machine profile is released |
+| DG-10 | Declared workload, measured capacity limits, batching/rollup policy, confirmation targets, state/indexer growth model, and security review | Any testnet or mainnet performance/capacity claim |
 
 A gate closes only when its decision is recorded in the relevant architecture document or decision record. A benchmark, prototype, or temporary configuration does not close a gate.
 
@@ -275,6 +286,7 @@ A gate closes only when its decision is recorded in the relevant architecture do
 | ZK | Positive/negative vectors, receipt/public-input substitution, wrong-version tests, verifier fuzzing, resource measurements |
 | APIs and SDKs | Conformance, compatibility, limit/abuse, retry, duplicate, and indexer-resync tests |
 | Operations | Deployment rehearsal, monitoring, upgrade/rollback, backup/recovery, incident, and disaster-recovery exercises |
+| Capacity and rollups | Reproducible workload generator, individual-versus-batched receipt measurements, queue/backpressure behavior, confirmation distribution, proof aggregation cost/latency, block/state/indexer growth, and P2P propagation under load |
 
 ## 8. Immediate Next Increment
 
@@ -308,5 +320,6 @@ The first implementation increment should:
 |---|---|---|---|
 | 0.2 | 2026-08-18 | Added quantum-resilience requirement to PoW evaluation and decision gate | L1-001 |
 | 0.3 | 2026-08-19 | Added autonomous-machine profiles and identity/authority release gate | Product direction; decisions remain TBD |
+| 0.4 | 2026-08-19 | Made capacity, batching/rollups, and confirmation performance mandatory at every phase | DG-10; targets remain TBD |
 | 0.1 | 2026-08-18 | Initial phased development plan | Architecture documents v0.1 |
 | X.Y | YYYY-MM-DD | Describe the change | Decision ID or link |

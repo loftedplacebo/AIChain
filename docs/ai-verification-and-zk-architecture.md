@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Living design document |
-| Document version | 0.4 |
+| Document version | 0.5 |
 | Last updated | 2026-08-19 |
 | Protocol/schema version | **TBD** |
 | Decision state | Product direction agreed; unresolved items are marked **TBD** |
@@ -145,7 +145,24 @@ Evaluation should cover proof-generation performance, on-chain verification cost
 - Define exactly what each proof reveals before deployment.
 - Do not claim privacy, provenance, or correctness beyond what the chosen commitment, attestation, and proof design establishes.
 
-## 8. Receipt Profiles and Use Cases
+## 8. Capacity, Batching, and Aggregation Requirements
+
+The network is intended to handle high-volume verification submissions. Scalability must therefore be designed and measured at every implementation stage, rather than deferred until after a receipt interface is fixed.
+
+Potential mechanisms include individual anchors, batched receipt roots, off-chain queues, proof aggregation, recursive proofs, and later data-availability or parallel-ingestion approaches. None is selected by this document.
+
+Every proposed mechanism must state:
+
+- the receipt workload and payload assumptions;
+- what is included directly on-chain versus represented by a batch root or proof;
+- submission, inclusion, confirmation, and verification latency definitions;
+- throughput, fee, block-space, state-growth, and indexer implications;
+- P2P propagation, reorganization, withholding, replay, data-availability, and censorship risks; and
+- fallback, retry, audit, and individual-receipt verification behavior.
+
+A batch or rollup may improve efficiency, but it must not overstate assurance: a receipt covered only by a batch commitment or proof needs clear inclusion and verification semantics.
+
+## 9. Receipt Profiles and Use Cases
 
 The initial AVR targets off-chain AI activity. The receipt architecture is also intended to support versioned profiles for enterprise agents, agent-to-agent interactions, AI-generated-content provenance, AI supply chains, robotics, vehicles, drones, and other autonomous machines. See [Autonomous Machines Product Vision](./autonomous-machines-product-vision.md).
 
@@ -153,7 +170,7 @@ Each profile must define its own evidence boundary, identity/authority semantics
 
 Full cryptographic proof of frontier-model inference is not an initial requirement. Initial proof exploration focuses on the wrapper around AI or machine activity: identity, configuration, policy, authority, approval, and committed evidence.
 
-## 9. Illustrative Verification Receipt
+## 10. Illustrative Verification Receipt
 
 This sample is **non-normative**. It shows the intended information categories only. Field names, encodings, required fields, and storage locations are **TBD**.
 
@@ -197,7 +214,7 @@ This sample is **non-normative**. It shows the intended information categories o
 
 For an unproved receipt, the `zk` section may be absent or may explicitly state that no proof is attached. The final convention is **TBD**.
 
-## 10. Open Decisions
+## 11. Open Decisions
 
 | ID | Decision | Status |
 |---|---|---|
@@ -218,8 +235,9 @@ For an unproved receipt, the `zk` section may be absent or may explicitly state 
 | ID-003 | Configuration, policy, and authority reference/registry model | TBD |
 | ZK-005 | Initial private policy/authority claims eligible for ZK evaluation | TBD |
 | SCALE-001 | Receipt batching, aggregation, recursion, and throughput strategy | TBD |
+| SCALE-002 | Workload, confirmation-latency, block/state/indexer-growth, and capacity targets | TBD |
 
-## 11. Maintenance Rules
+## 12. Maintenance Rules
 
 - Keep document versioning separate from the future AVR protocol/schema version.
 - When an open decision is resolved, update the relevant architecture section and decision row together.
@@ -227,7 +245,7 @@ For an unproved receipt, the `zk` section may be absent or may explicitly state 
 - Keep agreed choices separate from candidates and evaluation items.
 - Preserve assurance and privacy boundaries as implementation details evolve.
 
-## 12. Change Log
+## 13. Change Log
 
 | Version | Date | Change | Decision reference |
 |---|---|---|---|
@@ -235,4 +253,5 @@ For an unproved receipt, the `zk` section may be absent or may explicitly state 
 | 0.2 | 2026-08-19 | Recorded versioned, contract-level Phase 1B prototype boundary | Prototype only; AVR decisions remain TBD |
 | 0.3 | 2026-08-19 | Expanded product scope to autonomous-machine receipt profiles and identity/authority use cases | Product direction; decisions remain TBD |
 | 0.4 | 2026-08-19 | Recorded contract-level identity and authority prototype boundary | ID-001–003 and AVR-004 remain TBD |
+| 0.5 | 2026-08-19 | Added mandatory capacity, batching/rollup, and aggregation evaluation requirements | SCALE-001–002 remain TBD |
 | X.Y | YYYY-MM-DD | Describe the change | Decision ID or link |
