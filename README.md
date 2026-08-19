@@ -45,6 +45,7 @@ See [Development Environments](./docs/development-environments.md) for the initi
 
 - [Core L1 Architecture and Tooling](./docs/core-l1-architecture-and-tooling.md)
 - [AI Verification & ZK Architecture](./docs/ai-verification-and-zk-architecture.md)
+- [AVR Prototype Specification](./docs/avr-prototype-specification.md)
 - [Development Plan](./docs/development-plan.md)
 - [Development Environments](./docs/development-environments.md)
 - [ADR-0001: Core-Geth Development Baseline](./docs/decisions/0001-core-geth-development-baseline.md)

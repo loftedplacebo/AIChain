@@ -3,8 +3,8 @@
 | Field | Value |
 |---|---|
 | Status | Living design document |
-| Document version | 0.1 |
-| Last updated | 2026-08-16 |
+| Document version | 0.2 |
+| Last updated | 2026-08-19 |
 | Protocol/schema version | **TBD** |
 | Decision state | Product direction agreed; unresolved items are marked **TBD** |
 | Companion document | [Core L1 Architecture and Tooling](./core-l1-architecture-and-tooling.md) |
@@ -45,6 +45,12 @@ flowchart TD
 ```
 
 The exact division between transaction input, contract or protocol state, logs/events, and external data references is **TBD**.
+
+### 3.1 Phase 1B Prototype Boundary
+
+The Phase 1B prototype uses a versioned **Solidity event-and-state anchor contract** rather than a Core-Geth protocol modification. It accepts only a receipt identifier, a commitments root, and a schema version; the submitting EVM account is recorded as the prototype issuer. Raw AI artifacts, model/provider names, configuration values, policies, signatures, and ZK proofs are excluded from the transaction.
+
+This is an implementation experiment, not a resolution of **AVR-001** through **AVR-006** or a final decision about native placement, hash construction, or attestation trust. A later version may use a new contract, a migration record, or a native protocol mechanism.
 
 ## 4. AI Verification Receipt
 
@@ -206,5 +212,5 @@ For an unproved receipt, the `zk` section may be absent or may explicitly state 
 | Version | Date | Change | Decision reference |
 |---|---|---|---|
 | 0.1 | 2026-08-16 | Initial AVR and ZK architecture baseline | Agreed core product direction |
+| 0.2 | 2026-08-19 | Recorded versioned, contract-level Phase 1B prototype boundary | Prototype only; AVR decisions remain TBD |
 | X.Y | YYYY-MM-DD | Describe the change | Decision ID or link |
-

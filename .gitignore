@@ -2,6 +2,7 @@
 .toolchains/
 .gocache/
 .gomodcache/
+.npm-cache/
 
 # Build outputs
 bin/

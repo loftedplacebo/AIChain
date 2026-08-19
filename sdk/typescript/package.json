@@ -1,0 +1,8 @@
+{
+  "name": "@aichain/avr-sdk-prototype",
+  "private": true,
+  "version": "0.1.0-draft",
+  "scripts": {
+    "test": "node --test"
+  }
+}
