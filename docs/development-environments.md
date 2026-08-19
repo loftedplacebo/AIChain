@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Living operations guide |
-| Document version | 0.5 |
+| Document version | 0.6 |
 | Last updated | 2026-08-19 |
 | Scope | Local development network and remote development-node access |
 | Network status | Private, development-only; not a public testnet |
@@ -47,6 +47,19 @@ bash ./scripts/anchor-sample-avr.sh
 The script submits the fixture at `fixtures/avr/receipt-v0.1.0-draft.json` to the contract above. It prompts privately for the existing devnet keystore password, creates a mode-600 temporary password file only for Foundry, and removes it on exit. Do not enter a raw private key, paste a password into chat, or expose the localhost RPC endpoint.
 
 This fixture is intentionally public and carries the `unproved` assurance level. A successful transaction demonstrates receipt anchoring only; it does not prove an AI execution or settle the final AVR schema.
+
+#### First Anchored Sample Receipt
+
+| Item | Value |
+|---|---|
+| Receipt ID | `0x12513ac64f1855af0978a1ef8770cfda878af5e8fca6151b0f08ba76c482da73` |
+| Commitments root | `0x56e5f4534cf10e7fdfe0fa466072ba996d7d8fa9896ad746895ff1ff5bd6823b` |
+| Anchor transaction | `0xa70757849182611803891056d99abd46a90a8f97e7f21c437eebfd4768283802` |
+| Inclusion block | `8126` (`0x2ecb0b72d42eb9b5cf90765158f7844807b9ed19319e84f0918382c4d00c0261`) |
+| Receipt status | Successful (`1`) |
+| Event | `ReceiptAnchored` emitted by `AVRAnchor` |
+
+The event’s indexed receipt ID, commitments root, and issuer match the committed sample fixture and the submitting devnet account. This is the first confirmed Phase 1B end-to-end receipt anchor.
 
 ## 2. SSH Access
 
@@ -144,4 +157,4 @@ VPS service management, firewall rules, and user hardening remain explicit opera
 | 0.2 | 2026-08-18 | Recorded deployed VPS baseline and non-mining devnet node state |
 | 0.3 | 2026-08-18 | Recorded start of development mining and first produced block |
 | 0.4 | 2026-08-19 | Recorded Phase 1B AVR anchor deployment on the private devnet |
-| 0.5 | 2026-08-19 | Added repeatable sample-receipt anchoring workflow |
+| 0.5 | 2026-08-19 | Added repeatable sample-receipt anchoring workflow and recorded the first confirmed sample anchor |
