@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Living operations guide |
-| Document version | 1.4 |
+| Document version | 1.5 |
 | Last updated | 2026-08-19 |
 | Scope | Local development network and remote development-node access |
 | Network status | Private, development-only; not a public testnet |
@@ -138,6 +138,18 @@ bash ./scripts/register-demo-agent.sh
 
 The script prompts privately for the controller keystore password, sends two devnet transactions, and reads `isActive` afterwards. It intentionally refuses to treat the demo label or hash as a real-world identity, policy, credential, or legal authority.
 
+The demo delegation was successfully created and confirmed active:
+
+| Item | Value |
+|---|---|
+| Organisation registration transaction | `0xb080e545d3be582010f7b7f31a37a500f1be1746480404aee86a8a4608a0943f` |
+| Registration block | `8243` (`0xe9e3492d0b020ea1cd4fe8a2152e70a9fc52c5ffcd9017425bfd97c6f9f6f25e`) |
+| Agent authorization transaction | `0xca1926b304ae9009a2b40ec4b68f36845e8176fa5c3e8f81d5d244bddad71e87` |
+| Authorization block | `8244` (`0x82c0e249d04c0fe19228beeab6b71f90f23ce4df11748a2dd321f578e691d974`) |
+| Active delegation check | `true` |
+
+The `true` result means the registry has an unrevoked delegation for the agent and current chain time lies within its recorded validity window. It does not establish real-world identity, policy compliance, or authority beyond the prototype contract's defined semantics.
+
 #### First Anchored Sample Receipt
 
 | Item | Value |
@@ -263,3 +275,4 @@ VPS service management, firewall rules, and user hardening remain explicit opera
 | 1.2 | 2026-08-19 | Recorded verified issuer attestation for the second demonstration receipt |
 | 1.3 | 2026-08-19 | Recorded Phase 1B AuthorityRegistry deployment |
 | 1.4 | 2026-08-19 | Added distinct demo agent wallet and repeatable controller-delegation workflow |
+| 1.5 | 2026-08-19 | Recorded successful demo organisation registration and active agent delegation |
