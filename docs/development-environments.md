@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Living operations guide |
-| Document version | 1.3 |
+| Document version | 1.4 |
 | Last updated | 2026-08-19 |
 | Scope | Local development network and remote development-node access |
 | Network status | Private, development-only; not a public testnet |
@@ -116,6 +116,27 @@ The signature is public verification data, not a private key. The encrypted keys
 | Status | Deployed 2026-08-19; development-only and unaudited |
 
 The registry has not yet been populated. Any forthcoming organisation ID, agent address, authority commitment, and validity interval are test data until an identity, credential, delegation, and authority model is explicitly agreed.
+
+#### Demo Organisation and Agent Delegation
+
+The separate devnet agent wallet is `0x82F0165D1b77C69978E4127d347023680f685365`. The committed `register-demo-agent.sh` script uses the following clearly labelled demo values:
+
+| Item | Value |
+|---|---|
+| Organisation ID | `0x7550d2eadaa6602b06879e581f21ec46469c1325f4a5731e7db99ea9e677141a` (`keccak256("aichain:demo-organization:phase-1b")`) |
+| Authority commitment | `0x5a4e0654d0c7b9b2c8e3c40bae47e94b95b81aad794c5a7ccafa82a516b56bb4` (`keccak256("aichain:demo-authority:agent-1:v1")`) |
+| Agent | `0x82F0165D1b77C69978E4127d347023680f685365` |
+| Validity | Current chain timestamp through 30 days later |
+
+To register the organisation and delegate the authority using the controller wallet:
+
+```bash
+cd /opt/aichain
+git pull --ff-only
+bash ./scripts/register-demo-agent.sh
+```
+
+The script prompts privately for the controller keystore password, sends two devnet transactions, and reads `isActive` afterwards. It intentionally refuses to treat the demo label or hash as a real-world identity, policy, credential, or legal authority.
 
 #### First Anchored Sample Receipt
 
@@ -241,3 +262,4 @@ VPS service management, firewall rules, and user hardening remain explicit opera
 | 1.1 | 2026-08-19 | Added optional prototype issuer-attestation workflow |
 | 1.2 | 2026-08-19 | Recorded verified issuer attestation for the second demonstration receipt |
 | 1.3 | 2026-08-19 | Recorded Phase 1B AuthorityRegistry deployment |
+| 1.4 | 2026-08-19 | Added distinct demo agent wallet and repeatable controller-delegation workflow |
