@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Living delivery plan |
-| Document version | 0.2 |
+| Document version | 0.3 |
 | Last updated | 2026-08-18 |
 | Architecture inputs | [Core L1 Architecture and Tooling](./core-l1-architecture-and-tooling.md); [AI Verification & ZK Architecture](./ai-verification-and-zk-architecture.md) |
 | Schedule | Dates, durations, staffing, and owners are **TBD** |
@@ -11,7 +11,7 @@
 
 ## 1. Objective
 
-Deliver an independent, Core-Geth-derived, EVM-compatible Proof-of-Work L1 whose core product is the **AI Verification Receipt (AVR) layer**, with optional proofs generated off-chain and supported ZK proofs verified on-chain.
+Deliver an independent, Core-Geth-derived, EVM-compatible Proof-of-Work L1 whose core product is the **AI Verification Receipt (AVR) layer**, evolving through versioned profiles toward verification for autonomous agents and machines. Proofs are generated off-chain and supported ZK proofs are verified on-chain.
 
 This plan does **not** select the mining algorithm, Core-Geth baseline, chain parameters, coin economics, AVR schema, attestation model, proof statements, or ZK stack. Those choices must pass the decision gates in this document and then be recorded in the architecture documents.
 
@@ -25,6 +25,7 @@ This plan does **not** select the mining algorithm, Core-Geth baseline, chain pa
 - **Evidence-based decisions:** Benchmarks and prototypes inform choices, but a temporary configuration does not close a decision gate.
 - **Quantum-resilience requirement:** The PoW selection must include a documented quantum-threat assessment and rationale. This is distinct from any future decision on wallet/account signature migration.
 - **Version everything public:** Receipt schemas, proof statements, verifier interfaces, RPC extensions, SDKs, and network releases require explicit versions.
+- **Profile before expansion:** Each new domain—such as agents, robots, vehicles, drones, or content provenance—requires an explicit receipt profile, assurance boundary, privacy review, and threat model before implementation.
 
 ## 3. Target End-to-End Product Slice
 
@@ -115,6 +116,7 @@ Security, privacy, compatibility, documentation, and operations run across every
 - Contract/event-based anchoring prototype for testing semantics; this does not settle final on-chain placement.
 - Python and TypeScript prototypes for receipt creation, submission, lookup, and local verification.
 - End-to-end flow from off-chain execution fixture to chain inclusion and retrieval.
+- Profile-design criteria for identity, authority, configuration, policy, approval, and machine evidence; no registry or credential system is presumed by this phase.
 
 **Exit gate**
 
@@ -163,6 +165,7 @@ Security, privacy, compatibility, documentation, and operations run across every
 - Valid proofs verify against the intended receipt and public inputs; altered, malformed, substituted, and wrong-version proofs fail.
 - Public documentation states exactly what the proof does and does not establish.
 - **ZK-003** and **ZK-004** are resolved to the level required by the chosen release scope.
+- Any initial private authority or policy claim is explicitly scoped under **ZK-005**; proof of frontier-model inference remains out of the initial release scope.
 
 ### Phase 3 — Integrated Alpha
 
@@ -257,6 +260,7 @@ Security, privacy, compatibility, documentation, and operations run across every
 | DG-6 | **ZK-001** proof statements and public inputs | Candidate implementations are described as product proofs |
 | DG-7 | **ZK-002–004** stack, aggregation scope, verifier, and upgrades | ZK release scope is frozen |
 | DG-8 | Testnet targets, supported versions, security findings, and residual risks | Mainnet release-candidate approval |
+| DG-9 | **ID-001–003**, **AVR-007**, and applicable domain threat model | A machine-identity/authority or autonomous-machine profile is released |
 
 A gate closes only when its decision is recorded in the relevant architecture document or decision record. A benchmark, prototype, or temporary configuration does not close a gate.
 
@@ -303,5 +307,6 @@ The first implementation increment should:
 | Version | Date | Change | Reference |
 |---|---|---|---|
 | 0.2 | 2026-08-18 | Added quantum-resilience requirement to PoW evaluation and decision gate | L1-001 |
+| 0.3 | 2026-08-19 | Added autonomous-machine profiles and identity/authority release gate | Product direction; decisions remain TBD |
 | 0.1 | 2026-08-18 | Initial phased development plan | Architecture documents v0.1 |
 | X.Y | YYYY-MM-DD | Describe the change | Decision ID or link |

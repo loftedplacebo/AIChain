@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Living design document |
-| Document version | 0.2 |
+| Document version | 0.3 |
 | Last updated | 2026-08-19 |
 | Protocol/schema version | **TBD** |
 | Decision state | Product direction agreed; unresolved items are marked **TBD** |
@@ -19,7 +19,7 @@ AI inference and agent execution remain off-chain. The chain records the verific
 
 | Area | Direction | Status |
 |---|---|---|
-| Product focus | AI Verification Receipts | Agreed |
+| Product focus | AI Verification Receipts, evolving toward a general Verification Receipt primitive for autonomous machines | AVR is agreed; broader profiles are product direction and schema TBD |
 | AI execution | Off-chain | Agreed |
 | Evidence | Commitments/hashes, execution attestations, and timestamps | Agreed; exact formats TBD |
 | Committed context | Model, provider, configuration, and policy; input/output artifacts as applicable | Agreed direction; schema TBD |
@@ -70,6 +70,8 @@ An AVR binds an AI execution to a defined set of evidence. The final schema and 
 | Execution timestamp | Records a claimed execution time and its source | Source and semantics TBD |
 | ZK proof data/reference | Optionally associates an individual or aggregated proof | Format and storage TBD |
 | Chain anchor | Adds transaction and block inclusion details after submission | Format TBD |
+| Identity/authority commitment or reference | Binds an organisation, agent, model, machine, delegated authority, or credential where relevant | Profile, trust, and revocation rules TBD |
+| Approval commitment or reference | Binds a required human or system approval where relevant | Scope and verification rules TBD |
 
 The canonical encoding, required versus optional fields, hash or commitment construction, field sizes, and receipt identifier derivation are all **TBD**.
 
@@ -139,7 +141,15 @@ Evaluation should cover proof-generation performance, on-chain verification cost
 - Define exactly what each proof reveals before deployment.
 - Do not claim privacy, provenance, or correctness beyond what the chosen commitment, attestation, and proof design establishes.
 
-## 8. Illustrative Verification Receipt
+## 8. Receipt Profiles and Use Cases
+
+The initial AVR targets off-chain AI activity. The receipt architecture is also intended to support versioned profiles for enterprise agents, agent-to-agent interactions, AI-generated-content provenance, AI supply chains, robotics, vehicles, drones, and other autonomous machines. See [Autonomous Machines Product Vision](./autonomous-machines-product-vision.md).
+
+Each profile must define its own evidence boundary, identity/authority semantics, threat model, and assurance language. For example, a content receipt can establish provenance, not factual correctness; a vehicle receipt can bind disclosed incident evidence to a historical anchor, not prove safety or assign liability by itself.
+
+Full cryptographic proof of frontier-model inference is not an initial requirement. Initial proof exploration focuses on the wrapper around AI or machine activity: identity, configuration, policy, authority, approval, and committed evidence.
+
+## 9. Illustrative Verification Receipt
 
 This sample is **non-normative**. It shows the intended information categories only. Field names, encodings, required fields, and storage locations are **TBD**.
 
@@ -183,7 +193,7 @@ This sample is **non-normative**. It shows the intended information categories o
 
 For an unproved receipt, the `zk` section may be absent or may explicitly state that no proof is attached. The final convention is **TBD**.
 
-## 9. Open Decisions
+## 10. Open Decisions
 
 | ID | Decision | Status |
 |---|---|---|
@@ -198,8 +208,14 @@ For an unproved receipt, the `zk` section may be absent or may explicitly state 
 | ZK-003 | Individual and aggregate proof design | TBD |
 | ZK-004 | On-chain verifier integration, cost limits, upgrades, and security review | TBD |
 | PRIV-001 | Disclosure profiles and off-chain storage, access, and retention model | TBD |
+| AVR-007 | Versioned receipt profiles for AI and autonomous-machine domains | TBD |
+| ID-001 | Identity model for organisations, agents, models, and machines | TBD |
+| ID-002 | Credential issuance, delegation, authorization, and revocation model | TBD |
+| ID-003 | Configuration, policy, and authority reference/registry model | TBD |
+| ZK-005 | Initial private policy/authority claims eligible for ZK evaluation | TBD |
+| SCALE-001 | Receipt batching, aggregation, recursion, and throughput strategy | TBD |
 
-## 10. Maintenance Rules
+## 11. Maintenance Rules
 
 - Keep document versioning separate from the future AVR protocol/schema version.
 - When an open decision is resolved, update the relevant architecture section and decision row together.
@@ -207,10 +223,11 @@ For an unproved receipt, the `zk` section may be absent or may explicitly state 
 - Keep agreed choices separate from candidates and evaluation items.
 - Preserve assurance and privacy boundaries as implementation details evolve.
 
-## 11. Change Log
+## 12. Change Log
 
 | Version | Date | Change | Decision reference |
 |---|---|---|---|
 | 0.1 | 2026-08-16 | Initial AVR and ZK architecture baseline | Agreed core product direction |
 | 0.2 | 2026-08-19 | Recorded versioned, contract-level Phase 1B prototype boundary | Prototype only; AVR decisions remain TBD |
+| 0.3 | 2026-08-19 | Expanded product scope to autonomous-machine receipt profiles and identity/authority use cases | Product direction; decisions remain TBD |
 | X.Y | YYYY-MM-DD | Describe the change | Decision ID or link |

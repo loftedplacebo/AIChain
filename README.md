@@ -1,6 +1,6 @@
 # New Dag
 
-New Dag is an independent EVM-compatible Proof-of-Work L1 whose core product is the AI Verification Receipt layer.
+New Dag is an independent EVM-compatible Proof-of-Work L1 whose core product is the AI Verification Receipt layer. The product direction is a neutral verification and audit layer for autonomous AI, with a long-term ambition to serve as a trust layer for autonomous machines.
 
 ## Current Development Baseline
 
@@ -45,6 +45,7 @@ See [Development Environments](./docs/development-environments.md) for the initi
 
 - [Core L1 Architecture and Tooling](./docs/core-l1-architecture-and-tooling.md)
 - [AI Verification & ZK Architecture](./docs/ai-verification-and-zk-architecture.md)
+- [Autonomous Machines Product Vision](./docs/autonomous-machines-product-vision.md)
 - [AVR Prototype Specification](./docs/avr-prototype-specification.md)
 - [Development Plan](./docs/development-plan.md)
 - [Development Environments](./docs/development-environments.md)
