@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Living operations guide |
-| Document version | 0.9 |
+| Document version | 1.0 |
 | Last updated | 2026-08-19 |
 | Scope | Local development network and remote development-node access |
 | Network status | Private, development-only; not a public testnet |
@@ -66,6 +66,18 @@ cd /opt/aichain
 git pull --ff-only
 bash ./scripts/anchor-avr.sh ./fixtures/avr/receipt-v0.1.0-draft-demo-2.json
 ```
+
+The demo receipt was successfully anchored:
+
+| Item | Value |
+|---|---|
+| Receipt ID | `0x39c07a30df34f2f5631bc881b7912f506d94c8a6bdfbc98eb16fe3220c62f647` |
+| Commitments root | `0x6aef2c16cb3f5eca692ed17430be3901ddaec7ce858d766e377e7d6d7aa6e526` |
+| Anchor transaction | `0x2256c0b1b42d147fb368744b58942bb8f6141f3894fc574885e9a5588172cadc` |
+| Inclusion block | `8170` (`0x058348ca19d78d9328b93c47f8b6102affaa6f693083ce49f752fee73097f62d`) |
+| Receipt status | Successful (`1`) |
+
+This is the second confirmed anchor and validates the data-driven path from a distinct receipt JSON through SDK derivation to the deployed contract.
 
 #### First Anchored Sample Receipt
 
@@ -187,3 +199,4 @@ VPS service management, firewall rules, and user hardening remain explicit opera
 | 0.7 | 2026-08-19 | Added read-only anchor retrieval and SDK verification workflow |
 | 0.8 | 2026-08-19 | Added data-driven receipt submission workflow |
 | 0.9 | 2026-08-19 | Added a distinct, ready-to-submit demonstration receipt |
+| 1.0 | 2026-08-19 | Recorded successful data-driven submission of the second demonstration receipt |
