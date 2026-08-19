@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Living operations guide |
-| Document version | 0.4 |
+| Document version | 0.5 |
 | Last updated | 2026-08-19 |
 | Scope | Local development network and remote development-node access |
 | Network status | Private, development-only; not a public testnet |
@@ -33,6 +33,20 @@ The VPS currently runs the pinned Core-Geth `v1.12.23` baseline on the Phase 1A 
 | Status | Deployed 2026-08-19; development-only; not audited or a protocol decision |
 
 The contract anchors only a receipt identifier, commitments root, schema version, issuer account, and inclusion time. It does not validate AI execution, identity authority, signatures, timestamps, or ZK proofs. See the [AVR Prototype Specification](./avr-prototype-specification.md).
+
+#### Submit the Sample Receipt
+
+After updating the VPS checkout, run the committed script on the VPS:
+
+```bash
+cd /opt/aichain
+git pull --ff-only
+bash ./scripts/anchor-sample-avr.sh
+```
+
+The script submits the fixture at `fixtures/avr/receipt-v0.1.0-draft.json` to the contract above. It prompts privately for the existing devnet keystore password, creates a mode-600 temporary password file only for Foundry, and removes it on exit. Do not enter a raw private key, paste a password into chat, or expose the localhost RPC endpoint.
+
+This fixture is intentionally public and carries the `unproved` assurance level. A successful transaction demonstrates receipt anchoring only; it does not prove an AI execution or settle the final AVR schema.
 
 ## 2. SSH Access
 
@@ -130,3 +144,4 @@ VPS service management, firewall rules, and user hardening remain explicit opera
 | 0.2 | 2026-08-18 | Recorded deployed VPS baseline and non-mining devnet node state |
 | 0.3 | 2026-08-18 | Recorded start of development mining and first produced block |
 | 0.4 | 2026-08-19 | Recorded Phase 1B AVR anchor deployment on the private devnet |
+| 0.5 | 2026-08-19 | Added repeatable sample-receipt anchoring workflow |
