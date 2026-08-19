@@ -6,11 +6,19 @@ const { deriveReceipt, prepareAnchor, verifyReceiptAgainstAnchor } = require("./
 
 const fixturePath = path.join(__dirname, "..", "..", "fixtures", "avr", "receipt-v0.1.0-draft.json");
 const fixture = JSON.parse(fs.readFileSync(fixturePath, "utf8"));
+const demoFixturePath = path.join(__dirname, "..", "..", "fixtures", "avr", "receipt-v0.1.0-draft-demo-2.json");
+const demoFixture = JSON.parse(fs.readFileSync(demoFixturePath, "utf8"));
 
 test("derives the fixture receipt ID and commitments root", () => {
   const derived = deriveReceipt(fixture);
   assert.equal(derived.receiptId, fixture.expected.receiptId);
   assert.equal(derived.commitmentsRoot, fixture.expected.commitmentsRoot);
+});
+
+test("derives the second demo receipt ID and commitments root", () => {
+  const derived = deriveReceipt(demoFixture);
+  assert.equal(derived.receiptId, demoFixture.expected.receiptId);
+  assert.equal(derived.commitmentsRoot, demoFixture.expected.commitmentsRoot);
 });
 
 test("changes the receipt ID when a committed value changes", () => {

@@ -4,10 +4,18 @@ from receipt import derive_receipt, prepare_anchor, verify_receipt_against_ancho
 
 
 FIXTURE = Path(__file__).parents[2] / "fixtures" / "avr" / "receipt-v0.1.0-draft.json"
+DEMO_FIXTURE = Path(__file__).parents[2] / "fixtures" / "avr" / "receipt-v0.1.0-draft-demo-2.json"
 
 
 def test_fixture_identifiers():
     fixture = json.loads(FIXTURE.read_text(encoding="utf-8"))
+    derived = derive_receipt(fixture)
+    assert derived["receiptId"] == fixture["expected"]["receiptId"]
+    assert derived["commitmentsRoot"] == fixture["expected"]["commitmentsRoot"]
+
+
+def test_second_demo_fixture_identifiers():
+    fixture = json.loads(DEMO_FIXTURE.read_text(encoding="utf-8"))
     derived = derive_receipt(fixture)
     assert derived["receiptId"] == fixture["expected"]["receiptId"]
     assert derived["commitmentsRoot"] == fixture["expected"]["commitmentsRoot"]

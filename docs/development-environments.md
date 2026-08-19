@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Living operations guide |
-| Document version | 0.8 |
+| Document version | 0.9 |
 | Last updated | 2026-08-19 |
 | Scope | Local development network and remote development-node access |
 | Network status | Private, development-only; not a public testnet |
@@ -56,6 +56,16 @@ bash ./scripts/anchor-avr.sh /absolute/path/to/receipt.json
 ```
 
 The script derives the anchor values from the JSON through the Python SDK before it signs. The claimed receipt issuer must match the signing devnet account whenever issuer identity is part of the intended assurance claim; the current prototype reports but does not enforce that rule.
+
+#### Ready-to-Submit Second Demo Receipt
+
+`fixtures/avr/receipt-v0.1.0-draft-demo-2.json` is a second, non-sensitive, unproved receipt prepared for the same devnet issuer. It has a distinct receipt ID and commitments root, so it can be anchored after the first sample without triggering the duplicate-receipt guard. Its opaque commitment values are demonstration data, not evidence of a real AI execution.
+
+```bash
+cd /opt/aichain
+git pull --ff-only
+bash ./scripts/anchor-avr.sh ./fixtures/avr/receipt-v0.1.0-draft-demo-2.json
+```
 
 #### First Anchored Sample Receipt
 
@@ -176,3 +186,4 @@ VPS service management, firewall rules, and user hardening remain explicit opera
 | 0.5 | 2026-08-19 | Added repeatable sample-receipt anchoring workflow and recorded the first confirmed sample anchor |
 | 0.7 | 2026-08-19 | Added read-only anchor retrieval and SDK verification workflow |
 | 0.8 | 2026-08-19 | Added data-driven receipt submission workflow |
+| 0.9 | 2026-08-19 | Added a distinct, ready-to-submit demonstration receipt |
