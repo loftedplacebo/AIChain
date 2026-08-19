@@ -25,3 +25,26 @@ def derive_receipt(receipt: dict) -> dict:
         "receiptId": sha256_hex(RECEIPT_DOMAIN, canonical_receipt),
         "commitmentsRoot": sha256_hex(COMMITMENTS_DOMAIN, canonical_commitments),
     }
+
+
+def verify_receipt_against_anchor(receipt: dict, anchor: dict) -> dict:
+    """Compare a locally derived prototype receipt against a retrieved anchor."""
+    derived = derive_receipt(receipt)
+    issuer_matches = (
+        not anchor.get("issuer")
+        or not receipt.get("issuer")
+        or anchor["issuer"].lower() == receipt["issuer"].lower()
+    )
+    result = {
+        "receiptId": derived["receiptId"],
+        "commitmentsRoot": derived["commitmentsRoot"],
+        "receiptIdMatches": not anchor.get("receiptId") or anchor["receiptId"].lower() == derived["receiptId"].lower(),
+        "commitmentsRootMatches": anchor["commitmentsRoot"].lower() == derived["commitmentsRoot"].lower(),
+        "schemaVersionMatches": anchor["schemaVersion"] == receipt["schemaVersion"],
+        "issuerMatches": issuer_matches,
+    }
+    result["valid"] = all(
+        result[key]
+        for key in ("receiptIdMatches", "commitmentsRootMatches", "schemaVersionMatches", "issuerMatches")
+    )
+    return result

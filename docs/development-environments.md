@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Living operations guide |
-| Document version | 0.6 |
+| Document version | 0.7 |
 | Last updated | 2026-08-19 |
 | Scope | Local development network and remote development-node access |
 | Network status | Private, development-only; not a public testnet |
@@ -60,6 +60,13 @@ This fixture is intentionally public and carries the `unproved` assurance level.
 | Event | `ReceiptAnchored` emitted by `AVRAnchor` |
 
 The event’s indexed receipt ID, commitments root, and issuer match the committed sample fixture and the submitting devnet account. This is the first confirmed Phase 1B end-to-end receipt anchor.
+
+To retrieve the anchor without signing or using a password:
+
+```bash
+cd /opt/aichain
+bash ./scripts/read-sample-avr-anchor.sh
+```
 
 ## 2. SSH Access
 
@@ -158,3 +165,4 @@ VPS service management, firewall rules, and user hardening remain explicit opera
 | 0.3 | 2026-08-18 | Recorded start of development mining and first produced block |
 | 0.4 | 2026-08-19 | Recorded Phase 1B AVR anchor deployment on the private devnet |
 | 0.5 | 2026-08-19 | Added repeatable sample-receipt anchoring workflow and recorded the first confirmed sample anchor |
+| 0.7 | 2026-08-19 | Added read-only anchor retrieval and SDK verification workflow |

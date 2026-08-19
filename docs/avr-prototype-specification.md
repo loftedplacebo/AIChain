@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Phase 1B prototype specification |
-| Document version | 0.1 |
+| Document version | 0.2 |
 | Last updated | 2026-08-19 |
 | Receipt schema version | `0.1.0-draft` |
 | Protocol status | Non-final; does not settle AVR protocol decisions |
@@ -74,8 +74,15 @@ No proxy, admin key, or upgrade authority is introduced in this prototype. Choos
 
 The common fixture is at `fixtures/avr/receipt-v0.1.0-draft.json`. Python and TypeScript tests must derive the same receipt ID and commitments root, and must detect a changed committed value.
 
+### 6.1 Retrieval and Local Verification
+
+The Python and TypeScript prototypes expose `verify_receipt_against_anchor` / `verifyReceiptAgainstAnchor`. Given a locally held receipt and a retrieved anchor, each implementation compares the derived receipt ID and commitments root plus the schema version and, where supplied, issuer address. A changed committed value must fail verification against the original anchor.
+
+`scripts/read-sample-avr-anchor.sh` performs a read-only `getAnchor` call for the first sample receipt using localhost RPC. It does not require a password or sign a transaction.
+
 ## 7. Change Log
 
 | Version | Date | Change |
 |---|---|---|
 | 0.1 | 2026-08-19 | Initial Phase 1B prototype specification |
+| 0.2 | 2026-08-19 | Added local anchor-verification behavior and read-only retrieval workflow |

@@ -27,4 +27,18 @@ function deriveReceipt(receipt) {
   };
 }
 
-module.exports = { canonicalize, deriveReceipt };
+function verifyReceiptAgainstAnchor(receipt, anchor) {
+  const derived = deriveReceipt(receipt);
+  const issuerMatches = !anchor.issuer || !receipt.issuer || anchor.issuer.toLowerCase() === receipt.issuer.toLowerCase();
+  const result = {
+    receiptId: derived.receiptId,
+    commitmentsRoot: derived.commitmentsRoot,
+    receiptIdMatches: !anchor.receiptId || anchor.receiptId.toLowerCase() === derived.receiptId.toLowerCase(),
+    commitmentsRootMatches: anchor.commitmentsRoot.toLowerCase() === derived.commitmentsRoot.toLowerCase(),
+    schemaVersionMatches: anchor.schemaVersion === receipt.schemaVersion,
+    issuerMatches
+  };
+  return { ...result, valid: result.receiptIdMatches && result.commitmentsRootMatches && result.schemaVersionMatches && result.issuerMatches };
+}
+
+module.exports = { canonicalize, deriveReceipt, verifyReceiptAgainstAnchor };
