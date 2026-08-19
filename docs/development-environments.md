@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Living operations guide |
-| Document version | 1.1 |
+| Document version | 1.2 |
 | Last updated | 2026-08-19 |
 | Scope | Local development network and remote development-node access |
 | Network status | Private, development-only; not a public testnet |
@@ -91,6 +91,18 @@ bash ./scripts/sign-avr-attestation.sh \
 ```
 
 The script prompts privately for the encrypted keystore password, signs the domain-separated receipt-ID message, cryptographically verifies the result against the claimed issuer, and writes a JSON sidecar. This is an optional Phase 1B prototype feature; the deployed contract does not yet verify or store the signature.
+
+The second demo receipt has a verified attestation sidecar:
+
+| Item | Value |
+|---|---|
+| Receipt ID | `0x39c07a30df34f2f5631bc881b7912f506d94c8a6bdfbc98eb16fe3220c62f647` |
+| Scheme | `eip191-personal-sign` |
+| Verified issuer | `0xccF9f75DdbDC548eaDeF8aC3CA5EA18B10fD71CE` |
+| Signature | `0x0d3db31c0e387956d5124d7dd5e9cdc578ffe7a0be87a4e266aee4c755db3bfe025476245a2bc66ee2e26569f2b4a3353bd6277e114b6b79dddbb1a3be6e23331c` |
+| Status | Created and cryptographically verified on the VPS, 2026-08-19 |
+
+The signature is public verification data, not a private key. The encrypted keystore and password remain only on the VPS.
 
 #### First Anchored Sample Receipt
 
@@ -214,3 +226,4 @@ VPS service management, firewall rules, and user hardening remain explicit opera
 | 0.9 | 2026-08-19 | Added a distinct, ready-to-submit demonstration receipt |
 | 1.0 | 2026-08-19 | Recorded successful data-driven submission of the second demonstration receipt |
 | 1.1 | 2026-08-19 | Added optional prototype issuer-attestation workflow |
+| 1.2 | 2026-08-19 | Recorded verified issuer attestation for the second demonstration receipt |
