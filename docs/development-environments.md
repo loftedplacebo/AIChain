@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Living operations guide |
-| Document version | 1.0 |
+| Document version | 1.1 |
 | Last updated | 2026-08-19 |
 | Scope | Local development network and remote development-node access |
 | Network status | Private, development-only; not a public testnet |
@@ -78,6 +78,19 @@ The demo receipt was successfully anchored:
 | Receipt status | Successful (`1`) |
 
 This is the second confirmed anchor and validates the data-driven path from a distinct receipt JSON through SDK derivation to the deployed contract.
+
+#### Optional Issuer Attestation
+
+To create a separately verifiable EIP-191 signature for a receipt before or after anchoring, run:
+
+```bash
+cd /opt/aichain
+bash ./scripts/sign-avr-attestation.sh \
+  ./fixtures/avr/receipt-v0.1.0-draft-demo-2.json \
+  /opt/aichain/devnet/demo-2.attestation.json
+```
+
+The script prompts privately for the encrypted keystore password, signs the domain-separated receipt-ID message, cryptographically verifies the result against the claimed issuer, and writes a JSON sidecar. This is an optional Phase 1B prototype feature; the deployed contract does not yet verify or store the signature.
 
 #### First Anchored Sample Receipt
 
@@ -200,3 +213,4 @@ VPS service management, firewall rules, and user hardening remain explicit opera
 | 0.8 | 2026-08-19 | Added data-driven receipt submission workflow |
 | 0.9 | 2026-08-19 | Added a distinct, ready-to-submit demonstration receipt |
 | 1.0 | 2026-08-19 | Recorded successful data-driven submission of the second demonstration receipt |
+| 1.1 | 2026-08-19 | Added optional prototype issuer-attestation workflow |

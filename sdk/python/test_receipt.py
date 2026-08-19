@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from receipt import derive_receipt, prepare_anchor, verify_receipt_against_anchor
+from receipt import derive_receipt, prepare_anchor, prepare_attestation, verify_receipt_against_anchor
 
 
 FIXTURE = Path(__file__).parents[2] / "fixtures" / "avr" / "receipt-v0.1.0-draft.json"
@@ -52,3 +52,13 @@ def test_prepares_contract_anchor_fields():
         "schemaVersion": fixture["schemaVersion"],
         "claimedIssuer": fixture["issuer"],
     }
+
+
+def test_prepares_attestation_without_changing_receipt_id():
+    fixture = json.loads(FIXTURE.read_text(encoding="utf-8"))
+    before = derive_receipt(fixture)["receiptId"]
+    attestation = prepare_attestation(fixture)
+    signed = {**fixture, "attestation": {**attestation, "signature": "0x" + "11" * 65}}
+    assert attestation["receiptId"] == before
+    assert derive_receipt(signed)["receiptId"] == before
+    assert attestation["message"] == "AIChain AVR v0.1.0-draft receipt: " + before

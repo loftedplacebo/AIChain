@@ -2,6 +2,7 @@ const crypto = require("node:crypto");
 
 const RECEIPT_DOMAIN = "aichain:avr:0.1.0-draft:";
 const COMMITMENTS_DOMAIN = "aichain:avr:commitments:0.1.0-draft:";
+const ATTESTATION_MESSAGE_DOMAIN = "AIChain AVR v0.1.0-draft receipt: ";
 
 function canonicalize(value) {
   if (Array.isArray(value)) return `[${value.map(canonicalize).join(",")}]`;
@@ -16,7 +17,7 @@ function sha256Hex(domain, canonicalValue) {
 }
 
 function deriveReceipt(receipt) {
-  const { expected, ...payload } = receipt;
+  const { expected, attestation, ...payload } = receipt;
   const canonicalReceipt = canonicalize(payload);
   const canonicalCommitments = canonicalize(payload.commitments);
   return {
@@ -24,6 +25,18 @@ function deriveReceipt(receipt) {
     canonicalCommitments,
     receiptId: sha256Hex(RECEIPT_DOMAIN, canonicalReceipt),
     commitmentsRoot: sha256Hex(COMMITMENTS_DOMAIN, canonicalCommitments)
+  };
+}
+
+function prepareAttestation(receipt) {
+  const { receiptId } = deriveReceipt(receipt);
+  return {
+    schema: "aichain.avr-attestation",
+    schemaVersion: "0.1.0-draft",
+    scheme: "eip191-personal-sign",
+    receiptId,
+    issuer: receipt.issuer,
+    message: `${ATTESTATION_MESSAGE_DOMAIN}${receiptId}`
   };
 }
 
@@ -51,4 +64,4 @@ function prepareAnchor(receipt) {
   };
 }
 
-module.exports = { canonicalize, deriveReceipt, prepareAnchor, verifyReceiptAgainstAnchor };
+module.exports = { canonicalize, deriveReceipt, prepareAnchor, prepareAttestation, verifyReceiptAgainstAnchor };

@@ -2,7 +2,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const test = require("node:test");
-const { deriveReceipt, prepareAnchor, verifyReceiptAgainstAnchor } = require("./receipt");
+const { deriveReceipt, prepareAnchor, prepareAttestation, verifyReceiptAgainstAnchor } = require("./receipt");
 
 const fixturePath = path.join(__dirname, "..", "..", "fixtures", "avr", "receipt-v0.1.0-draft.json");
 const fixture = JSON.parse(fs.readFileSync(fixturePath, "utf8"));
@@ -49,4 +49,13 @@ test("prepares the contract anchor fields from a receipt", () => {
     schemaVersion: fixture.schemaVersion,
     claimedIssuer: fixture.issuer
   });
+});
+
+test("prepares a domain-separated attestation without changing the receipt ID", () => {
+  const before = deriveReceipt(fixture).receiptId;
+  const attestation = prepareAttestation(fixture);
+  const signed = { ...fixture, attestation: { ...attestation, signature: `0x${"11".repeat(65)}` } };
+  assert.equal(attestation.receiptId, before);
+  assert.equal(deriveReceipt(signed).receiptId, before);
+  assert.equal(attestation.message, `AIChain AVR v0.1.0-draft receipt: ${before}`);
 });

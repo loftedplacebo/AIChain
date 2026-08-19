@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Phase 1B prototype specification |
-| Document version | 0.3 |
+| Document version | 0.4 |
 | Last updated | 2026-08-19 |
 | Receipt schema version | `0.1.0-draft` |
 | Protocol status | Non-final; does not settle AVR protocol decisions |
@@ -70,17 +70,31 @@ The prototype is designed for replacement rather than mutable in-place semantics
 
 No proxy, admin key, or upgrade authority is introduced in this prototype. Choosing an on-chain upgrade model remains **TBD**.
 
-## 6. Test Fixture
+## 6. Prototype Issuer Attestation
+
+An optional, off-chain attestation sidecar may sign the derived receipt ID without changing it. The prototype message is the UTF-8 string:
+
+```text
+AIChain AVR v0.1.0-draft receipt: <receiptId>
+```
+
+The signer uses **EIP-191 personal-sign**. A sidecar contains its schema/version, receipt ID, claimed issuer address, message, signature scheme, and 65-byte signature. It is cryptographically verified by recovering/checking the claimed address against the original message.
+
+The receipt derivation explicitly excludes `expected` test data and optional `attestation` data. This avoids a circular identifier dependency and keeps existing receipt IDs stable. The sidecar is not stored or verified by `AVRAnchor` in Phase 1B; the anchor continues to record the transaction sender as prototype issuer. Binding a signature, enforcing sender-to-receipt issuer equality, or selecting a final signature scheme remain **TBD**.
+
+## 7. Test Fixture
 
 The common fixture is at `fixtures/avr/receipt-v0.1.0-draft.json`. Python and TypeScript tests must derive the same receipt ID and commitments root, and must detect a changed committed value.
 
-### 6.1 Retrieval and Local Verification
+### 7.1 Retrieval and Local Verification
 
 The Python and TypeScript prototypes expose `prepare_anchor` / `prepareAnchor`, which derive the exact `receiptId`, `commitmentsRoot`, and `schemaVersion` accepted by the contract from any prototype receipt. They also expose `verify_receipt_against_anchor` / `verifyReceiptAgainstAnchor`. Given a locally held receipt and a retrieved anchor, each implementation compares the derived receipt ID and commitments root plus the schema version and, where supplied, issuer address. A changed committed value must fail verification against the original anchor.
 
 `scripts/read-sample-avr-anchor.sh` performs a read-only `getAnchor` call for the first sample receipt using localhost RPC. It does not require a password or sign a transaction.
 
 `scripts/anchor-avr.sh path/to/receipt.json` derives anchor fields through the Python SDK and submits any prototype receipt using the encrypted VPS keystore. The contract records the signing account as issuer; applications must ensure this matches the receipt's claimed issuer whenever that claim is relied upon. This prototype does not yet enforce that relationship in the contract.
+
+`scripts/sign-avr-attestation.sh path/to/receipt.json [output.json]` creates and verifies an EIP-191 signature sidecar using the same encrypted VPS keystore. It prompts privately for the password and refuses to overwrite an existing sidecar.
 
 ## 7. Change Log
 
@@ -89,3 +103,4 @@ The Python and TypeScript prototypes expose `prepare_anchor` / `prepareAnchor`, 
 | 0.1 | 2026-08-19 | Initial Phase 1B prototype specification |
 | 0.2 | 2026-08-19 | Added local anchor-verification behavior and read-only retrieval workflow |
 | 0.3 | 2026-08-19 | Added data-driven SDK anchor preparation and submission workflow |
+| 0.4 | 2026-08-19 | Added optional EIP-191 issuer-attestation sidecar prototype |

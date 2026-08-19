@@ -5,6 +5,7 @@ import json
 
 RECEIPT_DOMAIN = "aichain:avr:0.1.0-draft:"
 COMMITMENTS_DOMAIN = "aichain:avr:commitments:0.1.0-draft:"
+ATTESTATION_MESSAGE_DOMAIN = "AIChain AVR v0.1.0-draft receipt: "
 
 
 def canonicalize(value: object) -> str:
@@ -16,7 +17,7 @@ def sha256_hex(domain: str, canonical_value: str) -> str:
 
 
 def derive_receipt(receipt: dict) -> dict:
-    payload = {key: value for key, value in receipt.items() if key != "expected"}
+    payload = {key: value for key, value in receipt.items() if key not in ("expected", "attestation")}
     canonical_receipt = canonicalize(payload)
     canonical_commitments = canonicalize(payload["commitments"])
     return {
@@ -24,6 +25,19 @@ def derive_receipt(receipt: dict) -> dict:
         "canonicalCommitments": canonical_commitments,
         "receiptId": sha256_hex(RECEIPT_DOMAIN, canonical_receipt),
         "commitmentsRoot": sha256_hex(COMMITMENTS_DOMAIN, canonical_commitments),
+    }
+
+
+def prepare_attestation(receipt: dict) -> dict:
+    """Prepare the EIP-191 message for a prototype receipt attestation."""
+    receipt_id = derive_receipt(receipt)["receiptId"]
+    return {
+        "schema": "aichain.avr-attestation",
+        "schemaVersion": "0.1.0-draft",
+        "scheme": "eip191-personal-sign",
+        "receiptId": receipt_id,
+        "issuer": receipt.get("issuer"),
+        "message": ATTESTATION_MESSAGE_DOMAIN + receipt_id,
     }
 
 
