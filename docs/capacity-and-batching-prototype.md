@@ -216,6 +216,22 @@ python3 ./scripts/verify-benchmark-replication.py \
 
 The signer may use the existing development keystore because it signs locally; it does not imply that Node 2 owns the account. A successful run proves the expected temporary path `client → Node 2 → P2P relay → Node 1 miner → both nodes`. It does not measure external-peer latency or validate a production transaction-ingress architecture.
 
+### 9.4 First Non-Mining Peer Relay Result
+
+| Field | Result |
+|---|---|
+| Date | 2026-08-20 |
+| Network scope | Same-VPS non-mining Node 2 submission and Node 1 mining relay |
+| Workload | 100 synthetic receipts in one 100-leaf batch |
+| Fresh workload namespace | `node-2-relay-1-20260820` |
+| Batch transaction | `0x78aa8ae9a4d3e99c2db36ba5b8433a5e09335390ffabe0d232242c7d75785e1b` |
+| Confirmed block | `15522` |
+| Broadcast logical receipt TPS | 116.10215 |
+| All-confirmed logical receipt TPS | 3.81818 |
+| Replication verification | The confirmed transaction matched on both nodes at shared height `15525` |
+
+The transaction entered through Node 2's RPC, received a confirmed receipt through Node 2, and was independently found through Node 1. This validates the devnet relay path. The one-batch all-confirmed rate is dominated by a 26.19-second PoW confirmation wait and is therefore not a capacity estimate or suitable for comparison with the 10-batch runs.
+
 ## 10. Open Decisions
 
 | ID | Decision | Status |
@@ -237,3 +253,4 @@ The signer may use the existing development keystore because it signs locally; i
 | 0.6 | 2026-08-20 | Added two-node benchmark-replication verification workflow |
 | 0.7 | 2026-08-20 | Recorded first replicated two-node same-VPS concurrent benchmark |
 | 0.8 | 2026-08-20 | Added non-mining Node 2 transaction-submission and relay test workflow |
+| 0.9 | 2026-08-20 | Recorded first successful non-mining peer transaction relay result |
