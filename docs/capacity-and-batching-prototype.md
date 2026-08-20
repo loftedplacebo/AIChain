@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Phase 1B capacity prototype |
-| Document version | 0.4 |
+| Document version | 0.5 |
 | Last updated | 2026-08-20 |
 | Protocol status | Non-final; does not select the production rollup or batching design |
 | Companion documents | [Development Plan](./development-plan.md); [AI Verification & ZK Architecture](./ai-verification-and-zk-architecture.md) |
@@ -151,7 +151,26 @@ The manifest must use a fresh seed so its roots do not collide with earlier anch
 
 The repeated workload makes the distinction between batching efficiency and PoW confirmation variance clearer. Each batch had near-constant gas cost and represented 100 receipts, while confirmation latency varied widely because the temporary one-miner PoW chain is probabilistic and untuned. The next capacity experiment must submit batches concurrently into the transaction pool, then measure acceptance, block packing, queueing, and confirmation distribution separately.
 
-## 9. Open Decisions
+## 9. Fourth Baseline: Concurrent Broadcast of 1,000 Receipts
+
+| Field | Result |
+|---|---|
+| Date | 2026-08-20 |
+| Network scope | Private one-node concurrent broadcast baseline; not P2P or public-network capacity |
+| Workload | 1,000 synthetic receipts, 10 batches, 100 leaves per batch |
+| Root construction | 23.930 seconds before broadcast |
+| Broadcast time | 9.127 seconds |
+| Broadcast transaction TPS | 1.09562 |
+| Broadcast logical receipt TPS | 109.56234 |
+| Time from broadcast start until all receipts confirmed | 37.852 seconds |
+| All-confirmed transaction TPS | 0.26419 |
+| All-confirmed logical receipt TPS | 26.41884 |
+| Block packing | All 10 batch transactions / 1,000 receipts included in block `15162` |
+| Batch gas used | 92,807–92,831; approximately 928.3 gas per logical receipt |
+
+The pending pool accepted the sequential-nonce broadcasts, and the miner packed every batch into one block. Therefore the transaction pool and block gas capacity did not constrain this workload. The confirmation interval remains governed by the temporary one-miner Ethash block-discovery time. These figures must not be described as decentralized-network TPS until the same test passes under multi-node P2P conditions with explicit finality/confirmation policy.
+
+## 10. Open Decisions
 
 | ID | Decision | Status |
 |---|---|---|
@@ -160,7 +179,7 @@ The repeated workload makes the distinction between batching efficiency and PoW 
 | SCALE-003 | Batch data availability, inclusion-proof distribution, retry, and audit model | TBD |
 | SCALE-004 | Whether batching is contract-level, native protocol, rollup-based, or hybrid | TBD |
 
-## 10. Change Log
+## 11. Change Log
 
 | Version | Date | Change |
 |---|---|---|
@@ -168,3 +187,4 @@ The repeated workload makes the distinction between batching efficiency and PoW 
 | 0.2 | 2026-08-20 | Recorded initial 100-receipt serial baseline and improved metric separation |
 | 0.3 | 2026-08-20 | Recorded 100-receipt single-batch baseline and PoW variance interpretation |
 | 0.4 | 2026-08-20 | Recorded 1,000-receipt repeated batch baseline |
+| 0.5 | 2026-08-20 | Recorded concurrent 1,000-receipt block-packing baseline |
