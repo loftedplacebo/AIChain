@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Phase 1B capacity prototype |
-| Document version | 0.2 |
+| Document version | 0.3 |
 | Last updated | 2026-08-20 |
 | Protocol status | Non-final; does not select the production rollup or batching design |
 | Companion documents | [Development Plan](./development-plan.md); [AI Verification & ZK Architecture](./ai-verification-and-zk-architecture.md) |
@@ -89,7 +89,27 @@ The runner creates roots using the same sorted Keccak-256 pair construction as t
 
 This is a preliminary baseline, not a target or a consensus limit. The run is intentionally serial, uses a temporary low-difficulty one-node Ethash development chain, and includes client-side root construction. The benchmark runner now separately reports root-construction time and serial confirmation-only TPS for subsequent runs.
 
-## 7. Open Decisions
+## 7. Second Baseline: 100 Receipts in One Batch
+
+| Field | Result |
+|---|---|
+| Date | 2026-08-20 |
+| Network scope | Private single-node serial confirmed baseline; not P2P or public-network capacity |
+| Workload | 100 synthetic receipts, 1 batch, 100 leaves |
+| Batch root construction | 1.839 seconds |
+| Confirmed submission time | 52.266 seconds |
+| End-to-end transaction TPS | 0.01845 |
+| End-to-end logical receipt TPS | 1.84549 |
+| Serial confirmation-only transaction TPS | 0.01913 |
+| Serial confirmation-only logical receipt TPS | 1.91330 |
+| Batch gas used | 92,831; 928.31 gas per logical receipt |
+| Batch transaction | `0x9c9e8cfc8749d35cabe1b14d6d8b2ffdc89c044445000d4e9fb8644f7c88c03c` |
+
+The one-batch run waited 52.266 seconds for a block, versus the earlier run's varying per-batch confirmation times. PoW block discovery is probabilistic, so a one-transaction sample is too small to estimate confirmation latency or TPS reliably. The strong comparable result is gas efficiency: the same 92,831-gas anchor represented 100 receipts rather than 10, reducing gas per logical receipt from 9,283.1 to 928.31.
+
+This demonstrates the value of batching but not a production-ready throughput level. Future capacity claims require repeated seeded workloads, concurrent submission tests, controlled block parameters, multi-node propagation, and data-availability/inclusion-proof measurements.
+
+## 8. Open Decisions
 
 | ID | Decision | Status |
 |---|---|---|
@@ -98,9 +118,10 @@ This is a preliminary baseline, not a target or a consensus limit. The run is in
 | SCALE-003 | Batch data availability, inclusion-proof distribution, retry, and audit model | TBD |
 | SCALE-004 | Whether batching is contract-level, native protocol, rollup-based, or hybrid | TBD |
 
-## 8. Change Log
+## 9. Change Log
 
 | Version | Date | Change |
 |---|---|---|
 | 0.1 | 2026-08-20 | Initial batch-anchor capacity prototype |
 | 0.2 | 2026-08-20 | Recorded initial 100-receipt serial baseline and improved metric separation |
+| 0.3 | 2026-08-20 | Recorded 100-receipt single-batch baseline and PoW variance interpretation |
