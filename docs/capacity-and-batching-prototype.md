@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Phase 1B capacity prototype |
-| Document version | 0.1 |
+| Document version | 0.2 |
 | Last updated | 2026-08-20 |
 | Protocol status | Non-final; does not select the production rollup or batching design |
 | Companion documents | [Development Plan](./development-plan.md); [AI Verification & ZK Architecture](./ai-verification-and-zk-architecture.md) |
@@ -58,7 +58,7 @@ On the VPS, create a 100-receipt workload in 10-receipt batches:
 ```bash
 cd /opt/aichain
 python3 ./benchmarks/generate-receipt-batches.py \
-  --receipt-count 100 --batch-size 10 \
+  --receipt-count 100 --batch-size 10 --seed run-2 \
   --output /opt/aichain/devnet/benchmark-100x10.json
 ```
 
@@ -73,7 +73,23 @@ BATCH_ANCHOR_ADDRESS=0xDEPLOYED_CONTRACT \
 
 The runner creates roots using the same sorted Keccak-256 pair construction as the contract and reports **confirmed transaction TPS** and **confirmed logical receipt TPS** separately.
 
-## 6. Open Decisions
+## 6. Initial Baseline: 100 Receipts in 10 Batches
+
+| Field | Result |
+|---|---|
+| Date | 2026-08-20 |
+| Network scope | Private single-node serial confirmed baseline; not P2P or public-network capacity |
+| Batch anchor | `0xE680eEb44688898c108FAf2bF8589d108Fe86fE8` |
+| Batch deployment transaction | `0x5a9b0733f06c6ccaf024f96a99fabda22d61c2d3b31780362b35145c300cc303` |
+| Workload | 100 synthetic receipts, 10 batches, 10 leaves per batch |
+| End-to-end elapsed time | 180.268 seconds, including local root construction and serial confirmation waits |
+| End-to-end transaction TPS | 0.05547 |
+| End-to-end logical receipt TPS | 0.55473 |
+| Batch gas used | 92,831 per batch; 9,283.1 gas per logical receipt |
+
+This is a preliminary baseline, not a target or a consensus limit. The run is intentionally serial, uses a temporary low-difficulty one-node Ethash development chain, and includes client-side root construction. The benchmark runner now separately reports root-construction time and serial confirmation-only TPS for subsequent runs.
+
+## 7. Open Decisions
 
 | ID | Decision | Status |
 |---|---|---|
@@ -82,8 +98,9 @@ The runner creates roots using the same sorted Keccak-256 pair construction as t
 | SCALE-003 | Batch data availability, inclusion-proof distribution, retry, and audit model | TBD |
 | SCALE-004 | Whether batching is contract-level, native protocol, rollup-based, or hybrid | TBD |
 
-## 7. Change Log
+## 8. Change Log
 
 | Version | Date | Change |
 |---|---|---|
 | 0.1 | 2026-08-20 | Initial batch-anchor capacity prototype |
+| 0.2 | 2026-08-20 | Recorded initial 100-receipt serial baseline and improved metric separation |

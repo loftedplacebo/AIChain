@@ -16,20 +16,22 @@ def sha256(value: bytes) -> bytes:
     return hashlib.sha256(value).digest()
 
 
-def receipt_id(index: int) -> str:
-    return "0x" + sha256(f"aichain:benchmark-receipt:{index}".encode("utf-8")).hex()
+def receipt_id(index: int, seed: str) -> str:
+    prefix = "aichain:benchmark-receipt" if not seed else f"aichain:benchmark-receipt:{seed}"
+    return "0x" + sha256(f"{prefix}:{index}".encode("utf-8")).hex()
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--receipt-count", type=int, required=True)
     parser.add_argument("--batch-size", type=int, required=True)
+    parser.add_argument("--seed", default="", help="Optional deterministic namespace for a distinct workload")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     if args.receipt_count <= 0 or args.batch_size <= 0:
         parser.error("receipt-count and batch-size must be positive")
 
-    receipt_ids = [receipt_id(index) for index in range(args.receipt_count)]
+    receipt_ids = [receipt_id(index, args.seed) for index in range(args.receipt_count)]
     batches = [receipt_ids[index:index + args.batch_size] for index in range(0, len(receipt_ids), args.batch_size)]
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps({
@@ -37,6 +39,7 @@ def main() -> None:
         "schemaVersion": "0.1.0-draft",
         "receiptCount": args.receipt_count,
         "batchSize": args.batch_size,
+        "seed": args.seed,
         "batches": batches,
     }, indent=2) + "\n", encoding="utf-8")
 
