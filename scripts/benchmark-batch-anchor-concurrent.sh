@@ -16,6 +16,7 @@ readonly BATCH_ANCHOR_ADDRESS="${BATCH_ANCHOR_ADDRESS:?Set BATCH_ANCHOR_ADDRESS 
 readonly SENDER_ADDRESS="${SENDER_ADDRESS:-0xccF9f75DdbDC548eaDeF8aC3CA5EA18B10fD71CE}"
 readonly FOUNDRY_BIN="${FOUNDRY_BIN:-/root/.foundry/bin}"
 readonly KEYSTORE_DIR="${KEYSTORE_DIR:-/opt/aichain/devnet/node-1/keystore}"
+readonly BENCHMARK_SCOPE="${BENCHMARK_SCOPE:-single-node concurrent broadcast baseline; not P2P or public-network TPS}"
 
 if [[ ! -f "$MANIFEST" ]]; then
     echo "Manifest file not found: $MANIFEST" >&2
@@ -108,11 +109,11 @@ confirmed_finished_ns="$(date +%s%N)"
 
 python3 - "$REPORT" "$MANIFEST" "$BATCH_ANCHOR_ADDRESS" "$batch_count" "$receipt_count" \
     "$((root_finished_ns - root_started_ns))" "$((broadcast_finished_ns - broadcast_started_ns))" \
-    "$((confirmed_finished_ns - broadcast_started_ns))" "$confirmed_file" <<'PY'
+    "$((confirmed_finished_ns - broadcast_started_ns))" "$confirmed_file" "$BENCHMARK_SCOPE" <<'PY'
 import json
 import sys
 
-(report, manifest_path, contract, batches, receipts, root_ns, broadcast_ns, confirmation_ns, records_path) = sys.argv[1:]
+(report, manifest_path, contract, batches, receipts, root_ns, broadcast_ns, confirmation_ns, records_path, scope) = sys.argv[1:]
 records = []
 for line in open(records_path, encoding="utf-8"):
     root, leaves, nonce, tx_hash, block, gas = line.rstrip("\n").split("\t")
@@ -124,7 +125,7 @@ manifest = json.load(open(manifest_path, encoding="utf-8"))
 json.dump({
     "schema": "aichain.capacity-benchmark-report",
     "schemaVersion": "0.1.0-draft",
-    "scope": "single-node concurrent broadcast baseline; not P2P or public-network TPS",
+    "scope": scope,
     "batchAnchor": contract,
     "receiptCount": int(receipts), "batchTransactionCount": int(batches),
     "configuredBatchSize": manifest["batchSize"], "seed": manifest.get("seed", ""),

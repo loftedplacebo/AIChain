@@ -198,6 +198,24 @@ The check first requires equal current block heights, then compares each report 
 
 This is the first successful replication-aware capacity run. The confirmed logical rate is close to the earlier one-node result (26.41884 logical receipts/sec); the difference is compatible with temporary PoW block-timing variation and must not be attributed to the second node. The test establishes that the non-mining peer receives the confirmed workload, not that the network has two independent fault domains or that it can sustain this rate on external hardware.
 
+### 9.3 Non-Mining Peer Submission Test
+
+To test application ingress through a non-mining peer, use a fresh one-batch manifest and send the signed transaction to Node 2's localhost RPC endpoint. Node 2 must relay it to Node 1 for mining; the runner then obtains its confirmed receipt through Node 2.
+
+```bash
+RPC_URL=http://127.0.0.1:8546 \
+BENCHMARK_SCOPE='same-VPS non-mining Node 2 submission and Node 1 mining relay test; not public-network TPS' \
+BATCH_ANCHOR_ADDRESS=0xE680eEb44688898c108FAf2bF8589d108Fe86fE8 \
+  bash ./scripts/benchmark-batch-anchor-concurrent.sh \
+  /opt/aichain/devnet/benchmark-node-2-relay.json \
+  /opt/aichain/devnet/benchmark-node-2-relay-report.json
+
+python3 ./scripts/verify-benchmark-replication.py \
+  /opt/aichain/devnet/benchmark-node-2-relay-report.json
+```
+
+The signer may use the existing development keystore because it signs locally; it does not imply that Node 2 owns the account. A successful run proves the expected temporary path `client → Node 2 → P2P relay → Node 1 miner → both nodes`. It does not measure external-peer latency or validate a production transaction-ingress architecture.
+
 ## 10. Open Decisions
 
 | ID | Decision | Status |
@@ -218,3 +236,4 @@ This is the first successful replication-aware capacity run. The confirmed logic
 | 0.5 | 2026-08-20 | Recorded concurrent 1,000-receipt block-packing baseline |
 | 0.6 | 2026-08-20 | Added two-node benchmark-replication verification workflow |
 | 0.7 | 2026-08-20 | Recorded first replicated two-node same-VPS concurrent benchmark |
+| 0.8 | 2026-08-20 | Added non-mining Node 2 transaction-submission and relay test workflow |
