@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Phase 1B capacity prototype |
-| Document version | 0.3 |
+| Document version | 0.4 |
 | Last updated | 2026-08-20 |
 | Protocol status | Non-final; does not select the production rollup or batching design |
 | Companion documents | [Development Plan](./development-plan.md); [AI Verification & ZK Architecture](./ai-verification-and-zk-architecture.md) |
@@ -120,7 +120,25 @@ The one-batch run waited 52.266 seconds for a block, versus the earlier run's va
 
 This demonstrates the value of batching but not a production-ready throughput level. Future capacity claims require repeated seeded workloads, concurrent submission tests, controlled block parameters, multi-node propagation, and data-availability/inclusion-proof measurements.
 
-## 8. Open Decisions
+## 8. Third Baseline: 1,000 Receipts in 10 Batches
+
+| Field | Result |
+|---|---|
+| Date | 2026-08-20 |
+| Network scope | Private single-node serial confirmed baseline; not P2P or public-network capacity |
+| Workload | 1,000 synthetic receipts, 10 batches, 100 leaves per batch |
+| Root construction time | 25.730 seconds total; approximately 2.573 seconds per batch |
+| Confirmed submission time | 122.775 seconds total |
+| End-to-end transaction TPS | 0.06700 |
+| End-to-end logical receipt TPS | 6.70009 |
+| Serial confirmation-only transaction TPS | 0.08145 |
+| Serial confirmation-only logical receipt TPS | 8.14498 |
+| Batch gas used | 92,819–92,831; approximately 928.3 gas per logical receipt |
+| Confirmation range | 2.342–48.735 seconds per serial batch |
+
+The repeated workload makes the distinction between batching efficiency and PoW confirmation variance clearer. Each batch had near-constant gas cost and represented 100 receipts, while confirmation latency varied widely because the temporary one-miner PoW chain is probabilistic and untuned. The next capacity experiment must submit batches concurrently into the transaction pool, then measure acceptance, block packing, queueing, and confirmation distribution separately.
+
+## 9. Open Decisions
 
 | ID | Decision | Status |
 |---|---|---|
@@ -129,10 +147,11 @@ This demonstrates the value of batching but not a production-ready throughput le
 | SCALE-003 | Batch data availability, inclusion-proof distribution, retry, and audit model | TBD |
 | SCALE-004 | Whether batching is contract-level, native protocol, rollup-based, or hybrid | TBD |
 
-## 9. Change Log
+## 10. Change Log
 
 | Version | Date | Change |
 |---|---|---|
 | 0.1 | 2026-08-20 | Initial batch-anchor capacity prototype |
 | 0.2 | 2026-08-20 | Recorded initial 100-receipt serial baseline and improved metric separation |
 | 0.3 | 2026-08-20 | Recorded 100-receipt single-batch baseline and PoW variance interpretation |
+| 0.4 | 2026-08-20 | Recorded 1,000-receipt repeated batch baseline |
