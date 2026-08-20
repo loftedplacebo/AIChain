@@ -306,7 +306,59 @@ VPS service management, firewall rules, and user hardening remain explicit opera
 4. Send a funded development transaction and verify it through JSON-RPC.
 5. Verify RPC stays inaccessible from the public Internet and accessible only through SSH tunnelling.
 
-## 8. Change Log
+## 8. Two Nodes on One VPS
+
+A second, non-mining node can run on the same VPS for development-network synchronization, restart, and controlled partition/rejoin exercises. This is useful before the provider firewall permits an external laptop peer, but it is **not** evidence of independent-host decentralization or production network performance.
+
+Node 2 uses a separate data directory, P2P port, and localhost-only RPC port:
+
+| Node | Data directory | P2P | JSON-RPC | Mining |
+|---|---|---:|---:|---|
+| Node 1 | `/opt/aichain/devnet/node-1` | `30303` | `127.0.0.1:8545` | Yes, development-only |
+| Node 2 | `/opt/aichain/devnet/node-2` | `30304` | `127.0.0.1:8546` | No |
+
+First, retrieve Node 1's enode and replace its host with `127.0.0.1` for the same-machine connection:
+
+```bash
+NODE_1_ENODE=$(/opt/aichain/bin/core-geth attach --exec 'admin.nodeInfo.enode' /opt/aichain/devnet/node-1/geth.ipc | tr -d '"')
+NODE_1_LOCAL_ENODE="${NODE_1_ENODE/@62.171.161.32:30303/@127.0.0.1:30303}"
+printf '%s\n' "$NODE_1_LOCAL_ENODE"
+```
+
+Initialize Node 2 only once. It has no private account or pre-funded balance because it does not submit transactions or mine:
+
+```bash
+cd /opt/aichain
+NODE_BINARY=/opt/aichain/bin/core-geth \
+  bash ./scripts/initialize-devnet.sh /opt/aichain/devnet/node-2
+```
+
+Start it without changing host or cloud firewalls:
+
+```bash
+cd /opt/aichain
+NODE_1_LOCAL_ENODE="$NODE_1_LOCAL_ENODE" \
+  bash ./scripts/start-vps-second-node.sh
+```
+
+Then add Node 1 as an explicit peer and verify both peers and block heights. `admin.addPeer` is intentional here: the development scripts have discovery disabled, so the test does not depend on public discovery.
+
+```bash
+/opt/aichain/bin/core-geth attach \
+  --exec "admin.addPeer('$NODE_1_LOCAL_ENODE')" \
+  /opt/aichain/devnet/node-2/geth.ipc
+
+/opt/aichain/bin/core-geth attach --exec 'admin.peers.length' /opt/aichain/devnet/node-1/geth.ipc
+/opt/aichain/bin/core-geth attach --exec 'eth.blockNumber' /opt/aichain/devnet/node-1/geth.ipc
+/opt/aichain/bin/core-geth attach --exec 'admin.peers.length' /opt/aichain/devnet/node-2/geth.ipc
+/opt/aichain/bin/core-geth attach --exec 'eth.blockNumber' /opt/aichain/devnet/node-2/geth.ipc
+```
+
+Both peer counts should become `1` and block heights should converge. Node 2's log and PID are at `/opt/aichain/devnet/node-2/node.log` and `/opt/aichain/devnet/node-2/core-geth.pid`. To create a controlled temporary partition, stop **only** Node 2, observe it fall behind while Node 1 mines, then restart it with the same command and verify it catches up. Do not delete either data directory for this test.
+
+This setup adds roughly another Ethash development dataset (about 1 GB) plus chain data. Check free space before initialization. It does not open `30304`, `8546`, or any additional public service.
+
+## 9. Change Log
 
 | Version | Date | Change |
 |---|---|---|
@@ -326,3 +378,4 @@ VPS service management, firewall rules, and user hardening remain explicit opera
 | 1.5 | 2026-08-19 | Recorded successful demo organisation registration and active agent delegation |
 | 1.6 | 2026-08-19 | Added funding and agent-issued receipt workflow for the active demo delegation |
 | 1.7 | 2026-08-19 | Recorded the completed agent-signed, agent-anchored, actively delegated demonstration |
+| 1.8 | 2026-08-20 | Added reproducible same-VPS second-node synchronization and partition/rejoin workflow |
