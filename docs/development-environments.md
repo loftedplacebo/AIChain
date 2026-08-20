@@ -358,6 +358,8 @@ Both peer counts should become `1` and block heights should converge. Node 2's l
 
 This setup adds roughly another Ethash development dataset (about 1 GB) plus chain data. Check free space before initialization. It does not open `30304`, `8546`, or any additional public service.
 
+**Validated development result (2026-08-20):** Node 2 completed an initial sync from Node 1, both nodes reported one peer and the same block height, and a controlled Node-2-only stop/restart rejoined successfully. This validates the same-host synchronization path only; it does not replace the pending cross-host P2P/firewall test.
+
 ## 9. Change Log
 
 | Version | Date | Change |
@@ -379,3 +381,4 @@ This setup adds roughly another Ethash development dataset (about 1 GB) plus cha
 | 1.6 | 2026-08-19 | Added funding and agent-issued receipt workflow for the active demo delegation |
 | 1.7 | 2026-08-19 | Recorded the completed agent-signed, agent-anchored, actively delegated demonstration |
 | 1.8 | 2026-08-20 | Added reproducible same-VPS second-node synchronization and partition/rejoin workflow |
+| 1.9 | 2026-08-20 | Recorded successful same-VPS initial sync and controlled partition/rejoin validation |
