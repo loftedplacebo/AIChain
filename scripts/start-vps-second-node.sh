@@ -38,7 +38,7 @@ nohup env \
   P2P_PORT="$node_2_p2p_port" \
   RPC_PORT="$node_2_rpc_port" \
   BOOTNODES="$node_1_local_enode" \
-  "$project_root/scripts/start-devnet-node.sh" \
+  bash "$project_root/scripts/start-devnet-node.sh" \
   >"$log_path" 2>&1 &
 node_2_pid=$!
 echo "$node_2_pid" > "$pid_path"
