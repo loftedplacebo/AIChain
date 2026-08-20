@@ -120,6 +120,19 @@ The one-batch run waited 52.266 seconds for a block, versus the earlier run's va
 
 This demonstrates the value of batching but not a production-ready throughput level. Future capacity claims require repeated seeded workloads, concurrent submission tests, controlled block parameters, multi-node propagation, and data-availability/inclusion-proof measurements.
 
+### 7.1 Concurrent Broadcast Benchmark
+
+The concurrent runner pre-computes roots, obtains the pending account nonce, broadcasts each batch with an explicit sequential nonce and `cast send --async`, then waits for receipts after all transactions are in the pool. It reports broadcast TPS separately from the time until all batches confirm.
+
+```bash
+BATCH_ANCHOR_ADDRESS=0xE680eEb44688898c108FAf2bF8589d108Fe86fE8 \
+  bash ./scripts/benchmark-batch-anchor-concurrent.sh \
+  /opt/aichain/devnet/benchmark-1000x100-concurrent.json \
+  /opt/aichain/devnet/benchmark-1000x100-concurrent-report.json
+```
+
+The manifest must use a fresh seed so its roots do not collide with earlier anchors. Broadcast TPS measures RPC/mempool ingestion from one sender; it is not consensus throughput. The all-confirmed metric measures the current one-node development chain's ability to include the queued batch transactions.
+
 ## 8. Third Baseline: 1,000 Receipts in 10 Batches
 
 | Field | Result |
