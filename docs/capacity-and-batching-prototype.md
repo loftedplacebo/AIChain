@@ -170,6 +170,18 @@ The repeated workload makes the distinction between batching efficiency and PoW 
 
 The pending pool accepted the sequential-nonce broadcasts, and the miner packed every batch into one block. Therefore the transaction pool and block gas capacity did not constrain this workload. The confirmation interval remains governed by the temporary one-miner Ethash block-discovery time. These figures must not be described as decentralized-network TPS until the same test passes under multi-node P2P conditions with explicit finality/confirmation policy.
 
+### 9.1 Two-Node Replication Check
+
+After a concurrent benchmark confirms through Node 1, verify that every benchmark transaction is visible with matching confirmed receipt data through Node 2's separate localhost RPC endpoint:
+
+```bash
+cd /opt/aichain
+python3 ./scripts/verify-benchmark-replication.py \
+  /opt/aichain/devnet/benchmark-1000x100-two-node-report.json
+```
+
+The check first requires equal current block heights, then compares each report transaction's hash, block number, block hash, and successful status between `127.0.0.1:8545` (Node 1) and `127.0.0.1:8546` (Node 2). It validates P2P replication of the confirmed benchmark data. It does **not** measure independent-host propagation latency, validator/miner diversity, finality, or public-network TPS because both nodes run on the same VPS and Node 1 is the only miner.
+
 ## 10. Open Decisions
 
 | ID | Decision | Status |
@@ -188,3 +200,4 @@ The pending pool accepted the sequential-nonce broadcasts, and the miner packed 
 | 0.3 | 2026-08-20 | Recorded 100-receipt single-batch baseline and PoW variance interpretation |
 | 0.4 | 2026-08-20 | Recorded 1,000-receipt repeated batch baseline |
 | 0.5 | 2026-08-20 | Recorded concurrent 1,000-receipt block-packing baseline |
+| 0.6 | 2026-08-20 | Added two-node benchmark-replication verification workflow |
