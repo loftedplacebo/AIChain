@@ -10,6 +10,7 @@ node_binary="${NODE_BINARY:-$project_root/bin/core-geth}"
 node_2_data_dir="${NODE_2_DATA_DIR:-$project_root/devnet/node-2}"
 node_2_p2p_port="${NODE_2_P2P_PORT:-30304}"
 node_2_rpc_port="${NODE_2_RPC_PORT:-8546}"
+node_2_authrpc_port="${NODE_2_AUTHRPC_PORT:-8552}"
 node_1_local_enode="${NODE_1_LOCAL_ENODE:-}"
 log_path="${NODE_2_LOG_PATH:-$node_2_data_dir/node.log}"
 pid_path="$node_2_data_dir/core-geth.pid"
@@ -37,6 +38,7 @@ nohup env \
   NODE_BINARY="$node_binary" \
   P2P_PORT="$node_2_p2p_port" \
   RPC_PORT="$node_2_rpc_port" \
+  AUTHRPC_PORT="$node_2_authrpc_port" \
   BOOTNODES="$node_1_local_enode" \
   bash "$project_root/scripts/start-devnet-node.sh" \
   >"$log_path" 2>&1 &

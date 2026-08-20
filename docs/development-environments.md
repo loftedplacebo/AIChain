@@ -312,10 +312,10 @@ A second, non-mining node can run on the same VPS for development-network synchr
 
 Node 2 uses a separate data directory, P2P port, and localhost-only RPC port:
 
-| Node | Data directory | P2P | JSON-RPC | Mining |
-|---|---|---:|---:|---|
-| Node 1 | `/opt/aichain/devnet/node-1` | `30303` | `127.0.0.1:8545` | Yes, development-only |
-| Node 2 | `/opt/aichain/devnet/node-2` | `30304` | `127.0.0.1:8546` | No |
+| Node | Data directory | P2P | JSON-RPC | Internal engine RPC | Mining |
+|---|---|---:|---:|---:|---|
+| Node 1 | `/opt/aichain/devnet/node-1` | `30303` | `127.0.0.1:8545` | `127.0.0.1:8551` | Yes, development-only |
+| Node 2 | `/opt/aichain/devnet/node-2` | `30304` | `127.0.0.1:8546` | `127.0.0.1:8552` | No |
 
 First, retrieve Node 1's enode and replace its host with `127.0.0.1` for the same-machine connection:
 
