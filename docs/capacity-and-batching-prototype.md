@@ -182,6 +182,22 @@ python3 ./scripts/verify-benchmark-replication.py \
 
 The check first requires equal current block heights, then compares each report transaction's hash, block number, block hash, and successful status between `127.0.0.1:8545` (Node 1) and `127.0.0.1:8546` (Node 2). It validates P2P replication of the confirmed benchmark data. It does **not** measure independent-host propagation latency, validator/miner diversity, finality, or public-network TPS because both nodes run on the same VPS and Node 1 is the only miner.
 
+### 9.2 First Two-Node Same-VPS Run
+
+| Field | Result |
+|---|---|
+| Date | 2026-08-20 |
+| Network scope | Two peered nodes on one VPS; Node 1 mines and Node 2 is non-mining |
+| Workload | 1,000 synthetic receipts, 10 concurrent batches, 100 leaves per batch |
+| Fresh workload namespace | `two-node-run-1-20260820` |
+| Broadcast transaction TPS | 0.89889 |
+| Broadcast logical receipt TPS | 89.88947 |
+| All-confirmed transaction TPS | 0.29921 |
+| All-confirmed logical receipt TPS | 29.92134 |
+| Replication verification | All 10 confirmed batch transactions matched on Node 1 and Node 2 at shared block `15507` |
+
+This is the first successful replication-aware capacity run. The confirmed logical rate is close to the earlier one-node result (26.41884 logical receipts/sec); the difference is compatible with temporary PoW block-timing variation and must not be attributed to the second node. The test establishes that the non-mining peer receives the confirmed workload, not that the network has two independent fault domains or that it can sustain this rate on external hardware.
+
 ## 10. Open Decisions
 
 | ID | Decision | Status |
@@ -201,3 +217,4 @@ The check first requires equal current block heights, then compares each report 
 | 0.4 | 2026-08-20 | Recorded 1,000-receipt repeated batch baseline |
 | 0.5 | 2026-08-20 | Recorded concurrent 1,000-receipt block-packing baseline |
 | 0.6 | 2026-08-20 | Added two-node benchmark-replication verification workflow |
+| 0.7 | 2026-08-20 | Recorded first replicated two-node same-VPS concurrent benchmark |
