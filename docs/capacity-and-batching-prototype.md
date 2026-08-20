@@ -73,6 +73,17 @@ BATCH_ANCHOR_ADDRESS=0xDEPLOYED_CONTRACT \
 
 The runner creates roots using the same sorted Keccak-256 pair construction as the contract and reports **confirmed transaction TPS** and **confirmed logical receipt TPS** separately.
 
+To verify one receipt's inclusion in an anchored batch without a password or transaction:
+
+```bash
+BATCH_ANCHOR_ADDRESS=0xE680eEb44688898c108FAf2bF8589d108Fe86fE8 \
+  bash ./scripts/verify-batch-membership.sh \
+  /opt/aichain/devnet/benchmark-100x100-run-2.json \
+  0 42
+```
+
+The command constructs the receipt's Merkle proof from the deterministic manifest and calls the contract's pure `verifyMembership` method. The off-chain manifest remains necessary to distribute receipt IDs and proofs; anchoring a root alone does not provide batch data availability.
+
 ## 6. Initial Baseline: 100 Receipts in 10 Batches
 
 | Field | Result |
