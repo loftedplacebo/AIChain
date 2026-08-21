@@ -232,6 +232,22 @@ The signer may use the existing development keystore because it signs locally; i
 
 The transaction entered through Node 2's RPC, received a confirmed receipt through Node 2, and was independently found through Node 1. This validates the devnet relay path. The one-batch all-confirmed rate is dominated by a 26.19-second PoW confirmation wait and is therefore not a capacity estimate or suitable for comparison with the 10-batch runs.
 
+### 9.5 First Three-Peer Cross-Host Propagation Run
+
+| Field | Result |
+|---|---|
+| Date | 2026-08-21 |
+| Network scope | VPS Node 2 submitted; VPS Node 1 mined; VPS Node 2 and external laptop replicated |
+| Workload | 1,000 synthetic receipts, 10 concurrent batches, 100 leaves per batch |
+| Fresh workload namespace | `laptop-peer-run-1-20260821` |
+| Broadcast logical receipt TPS | 68.87374 |
+| All-confirmed logical receipt TPS | 34.52827 |
+| Block packing | 6 batch transactions in block `22234`; 4 in block `22235` |
+| VPS replication verification | All 10 batch receipts matched between VPS Nodes 1 and 2 at shared height `22236` |
+| Laptop replication verification | Laptop had one peer at block `22237`; all 10 batch receipts were present and successful |
+
+This is the first successful receipt-batch propagation test across separate hosts. It validates the development path `VPS Node 2 → VPS Node 1 miner → VPS Node 2 and laptop`. The values remain a small private development result, not public-network TPS or an independent-consensus result: one operator controls the VPS miner and laptop node, the laptop does not mine, and there is no measured propagation-latency distribution, fault diversity, or finality policy.
+
 ## 10. Open Decisions
 
 | ID | Decision | Status |
@@ -254,3 +270,4 @@ The transaction entered through Node 2's RPC, received a confirmed receipt throu
 | 0.7 | 2026-08-20 | Recorded first replicated two-node same-VPS concurrent benchmark |
 | 0.8 | 2026-08-20 | Added non-mining Node 2 transaction-submission and relay test workflow |
 | 0.9 | 2026-08-20 | Recorded first successful non-mining peer transaction relay result |
+| 0.10 | 2026-08-21 | Recorded first successful three-peer, cross-host batch-propagation run |
