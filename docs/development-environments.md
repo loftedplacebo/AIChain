@@ -360,7 +360,34 @@ This setup adds roughly another Ethash development dataset (about 1 GB) plus cha
 
 **Validated development result (2026-08-20):** Node 2 completed an initial sync from Node 1, both nodes reported one peer and the same block height, and a controlled Node-2-only stop/restart rejoined successfully. This validates the same-host synchronization path only; it does not replace the pending cross-host P2P/firewall test.
 
-## 9. Change Log
+## 9. External Laptop Peer
+
+An external non-mining laptop node connects **outbound** to the VPS's Node 1 on `30303`. Its RPC remains on `127.0.0.1:8545`; do not expose it. The VPS need only accept P2P on `30303/TCP` and `30303/UDP`. No inbound port is required on the laptop for this initiator-side test.
+
+From an ordinary local PowerShell session (not through an SSH tunnel), start the already-initialized laptop node:
+
+```powershell
+cd C:\AIChain
+
+.\scripts\start-devnet-node.ps1 `
+  -DataDir C:\AIChain\devnet\laptop-node-1 `
+  -Port 30304 `
+  -Bootnodes 'enode://80840b1a31cc14c5df6c44131084c8ce06db0f24885f730f92487901997e28ffc1d548dd7921c8778c488c2ada3392951af5ceda606f0637290307e058bd0e52@62.171.161.32:30303?discport=0'
+```
+
+With discovery disabled, explicitly add Node 1. On Windows, Core-Geth's default IPC interface is a named pipe, so use the `ipc:` endpoint rather than a filesystem path:
+
+```powershell
+& C:\AIChain\build\core-geth.exe attach `
+  --exec 'admin.addPeer("enode://80840b1a31cc14c5df6c44131084c8ce06db0f24885f730f92487901997e28ffc1d548dd7921c8778c488c2ada3392951af5ceda606f0637290307e058bd0e52@62.171.161.32:30303?discport=0")' `
+  'ipc:\\.\pipe\geth.ipc'
+```
+
+Check the laptop through localhost JSON-RPC or the same named-pipe endpoint, then check Node 1 through its VPS IPC. The laptop must report at least one peer and the same current block height as the VPS before it is used for transaction-relay testing.
+
+**Validated development result (2026-08-21):** the laptop explicitly added the VPS enode, reached one peer, synchronized to block `22214`, and reported `eth.syncing = false`. The VPS reported two peers: its same-host non-mining Node 2 and the external laptop node. This is the first cross-host P2P validation. It does not establish independent consensus security because Node 1 remains the sole miner.
+
+## 10. Change Log
 
 | Version | Date | Change |
 |---|---|---|
@@ -382,3 +409,4 @@ This setup adds roughly another Ethash development dataset (about 1 GB) plus cha
 | 1.7 | 2026-08-19 | Recorded the completed agent-signed, agent-anchored, actively delegated demonstration |
 | 1.8 | 2026-08-20 | Added reproducible same-VPS second-node synchronization and partition/rejoin workflow |
 | 1.9 | 2026-08-20 | Recorded successful same-VPS initial sync and controlled partition/rejoin validation |
+| 2.0 | 2026-08-21 | Added and recorded successful external laptop-to-VPS P2P synchronization workflow |
