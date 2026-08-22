@@ -37,7 +37,7 @@ contract HistoricalAuthorityRegistry {
     error EmptyAuthorityCommitment();
     error InvalidValidityWindow(uint64 validAfter, uint64 validUntil);
     error NoRevocableDelegation(bytes32 organizationId, address agent);
-    error UnknownDelegationEpoch(bytes32 organizationId, address agent, uint32 epoch);
+    error UnknownDelegationEpoch(bytes32 organizationId, address agent, uint256 epoch);
 
     function registerOrganization(bytes32 organizationId) external {
         if (organizationId == bytes32(0)) revert EmptyOrganizationId();
