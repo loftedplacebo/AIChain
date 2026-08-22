@@ -1,3 +1,6 @@
 [submodule "core-geth"]
 	path = node/core-geth
 	url = https://github.com/etclabscore/core-geth.git
+[submodule "spikes/c1-kawpow-verifier/cpp-kawpow"]
+	path = spikes/c1-kawpow-verifier/cpp-kawpow
+	url = https://github.com/RavenCommunity/cpp-kawpow.git

@@ -46,6 +46,12 @@ The committed runner [`scripts/run-c1-kawpow-vector-check.ps1`](../scripts/run-c
 
 Result on 2026-08-22: **13 vectors passed**, including positive verification and tampered-mix rejection. The runner is CPU-only; it verifies a reference implementation and has not yet placed KawPoW in the Core-Geth consensus path. Source provenance is recorded in [Candidate Source Pins](../benchmarks/pow/candidate-source-pins.md).
 
+### C1 Go adapter control result
+
+The isolated [`c1-kawpow-verifier`](../spikes/c1-kawpow-verifier) Go/CGO adapter now calculates and verifies the pinned C1 vector with CPU-only calls. It passed its Go test suite, including known-output, valid-seal, tampered-seal, and invalid-block-number cases.
+
+The first three-iteration control run on the local i5-1335U recorded approximately **504.67 ms/hash** and **507.24 ms/verify**. Both calls intentionally construct an epoch context each time, so these numbers are a conservative smoke control—not cached full-node validation cost, mining performance, energy use, or TPS. The complete environment and result are recorded in [the run manifest](../benchmarks/pow/runs/2026-08-22-c1-kawpow-cpu-adapter-control.json).
+
 ## Spike rules
 
 - Work only in an isolated Core-Geth development branch or disposable worktree.

@@ -1,0 +1,80 @@
+{
+  "schemaVersion": "0.1.0-draft",
+  "runId": "2026-08-22-c1-kawpow-cpu-adapter-control",
+  "recordedAtUtc": "2026-08-22",
+  "classification": "CPU-only conformance and adapter control; not a mining or network benchmark",
+  "candidate": {
+    "id": "c1-progpow-kawpow-family",
+    "algorithmRevision": "ProgPoW 0.9.4 vectors exposed by cpp-kawpow",
+    "upstreamRepository": "https://github.com/RavenCommunity/cpp-kawpow.git",
+    "upstreamCommit": "061d341011ca341e1f506c52b571f5fd64a0df71",
+    "localPatchCommit": "pending AIChain commit",
+    "license": "Apache-2.0 reference source",
+    "testVectorSource": "cpp-kawpow/test/unittests/progpow_test_vectors.hpp"
+  },
+  "client": {
+    "coreGethCommit": "96b2afc25c7023bb500d14e8ed69455339b1ca90",
+    "consensusFlag": "not integrated; isolated adapter only",
+    "buildFlags": [
+      "CGO_ENABLED=1",
+      "C++11",
+      "AIChain pinned LLVM-MinGW compiler"
+    ]
+  },
+  "host": {
+    "role": "CPU adapter test host",
+    "operatingSystem": "Windows",
+    "cpu": "13th Gen Intel Core i5-1335U",
+    "cpuCores": 10,
+    "logicalProcessors": 12,
+    "reportedMaxClockMHz": 1300,
+    "memoryGiB": 7.69,
+    "storage": "not measured",
+    "network": "not applicable"
+  },
+  "accelerators": [],
+  "networkScenario": {
+    "nodeCount": 0,
+    "topology": "not applicable",
+    "simulatedLatencyMs": null,
+    "simulatedPacketLossPercent": null,
+    "blockTargetSeconds": null,
+    "gasLimit": null,
+    "difficultyConfiguration": "not applicable",
+    "clockSource": "local test process"
+  },
+  "avrWorkload": {
+    "fixtureRevision": "not applicable",
+    "logicalReceiptCount": 0,
+    "batchSize": 0,
+    "submitterConcurrency": 0,
+    "confirmationDefinition": "not applicable",
+    "warmupSeconds": 0,
+    "failureConditions": [
+      "Any published positive vector mismatch",
+      "A tampered mix digest is accepted"
+    ]
+  },
+  "measurements": {
+    "vectorCount": 13,
+    "positiveVectorsPassed": 13,
+    "tamperedMixRejected": true,
+    "benchmarkIterationsPerOperation": 3,
+    "hashIncludesEpochSetupNsPerOp": 504669767,
+    "verifyIncludesEpochSetupNsPerOp": 507238067,
+    "wallPowerWatts": null,
+    "validatorLatencyMs": null,
+    "peakMemoryMiB": null,
+    "blockPropagationMs": null,
+    "staleOrOrphanRate": null,
+    "reorganisationSummary": "not applicable",
+    "broadcastLogicalReceiptTps": null,
+    "allConfirmedLogicalReceiptTps": null
+  },
+  "rawArtefacts": [
+    "scripts/test-c1-kawpow-verifier-spike.ps1",
+    "scripts/benchmark-c1-kawpow-verifier-spike.ps1",
+    "spikes/c1-kawpow-verifier"
+  ],
+  "notes": "Both benchmark operations create an epoch context on every call. They are conservative adapter-control numbers, not cached full-node verification cost, mining hashrate, energy efficiency, block-validation latency, or TPS. Three iterations are a smoke-level measurement only."
+}
