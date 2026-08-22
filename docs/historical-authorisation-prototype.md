@@ -52,3 +52,13 @@ REGISTRY_ADDRESS=0x<new-historical-registry> \
 ```
 
 Both scripts prompt privately for the controller password. They do not migrate the current registry, alter existing delegations, or expose a secret. Registering an organisation and its agent delegation in the new registry is a separate next development action.
+
+For the synthetic development organisation and laptop agent, run:
+
+```bash
+cd /opt/aichain
+REGISTRY_ADDRESS=0x<new-historical-registry> \
+  bash ./scripts/bootstrap-historical-organisation.sh
+```
+
+It creates organisation state only in the new historical registry and appends epoch `0` for the laptop agent. It does not alter the earlier AuthorityRegistry.
