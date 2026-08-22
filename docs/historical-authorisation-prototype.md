@@ -34,3 +34,21 @@ This establishes historical chain-state semantics for **inclusion-time authorisa
 - Queries scan an agent's historical epochs and are intended for off-chain/audit reads and prototype write checks, not unbounded production workloads.
 - Controller recovery, multi-signature control, credential issuer trust, policy evaluation, and final revocation governance remain **TBD**.
 
+## Development deployment
+
+Deploy the new registry first with the controller's encrypted development keystore:
+
+```bash
+cd /opt/aichain
+bash ./scripts/deploy-historical-authority-registry.sh
+```
+
+Then deploy the matching anchor, substituting the new registry address:
+
+```bash
+cd /opt/aichain
+REGISTRY_ADDRESS=0x<new-historical-registry> \
+  bash ./scripts/deploy-historical-authorised-anchor.sh
+```
+
+Both scripts prompt privately for the controller password. They do not migrate the current registry, alter existing delegations, or expose a secret. Registering an organisation and its agent delegation in the new registry is a separate next development action.
