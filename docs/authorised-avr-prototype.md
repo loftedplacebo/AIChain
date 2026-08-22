@@ -68,7 +68,23 @@ Before deployment, test the contract in Foundry on the VPS after pulling this co
 cd /opt/aichain
 git pull --ff-only
 cd contracts/avr-anchor
-/root/.foundry/bin/forge test
+/root/.foundry/bin/forge build
 ```
 
-Deployment and a live authorised submission require the currently delegated agent's encrypted keystore password, so those steps remain an operator action rather than an automated secret-handling step.
+Deploy using the controller account's encrypted keystore; the script prompts privately and neither stores nor prints the password:
+
+```bash
+cd /opt/aichain
+bash ./scripts/deploy-authorised-avr-anchor.sh
+```
+
+Copy the resulting contract address, then use the already delegated VPS agent to submit the synthetic fixture:
+
+```bash
+cd /opt/aichain
+CONTRACT_ADDRESS=0x<deployed-authorised-anchor> \
+  bash ./scripts/anchor-authorised-avr.sh \
+  fixtures/avr/authorised-receipt-v0.2.0-draft.json
+```
+
+Deployment and live authorised submission require encrypted-keystore passwords, so those steps remain an operator action rather than an automated secret-handling step.
