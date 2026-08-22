@@ -109,3 +109,17 @@ node scripts/submit-laptop-authorised-avr.mjs `
 ```
 
 This fallback is development-only. Production recovery must use a defined multi-party/key-rotation model rather than a replacement wallet workflow.
+
+## Validated development result
+
+On 2026-08-22, the separately authorised laptop development agent submitted the synthetic laptop fixture to `AuthorisedAVRAnchor` at `0x1EAe0127C22183B970f065c1FCd8188Cec3E2F04`.
+
+| Field | Value |
+|---|---|
+| Authorisation transaction | `0x6f0128eb006b6bedcecb76a385e83694186e42ee8331439b09daf1076f876144` (block `28636`) |
+| Receipt-anchor transaction | `0x735295f06af6cfa1ea7a366b2ed35cb5a9229328ac02115e9723cc9c51c699a2` (block `28640`) |
+| Receipt ID | `0xa1d13edf701d07c6c86647b67c78c1aea8557fd450186afcff0ceef620b22b6e` |
+| Recorded issuer | `0x871252AE9E27BDf8265402a70A0Fb04B55b64dF7` |
+| Recorded organisation / authority | Existing synthetic development organisation and matching authority commitment |
+
+A read-only `getAnchor` call confirmed the stored organisation ID, authority commitment, commitments root, issuer, inclusion time, and schema version. This confirms the development contract rejected neither the delegation nor the authority-commitment match. It does not upgrade the prototype's identity, credential, policy, or historical-authorisation assurance boundaries.
