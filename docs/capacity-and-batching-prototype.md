@@ -248,6 +248,21 @@ The transaction entered through Node 2's RPC, received a confirmed receipt throu
 
 This is the first successful receipt-batch propagation test across separate hosts. It validates the development path `VPS Node 2 → VPS Node 1 miner → VPS Node 2 and laptop`. The values remain a small private development result, not public-network TPS or an independent-consensus result: one operator controls the VPS miner and laptop node, the laptop does not mine, and there is no measured propagation-latency distribution, fault diversity, or finality policy.
 
+### 9.6 First Laptop-Originated Batch Submission
+
+| Field | Result |
+|---|---|
+| Date | 2026-08-22 |
+| Network scope | Laptop client submitted through laptop node; VPS Node 1 mined; VPS Node 2 replicated |
+| Sender | `0x871252AE9E27BDf8265402a70A0Fb04B55b64dF7` |
+| Workload | 100 synthetic receipts in one batch |
+| Fresh workload namespace | `laptop-originated-1-20260822` |
+| Batch transaction | `0x69fed2f4783e7d0811f3c50552af678c85d685f93c7d1ac7675a6385bb684828` |
+| Confirmed block | `25819` |
+| VPS verification | Nodes 1 and 2 returned matching successful receipts and block height `25819` |
+
+This validates the first external-client signing and ingress path: a private key stayed on the laptop, the laptop node accepted the signed transaction through localhost RPC, the VPS miner included it, and the VPS replica observed it. This one-batch result is an integration test, not a throughput or custody-security claim.
+
 ## 10. Open Decisions
 
 | ID | Decision | Status |
@@ -271,3 +286,4 @@ This is the first successful receipt-batch propagation test across separate host
 | 0.8 | 2026-08-20 | Added non-mining Node 2 transaction-submission and relay test workflow |
 | 0.9 | 2026-08-20 | Recorded first successful non-mining peer transaction relay result |
 | 0.10 | 2026-08-21 | Recorded first successful three-peer, cross-host batch-propagation run |
+| 0.11 | 2026-08-22 | Recorded first laptop-originated signed batch submission |

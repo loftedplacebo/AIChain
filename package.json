@@ -1,0 +1,12 @@
+{
+  "name": "aichain-devnet-tools",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Local development helpers for the AIChain devnet",
+  "scripts": {
+    "submit:laptop-batch": "node ./scripts/submit-laptop-batch.mjs"
+  },
+  "dependencies": {
+    "ethers": "^6.16.0"
+  }
+}
