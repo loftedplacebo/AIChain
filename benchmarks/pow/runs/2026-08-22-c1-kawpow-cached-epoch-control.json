@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "0.1.0-draft",
+  "runId": "2026-08-22-c1-kawpow-cached-epoch-control",
+  "recordedAtUtc": "2026-08-22",
+  "classification": "CPU-only isolated verifier-cache control; not a mining, full-node, or network benchmark",
+  "candidate": {
+    "id": "c1-progpow-kawpow-family",
+    "upstreamRepository": "https://github.com/RavenCommunity/cpp-kawpow.git",
+    "upstreamCommit": "061d341011ca341e1f506c52b571f5fd64a0df71",
+    "license": "Apache-2.0 reference source",
+    "testVectorSource": "cpp-kawpow/test/unittests/progpow_test_vectors.hpp"
+  },
+  "host": {
+    "role": "CPU adapter test host",
+    "operatingSystem": "Windows",
+    "cpu": "13th Gen Intel Core i5-1335U",
+    "cpuCores": 10,
+    "logicalProcessors": 12,
+    "memoryGiB": 7.69
+  },
+  "measurements": {
+    "vectorCount": 13,
+    "positiveVectorsPassed": 13,
+    "tamperedMixRejected": true,
+    "concurrentHashAndVerifyWorkers": 12,
+    "concurrentOperations": 24,
+    "benchmarkIterationsPerOperation": 5,
+    "hashIncludesEpochSetupNsPerOp": 391241500,
+    "verifyIncludesEpochSetupNsPerOp": 384096220,
+    "hashCachedEpochNsPerOp": 3281920,
+    "verifyCachedEpochNsPerOp": 4758780
+  },
+  "notes": "The adapter has a bounded, mutex-protected, one-epoch cache. Cached results are a local microbenchmark with only five iterations and a serialised cache lock, not a prediction of final Core-Geth validation throughput. The context-rebuild figures are intentionally conservative. No GPU, miner, block propagation, AVR workload, or energy measurement was performed."
+}

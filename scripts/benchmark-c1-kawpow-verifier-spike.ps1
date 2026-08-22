@@ -29,7 +29,7 @@ $env:PATH = "$compilerDirectory;$env:PATH"
 
 Push-Location $spikeDirectory
 try {
-    & $goExe test -run '^$' -bench '^Benchmark(Hash|Verify)IncludesEpochSetup$' -benchtime $Benchtime -count 1
+    & $goExe test -run '^$' -bench '^Benchmark(Hash|Verify)(IncludesEpochSetup|CachedEpoch)$' -benchtime $Benchtime -count 1
     if ($LASTEXITCODE -ne 0) { throw 'C1 KawPoW verifier spike benchmark failed.' }
 }
 finally {

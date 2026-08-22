@@ -20,6 +20,7 @@ func BenchmarkHashIncludesEpochSetup(b *testing.B) {
 	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
+		ResetEpochCacheForTest()
 		if _, _, err := Hash(0, header, uint64(i)); err != nil {
 			b.Fatal(err)
 		}
@@ -28,6 +29,35 @@ func BenchmarkHashIncludesEpochSetup(b *testing.B) {
 
 // BenchmarkVerifyIncludesEpochSetup has the same conservative caveat as Hash.
 func BenchmarkVerifyIncludesEpochSetup(b *testing.B) {
+	seal, _ := benchmarkFixture(b)
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		ResetEpochCacheForTest()
+		valid, err := Verify(seal)
+		if err != nil || !valid {
+			b.Fatalf("valid=%t err=%v", valid, err)
+		}
+	}
+}
+
+func BenchmarkHashCachedEpoch(b *testing.B) {
+	ResetEpochCacheForTest()
+	var header [32]byte
+	if _, _, err := Hash(0, header, 0); err != nil {
+		b.Fatal(err)
+	}
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		if _, _, err := Hash(0, header, uint64(i)); err != nil {
+			b.Fatal(err)
+		}
+	}
+}
+
+func BenchmarkVerifyCachedEpoch(b *testing.B) {
+	ResetEpochCacheForTest()
 	seal, _ := benchmarkFixture(b)
 	b.ReportAllocs()
 	b.ResetTimer()

@@ -52,6 +52,12 @@ The isolated [`c1-kawpow-verifier`](../spikes/c1-kawpow-verifier) Go/CGO adapter
 
 The first three-iteration control run on the local i5-1335U recorded approximately **504.67 ms/hash** and **507.24 ms/verify**. Both calls intentionally construct an epoch context each time, so these numbers are a conservative smoke control—not cached full-node validation cost, mining performance, energy use, or TPS. The complete environment and result are recorded in [the run manifest](../benchmarks/pow/runs/2026-08-22-c1-kawpow-cpu-adapter-control.json).
 
+The follow-up bounded-cache control passed 13 vectors, tampered-seal rejection, and 24 concurrent hash/verify operations across 12 workers. Its five-iteration microbenchmark recorded approximately **391.24 ms/hash** and **384.10 ms/verify** with a forced context rebuild, versus **3.28 ms/hash** and **4.76 ms/verify** with the same epoch cached. These are not final full-node figures: the current one-epoch cache serialises calls with a mutex and exists only to establish correct cache semantics. See [the cached-epoch run manifest](../benchmarks/pow/runs/2026-08-22-c1-kawpow-cached-epoch-control.json).
+
+### Core-Geth header mapping contract
+
+The spike now imports the pinned Core-Geth module without modifying its source. Its mapping test derives the actual Core-Geth `SealHash`, maps header number, nonce, and mix digest, and converts Core-Geth's target convention (`2^256 / difficulty`) to the C1 256-bit boundary. The test verifies a mapped header-derived C1 seal and rejects invalid header inputs. This is sufficient to define the input boundary for a future consensus-engine adapter; it is **not** a modified client, a complete block-validation test, or protocol activation.
+
 ## Spike rules
 
 - Work only in an isolated Core-Geth development branch or disposable worktree.
@@ -64,8 +70,8 @@ The first three-iteration control run on the local i5-1335U recorded approximate
 ## Staged implementation sequence
 
 1. Pin upstream candidate revision, licence, specification, and test-vector source in a run manifest. **C1 complete.**
-2. Add a minimal verifier adapter and deterministic Go unit tests for valid, invalid, malformed, and wrong-difficulty seals.
-3. Measure CPU block-verification latency and memory before adding mining support.
+2. Add a minimal verifier adapter and deterministic Go unit tests for valid, invalid, malformed, and wrong-difficulty seals. **C1 adapter, vector, tamper, cache-rotation, concurrent-use, and Core-Geth header-mapping tests complete.**
+3. Measure CPU block-verification latency and memory before adding mining support. **Adapter microbenchmark control complete; full Core-Geth block-validation measurement pending.**
 4. Add development-only sealing/miner integration.
 5. Use rented NVIDIA and AMD GPU environments for mining throughput, VRAM, power, and multi-node network measurements.
 6. Produce a candidate comparison report; only then consider an L1-001 ADR.

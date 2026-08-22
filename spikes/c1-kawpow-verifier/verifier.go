@@ -18,6 +18,8 @@ int aichain_kawpow_verify(
     const uint8_t mix_hash[32],
     uint64_t nonce,
     const uint8_t boundary[32]);
+void aichain_kawpow_reset_epoch_cache(void);
+uint64_t aichain_kawpow_epoch_cache_build_count(void);
 */
 import "C"
 
@@ -38,6 +40,9 @@ type Seal struct {
 
 // Hash calculates the candidate-specific mix and final hashes on CPU.
 func Hash(blockNumber int, headerHash [32]byte, nonce uint64) (mixHash, finalHash [32]byte, err error) {
+	if blockNumber < 0 {
+		return mixHash, finalHash, fmt.Errorf("block number must be non-negative")
+	}
 	ok := C.aichain_kawpow_hash(
 		C.int(blockNumber),
 		(*C.uint8_t)(unsafe.Pointer(&headerHash[0])),
@@ -49,6 +54,18 @@ func Hash(blockNumber int, headerHash [32]byte, nonce uint64) (mixHash, finalHas
 		return mixHash, finalHash, fmt.Errorf("could not create KawPoW epoch context")
 	}
 	return mixHash, finalHash, nil
+}
+
+// ResetEpochCacheForTest empties the development-only one-epoch cache. It is
+// exposed solely for deterministic spike tests and must not define production
+// Core-Geth cache behaviour.
+func ResetEpochCacheForTest() {
+	C.aichain_kawpow_reset_epoch_cache()
+}
+
+// EpochCacheBuildCount returns the development-only cache construction count.
+func EpochCacheBuildCount() uint64 {
+	return uint64(C.aichain_kawpow_epoch_cache_build_count())
 }
 
 // Verify checks a candidate seal on CPU. A GPU is never required by this path.
