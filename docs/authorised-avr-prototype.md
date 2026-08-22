@@ -87,4 +87,4 @@ CONTRACT_ADDRESS=0x<deployed-authorised-anchor> \
   fixtures/avr/authorised-receipt-v0.2.0-draft.json
 ```
 
-Deployment and live authorised submission require encrypted-keystore passwords, so those steps remain an operator action rather than an automated secret-handling step.
+The VPS submission helper derives the anchor fields through the Python reference implementation, so it does not require Node.js on the server. Deployment and live authorised submission require encrypted-keystore passwords, so those steps remain an operator action rather than an automated secret-handling step.

@@ -25,14 +25,16 @@ if [[ ! -x "$FOUNDRY_BIN/cast" ]]; then
     exit 1
 fi
 
-mapfile -t fields < <(node - "$PROJECT_ROOT" "$RECEIPT_FILE" <<'NODE'
-const fs = require("node:fs");
-const projectRoot = process.argv[2];
-const receiptPath = process.argv[3];
-const { prepareAuthorisedAnchor } = require(`${projectRoot}/sdk/typescript/authorised-receipt.js`);
-const prepared = prepareAuthorisedAnchor(JSON.parse(fs.readFileSync(receiptPath, "utf8")));
-for (const key of ["receiptId", "commitmentsRoot", "organizationId", "authorityCommitment", "schemaVersion", "issuer"]) console.log(prepared[key]);
-NODE
+mapfile -t fields < <(PYTHONPATH="$PROJECT_ROOT/sdk/python" python3 - "$RECEIPT_FILE" <<'PY'
+import json
+import sys
+from authorised_receipt import prepare_authorised_anchor
+
+with open(sys.argv[1], encoding="utf-8") as file:
+    prepared = prepare_authorised_anchor(json.load(file))
+for key in ("receiptId", "commitmentsRoot", "organizationId", "authorityCommitment", "schemaVersion", "issuer"):
+    print(prepared[key])
+PY
 )
 
 readonly RECEIPT_ID="${fields[0]}"
@@ -67,4 +69,3 @@ unset keystore_password
     "anchorAuthorisedReceipt(bytes32,bytes32,bytes32,bytes32,string)" \
     "$RECEIPT_ID" "$COMMITMENTS_ROOT" "$ORGANIZATION_ID" "$AUTHORITY_COMMITMENT" "$SCHEMA_VERSION" \
     --rpc-url "$RPC_URL" --keystore "$keystore" --password-file "$password_file" --legacy
-
