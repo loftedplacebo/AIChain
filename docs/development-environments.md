@@ -387,6 +387,17 @@ Check the laptop through localhost JSON-RPC or the same named-pipe endpoint, the
 
 **Validated development result (2026-08-21):** the laptop explicitly added the VPS enode, reached one peer, synchronized to block `22214`, and reported `eth.syncing = false`. The VPS reported two peers: its same-host non-mining Node 2 and the external laptop node. This is the first cross-host P2P validation. It does not establish independent consensus security because Node 1 remains the sole miner.
 
+### Laptop Development Account
+
+Use a dedicated, locally stored account for laptop-originated devnet transactions. Its keystore and local `.env` password file are ignored by Git; never move either to the VPS or commit them. Fund only the public address from the VPS controller account:
+
+```bash
+cd /opt/aichain
+FUND_AMOUNT=1ether bash ./scripts/fund-dev-account.sh 0xLAPTOP_ADDRESS
+```
+
+The script prompts for the **VPS controller** keystore password and removes its temporary password file on exit. The receiving laptop account's password is never needed on the VPS. `1ether` is temporary development currency only; it is not a token-economics decision.
+
 ## 10. Change Log
 
 | Version | Date | Change |
@@ -410,3 +421,4 @@ Check the laptop through localhost JSON-RPC or the same named-pipe endpoint, the
 | 1.8 | 2026-08-20 | Added reproducible same-VPS second-node synchronization and partition/rejoin workflow |
 | 1.9 | 2026-08-20 | Recorded successful same-VPS initial sync and controlled partition/rejoin validation |
 | 2.0 | 2026-08-21 | Added and recorded successful external laptop-to-VPS P2P synchronization workflow |
+| 2.1 | 2026-08-22 | Added dedicated laptop development-account funding workflow |
