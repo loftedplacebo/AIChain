@@ -11,6 +11,8 @@ build/
 
 # Local network state and secrets
 /devnet/
+.env
+.env.*
 *.key
 *.keystore
 
