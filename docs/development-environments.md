@@ -341,7 +341,7 @@ NODE_1_LOCAL_ENODE="$NODE_1_LOCAL_ENODE" \
   bash ./scripts/start-vps-second-node.sh
 ```
 
-Then add Node 1 as an explicit peer and verify both peers and block heights. `admin.addPeer` is intentional here: the development scripts have discovery disabled, so the test does not depend on public discovery.
+The startup helper automatically adds Node 1 as an explicit peer once Node 2's IPC endpoint is ready. `admin.addPeer` is intentional here: the development scripts have discovery disabled, so the test does not depend on public discovery. Verify both peers and block heights after startup.
 
 ```bash
 /opt/aichain/bin/core-geth attach \

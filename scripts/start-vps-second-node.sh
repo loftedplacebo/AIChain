@@ -45,5 +45,19 @@ nohup env \
 node_2_pid=$!
 echo "$node_2_pid" > "$pid_path"
 echo "Started non-mining node 2 (PID $node_2_pid). Log: $log_path"
-echo "Add node 1 explicitly after its IPC is available:"
-echo "  $node_binary attach --exec 'admin.addPeer(\"$node_1_local_enode\")' $node_2_data_dir/geth.ipc"
+
+# Discovery is deliberately disabled for the private development network, so
+# make the configured local bootnode a static peer once Node 2 exposes IPC.
+for attempt in $(seq 1 20); do
+  if [[ -S "$node_2_data_dir/geth.ipc" ]]; then
+    "$node_binary" attach \
+      --exec "admin.addPeer(\"$node_1_local_enode\")" \
+      "$node_2_data_dir/geth.ipc" >/dev/null
+    echo "Added Node 1 as Node 2's explicit local peer."
+    exit 0
+  fi
+  sleep 1
+done
+
+echo "Node 2 started but its IPC endpoint was not ready for explicit peering." >&2
+exit 1
