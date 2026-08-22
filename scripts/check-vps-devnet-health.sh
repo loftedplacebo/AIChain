@@ -24,8 +24,10 @@ node_1_syncing="$(query 'eth.syncing' "$node_1_data_dir")"
 node_2_syncing="$(query 'eth.syncing' "$node_2_data_dir")"
 node_1_peers="$(query 'admin.peers.length' "$node_1_data_dir")"
 node_2_peers="$(query 'admin.peers.length' "$node_2_data_dir")"
-node_1_chain_id="$(query 'eth.chainId' "$node_1_data_dir")"
-node_2_chain_id="$(query 'eth.chainId' "$node_2_data_dir")"
+node_1_network_id="$(query 'net.version' "$node_1_data_dir")"
+node_2_network_id="$(query 'net.version' "$node_2_data_dir")"
+node_1_genesis_hash="$(query 'eth.getBlock(0).hash' "$node_1_data_dir")"
+node_2_genesis_hash="$(query 'eth.getBlock(0).hash' "$node_2_data_dir")"
 
 if [[ "$node_1_block" != "$node_2_block" ]]; then
   echo "Node block heights differ: node-1=$node_1_block node-2=$node_2_block" >&2
@@ -35,8 +37,8 @@ if [[ "$node_1_syncing" != "false" || "$node_2_syncing" != "false" ]]; then
   echo "A VPS node is still syncing: node-1=$node_1_syncing node-2=$node_2_syncing" >&2
   exit 1
 fi
-if [[ "$node_1_chain_id" != "$node_2_chain_id" ]]; then
-  echo "Node chain IDs differ: node-1=$node_1_chain_id node-2=$node_2_chain_id" >&2
+if [[ "$node_1_network_id" != "$node_2_network_id" || "$node_1_genesis_hash" != "$node_2_genesis_hash" ]]; then
+  echo "Node network or genesis differs" >&2
   exit 1
 fi
 if (( node_1_peers < node_1_min_peers || node_2_peers < node_2_min_peers )); then
@@ -44,5 +46,5 @@ if (( node_1_peers < node_1_min_peers || node_2_peers < node_2_min_peers )); the
   exit 1
 fi
 
-printf 'VPS devnet healthy: chainId=%s block=%s node1Peers=%s node2Peers=%s\n' \
-  "$node_1_chain_id" "$node_1_block" "$node_1_peers" "$node_2_peers"
+printf 'VPS devnet healthy: networkId=%s genesis=%s block=%s node1Peers=%s node2Peers=%s\n' \
+  "$node_1_network_id" "$node_1_genesis_hash" "$node_1_block" "$node_1_peers" "$node_2_peers"
