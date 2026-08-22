@@ -128,6 +128,8 @@ npm run submit:laptop-avr -- `
 
 After confirmation, use the reported transaction and `verify-avr-lifecycle.sh` on the VPS to confirm that the same receipt is retrieved and verified from the chain. This example is development-only; the key-management path, `ethers` usage, fixed contract address, and individual anchor transaction are not a production SDK or custody model.
 
+**Validated development result (2026-08-22):** the laptop account submitted the synthetic fixture using transaction `0x742711453e8fb4397938a9087bba092a3bbcccb423a620b1b3a281d85397cf06`, confirmed in block `25865`. The VPS lifecycle verifier independently retrieved the anchor and confirmed matching receipt ID `0x63eee6e886390ec7873a9a291d21b94e4d1fc5d76be8e6ac072595de9eec8f6e`, commitments root, schema version, and issuer.
+
 ## 7. Change Log
 
 | Version | Date | Change |
@@ -139,3 +141,4 @@ After confirmation, use the reported transaction and `verify-avr-lifecycle.sh` o
 | 0.5 | 2026-08-22 | Added strict draft validation and machine-readable schema for shared SDK conformance |
 | 0.6 | 2026-08-22 | Added parallel SDK-style CLIs and read-only deployed-anchor lifecycle verification |
 | 0.7 | 2026-08-22 | Added synthetic laptop-originated AVR fixture and end-to-end individual-anchor helper |
+| 0.8 | 2026-08-22 | Recorded successful laptop-to-chain-to-VPS AVR lifecycle validation |
