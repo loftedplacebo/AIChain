@@ -3,11 +3,12 @@
 | Field | Value |
 |---|---|
 | Status | Living delivery plan |
-| Document version | 0.4 |
-| Last updated | 2026-08-18 |
+| Document version | 0.5 |
+| Last updated | 2026-08-22 |
 | Architecture inputs | [Core L1 Architecture and Tooling](./core-l1-architecture-and-tooling.md); [AI Verification & ZK Architecture](./ai-verification-and-zk-architecture.md) |
 | Schedule | Dates, durations, staffing, and owners are **TBD** |
 | Decision state | This plan sequences open decisions; it does not settle them |
+| Delivery status | Phase 1A complete for development; Phase 1B development-validation milestone complete; stable protocol decision gate DG-2 remains open |
 
 ## 1. Objective
 
@@ -134,6 +135,8 @@ Security, privacy, compatibility, documentation, and operations run across every
 
 **Goal:** Replace temporary development assumptions with measured and explicitly approved network rules.
 
+**Next active work:** define the decision rubric and benchmark harness for GPU-friendly PoW candidates before selecting any algorithm. The rubric must separately assess present-day GPU accessibility, ASIC/centralisation exposure, implementation maturity, verification/propagation cost, DoS resistance, upgrade path, and quantum-threat assumptions. Existing Ethash mining remains development-only.
+
 **Primary outputs**
 
 - GPU-friendly PoW candidate criteria, prototypes, benchmarks, and recommendation, including a documented quantum-threat assessment and quantum-resilience rationale.
@@ -153,6 +156,8 @@ Security, privacy, compatibility, documentation, and operations run across every
 ### Phase 2B — ZK Statement and Stack Evaluation
 
 **Goal:** Select a ZK approach against precise AVR claims and measurable requirements.
+
+**Next active work:** specify and evaluate one narrow deterministic wrapper claim first: a committed receipt action was evaluated against a committed policy/configuration under a versioned rule set. This is not a claim of frontier-model inference correctness.
 
 **Primary outputs**
 
@@ -299,6 +304,19 @@ The first implementation increment should:
 5. Define the PoW evaluation criteria and candidate benchmark harness, including quantum-threat assessment criteria, without selecting an algorithm prematurely.
 6. Define the first useful ZK claim and public inputs before comparing candidate stacks.
 
+## 8.1 Completed Phase 1B Development Validation (2026-08-22)
+
+The following development evidence completes the AVR vertical-slice implementation milestone:
+
+- AVR `0.1.0-draft` individual and batched anchors, local verification, and laptop-originated submission.
+- OVL checkpoint sealing, L1 batch anchoring, inclusion proofs, private organisation view, and disclosure-package prototype.
+- Authorised AVR `0.2.0-draft`, signed agent-credential sidecar, live on-chain delegation check, and authority-bound laptop receipt.
+- Historical-authorisation registry and anchor, including a live test showing an earlier receipt remains authorised at its stored inclusion time after revocation while a new receipt is rejected.
+- Shared authorised-receipt vector passing in Go, Python, and TypeScript.
+- Private prompts, outputs, credentials, policies, and evidence remain outside the public chain in all demonstrated flows.
+
+This is a development-validation milestone, not a final AVR protocol release. **DG-2 remains open** until AVR-001–006 and PRIV-001 are explicitly resolved for a stable schema/API/anchor profile.
+
 ## 9. Definition of Done for Every Phase
 
 - Deliverables and automated validation are committed and reproducible.
@@ -321,5 +339,6 @@ The first implementation increment should:
 | 0.2 | 2026-08-18 | Added quantum-resilience requirement to PoW evaluation and decision gate | L1-001 |
 | 0.3 | 2026-08-19 | Added autonomous-machine profiles and identity/authority release gate | Product direction; decisions remain TBD |
 | 0.4 | 2026-08-19 | Made capacity, batching/rollups, and confirmation performance mandatory at every phase | DG-10; targets remain TBD |
+| 0.5 | 2026-08-22 | Recorded Phase 1B development-validation completion and Phase 2A/2B next work | DG-2 remains open; L1-001 and ZK-001–005 remain TBD |
 | 0.1 | 2026-08-18 | Initial phased development plan | Architecture documents v0.1 |
 | X.Y | YYYY-MM-DD | Describe the change | Decision ID or link |
