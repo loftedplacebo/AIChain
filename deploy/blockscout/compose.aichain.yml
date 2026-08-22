@@ -13,6 +13,8 @@ services:
       POSTGRES_PASSWORD: ${BLOCKSCOUT_STATS_DB_PASSWORD:?Set BLOCKSCOUT_STATS_DB_PASSWORD in the runtime env file}
 
   backend:
+    extra_hosts:
+      host.docker.internal: "${BLOCKSCOUT_DOCKER_GATEWAY:-172.17.0.1}"
     environment:
       ETHEREUM_JSONRPC_VARIANT: geth
       # A bridge-only relay exposes Node 1's loopback RPC to this Docker network.
