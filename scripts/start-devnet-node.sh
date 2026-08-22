@@ -11,6 +11,7 @@ authrpc_port="${AUTHRPC_PORT:-8551}"
 bootnodes="${BOOTNODES:-}"
 miner_etherbase="${MINER_ETHERBASE:-}"
 miner_threads="${MINER_THREADS:-1}"
+http_vhosts="${HTTP_VHOSTS:-localhost}"
 
 if [[ ! -x "$node_binary" ]]; then
   echo "Core-Geth binary not found or not executable at $node_binary." >&2
@@ -31,7 +32,7 @@ arguments=(
   --http.addr 127.0.0.1
   --http.port "$rpc_port"
   --http.api eth,net,web3,txpool
-  --http.vhosts localhost
+  --http.vhosts "$http_vhosts"
   --authrpc.addr 127.0.0.1
   --authrpc.port "$authrpc_port"
   --nodiscover

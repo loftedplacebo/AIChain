@@ -30,6 +30,8 @@ A future spike may run Blockscout and a **separate** PostgreSQL database in an i
 
 The versioned `deploy/blockscout/compose.aichain.yml` override is used with Blockscout's official `geth.yml` template. It binds only the proxy UI to `127.0.0.1:4000`, does not publish either database, uses chain ID `20260818`, and disables trace-dependent/pending-transaction indexers for the current RPC profile. Node 1's RPC stays bound to `127.0.0.1:8545`; a dedicated relay listens only on the Blockscout Docker network's private gateway at port `18545` so the explorer containers can reach it. The optional user-operation indexer is excluded because this development node does not expose a normal WebSocket RPC endpoint. Runtime database passwords and `SECRET_KEY_BASE` are generated in the ignored `/opt/aichain/.env.blockscout` file.
 
+For this private relay, Node 1 must accept the relay's `Host: host.docker.internal` header while remaining loopback-bound. Start it with `HTTP_VHOSTS=localhost,host.docker.internal`; this is a host-header allow-list change, not a public JSON-RPC exposure.
+
 The deployment remains a compatibility spike. Before any broader use, record the exact Blockscout release/image digest, observed Core-Geth JSON-RPC compatibility, resource limits, volume/reset policy, and selected UI access model. Public exposure remains **TBD**.
 
 ## 4. Private Deployment Commands
