@@ -8,8 +8,11 @@
     "submit:laptop-avr": "node ./scripts/submit-laptop-avr-anchor.mjs",
     "test:avr:typescript": "node --test ./sdk/typescript/receipt.test.js",
     "test:ovl:typescript": "node --test ./sdk/typescript/organisational-ledger.test.js",
+    "test:organisation-view:typescript": "node --test ./sdk/typescript/organisation-view.test.js",
     "avr:derive": "node ./sdk/typescript/avr-cli.js derive",
-    "ovl:seal": "node ./sdk/typescript/ovl-cli.js seal"
+    "ovl:seal": "node ./sdk/typescript/ovl-cli.js seal",
+    "organisation:report": "node ./sdk/typescript/organisation-view-cli.js report",
+    "organisation:disclose": "node ./sdk/typescript/organisation-view-cli.js disclose"
   },
   "dependencies": {
     "ethers": "^6.16.0"

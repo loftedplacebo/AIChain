@@ -1,0 +1,29 @@
+{
+  "schema": "aichain.organisation-view",
+  "schemaVersion": "0.1.0-draft",
+  "organisation": {
+    "ref": "org:synthetic-demo",
+    "ledgerId": "ledger:synthetic-demo",
+    "displayName": "Synthetic Development Organisation"
+  },
+  "agents": [
+    { "id": "agent:research", "status": "active", "authorityRef": "authority:synthetic-1" },
+    { "id": "agent:retired", "status": "revoked", "authorityRef": "authority:synthetic-0" }
+  ],
+  "policies": [
+    { "id": "policy:research-v1", "status": "active" }
+  ],
+  "configurations": [
+    { "id": "config:research-v1", "status": "active", "policyRef": "policy:research-v1" }
+  ],
+  "checkpoints": [
+    {
+      "epoch": 0,
+      "root": "0x3b51ab6732ba3c3ce45bc8e73c2d851840f08bfe53172c91bc640ae62301bdc6",
+      "anchor": {
+        "transactionHash": "0xe3c81ae12b1c0b51886a1a072d2336d21fee0149d9019251eab59042f7b55afd",
+        "blockNumber": 28313
+      }
+    }
+  ]
+}
