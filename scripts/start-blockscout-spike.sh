@@ -20,7 +20,8 @@ fi
 
 docker compose -p aichain-blockscout \
   --env-file "$runtime_env" \
-  -f "$compose_base" -f "$compose_override" up -d
+  -f "$compose_base" -f "$compose_override" up -d \
+  redis-db db backend visualizer sig-provider frontend stats-db stats proxy
 docker compose -p aichain-blockscout \
   --env-file "$runtime_env" \
   -f "$compose_base" -f "$compose_override" ps

@@ -28,7 +28,7 @@ Assess whether a Blockscout deployment can index the private EVM-compatible deve
 
 A future spike may run Blockscout and a **separate** PostgreSQL database in an isolated container network, with the database port unexposed on the host. The explorer should access Node 1 through a localhost-preserving configuration and should initially bind any UI to loopback or an authenticated reverse proxy.
 
-The versioned `deploy/blockscout/compose.aichain.yml` override is used with Blockscout's official `geth.yml` template. It binds only the proxy UI to `127.0.0.1:4000`, does not publish either database, targets `host.docker.internal:8545`, uses chain ID `20260818`, and disables trace-dependent/pending-transaction indexers for the current RPC profile. Runtime database passwords and `SECRET_KEY_BASE` are generated in the ignored `/opt/aichain/.env.blockscout` file.
+The versioned `deploy/blockscout/compose.aichain.yml` override is used with Blockscout's official `geth.yml` template. It binds only the proxy UI to `127.0.0.1:4000`, does not publish either database, targets `host.docker.internal:8545`, uses chain ID `20260818`, and disables trace-dependent/pending-transaction indexers for the current RPC profile. The optional user-operation indexer is excluded because this development node does not expose a normal WebSocket RPC endpoint. Runtime database passwords and `SECRET_KEY_BASE` are generated in the ignored `/opt/aichain/.env.blockscout` file.
 
 The deployment remains a compatibility spike. Before any broader use, record the exact Blockscout release/image digest, observed Core-Geth JSON-RPC compatibility, resource limits, volume/reset policy, and selected UI access model. Public exposure remains **TBD**.
 
