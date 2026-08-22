@@ -32,6 +32,8 @@ The versioned `deploy/blockscout/compose.aichain.yml` override is used with Bloc
 
 For this private relay, Node 1 must accept the relay's `Host: host.docker.internal` header while remaining loopback-bound. Start it with `HTTP_VHOSTS=localhost,host.docker.internal`; this is a host-header allow-list change, not a public JSON-RPC exposure.
 
+The current development node is not archive-capable. The spike therefore disables Blockscout's historical balance enrichment; blocks, transactions, receipts, and logs remain in scope, but historical balance queries are not an acceptance criterion. Archive-node requirements for a lasting explorer remain **TBD**.
+
 The deployment remains a compatibility spike. Before any broader use, record the exact Blockscout release/image digest, observed Core-Geth JSON-RPC compatibility, resource limits, volume/reset policy, and selected UI access model. Public exposure remains **TBD**.
 
 ## 4. Private Deployment Commands

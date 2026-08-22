@@ -24,6 +24,9 @@ services:
       CHAIN_ID: "20260818"
       DATABASE_URL: postgresql://blockscout:${BLOCKSCOUT_DB_PASSWORD}@db:5432/blockscout?ssl=false
       SECRET_KEY_BASE: ${BLOCKSCOUT_SECRET_KEY_BASE:?Set BLOCKSCOUT_SECRET_KEY_BASE in the runtime env file}
+      # The development node is not an archive node, so historical balance
+      # enrichment must remain disabled for the compatibility spike.
+      ETHEREUM_JSONRPC_DISABLE_ARCHIVE_BALANCES: "true"
       INDEXER_DISABLE_INTERNAL_TRANSACTIONS_FETCHER: "true"
       INDEXER_DISABLE_PENDING_TRANSACTIONS_FETCHER: "true"
 

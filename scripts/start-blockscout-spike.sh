@@ -30,10 +30,10 @@ compose=(docker compose -p aichain-blockscout --env-file "$runtime_env" \
   -f "$compose_base" -f "$compose_override")
 
 # Create the Compose network before determining its private bridge gateway.
-# This initial start is harmless: the backend will be recreated below with the
-# correct private host mapping.
-"${compose[@]}" up -d \
-  redis-db db backend visualizer sig-provider frontend stats-db stats proxy
+# `create` does not start a backend with the temporary default host mapping.
+if ! docker network inspect aichain-blockscout_default >/dev/null 2>&1; then
+  "${compose[@]}" create backend
+fi
 
 docker_gateway="$(docker network inspect aichain-blockscout_default \
   --format '{{(index .IPAM.Config 0).Gateway}}')"
@@ -60,7 +60,7 @@ if ! docker container inspect "$rpc_bridge_name" >/dev/null 2>&1; then
     "TCP4-LISTEN:18545,bind=$docker_gateway,reuseaddr,fork" TCP4:127.0.0.1:8545
 fi
 
-# Recreate backend with the exact private-gateway mapping.
+# Start (or reconcile) the stack with the exact private-gateway mapping.
 "${compose[@]}" up -d \
   redis-db db backend visualizer sig-provider frontend stats-db stats proxy
 "${compose[@]}" ps
