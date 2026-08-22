@@ -18,6 +18,14 @@ if [[ ! -f "$runtime_env" ]]; then
   exit 1
 fi
 
+# The official Compose template bind-mounts these state directories into a
+# non-root Blockscout container. The source checkout may have been cloned by
+# root on the VPS, so prepare only these runtime directories for that service.
+mkdir -p "$source_root/docker-compose/services/dets" \
+  "$source_root/docker-compose/services/logs"
+chown 10001:10001 "$source_root/docker-compose/services/dets" \
+  "$source_root/docker-compose/services/logs"
+
 docker compose -p aichain-blockscout \
   --env-file "$runtime_env" \
   -f "$compose_base" -f "$compose_override" up -d \
