@@ -98,6 +98,23 @@ The Python and TypeScript prototypes expose `prepare_anchor` / `prepareAnchor`, 
 
 `scripts/sign-avr-attestation.sh path/to/receipt.json [output.json]` creates and verifies an EIP-191 signature sidecar using the same encrypted VPS keystore. It prompts privately for the password and refuses to overwrite an existing sidecar.
 
+### 7.2 SDK-Style CLI and Read-Only Lifecycle Check
+
+Both reference implementations expose a small JSON command-line interface around their existing derivation and anchor-verification helpers:
+
+```bash
+PYTHONPATH=sdk/python python3 sdk/python/avr_cli.py derive fixtures/avr/receipt-v0.1.0-draft.json
+node sdk/typescript/avr-cli.js derive fixtures/avr/receipt-v0.1.0-draft.json
+```
+
+Each supports `derive`, `prepare-anchor`, and `verify-anchor`. The `verify-avr-lifecycle.sh` script derives the fixture, reads the deployed anchor using standard EVM RPC, normalizes the returned data, and verifies it with the Python reference implementation. It is read-only and requires no credential:
+
+```bash
+bash ./scripts/verify-avr-lifecycle.sh
+```
+
+The CLI and lifecycle check are developer tooling for the Phase 1B draft. They are not a public SDK release or a commitment to final JSON, RPC, wallet, or credential interfaces.
+
 ## 7. Change Log
 
 | Version | Date | Change |
@@ -107,3 +124,4 @@ The Python and TypeScript prototypes expose `prepare_anchor` / `prepareAnchor`, 
 | 0.3 | 2026-08-19 | Added data-driven SDK anchor preparation and submission workflow |
 | 0.4 | 2026-08-19 | Added optional EIP-191 issuer-attestation sidecar prototype |
 | 0.5 | 2026-08-22 | Added strict draft validation and machine-readable schema for shared SDK conformance |
+| 0.6 | 2026-08-22 | Added parallel SDK-style CLIs and read-only deployed-anchor lifecycle verification |

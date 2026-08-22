@@ -4,7 +4,9 @@
   "version": "0.1.0",
   "description": "Local development helpers for the AIChain devnet",
   "scripts": {
-    "submit:laptop-batch": "node ./scripts/submit-laptop-batch.mjs"
+    "submit:laptop-batch": "node ./scripts/submit-laptop-batch.mjs",
+    "test:avr:typescript": "node --test ./sdk/typescript/receipt.test.js",
+    "avr:derive": "node ./sdk/typescript/avr-cli.js derive"
   },
   "dependencies": {
     "ethers": "^6.16.0"
