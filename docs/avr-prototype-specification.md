@@ -115,6 +115,19 @@ bash ./scripts/verify-avr-lifecycle.sh
 
 The CLI and lifecycle check are developer tooling for the Phase 1B draft. They are not a public SDK release or a commitment to final JSON, RPC, wallet, or credential interfaces.
 
+### 7.3 Laptop-Originated End-to-End Example
+
+`receipt-v0.1.0-draft-laptop-e2e.json` is a synthetic fixture whose claimed issuer is the dedicated development account on the laptop. The local helper derives the anchor arguments using the TypeScript reference implementation, decrypts the **local** keystore, and submits through only the laptop's localhost RPC:
+
+```powershell
+cd C:\AIChain
+npm run submit:laptop-avr -- `
+  fixtures/avr/receipt-v0.1.0-draft-laptop-e2e.json `
+  0x871252AE9E27BDf8265402a70A0Fb04B55b64dF7
+```
+
+After confirmation, use the reported transaction and `verify-avr-lifecycle.sh` on the VPS to confirm that the same receipt is retrieved and verified from the chain. This example is development-only; the key-management path, `ethers` usage, fixed contract address, and individual anchor transaction are not a production SDK or custody model.
+
 ## 7. Change Log
 
 | Version | Date | Change |
@@ -125,3 +138,4 @@ The CLI and lifecycle check are developer tooling for the Phase 1B draft. They a
 | 0.4 | 2026-08-19 | Added optional EIP-191 issuer-attestation sidecar prototype |
 | 0.5 | 2026-08-22 | Added strict draft validation and machine-readable schema for shared SDK conformance |
 | 0.6 | 2026-08-22 | Added parallel SDK-style CLIs and read-only deployed-anchor lifecycle verification |
+| 0.7 | 2026-08-22 | Added synthetic laptop-originated AVR fixture and end-to-end individual-anchor helper |

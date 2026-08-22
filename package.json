@@ -5,6 +5,7 @@
   "description": "Local development helpers for the AIChain devnet",
   "scripts": {
     "submit:laptop-batch": "node ./scripts/submit-laptop-batch.mjs",
+    "submit:laptop-avr": "node ./scripts/submit-laptop-avr-anchor.mjs",
     "test:avr:typescript": "node --test ./sdk/typescript/receipt.test.js",
     "avr:derive": "node ./sdk/typescript/avr-cli.js derive"
   },

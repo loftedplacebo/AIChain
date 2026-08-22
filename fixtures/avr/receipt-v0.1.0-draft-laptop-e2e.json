@@ -1,0 +1,21 @@
+{
+  "schema": "aichain.avr",
+  "schemaVersion": "0.1.0-draft",
+  "assuranceLevel": "unproved",
+  "issuer": "0x871252AE9E27BDf8265402a70A0Fb04B55b64dF7",
+  "execution": {
+    "claimedAt": "2026-08-22T10:30:00Z"
+  },
+  "commitments": {
+    "configuration": "0x7777777777777777777777777777777777777777777777777777777777777777",
+    "input": "0x8888888888888888888888888888888888888888888888888888888888888888",
+    "model": "0x9999999999999999999999999999999999999999999999999999999999999999",
+    "output": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "policy": "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "provider": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+  },
+  "expected": {
+    "receiptId": "0x63eee6e886390ec7873a9a291d21b94e4d1fc5d76be8e6ac072595de9eec8f6e",
+    "commitmentsRoot": "0xea889ed3b7af077b938e16f99e14ad4e6955e44e3f1ec9462a852388a2e3cf93"
+  }
+}

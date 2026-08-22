@@ -10,6 +10,8 @@ const demoFixturePath = path.join(__dirname, "..", "..", "fixtures", "avr", "rec
 const demoFixture = JSON.parse(fs.readFileSync(demoFixturePath, "utf8"));
 const agentDemoFixturePath = path.join(__dirname, "..", "..", "fixtures", "avr", "receipt-v0.1.0-draft-agent-demo-3.json");
 const agentDemoFixture = JSON.parse(fs.readFileSync(agentDemoFixturePath, "utf8"));
+const laptopE2eFixturePath = path.join(__dirname, "..", "..", "fixtures", "avr", "receipt-v0.1.0-draft-laptop-e2e.json");
+const laptopE2eFixture = JSON.parse(fs.readFileSync(laptopE2eFixturePath, "utf8"));
 
 test("derives the fixture receipt ID and commitments root", () => {
   const derived = deriveReceipt(fixture);
@@ -27,6 +29,12 @@ test("derives the delegated-agent demo receipt ID and commitments root", () => {
   const derived = deriveReceipt(agentDemoFixture);
   assert.equal(derived.receiptId, agentDemoFixture.expected.receiptId);
   assert.equal(derived.commitmentsRoot, agentDemoFixture.expected.commitmentsRoot);
+});
+
+test("derives the laptop end-to-end fixture identifiers", () => {
+  const derived = deriveReceipt(laptopE2eFixture);
+  assert.equal(derived.receiptId, laptopE2eFixture.expected.receiptId);
+  assert.equal(derived.commitmentsRoot, laptopE2eFixture.expected.commitmentsRoot);
 });
 
 test("changes the receipt ID when a committed value changes", () => {
