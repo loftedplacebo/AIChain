@@ -1,0 +1,33 @@
+# Override for the official Blockscout geth.yml Compose template.
+# Invoke with that template first; this file must not be used standalone.
+
+services:
+  db:
+    ports: !override []
+    environment:
+      POSTGRES_PASSWORD: ${BLOCKSCOUT_DB_PASSWORD:?Set BLOCKSCOUT_DB_PASSWORD in the runtime env file}
+
+  stats-db:
+    ports: !override []
+    environment:
+      POSTGRES_PASSWORD: ${BLOCKSCOUT_STATS_DB_PASSWORD:?Set BLOCKSCOUT_STATS_DB_PASSWORD in the runtime env file}
+
+  backend:
+    environment:
+      ETHEREUM_JSONRPC_VARIANT: geth
+      ETHEREUM_JSONRPC_HTTP_URL: http://host.docker.internal:8545/
+      ETHEREUM_JSONRPC_TRACE_URL: http://host.docker.internal:8545/
+      CHAIN_ID: "20260818"
+      DATABASE_URL: postgresql://blockscout:${BLOCKSCOUT_DB_PASSWORD}@db:5432/blockscout?ssl=false
+      SECRET_KEY_BASE: ${BLOCKSCOUT_SECRET_KEY_BASE:?Set BLOCKSCOUT_SECRET_KEY_BASE in the runtime env file}
+      INDEXER_DISABLE_INTERNAL_TRANSACTIONS_FETCHER: "true"
+      INDEXER_DISABLE_PENDING_TRANSACTIONS_FETCHER: "true"
+
+  stats:
+    environment:
+      STATS__DB_URL: postgres://stats:${BLOCKSCOUT_STATS_DB_PASSWORD}@stats-db:5432/stats
+      STATS__BLOCKSCOUT_DB_URL: postgresql://blockscout:${BLOCKSCOUT_DB_PASSWORD}@db:5432/blockscout
+
+  proxy:
+    ports: !override
+      - "127.0.0.1:4000:80"
