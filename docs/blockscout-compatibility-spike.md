@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Phase 1A compatibility spike completed; production suitability unresolved |
-| Document version | 0.3 |
+| Document version | 0.4 |
 | Last updated | 2026-08-22 |
 | Scope | Private development-network explorer only |
 | Decision state | No explorer deployment or public exposure has been selected |
@@ -40,6 +40,7 @@ The deployment remains a compatibility spike. Before any broader use, record the
 
 - The loopback-only UI returned HTTP 200 and its block API returned indexed live blocks.
 - Blockscout retrieved the recorded laptop-originated AVR anchor transaction (`0x742711453e8fb4397938a9087bba092a3bbcccb423a620b1b3a281d85397cf06`).
+- A fresh laptop-originated AVR was submitted and indexed end-to-end on 2026-08-22: transaction `0x873a167b8e6d6d3ce17df03ba70b7abc3ccaf06ed040b4e7e873c8b4671fcceb`, block `28226`, receipt ID `0x83e83d09f4e54590e00b81e35a4ff9737b47a9b451806f8ca290bf4a1b94f5ea`, and commitments root `0xdd46772ad3238f287d76ba78247bf6dbea058f10fb4d7f64ba4da6b039357745`. The on-chain event and explorer record match.
 - No JSON-RPC, Blockscout PostgreSQL, or explorer UI port was published publicly. The only relay path is the Docker-network-private gateway to Node 1's loopback RPC.
 - Historical state lookups can fail on the current pruned development node. This is expected for the spike and confirms that an archive-capable node is required before treating Blockscout as a complete historical explorer.
 
@@ -87,3 +88,4 @@ The frontend configuration is intentionally set to `127.0.0.1:4000` for this SSH
 | 0.1 | 2026-08-22 | Initial VPS compatibility assessment and safe evaluation boundary |
 | 0.2 | 2026-08-22 | Added localhost-only Compose override and private runtime configuration workflow |
 | 0.3 | 2026-08-22 | Confirmed private indexing and documented archive-node limitation |
+| 0.4 | 2026-08-22 | Recorded fresh laptop-to-explorer AVR end-to-end verification |
