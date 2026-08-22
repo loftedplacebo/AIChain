@@ -3,8 +3,8 @@
 | Field | Value |
 |---|---|
 | Status | Living design document |
-| Document version | 0.5 |
-| Last updated | 2026-08-19 |
+| Document version | 0.6 |
+| Last updated | 2026-08-22 |
 | Protocol/schema version | **TBD** |
 | Decision state | Product direction agreed; unresolved items are marked **TBD** |
 | Companion document | [Core L1 Architecture and Tooling](./core-l1-architecture-and-tooling.md) |
@@ -236,6 +236,12 @@ For an unproved receipt, the `zk` section may be absent or may explicitly state 
 | ZK-005 | Initial private policy/authority claims eligible for ZK evaluation | TBD |
 | SCALE-001 | Receipt batching, aggregation, recursion, and throughput strategy | TBD |
 | SCALE-002 | Workload, confirmation-latency, block/state/indexer-growth, and capacity targets | TBD |
+| ARCH-002 | Enterprise deployment model | Agreed: Organisation Verification Ledger (OVL) plus AIChain anchoring is the default; customer-specific private L1 is deferred. See [ADR-0002](./decisions/0002-organisational-verification-ledger.md). |
+| AVR-008 | Profile-based receipt architecture | Agreed direction; canonical object schema remains TBD. |
+| AVR-009 | Assurance presentation | Agreed: present distinct evidence dimensions; do not use a generic “verified” claim. |
+| PRIV-002 | OVL privacy baseline | Agreed: private evidence remains in the organisation boundary; public L1 anchors commitments/checkpoint metadata only. |
+| SCALE-003 | OVL anchor hierarchy | Agreed direction: receipt → Merkle batch → signed checkpoint → L1 anchor; detailed limits TBD. |
+| CRYPTO-001 | Crypto agility | Agreed direction: suite IDs, key rotation, migration/re-signing records, and versioned reports; suites remain TBD. |
 
 ## 12. Maintenance Rules
 
@@ -254,4 +260,5 @@ For an unproved receipt, the `zk` section may be absent or may explicitly state 
 | 0.3 | 2026-08-19 | Expanded product scope to autonomous-machine receipt profiles and identity/authority use cases | Product direction; decisions remain TBD |
 | 0.4 | 2026-08-19 | Recorded contract-level identity and authority prototype boundary | ID-001–003 and AVR-004 remain TBD |
 | 0.5 | 2026-08-19 | Added mandatory capacity, batching/rollup, and aggregation evaluation requirements | SCALE-001–002 remain TBD |
+| 0.6 | 2026-08-22 | Accepted organisational-ledger, privacy, assurance, scaling, and crypto-agility directions | ADR-0002; detailed protocol values remain TBD |
 | X.Y | YYYY-MM-DD | Describe the change | Decision ID or link |
