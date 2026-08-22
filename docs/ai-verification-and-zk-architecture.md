@@ -52,6 +52,10 @@ The Phase 1B prototype uses a versioned **Solidity event-and-state anchor contra
 
 This is an implementation experiment, not a resolution of **AVR-001** through **AVR-006** or a final decision about native placement, hash construction, or attestation trust. A later version may use a new contract, a migration record, or a native protocol mechanism.
 
+### 3.2 Authorised AVR Prototype Boundary
+
+The additive `0.2.0-draft` Authorised AVR prototype binds an opaque organisation ID and authority commitment to a receipt. Its companion contract checks that the submitting wallet has an active, matching `AuthorityRegistry` delegation at submission time. It does not validate credential signatures, the committed policy/configuration, a real-world identity, or historical authorisation semantics. See [Authorised AVR Prototype](./authorised-avr-prototype.md).
+
 ## 4. AI Verification Receipt
 
 An AVR binds an AI execution to a defined set of evidence. The final schema and verification rules remain open.
@@ -261,4 +265,5 @@ For an unproved receipt, the `zk` section may be absent or may explicitly state 
 | 0.4 | 2026-08-19 | Recorded contract-level identity and authority prototype boundary | ID-001–003 and AVR-004 remain TBD |
 | 0.5 | 2026-08-19 | Added mandatory capacity, batching/rollup, and aggregation evaluation requirements | SCALE-001–002 remain TBD |
 | 0.6 | 2026-08-22 | Accepted organisational-ledger, privacy, assurance, scaling, and crypto-agility directions | ADR-0002; detailed protocol values remain TBD |
+| 0.7 | 2026-08-22 | Added additive authorised-AVR prototype boundary | Development-only; final credential/trust decisions remain TBD |
 | X.Y | YYYY-MM-DD | Describe the change | Decision ID or link |
