@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "0.1.0-draft",
+  "runId": "YYYY-MM-DD-candidate-host-sequence",
+  "recordedAtUtc": "YYYY-MM-DDTHH:MM:SSZ",
+  "candidate": {
+    "id": "c1-progpow-kawpow-family-or-c2-autolykos-v2",
+    "algorithmRevision": "TBD",
+    "upstreamRepository": "TBD",
+    "upstreamCommit": "TBD",
+    "localPatchCommit": "TBD",
+    "license": "TBD",
+    "testVectorSource": "TBD"
+  },
+  "client": {
+    "coreGethCommit": "TBD",
+    "consensusFlag": "development-only",
+    "buildFlags": []
+  },
+  "host": {
+    "role": "miner-or-validator",
+    "operatingSystem": "TBD",
+    "kernel": "TBD",
+    "cpu": "TBD",
+    "memoryGiB": null,
+    "storage": "TBD",
+    "network": "TBD"
+  },
+  "accelerators": [
+    {
+      "vendor": "NVIDIA-or-AMD",
+      "model": "TBD",
+      "vramGiB": null,
+      "driver": "TBD",
+      "runtime": "CUDA-or-OpenCL-version",
+      "powerLimitWatts": null,
+      "clockSettings": "TBD"
+    }
+  ],
+  "networkScenario": {
+    "nodeCount": null,
+    "topology": "TBD",
+    "simulatedLatencyMs": null,
+    "simulatedPacketLossPercent": null,
+    "blockTargetSeconds": null,
+    "gasLimit": null,
+    "difficultyConfiguration": "TBD",
+    "clockSource": "TBD"
+  },
+  "avrWorkload": {
+    "fixtureRevision": "TBD",
+    "logicalReceiptCount": null,
+    "batchSize": null,
+    "submitterConcurrency": null,
+    "confirmationDefinition": "TBD",
+    "warmupSeconds": null,
+    "failureConditions": []
+  },
+  "measurements": {
+    "hashrate": "TBD with unit and method",
+    "wallPowerWatts": null,
+    "validatorLatencyMs": null,
+    "peakMemoryMiB": null,
+    "blockPropagationMs": null,
+    "staleOrOrphanRate": null,
+    "reorganisationSummary": "TBD",
+    "broadcastLogicalReceiptTps": null,
+    "allConfirmedLogicalReceiptTps": null
+  },
+  "rawArtefacts": [],
+  "notes": "TBD"
+}
