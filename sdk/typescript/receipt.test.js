@@ -2,7 +2,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const test = require("node:test");
-const { deriveReceipt, prepareAnchor, prepareAttestation, verifyReceiptAgainstAnchor } = require("./receipt");
+const { deriveReceipt, prepareAnchor, prepareAttestation, validateReceipt, verifyReceiptAgainstAnchor } = require("./receipt");
 
 const fixturePath = path.join(__dirname, "..", "..", "fixtures", "avr", "receipt-v0.1.0-draft.json");
 const fixture = JSON.parse(fs.readFileSync(fixturePath, "utf8"));
@@ -34,6 +34,20 @@ test("changes the receipt ID when a committed value changes", () => {
   changed.commitments.input = `0x${"aa".repeat(32)}`;
   assert.notEqual(deriveReceipt(changed).receiptId, deriveReceipt(fixture).receiptId);
   assert.notEqual(deriveReceipt(changed).commitmentsRoot, deriveReceipt(fixture).commitmentsRoot);
+});
+
+test("rejects malformed or unsupported receipts before derivation", () => {
+  const missingCommitment = structuredClone(fixture);
+  delete missingCommitment.commitments.provider;
+  assert.throws(() => validateReceipt(missingCommitment));
+
+  const invalidCommitment = structuredClone(fixture);
+  invalidCommitment.commitments.input = "0x1234";
+  assert.throws(() => deriveReceipt(invalidCommitment));
+
+  const unknownVersion = structuredClone(fixture);
+  unknownVersion.schemaVersion = "0.2.0";
+  assert.throws(() => deriveReceipt(unknownVersion));
 });
 
 test("verifies a matching anchor and rejects a changed receipt", () => {

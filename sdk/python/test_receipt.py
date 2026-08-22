@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from receipt import derive_receipt, prepare_anchor, prepare_attestation, verify_receipt_against_anchor
+from receipt import derive_receipt, prepare_anchor, prepare_attestation, validate_receipt, verify_receipt_against_anchor
 
 
 FIXTURE = Path(__file__).parents[2] / "fixtures" / "avr" / "receipt-v0.1.0-draft.json"
@@ -35,6 +35,33 @@ def test_changed_commitment_changes_identifiers():
     changed["commitments"]["input"] = "0x" + "aa" * 32
     assert derive_receipt(changed)["receiptId"] != derive_receipt(fixture)["receiptId"]
     assert derive_receipt(changed)["commitmentsRoot"] != derive_receipt(fixture)["commitmentsRoot"]
+
+
+def test_rejects_malformed_or_unsupported_receipts():
+    fixture = json.loads(FIXTURE.read_text(encoding="utf-8"))
+    missing_commitment = json.loads(json.dumps(fixture))
+    del missing_commitment["commitments"]["provider"]
+    try:
+        validate_receipt(missing_commitment)
+        assert False, "Expected missing commitment to fail"
+    except ValueError:
+        pass
+
+    invalid_commitment = json.loads(json.dumps(fixture))
+    invalid_commitment["commitments"]["input"] = "0x1234"
+    try:
+        derive_receipt(invalid_commitment)
+        assert False, "Expected invalid commitment to fail"
+    except ValueError:
+        pass
+
+    unknown_version = json.loads(json.dumps(fixture))
+    unknown_version["schemaVersion"] = "0.2.0"
+    try:
+        derive_receipt(unknown_version)
+        assert False, "Expected unsupported version to fail"
+    except ValueError:
+        pass
 
 
 def test_verifies_matching_anchor_and_rejects_changed_receipt():

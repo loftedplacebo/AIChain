@@ -3,8 +3,8 @@
 | Field | Value |
 |---|---|
 | Status | Phase 1B prototype specification |
-| Document version | 0.4 |
-| Last updated | 2026-08-19 |
+| Document version | 0.5 |
+| Last updated | 2026-08-22 |
 | Receipt schema version | `0.1.0-draft` |
 | Protocol status | Non-final; does not settle AVR protocol decisions |
 | Companion design | [AI Verification & ZK Architecture](./ai-verification-and-zk-architecture.md) |
@@ -38,6 +38,8 @@ It is deliberately not the final AVR schema, commitment scheme, signature model,
 ```
 
 All commitment values are opaque 32-byte values. The receipt contains no raw prompt, output, customer data, model identifier, provider name, configuration, or policy text.
+
+The machine-readable Phase 1B draft schema is [avr-v0.1.0-draft.schema.json](../spec/avr/avr-v0.1.0-draft.schema.json). It fixes this prototype's field shape so Python and TypeScript reject missing, malformed, unknown-version, or silently extended receipt payloads before identifier derivation. This validation is a **draft conformance boundary**, not a final AVR protocol decision.
 
 ## 3. Canonicalization and Identifier
 
@@ -104,3 +106,4 @@ The Python and TypeScript prototypes expose `prepare_anchor` / `prepareAnchor`, 
 | 0.2 | 2026-08-19 | Added local anchor-verification behavior and read-only retrieval workflow |
 | 0.3 | 2026-08-19 | Added data-driven SDK anchor preparation and submission workflow |
 | 0.4 | 2026-08-19 | Added optional EIP-191 issuer-attestation sidecar prototype |
+| 0.5 | 2026-08-22 | Added strict draft validation and machine-readable schema for shared SDK conformance |

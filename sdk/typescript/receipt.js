@@ -3,6 +3,31 @@ const crypto = require("node:crypto");
 const RECEIPT_DOMAIN = "aichain:avr:0.1.0-draft:";
 const COMMITMENTS_DOMAIN = "aichain:avr:commitments:0.1.0-draft:";
 const ATTESTATION_MESSAGE_DOMAIN = "AIChain AVR v0.1.0-draft receipt: ";
+const RECEIPT_FIELDS = new Set(["schema", "schemaVersion", "assuranceLevel", "issuer", "execution", "commitments"]);
+const COMMITMENT_FIELDS = new Set(["configuration", "input", "model", "output", "policy", "provider"]);
+const BYTES32 = /^0x[0-9a-fA-F]{64}$/;
+const ADDRESS = /^0x[0-9a-fA-F]{40}$/;
+
+function hasExactKeys(value, keys) {
+  return value !== null && typeof value === "object" && !Array.isArray(value)
+    && Object.keys(value).length === keys.size && Object.keys(value).every((key) => keys.has(key));
+}
+
+function validateReceipt(receipt) {
+  if (receipt === null || typeof receipt !== "object" || Array.isArray(receipt)) throw new Error("Receipt must be an object");
+  const { expected, attestation, ...payload } = receipt;
+  if (!hasExactKeys(payload, RECEIPT_FIELDS)) throw new Error("Receipt fields do not match the AVR v0.1.0-draft shape");
+  if (payload.schema !== "aichain.avr" || payload.schemaVersion !== "0.1.0-draft") throw new Error("Unsupported AVR schema or schema version");
+  if (typeof payload.assuranceLevel !== "string" || !payload.assuranceLevel) throw new Error("assuranceLevel must be a non-empty string");
+  if (typeof payload.issuer !== "string" || !ADDRESS.test(payload.issuer)) throw new Error("issuer must be a 20-byte EVM address");
+  if (!hasExactKeys(payload.execution, new Set(["claimedAt"])) || typeof payload.execution.claimedAt !== "string"
+    || !payload.execution.claimedAt.endsWith("Z") || Number.isNaN(Date.parse(payload.execution.claimedAt))) {
+    throw new Error("claimedAt must be an RFC 3339 UTC timestamp");
+  }
+  if (!hasExactKeys(payload.commitments, COMMITMENT_FIELDS) || Object.values(payload.commitments).some((value) => typeof value !== "string" || !BYTES32.test(value))) {
+    throw new Error("Each commitment must be a 32-byte hex value");
+  }
+}
 
 function canonicalize(value) {
   if (Array.isArray(value)) return `[${value.map(canonicalize).join(",")}]`;
@@ -17,6 +42,7 @@ function sha256Hex(domain, canonicalValue) {
 }
 
 function deriveReceipt(receipt) {
+  validateReceipt(receipt);
   const { expected, attestation, ...payload } = receipt;
   const canonicalReceipt = canonicalize(payload);
   const canonicalCommitments = canonicalize(payload.commitments);
@@ -64,4 +90,4 @@ function prepareAnchor(receipt) {
   };
 }
 
-module.exports = { canonicalize, deriveReceipt, prepareAnchor, prepareAttestation, verifyReceiptAgainstAnchor };
+module.exports = { canonicalize, validateReceipt, deriveReceipt, prepareAnchor, prepareAttestation, verifyReceiptAgainstAnchor };
