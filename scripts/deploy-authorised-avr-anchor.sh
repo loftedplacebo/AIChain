@@ -38,9 +38,8 @@ echo "Deploying AuthorisedAVRAnchor with AuthorityRegistry: $AUTHORITY_REGISTRY_
 cd "$CONTRACT_ROOT"
 "$FOUNDRY_BIN/forge" create src/AuthorisedAVRAnchor.sol:AuthorisedAVRAnchor \
     --rpc-url "$RPC_URL" \
-    --constructor-args "$AUTHORITY_REGISTRY_ADDRESS" \
     --keystore "$keystore" \
     --password-file "$password_file" \
     --broadcast \
-    --legacy
-
+    --legacy \
+    --constructor-args "$AUTHORITY_REGISTRY_ADDRESS"
