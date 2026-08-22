@@ -51,4 +51,5 @@ See [Development Environments](./docs/development-environments.md) for the initi
 - [Development Plan](./docs/development-plan.md)
 - [Capacity and Batching Prototype](./docs/capacity-and-batching-prototype.md)
 - [Development Environments](./docs/development-environments.md)
+- [Blockscout Compatibility Spike](./docs/blockscout-compatibility-spike.md)
 - [ADR-0001: Core-Geth Development Baseline](./docs/decisions/0001-core-geth-development-baseline.md)

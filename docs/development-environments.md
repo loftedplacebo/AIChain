@@ -413,7 +413,25 @@ The command writes a non-sensitive report under the ignored `devnet/` directory.
 
 **Validated development result (2026-08-22):** the funded laptop address `0x871252AE9E27BDf8265402a70A0Fb04B55b64dF7` locally signed and submitted a 100-receipt batch through the laptop node. VPS Node 1 mined transaction `0x69fed2f4783e7d0811f3c50552af678c85d685f93c7d1ac7675a6385bb684828` in block `25819`; VPS Node 2 returned the identical successful receipt. This is the first end-to-end external-client submission validation.
 
-## 10. Change Log
+## 10. Automated Health Checks
+
+The read-only VPS health check verifies that Nodes 1 and 2 share a chain ID and block height, are not syncing, and meet configurable minimum peer counts:
+
+```bash
+cd /opt/aichain
+bash ./scripts/check-vps-devnet-health.sh
+```
+
+The laptop check verifies its localhost RPC, chain ID, synchronization state, and peer count:
+
+```powershell
+cd C:\AIChain
+.\scripts\check-laptop-devnet.ps1
+```
+
+These checks do not replace load, fault, reorganization, or security testing. They are safe readiness checks before a benchmark, receipt-submission demonstration, or maintenance operation.
+
+## 11. Change Log
 
 | Version | Date | Change |
 |---|---|---|
@@ -438,3 +456,4 @@ The command writes a non-sensitive report under the ignored `devnet/` directory.
 | 2.0 | 2026-08-21 | Added and recorded successful external laptop-to-VPS P2P synchronization workflow |
 | 2.1 | 2026-08-22 | Added dedicated laptop development-account funding workflow |
 | 2.2 | 2026-08-22 | Added and recorded first laptop-originated batch-submission workflow |
+| 2.3 | 2026-08-22 | Added read-only VPS and laptop devnet health checks |
