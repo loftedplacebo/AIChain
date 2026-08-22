@@ -246,6 +246,7 @@ For an unproved receipt, the `zk` section may be absent or may explicitly state 
 | PRIV-002 | OVL privacy baseline | Agreed: private evidence remains in the organisation boundary; public L1 anchors commitments/checkpoint metadata only. |
 | SCALE-003 | OVL anchor hierarchy | Agreed direction: receipt → Merkle batch → signed checkpoint → L1 anchor; detailed limits TBD. |
 | CRYPTO-001 | Crypto agility | Agreed direction: suite IDs, key rotation, migration/re-signing records, and versioned reports; suites remain TBD. |
+| ID-004 | Historical authorisation semantics | Prototype added: append-only delegation epochs and inclusion-time checks; final execution-time/revocation policy remains TBD. |
 
 ## 12. Maintenance Rules
 
@@ -266,4 +267,5 @@ For an unproved receipt, the `zk` section may be absent or may explicitly state 
 | 0.5 | 2026-08-19 | Added mandatory capacity, batching/rollup, and aggregation evaluation requirements | SCALE-001–002 remain TBD |
 | 0.6 | 2026-08-22 | Accepted organisational-ledger, privacy, assurance, scaling, and crypto-agility directions | ADR-0002; detailed protocol values remain TBD |
 | 0.7 | 2026-08-22 | Added additive authorised-AVR prototype boundary | Development-only; final credential/trust decisions remain TBD |
+| 0.8 | 2026-08-22 | Added historical-authorisation prototype boundary | ID-004 remains partially unresolved |
 | X.Y | YYYY-MM-DD | Describe the change | Decision ID or link |
