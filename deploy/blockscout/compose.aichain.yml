@@ -15,8 +15,10 @@ services:
   backend:
     environment:
       ETHEREUM_JSONRPC_VARIANT: geth
-      ETHEREUM_JSONRPC_HTTP_URL: http://host.docker.internal:8545/
-      ETHEREUM_JSONRPC_TRACE_URL: http://host.docker.internal:8545/
+      # A bridge-only relay exposes Node 1's loopback RPC to this Docker network.
+      # It does not listen on the VPS public interface.
+      ETHEREUM_JSONRPC_HTTP_URL: http://host.docker.internal:18545/
+      ETHEREUM_JSONRPC_TRACE_URL: http://host.docker.internal:18545/
       CHAIN_ID: "20260818"
       DATABASE_URL: postgresql://blockscout:${BLOCKSCOUT_DB_PASSWORD}@db:5432/blockscout?ssl=false
       SECRET_KEY_BASE: ${BLOCKSCOUT_SECRET_KEY_BASE:?Set BLOCKSCOUT_SECRET_KEY_BASE in the runtime env file}
