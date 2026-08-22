@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Living delivery plan |
-| Document version | 0.5 |
+| Document version | 0.6 |
 | Last updated | 2026-08-22 |
 | Architecture inputs | [Core L1 Architecture and Tooling](./core-l1-architecture-and-tooling.md); [AI Verification & ZK Architecture](./ai-verification-and-zk-architecture.md) |
 | Schedule | Dates, durations, staffing, and owners are **TBD** |
@@ -340,5 +340,6 @@ This is a development-validation milestone, not a final AVR protocol release. **
 | 0.3 | 2026-08-19 | Added autonomous-machine profiles and identity/authority release gate | Product direction; decisions remain TBD |
 | 0.4 | 2026-08-19 | Made capacity, batching/rollups, and confirmation performance mandatory at every phase | DG-10; targets remain TBD |
 | 0.5 | 2026-08-22 | Recorded Phase 1B development-validation completion and Phase 2A/2B next work | DG-2 remains open; L1-001 and ZK-001–005 remain TBD |
+| 0.6 | 2026-08-22 | Started Phase 2 evaluation charters without selecting PoW or ZK choices | [Phase 2 Evaluation Charter](./phase-2-evaluation-charter.md) |
 | 0.1 | 2026-08-18 | Initial phased development plan | Architecture documents v0.1 |
 | X.Y | YYYY-MM-DD | Describe the change | Decision ID or link |
