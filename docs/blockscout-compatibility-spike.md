@@ -2,8 +2,8 @@
 
 | Field | Value |
 |---|---|
-| Status | Phase 1A compatibility assessment |
-| Document version | 0.1 |
+| Status | Phase 1A compatibility spike completed; production suitability unresolved |
+| Document version | 0.3 |
 | Last updated | 2026-08-22 |
 | Scope | Private development-network explorer only |
 | Decision state | No explorer deployment or public exposure has been selected |
@@ -36,7 +36,14 @@ The current development node is not archive-capable. The spike therefore disable
 
 The deployment remains a compatibility spike. Before any broader use, record the exact Blockscout release/image digest, observed Core-Geth JSON-RPC compatibility, resource limits, volume/reset policy, and selected UI access model. Public exposure remains **TBD**.
 
-## 4. Private Deployment Commands
+## 4. Observed Result
+
+- The loopback-only UI returned HTTP 200 and its block API returned indexed live blocks.
+- Blockscout retrieved the recorded laptop-originated AVR anchor transaction (`0x742711453e8fb4397938a9087bba092a3bbcccb423a620b1b3a281d85397cf06`).
+- No JSON-RPC, Blockscout PostgreSQL, or explorer UI port was published publicly. The only relay path is the Docker-network-private gateway to Node 1's loopback RPC.
+- Historical state lookups can fail on the current pruned development node. This is expected for the spike and confirms that an archive-capable node is required before treating Blockscout as a complete historical explorer.
+
+## 5. Private Deployment Commands
 
 On the VPS, after the official Blockscout source templates have been cloned to `/opt/aichain/services/blockscout-source`:
 
@@ -55,25 +62,26 @@ ssh -N -L 4000:127.0.0.1:4000 root@62.171.161.32
 
 Then browse to `http://127.0.0.1:4000`. Do not open port `4000` in UFW or the provider firewall.
 
-## 5. Acceptance Checks
+## 6. Acceptance Checks
 
 - Index chain ID `20260818`, blocks, transactions, and receipts from Node 1.
 - Display the AVR anchor and batch-anchor contract events as ordinary EVM logs.
 - Remain functional after node recovery and peer reconnection.
 - Do not expose node JSON-RPC or database ports publicly.
 
-## 6. Open Decisions
+## 7. Open Decisions
 
 | ID | Decision | Status |
 |---|---|---|
-| EXP-001 | Blockscout version/image and compatibility result | TBD |
+| EXP-001 | Blockscout version/image and compatibility result | Compatible for the private, pruned-node spike; production suitability TBD |
 | EXP-002 | Explorer UI access model and authentication | TBD |
 | EXP-003 | Indexer retention, reset, backup, and monitoring model | TBD |
 | EXP-004 | Receipt-specific indexing/display beyond ordinary EVM events | TBD |
 
-## 7. Change Log
+## 8. Change Log
 
 | Version | Date | Change |
 |---|---|---|
 | 0.1 | 2026-08-22 | Initial VPS compatibility assessment and safe evaluation boundary |
 | 0.2 | 2026-08-22 | Added localhost-only Compose override and private runtime configuration workflow |
+| 0.3 | 2026-08-22 | Confirmed private indexing and documented archive-node limitation |

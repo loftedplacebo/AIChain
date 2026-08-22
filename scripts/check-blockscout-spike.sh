@@ -9,4 +9,11 @@ if [[ "$status" != "200" && "$status" != "302" ]]; then
   echo "Blockscout did not return a ready HTTP response at $url (status $status)." >&2
   exit 1
 fi
-echo "Blockscout HTTP readiness check passed at $url (status $status)."
+
+blocks="$(curl --silent --show-error --max-time 15 "$url/api/v2/main-page/blocks")"
+if [[ "$blocks" != *'"height"'* ]]; then
+  echo "Blockscout UI is reachable but its block API returned no indexed blocks." >&2
+  exit 1
+fi
+
+echo "Blockscout readiness check passed at $url (HTTP $status; indexed blocks available)."
