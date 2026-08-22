@@ -40,6 +40,12 @@ On 2026-08-22, the repository’s pinned Windows Go/CGO toolchain ran:
 
 Result: **pass**. This is a focused CPU-only control test for the existing Ethash consensus package. It does not validate a GPU miner, public-network behaviour, or a final algorithm.
 
+### C1 CPU conformance evidence
+
+The committed runner [`scripts/run-c1-kawpow-vector-check.ps1`](../scripts/run-c1-kawpow-vector-check.ps1) compiled the Apache-2.0 `RavenCommunity/cpp-kawpow` reference at pinned commit `061d341011ca341e1f506c52b571f5fd64a0df71` with AIChain’s pinned Windows compiler and ran its deterministic ProgPoW vectors.
+
+Result on 2026-08-22: **13 vectors passed**, including positive verification and tampered-mix rejection. The runner is CPU-only; it verifies a reference implementation and has not yet placed KawPoW in the Core-Geth consensus path. Source provenance is recorded in [Candidate Source Pins](../benchmarks/pow/candidate-source-pins.md).
+
 ## Spike rules
 
 - Work only in an isolated Core-Geth development branch or disposable worktree.
@@ -51,7 +57,7 @@ Result: **pass**. This is a focused CPU-only control test for the existing Ethas
 
 ## Staged implementation sequence
 
-1. Pin upstream candidate revision, licence, specification, and test-vector source in a run manifest.
+1. Pin upstream candidate revision, licence, specification, and test-vector source in a run manifest. **C1 complete.**
 2. Add a minimal verifier adapter and deterministic Go unit tests for valid, invalid, malformed, and wrong-difficulty seals.
 3. Measure CPU block-verification latency and memory before adding mining support.
 4. Add development-only sealing/miner integration.
