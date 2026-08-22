@@ -22,12 +22,12 @@ contract HistoricalAuthorityRegistry {
     event AgentAuthorised(
         bytes32 indexed organizationId,
         address indexed agent,
-        uint32 indexed epoch,
+        uint256 indexed epoch,
         bytes32 authorityCommitment,
         uint64 validAfter,
         uint64 validUntil
     );
-    event AgentEpochRevoked(bytes32 indexed organizationId, address indexed agent, uint32 indexed epoch, uint64 revokedAt);
+    event AgentEpochRevoked(bytes32 indexed organizationId, address indexed agent, uint256 indexed epoch, uint64 revokedAt);
 
     error EmptyOrganizationId();
     error OrganizationAlreadyRegistered(bytes32 organizationId);
@@ -64,7 +64,7 @@ contract HistoricalAuthorityRegistry {
             validUntil: validUntil,
             revokedAt: 0
         }));
-        emit AgentAuthorised(organizationId, agent, uint32(epochs.length - 1), authorityCommitment, validAfter, validUntil);
+        emit AgentAuthorised(organizationId, agent, epochs.length - 1, authorityCommitment, validAfter, validUntil);
     }
 
     function revokeLatestAgentEpoch(bytes32 organizationId, address agent) external {
@@ -74,7 +74,7 @@ contract HistoricalAuthorityRegistry {
             DelegationEpoch storage epoch = epochs[cursor - 1];
             if (epoch.revokedAt == 0) {
                 epoch.revokedAt = uint64(block.timestamp);
-                emit AgentEpochRevoked(organizationId, agent, uint32(cursor - 1), epoch.revokedAt);
+                emit AgentEpochRevoked(organizationId, agent, cursor - 1, epoch.revokedAt);
                 return;
             }
         }
@@ -91,7 +91,7 @@ contract HistoricalAuthorityRegistry {
         return delegationHistory[organizationId][agent].length;
     }
 
-    function getDelegationEpoch(bytes32 organizationId, address agent, uint32 epoch) external view returns (DelegationEpoch memory) {
+    function getDelegationEpoch(bytes32 organizationId, address agent, uint256 epoch) external view returns (DelegationEpoch memory) {
         DelegationEpoch[] storage epochs = delegationHistory[organizationId][agent];
         if (epoch >= epochs.length) revert UnknownDelegationEpoch(organizationId, agent, epoch);
         return epochs[epoch];
@@ -119,4 +119,3 @@ contract HistoricalAuthorityRegistry {
         if (organization.controller != msg.sender) revert UnauthorizedController(organizationId, msg.sender);
     }
 }
-
