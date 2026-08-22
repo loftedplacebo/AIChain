@@ -52,4 +52,6 @@ See [Development Environments](./docs/development-environments.md) for the initi
 - [Capacity and Batching Prototype](./docs/capacity-and-batching-prototype.md)
 - [Development Environments](./docs/development-environments.md)
 - [Blockscout Compatibility Spike](./docs/blockscout-compatibility-spike.md)
+- [Phase 2A PoW Candidate Shortlist](./docs/phase-2a-pow-candidate-shortlist.md)
+- [Phase 2A Core-Geth Integration Spike](./docs/phase-2a-core-geth-integration-spike.md)
 - [ADR-0001: Core-Geth Development Baseline](./docs/decisions/0001-core-geth-development-baseline.md)
