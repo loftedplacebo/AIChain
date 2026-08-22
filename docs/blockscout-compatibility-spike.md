@@ -62,6 +62,8 @@ ssh -N -L 4000:127.0.0.1:4000 root@62.171.161.32
 
 Then browse to `http://127.0.0.1:4000`. Do not open port `4000` in UFW or the provider firewall.
 
+The frontend configuration is intentionally set to `127.0.0.1:4000` for this SSH-tunnel workflow. If the UI is later put behind an authenticated hostname, set `BLOCKSCOUT_TUNNEL_HOST` to that hostname and redeploy; this is an access-model decision, not a protocol decision.
+
 ## 6. Acceptance Checks
 
 - Index chain ID `20260818`, blocks, transactions, and receipts from Node 1.

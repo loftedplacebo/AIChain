@@ -30,6 +30,17 @@ services:
       INDEXER_DISABLE_INTERNAL_TRANSACTIONS_FETCHER: "true"
       INDEXER_DISABLE_PENDING_TRANSACTIONS_FETCHER: "true"
 
+  # This spike is accessed through an SSH tunnel on the developer's laptop.
+  # Browser-side API calls must include the tunnel port rather than the
+  # upstream template's unqualified localhost host.
+  frontend:
+    environment:
+      NEXT_PUBLIC_APP_PROTOCOL: http
+      NEXT_PUBLIC_APP_HOST: ${BLOCKSCOUT_TUNNEL_HOST:-127.0.0.1:4000}
+      NEXT_PUBLIC_API_PROTOCOL: http
+      NEXT_PUBLIC_API_HOST: ${BLOCKSCOUT_TUNNEL_HOST:-127.0.0.1:4000}
+      NEXT_PUBLIC_API_WEBSOCKET_PROTOCOL: ws
+
   stats:
     environment:
       STATS__DB_URL: postgres://stats:${BLOCKSCOUT_STATS_DB_PASSWORD}@stats-db:5432/stats
