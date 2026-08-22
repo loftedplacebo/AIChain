@@ -88,3 +88,24 @@ CONTRACT_ADDRESS=0x<deployed-authorised-anchor> \
 ```
 
 The VPS submission helper derives the anchor fields through the Python reference implementation, so it does not require Node.js on the server. Deployment and live authorised submission require encrypted-keystore passwords, so those steps remain an operator action rather than an automated secret-handling step.
+
+### Recovery / additional-agent path
+
+If an existing delegated-agent keystore password is unavailable, do not repeatedly guess it. The old key remains unchanged. Instead, authorise a separate controlled development key, then submit a matching receipt from that key's local node:
+
+```bash
+cd /opt/aichain
+bash ./scripts/authorize-vps-agent.sh 0x871252AE9E27BDf8265402a70A0Fb04B55b64dF7
+```
+
+The controller password is required for that authorisation. It adds a time-bounded delegation and does not revoke or modify the existing agent. Then, on the laptop:
+
+```powershell
+cd C:\AIChain
+node scripts/submit-laptop-authorised-avr.mjs `
+  fixtures/avr/authorised-receipt-v0.2.0-draft-laptop.json `
+  0x871252AE9E27BDf8265402a70A0Fb04B55b64dF7 `
+  0x1EAe0127C22183B970f065c1FCd8188Cec3E2F04
+```
+
+This fallback is development-only. Production recovery must use a defined multi-party/key-rotation model rather than a replacement wallet workflow.
