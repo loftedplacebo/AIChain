@@ -89,3 +89,11 @@ node scripts/verify-historical-authorised-avr.mjs `
 ```
 
 The next controlled test revokes epoch `0`, verifies that the prior anchor remains historically authorised, and confirms that the different `laptop-revoked-test` fixture is rejected by the historical anchor after revocation. This is development-only and is followed by a new delegation epoch where further tests are needed.
+
+After that test, append a new epoch (rather than changing history):
+
+```bash
+cd /opt/aichain
+REGISTRY_ADDRESS=0xDda59b071201C0e38DcBb7670b7a125d33c9b8D9 \
+  bash ./scripts/append-historical-agent-epoch.sh
+```
