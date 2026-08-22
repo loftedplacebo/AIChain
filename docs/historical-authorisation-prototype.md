@@ -76,3 +76,16 @@ On 2026-08-22, the synthetic organisation and laptop agent were registered in `H
 | Stored authorisation check time | `1787426816` |
 
 The historical anchor read-back matched the expected organisation, authority commitment, commitment root, issuer, and schema version. A separate `isAuthorisedAt` query against the historical registry returned `true` at the exact stored check time. This is the intended prototype proof of inclusion-time authorisation surviving later state changes; it does not yet demonstrate a later revocation test or establish off-chain execution-time authority.
+
+## Auditor report and revocation test
+
+The read-only auditor verifier checks receipt-to-anchor bindings and asks the registry whether the issuer was authorised at the anchor's stored check time:
+
+```powershell
+node scripts/verify-historical-authorised-avr.mjs `
+  fixtures/avr/authorised-receipt-v0.2.0-draft-laptop.json `
+  0xfEBD6bbf90B1D9f9beDBF551EB098B32386FEeb2 `
+  0xDda59b071201C0e38DcBb7670b7a125d33c9b8D9
+```
+
+The next controlled test revokes epoch `0`, verifies that the prior anchor remains historically authorised, and confirms that the different `laptop-revoked-test` fixture is rejected by the historical anchor after revocation. This is development-only and is followed by a new delegation epoch where further tests are needed.

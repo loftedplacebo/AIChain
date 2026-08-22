@@ -9,6 +9,7 @@
     "test:avr:typescript": "node --test ./sdk/typescript/receipt.test.js",
     "test:authorised-avr:typescript": "node --test ./sdk/typescript/authorised-receipt.test.js",
     "test:agent-credential:typescript": "node --test ./sdk/typescript/agent-credential.test.js",
+    "test:historical-audit:typescript": "node --test ./sdk/typescript/historical-audit.test.js",
     "test:ovl:typescript": "node --test ./sdk/typescript/organisational-ledger.test.js",
     "test:organisation-view:typescript": "node --test ./sdk/typescript/organisation-view.test.js",
     "avr:derive": "node ./sdk/typescript/avr-cli.js derive",
