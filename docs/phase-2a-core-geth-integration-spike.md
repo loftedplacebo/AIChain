@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Active, development-only preparation |
-| Version | 0.3 |
+| Version | 0.4 |
 | Last updated | 2026-08-23 |
 | Decision affected | L1-001 — no selection made |
 
@@ -66,6 +66,8 @@ The AIChain fork now contains [`consensus/kawpow`](../node/core-geth/consensus/k
 
 This package does **not** implement `consensus.Engine`, engine selection, mining, genesis changes, or a network rule. The shared VPS/laptop devnet remains on its existing configuration.
 
+The end-to-end candidate test also made two unresolved compatibility constraints concrete. The pinned reference API accepts only a signed 32-bit block number, and Core-Geth's existing `2^256 / difficulty` convention is not representable in a 256-bit C1 boundary at difficulty 1. The candidate rejects both cases rather than silently changing them. They must be resolved in the future consensus specification before any engine integration.
+
 GitHub Actions remain disabled on the newly created fork. They were not enabled as part of this work; enabling third-party inherited workflows is a separate repository-security decision.
 
 ## Spike rules
@@ -88,7 +90,7 @@ GitHub Actions remain disabled on the newly created fork. They were not enabled 
 
 ## Immediate next work
 
-Add a header-derived positive/negative verification test that connects the candidate mapping to the in-fork reference bridge, still without connecting it to `CreateConsensusEngine`. The initial CPU target remains deterministic verification; GPU rental is needed only for development mining and performance stages.
+Evaluate and document safe resolution options for the C1 height and target-boundary constraints, then measure repeated CPU header-verification latency and memory. Do not connect the package to `CreateConsensusEngine` until those constraints have an explicit protocol disposition. GPU rental is still needed only for development mining and performance stages.
 
 ## Change log
 
@@ -97,3 +99,4 @@ Add a header-derived positive/negative verification test that connects the candi
 | 0.1 | 2026-08-22 | Recorded consensus seam, CPU baseline, and isolated-spike rules |
 | 0.2 | 2026-08-23 | Recorded AIChain-owned fork, isolated candidate boundary, local focused-test result, and intentionally disabled fork CI |
 | 0.3 | 2026-08-23 | Added the pinned native C1 reference verifier within the isolated fork boundary and recorded its focused build/test result |
+| 0.4 | 2026-08-23 | Added end-to-end header-derived candidate verification tests and recorded the height/target compatibility constraints they exposed |
