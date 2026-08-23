@@ -30,10 +30,13 @@ The pinned public API uses signed `int` block numbers in:
 
 ## Conclusion
 
-**C1 does not currently satisfy the maintained canonical 64-bit implementation
+**C1 does not satisfy the original maintained canonical 64-bit implementation
 criterion.** The implementation is valid for isolated vector, mapping, and CPU
-benchmark work, but it is not a suitable basis for an AIChain consensus-engine
-proposal without one of the following:
+benchmark work. The subsequent [GPU PoW Source Screen](phase-2a-gpu-pow-source-screen.md)
+found the same bounded-height pattern in the established candidates audited, so
+the programme now requires an explicit bounded-height migration strategy rather
+than a custom cryptographic variant. C1 is not suitable for an AIChain
+consensus-engine proposal without one of the following:
 
 1. a maintained and canonical 64-bit implementation accepted as the candidate
    reference; or
@@ -49,8 +52,8 @@ recommended** during Phase 2A.
 - Do not attach C1 to `CreateConsensusEngine`, a miner, genesis, or the shared
   devnet.
 - Do not remove the explicit C1 height and target guards.
-- Move candidate selection to a comparison of alternatives with a maintained,
-  canonical reference implementation and an auditable 64-bit height API.
+- Before any implementation escalation, record whether the bounded-height
+  migration strategy is accepted for the candidate programme.
 
 ## Change Log
 

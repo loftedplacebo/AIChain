@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Active, development-only preparation |
-| Version | 0.8 |
+| Version | 0.9 |
 | Last updated | 2026-08-23 |
 | Decision affected | L1-001 — no selection made |
 
@@ -96,7 +96,7 @@ GitHub Actions remain disabled on the newly created fork. They were not enabled 
 
 ## Immediate next work
 
-C1 source audit is complete: the selected reference has no maintained released canonical 64-bit API, so C1 remains a test/benchmark control and will not enter engine integration. Next, select a C2 candidate with a maintained canonical reference, a safe height API, and the same CPU-verification test plan. GPU rental is still needed only for development mining and performance stages.
+The initial C1/C2/C3 source screen is complete. Established GPU-oriented candidates audited so far use bounded 32-bit height APIs; the screen recommends an explicit bounded-height migration plan instead of inventing an AIChain-specific 64-bit cryptographic variant. See [GPU PoW Source Screen](phase-2a-gpu-pow-source-screen.md). Before C2 implementation, record whether that strategy is acceptable for the candidate programme. GPU rental is still needed only for development mining and performance stages.
 
 ## Change log
 
@@ -110,3 +110,4 @@ C1 source audit is complete: the selected reference has no maintained released c
 | 0.6 | 2026-08-23 | Added direct native-bridge height-range rejection test and guard |
 | 0.7 | 2026-08-23 | Recorded and enforced the agreed C1 candidate minimum difficulty and target-encoding rules |
 | 0.8 | 2026-08-23 | Recorded C1 source-audit result; C1 remains a benchmark control and is not eligible for engine integration |
+| 0.9 | 2026-08-23 | Added the C1/C2/C3 GPU PoW source screen and bounded-height migration recommendation |
