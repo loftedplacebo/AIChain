@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Active, development-only preparation |
-| Version | 0.6 |
+| Version | 0.7 |
 | Last updated | 2026-08-23 |
 | Decision affected | L1-001 — no selection made |
 
@@ -66,7 +66,7 @@ The AIChain fork now contains [`consensus/kawpow`](../node/core-geth/consensus/k
 
 This package does **not** implement `consensus.Engine`, engine selection, mining, genesis changes, or a network rule. The shared VPS/laptop devnet remains on its existing configuration.
 
-The end-to-end candidate test also made two unresolved compatibility constraints concrete. The pinned reference API accepts only a signed 32-bit block number, and Core-Geth's existing `2^256 / difficulty` convention is not representable in a 256-bit C1 boundary at difficulty 1. The candidate rejects both cases rather than silently changing them. They must be resolved in the future consensus specification before any engine integration.
+The end-to-end candidate test also made two compatibility constraints concrete. The pinned reference API accepts only a signed 32-bit block number. Core-Geth's existing `2^256 / difficulty` convention is not representable in a 256-bit C1 boundary at difficulty 1; the agreed C1 testing rule therefore requires a minimum difficulty of 2. Both the candidate-only rule and explicit non-decisions are recorded in [the C1 candidate rules](phase-2a-c1-kawpow-candidate-spec.md). They must be resolved for a future protocol specification before any engine integration.
 
 The direct CGo bridge is covered by the same height-range rule and rejects an out-of-range Go value before converting it to the reference API's C `int`. This prevents an accidental truncation path while the limitation remains unresolved.
 
@@ -96,7 +96,7 @@ GitHub Actions remain disabled on the newly created fork. They were not enabled 
 
 ## Immediate next work
 
-Evaluate and document safe resolution options for the C1 height and target-boundary constraints, then measure repeated CPU header-verification latency and memory. Do not connect the package to `CreateConsensusEngine` until those constraints have an explicit protocol disposition. GPU rental is still needed only for development mining and performance stages.
+Evaluate whether a maintained, canonical KawPoW/ProgPoW implementation resolves the C1 signed-32-bit height boundary without inventing an AIChain-specific cryptographic variant. Do not connect the package to `CreateConsensusEngine` until that constraint has an explicit protocol disposition. GPU rental is still needed only for development mining and performance stages.
 
 ## Change log
 
@@ -108,3 +108,4 @@ Evaluate and document safe resolution options for the C1 height and target-bound
 | 0.4 | 2026-08-23 | Added end-to-end header-derived candidate verification tests and recorded the height/target compatibility constraints they exposed |
 | 0.5 | 2026-08-23 | Added five-run cached and parallel CPU header-verification controls with raw benchmark manifest |
 | 0.6 | 2026-08-23 | Added direct native-bridge height-range rejection test and guard |
+| 0.7 | 2026-08-23 | Recorded and enforced the agreed C1 candidate minimum difficulty and target-encoding rules |
