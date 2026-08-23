@@ -2,14 +2,14 @@
 
 | Field | Value |
 |---|---|
-| Status | Research-backed recommendation — **not** an algorithm selection |
-| Version | 0.2 |
-| Last updated | 2026-08-22 |
+| Status | KawPoW selected for Phase 2A development; production activation remains gated |
+| Version | 0.3 |
+| Last updated | 2026-08-23 |
 | Decision affected | L1-001: GPU-friendly PoW and quantum-resilience assessment |
 
 ## Executive answer
 
-AIChain should **not** use proof-of-AI or proof-of-useful-work as its base-chain consensus mechanism at launch. The recommended Phase 2A path is a **GPU-targeted Proof-of-Work evaluation**, with a ProgPoW/KawPoW-style family as a leading evaluation candidate, while retaining the right to reject it after benchmarks and security review.
+AIChain should **not** use proof-of-AI or proof-of-useful-work as its base-chain consensus mechanism at launch. **KawPoW is selected as the Phase 2A development candidate** because it is the lowest-maintenance viable route that preserves GPU targeting and the EVM-header rule. Production activation remains conditional on the exit gates in [ADR-0004](./decisions/0004-kawpow-phase-2a-development-selection.md).
 
 Build verified AI computation as a separate market and reward layer above the neutral L1—not as the source of block-production authority.
 
@@ -71,7 +71,9 @@ For each PoW candidate, publish the same hardware/environment manifest and measu
 - quantum assumptions, including the distinction between work-function exposure and wallet/signature migration; and
 - a safe rollback or algorithm-transition plan.
 
-Only then write the L1-001 ADR. Until then, Ethash remains a development-only engine and no quantum-resistance claim should be made for the operational chain.
+Only then upgrade the Phase 2A development selection into the final L1-001
+production decision. Until then, Ethash remains a development-only engine and
+no quantum-resistance claim should be made for the operational chain.
 
 ## Header-Compatibility Gate
 
@@ -89,3 +91,4 @@ It does not resolve L1-001.
 |---|---|---|
 | 0.1 | 2026-08-22 | Initial GPU-targeted PoW recommendation |
 | 0.2 | 2026-08-23 | Added proposed EVM-native header-compatibility selection gate |
+| 0.3 | 2026-08-23 | Recorded KawPoW as the lowest-maintenance viable Phase 2A development selection; production activation remains gated by ADR-0004 |

@@ -2,14 +2,16 @@
 
 | Field | Value |
 |---|---|
-| Status | Active, development-only preparation |
-| Version | 1.2 |
+| Status | Active, development-only KawPoW integration preparation |
+| Version | 1.5 |
 | Last updated | 2026-08-23 |
-| Decision affected | L1-001 — no selection made |
+| Decision affected | L1-001 — KawPoW selected for Phase 2A development only |
 
 ## Purpose
 
-Prepare a safe, CPU-verifiable route for testing Phase 2A PoW candidates without changing the shared devnet or representing any candidate as selected.
+Prepare a safe, CPU-verifiable route for KawPoW development work without
+changing the shared devnet or representing the Phase 2A selection as a
+production activation.
 
 ## Confirmed Core-Geth boundary
 
@@ -121,9 +123,10 @@ C2 verifier-control manifest](../benchmarks/pow/runs/2026-08-23-c2-firopow-cpu-v
 1. Pin upstream candidate revision, licence, specification, and test-vector source in a run manifest. **C1 complete.**
 2. Add a minimal verifier adapter and deterministic Go unit tests for valid, invalid, malformed, and wrong-difficulty seals. **C1 adapter, vector, tamper, cache-rotation, concurrent-use, Core-Geth header-mapping tests, and an isolated fork boundary are complete. C2 has an official vector, tamper, and range-rejection CPU boundary; header/target mapping is intentionally not started.**
 3. Package the pinned native reference verifier behind the fork boundary, then measure CPU block-verification latency and memory before adding mining support. **Native-in-fork package and deterministic vector test complete; full Core-Geth block-validation measurement pending.**
-4. Add development-only sealing/miner integration.
+4. Add development-only sealing/miner integration. **Next.**
 5. Use rented NVIDIA and AMD GPU environments for mining throughput, VRAM, power, and multi-node network measurements.
-6. Produce a candidate comparison report; only then consider an L1-001 ADR.
+6. Produce the production-selection report; only then consider activating the
+   final L1-001 rule.
 
 ## Immediate next work
 
@@ -141,12 +144,12 @@ cryptographic mapping. The C2 source review found that Firo's Bitcoin-style
 header commitment and compact target cannot be silently mapped onto Core-Geth;
 see [C2 FiroPoW Header-Mapping Review](phase-2a-c2-firopow-header-mapping-review.md).
 
-Next, decide whether to specify an AIChain-native EVM header/target mapping
-for a shortlisted candidate or retain C1/C2 as verifier controls while
-screening for a more direct EVM fit. The completed
-[EVM-Compatibility Gate Review](phase-2a-evm-compatibility-gate-review.md)
-finds no current engine-ready candidate and defines the next decision paths.
-GPU rental is still needed only for development mining and performance stages.
+KawPoW is now the Phase 2A development candidate under
+[ADR-0004](decisions/0004-kawpow-phase-2a-development-selection.md). The
+immediate implementation task is a disabled-by-default development-only
+`consensus.Engine` design and its header/seal/difficulty test matrix. It must
+not repoint the devnet, alter genesis, or add production mining support.
+GPU rental remains needed only after the CPU engine controls pass.
 
 ## Change log
 
@@ -166,3 +169,4 @@ GPU rental is still needed only for development mining and performance stages.
 | 1.2 | 2026-08-23 | Added candidate-neutral header/target mapping contract before C2 mapping work |
 | 1.3 | 2026-08-23 | Recorded C2 source-review result: Firo header/target rules require a separate AIChain design decision |
 | 1.4 | 2026-08-23 | Applied the accepted EVM gate to the candidate set; no candidate may advance to engine work as-is |
+| 1.5 | 2026-08-23 | Recorded ADR-0004 KawPoW Phase 2A development selection and opened disabled-by-default engine design work |
