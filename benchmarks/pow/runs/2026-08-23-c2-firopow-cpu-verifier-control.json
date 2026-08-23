@@ -1,0 +1,42 @@
+{
+  "status": "candidate-only local CPU control; not a mining, block-import, network, or TPS measurement",
+  "date": "2026-08-23",
+  "candidate": "C2 FiroPoW",
+  "source": {
+    "repository": "https://github.com/firoorg/firo",
+    "commit": "adba4310a1b118f879cb16013c669ea8b7dae01f",
+    "licence": "MIT",
+    "vector": "src/crypto/progpow/firopow_test_vectors.hpp, first official vector"
+  },
+  "environment": {
+    "os": "Windows",
+    "architecture": "amd64",
+    "cpu": "13th Gen Intel(R) Core(TM) i5-1335U",
+    "go": "1.21.13",
+    "native_toolchain": "llvm-mingw-20260616-ucrt-x86_64",
+    "core_geth_package": "consensus/firopow"
+  },
+  "command": "go test -run '^Test' -bench '^BenchmarkVerifyC2OfficialVector' -benchmem -benchtime=5x -count=5 ./consensus/firopow",
+  "scope": {
+    "operation": "warmed CPU verification of the first official FiroPoW vector",
+    "included": ["candidate bridge", "pinned native light-context verifier", "single-epoch cache"],
+    "excluded": ["epoch construction", "header mapping", "target conversion", "mining", "block import", "networking", "GPU work"]
+  },
+  "serial": {
+    "ns_per_op": [1734940, 2727820, 3237080, 2666380, 2658520],
+    "median_ns_per_op": 2666380,
+    "median_ms_per_op": 2.66638,
+    "bytes_per_op": 112,
+    "allocations_per_op": 1
+  },
+  "parallel": {
+    "ns_per_op": [2797820, 2101280, 1954080, 2548100, 2319280],
+    "median_ns_per_op": 2319280,
+    "median_ms_per_op": 2.31928,
+    "note": "The cache serialises native calls with a mutex; this short parallel control is not a concurrency or TPS estimate."
+  },
+  "comparison_control": {
+    "c1_serial_median_ms_per_op": 2.64536,
+    "interpretation": "C1 and C2 are comparable in this narrow warmed local CPU control. This does not establish security, GPU performance, ASIC resistance, total full-node cost, or algorithm suitability."
+  }
+}

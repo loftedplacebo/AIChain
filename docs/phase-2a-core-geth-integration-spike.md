@@ -94,6 +94,19 @@ height, so C2 rejects a height outside `0..2,147,483,647` before native
 conversion. C2 has no header mapping, target conversion, `consensus.Engine`,
 engine-selection, mining, genesis, or devnet call path.
 
+### C2 CPU verification performance control
+
+On 2026-08-23, five short warmed CPU controls of the C2 official-vector
+verifier had a median serial verification time of **2.666 ms**, with **112 Go
+bytes** and **1 Go allocation** per operation. The matching short parallel
+control had a 2.319 ms median; it remains constrained by the deliberate
+single-epoch cache mutex and is not a parallel-capacity or TPS figure.
+
+For the same narrow local control, C1 recorded a 2.645 ms serial median. The
+two figures are close enough to avoid treating verifier latency alone as a
+candidate differentiator. Raw runs, scope, and exclusions are recorded in [the
+C2 verifier-control manifest](../benchmarks/pow/runs/2026-08-23-c2-firopow-cpu-verifier-control.json).
+
 ## Spike rules
 
 - Work only in an isolated Core-Geth development branch or disposable worktree.
@@ -121,10 +134,11 @@ consensus migration rather than an AIChain-specific 64-bit cryptographic
 variant. See [GPU PoW Source Screen](phase-2a-gpu-pow-source-screen.md) and
 [C2 FiroPoW Candidate Rules](phase-2a-c2-firopow-candidate-spec.md).
 
-Next, record equivalent cached CPU verification controls for C2 and compare
-their memory/latency with C1 before considering candidate-specific
-header/target mapping. GPU rental is still needed only for development mining
-and performance stages.
+The C2 cached CPU control is complete and comparable with C1. Next, define a
+candidate-neutral Core-Geth header/target mapping contract before implementing
+candidate-specific mapping. This must state what can be shared across C1/C2
+and which algorithm parameters remain separate. GPU rental is still needed
+only for development mining and performance stages.
 
 ## Change log
 
@@ -140,3 +154,4 @@ and performance stages.
 | 0.8 | 2026-08-23 | Recorded C1 source-audit result; C1 remains a benchmark control and is not eligible for engine integration |
 | 0.9 | 2026-08-23 | Added the C1/C2/C3 GPU PoW source screen and bounded-height migration recommendation |
 | 1.0 | 2026-08-23 | Recorded accepted bounded-height policy and C2 FiroPoW official-vector CPU boundary |
+| 1.1 | 2026-08-23 | Added five-run C2 warmed CPU verifier control and C1 comparison evidence |

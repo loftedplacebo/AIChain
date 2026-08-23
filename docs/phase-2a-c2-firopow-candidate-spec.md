@@ -64,6 +64,15 @@ The pinned Windows Go 1.21.13 / LLVM-MinGW CPU control passed on 2026-08-23:
 
 No target/header mapping or network-facing integration was exercised.
 
+## Local CPU Verification Control
+
+Five short warmed serial controls of the official-vector verifier had a median
+of **2.666 ms/op**, **112 B/op**, and **1 allocation/op** on the local i5-1335U
+control environment. The figure excludes epoch construction, header/target
+mapping, block import, mining, networking, and GPU work. Its comparable C1
+serial control was 2.645 ms/op; neither result selects a candidate. Full raw
+results are in [the C2 benchmark manifest](../benchmarks/pow/runs/2026-08-23-c2-firopow-cpu-verifier-control.json).
+
 ## Explicit Non-Decisions
 
 - C2 does not select FiroPoW.
