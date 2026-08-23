@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Active, development-only preparation |
-| Version | 0.4 |
+| Version | 0.5 |
 | Last updated | 2026-08-23 |
 | Decision affected | L1-001 — no selection made |
 
@@ -68,6 +68,10 @@ This package does **not** implement `consensus.Engine`, engine selection, mining
 
 The end-to-end candidate test also made two unresolved compatibility constraints concrete. The pinned reference API accepts only a signed 32-bit block number, and Core-Geth's existing `2^256 / difficulty` convention is not representable in a 256-bit C1 boundary at difficulty 1. The candidate rejects both cases rather than silently changing them. They must be resolved in the future consensus specification before any engine integration.
 
+### Header-verification performance control
+
+On 2026-08-23, five short local control runs of the complete header-to-reference-verifier path had a median cached-epoch CPU verification time of **2.645 ms per header**, with **2,032 Go bytes** and **26 Go allocations** per operation. The matching parallel control had a 2.854 ms median but is constrained by the candidate's intentionally conservative mutex-protected one-epoch cache. These figures establish a local CPU control only; they are not mining speed, block-import throughput, sustained full-node capacity, or network TPS. Raw runs and constraints are in [the benchmark manifest](../benchmarks/pow/runs/2026-08-23-c1-core-geth-header-verifier-control.json).
+
 GitHub Actions remain disabled on the newly created fork. They were not enabled as part of this work; enabling third-party inherited workflows is a separate repository-security decision.
 
 ## Spike rules
@@ -100,3 +104,4 @@ Evaluate and document safe resolution options for the C1 height and target-bound
 | 0.2 | 2026-08-23 | Recorded AIChain-owned fork, isolated candidate boundary, local focused-test result, and intentionally disabled fork CI |
 | 0.3 | 2026-08-23 | Added the pinned native C1 reference verifier within the isolated fork boundary and recorded its focused build/test result |
 | 0.4 | 2026-08-23 | Added end-to-end header-derived candidate verification tests and recorded the height/target compatibility constraints they exposed |
+| 0.5 | 2026-08-23 | Added five-run cached and parallel CPU header-verification controls with raw benchmark manifest |

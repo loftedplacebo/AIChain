@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "0.1.0-draft",
+  "runId": "2026-08-23-c1-core-geth-header-verifier-control",
+  "recordedAtUtc": "2026-08-23",
+  "classification": "CPU-only Core-Geth header-to-reference-verifier control; not a mining, block-import, or network benchmark",
+  "candidate": {
+    "id": "c1-progpow-kawpow-family",
+    "upstreamRepository": "https://github.com/RavenCommunity/cpp-kawpow.git",
+    "upstreamCommit": "061d341011ca341e1f506c52b571f5fd64a0df71",
+    "license": "Apache-2.0 reference source"
+  },
+  "host": {
+    "role": "local Core-Geth candidate verification host",
+    "operatingSystem": "Windows",
+    "cpu": "13th Gen Intel Core i5-1335U",
+    "logicalProcessors": 12,
+    "goVersion": "1.21.13",
+    "compiler": "LLVM/MinGW pinned project toolchain"
+  },
+  "command": "go test -v -run '^Test' -bench '^BenchmarkVerifyHeaderC1Candidate' -benchmem -benchtime=5x -count=5 ./consensus/kawpow",
+  "measurements": {
+    "serialCachedEpochNsPerOp": [3728180, 2699420, 2645360, 2494140, 2386260],
+    "serialCachedEpochMedianNsPerOp": 2645360,
+    "serialCachedEpochBytesPerOp": 2032,
+    "serialCachedEpochAllocsPerOp": 26,
+    "parallelNsPerOp": [3245000, 2524480, 2869740, 2160900, 2854060],
+    "parallelMedianNsPerOp": 2854060,
+    "parallelBytesPerOp": [4488, 4686, 4148, 3566, 4481],
+    "parallelAllocsPerOp": [39, 40, 38, 38, 40]
+  },
+  "validation": {
+    "headerDerivedPositiveCasePassed": true,
+    "tamperedMixRejected": true,
+    "wrongDifficultyRejected": true,
+    "nilHeaderRejected": true,
+    "unsupportedTargetRejected": true,
+    "oversizedHeightRejected": true
+  },
+  "notes": "The serial measurement warms the current one-epoch native cache before timing. The parallel measurement is constrained by that cache's mutex and therefore does not predict a production verifier cache or network throughput. Go allocation figures exclude native heap behaviour. No GPU, mining, block import, state execution, propagation, AVR workload, or energy measurement was included."
+}
