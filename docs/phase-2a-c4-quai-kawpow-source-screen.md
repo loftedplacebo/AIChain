@@ -59,6 +59,9 @@ is valid.
 the evidence base for Path B but does not clear ADR-0003's mapping,
 reproducibility, maintainability, or legal-reuse gates.
 
+The subsequent independent assessment did not change this disposition. See
+[C4 conformance and provenance assessment](./phase-2a-c4-quai-kawpow-conformance-provenance-assessment.md).
+
 ## Permitted Next Work
 
 - Trace the licence and dependency provenance of the minimal generic verifier
