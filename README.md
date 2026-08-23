@@ -55,3 +55,4 @@ See [Development Environments](./docs/development-environments.md) for the initi
 - [Phase 2A PoW Candidate Shortlist](./docs/phase-2a-pow-candidate-shortlist.md)
 - [Phase 2A Core-Geth Integration Spike](./docs/phase-2a-core-geth-integration-spike.md)
 - [ADR-0001: Core-Geth Development Baseline](./docs/decisions/0001-core-geth-development-baseline.md)
+- [ADR-0003: EVM-Native PoW Header Compatibility (Proposed)](./docs/decisions/0003-evm-native-pow-header-compatibility.md)
