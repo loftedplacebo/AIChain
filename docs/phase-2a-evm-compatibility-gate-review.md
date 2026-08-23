@@ -2,11 +2,11 @@
 
 | Field | Value |
 |---|---|
-| Status | Expanded screen complete — no current candidate may advance to engine work |
-| Version | 0.2 |
+| Status | Complete historical gate — ADR-0004 subsequently authorised bounded C1 engine work |
+| Version | 0.3 |
 | Last updated | 2026-08-23 |
 | Governing decision | [ADR-0003](./decisions/0003-evm-native-pow-header-compatibility.md) |
-| L1-001 status | **TBD — no mining algorithm selected** |
+| L1-001 status | **KawPoW selected for Phase 2A development only; production selection remains TBD** |
 
 ## Result
 
@@ -15,12 +15,21 @@ candidate**. This is a useful Phase 2A result: it prevents a premature
 consensus implementation based on a source or header model that does not meet
 the accepted EVM compatibility rule.
 
+## Subsequent Decision
+
+[ADR-0004](decisions/0004-kawpow-phase-2a-development-selection.md) later
+selected C1 KawPoW as the lowest-maintenance Phase 2A development path. It
+accepted the explicit bounded-height migration strategy and authorised only a
+disabled engine wrapper with strict regression gates. It did not make KawPoW a
+production algorithm or authorise miner, genesis, RPC, or shared-devnet
+activation.
+
 ## Candidate Disposition
 
 | Candidate | GPU orientation | EVM/Core-Geth header fit | Source posture | Outcome |
 |---|---|---|---|---|
 | C0 Ethash | Historic GPU-oriented control | Direct | Core-Geth development baseline | Keep as devnet control only; not a launch candidate due to known ASIC history |
-| C1 KawPoW | GPU-targeted | Demonstrated isolated Core-Geth pre-seal mapping | Pinned `cpp-kawpow` source is 2020 and has no current canonical 64-bit API | CPU/header control only; cannot enter engine work without an explicit maintained-implementation decision |
+| C1 KawPoW | GPU-targeted | Demonstrated isolated Core-Geth pre-seal mapping | Pinned `cpp-kawpow` source is 2020 and has no current canonical 64-bit API | Advanced only under ADR-0004 to a disabled engine spike; not production eligible |
 | C2 FiroPoW | GPU-targeted | Does not directly fit: hashes Firo's Bitcoin-style header and compact target | Official source active | CPU verifier control only; no Core-Geth mapping without a separate AIChain-native profile decision |
 | C3 Autolykos v2 | GPU-memory-hard | Different header/client model | Official source active | Not a Phase 2A engine candidate |
 | EIP-1057 / ProgPoW source check | Designed for Ethereum-style PoW | Conceptually aligned | The standard is marked stagnant; current `chfast/ethash` at `17e80309…` (2025-06-08) exposes Ethash but no ProgPoW API | Not a maintained off-the-shelf implementation candidate |
@@ -112,3 +121,10 @@ import Quai source into Core-Geth or change the devnet.
 - [C1 source audit](./phase-2a-c1-source-audit.md) and
   [C2 mapping review](./phase-2a-c2-firopow-header-mapping-review.md).
 - [C4 Quai KawPoW source screen](./phase-2a-c4-quai-kawpow-source-screen.md).
+
+## Change Log
+
+| Version | Date | Change |
+|---|---|---|
+| 0.2 | 2026-08-23 | Recorded the completed expanded screen and historical no-engine result |
+| 0.3 | 2026-08-23 | Reconciled the historical gate with ADR-0004's bounded C1 engine authorisation |

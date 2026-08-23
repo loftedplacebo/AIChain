@@ -2,8 +2,8 @@
 
 | Field | Value |
 |---|---|
-| Status | Prepared — GPU rental not yet required |
-| Version | 0.1 |
+| Status | G1 prepared; G2 protocol specified but not implemented |
+| Version | 0.2 |
 | Last updated | 2026-08-23 |
 | Governing decision | [ADR-0004](./decisions/0004-kawpow-phase-2a-development-selection.md) |
 
@@ -78,9 +78,10 @@ Core-Geth dependency.
 
 ## Stage G2 — Node Interoperability
 
-G2 cannot begin yet. The disabled engine has no mining implementation and
-`Seal` fails closed. Before renting a GPU for interoperability, AIChain must
-commit and review a development-only work protocol that specifies:
+The disabled engine has no mining implementation and `Seal` fails closed. The
+development-only wire contract is now specified in
+[KawPoW Development Work Protocol](phase-2a-kawpow-development-work-protocol.md).
+Implementation must preserve its requirements for:
 
 1. work identifier and version;
 2. 32-byte pre-seal commitment, 64-bit nonce, mix/proof, height, and target;
@@ -126,3 +127,10 @@ NVIDIA procedure is reproducible.
 - A CPU-only validator independently accepts GPU-produced blocks.
 - No private data or rented-host credential is committed.
 - Results do not claim permanent ASIC resistance or quantum resistance.
+
+## Change Log
+
+| Version | Date | Change |
+|---|---|---|
+| 0.1 | 2026-08-23 | Defined the isolated GPU, node-interoperability, and network gates |
+| 0.2 | 2026-08-23 | Linked the committed development work-protocol specification |

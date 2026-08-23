@@ -2,10 +2,10 @@
 
 | Field | Value |
 |---|---|
-| Status | Bounded-height policy accepted; expanded screen complete; no candidate selected |
-| Version | 0.3 |
+| Status | Complete historical screen — KawPoW selected for Phase 2A development under ADR-0004 |
+| Version | 0.4 |
 | Last updated | 2026-08-23 |
-| Decision affected | L1-001 — still **TBD** |
+| Decision affected | L1-001 — Phase 2A development selection made; production remains **TBD** |
 
 ## Screening Criteria
 
@@ -18,7 +18,7 @@ benchmark or security audit.
 
 | Candidate | Positive evidence | Height/API finding | Disposition |
 |---|---|---|---|
-| C1 KawPoW | Off-the-shelf ProgPoW-family source, deterministic vectors, working Core-Geth boundary | Pinned 2020 `cpp-kawpow` API uses signed `int` | Retain as CPU control and benchmark candidate; no engine integration yet |
+| C1 KawPoW | Off-the-shelf ProgPoW-family source, deterministic vectors, working Core-Geth boundary | Pinned 2020 `cpp-kawpow` API uses signed `int` | Selected by ADR-0004 for a bounded, disabled Phase 2A engine spike; production remains gated |
 | C2 FiroPoW | Official Firo source is active; it describes FiroPoW as GPU-targeted and FPGA/ASIC-resistant; ships vectors | `CProgPowHeader::nHeight` is `uint32_t`, but the embedded `progpow::hash`/`verify` API uses signed `int` | Shortlist for a separate source/vector compatibility review; do not integrate yet |
 | C3 Autolykos v2 | Official Ergo source is active; memory-hard GPU mining ecosystem and efficient validation path | Production header and history interfaces use Scala `Int` | Do not integrate in Phase 2A; it also has a different node/model and height boundary |
 | FishHash | Open source implementation and specification available | Repository labels itself a work in progress | Exclude from current consensus candidates |
@@ -81,8 +81,9 @@ reference API, the spike must:
 4. Keep high-volume AI receipt throughput in batching/rollup layers rather
    than reducing the PoW block interval to compensate.
 
-This authorises source/vector compatibility work for C2 FiroPoW. It does not
-select FiroPoW, change any consensus engine, or activate a network rule.
+This originally authorised source/vector compatibility work for C2 FiroPoW.
+ADR-0004 subsequently applied the policy to C1 KawPoW and authorised its
+disabled development-engine wrapper. It does not activate a network rule.
 
 ## EVM-Compatibility Selection Gate
 
@@ -95,16 +96,11 @@ final algorithm remains **TBD**.
 
 ## Next Gate
 
-The C2 source/vector spike and header-mapping review are complete. Under
-accepted ADR-0003, no current candidate may advance to engine work as-is; see
-[EVM-Compatibility Gate Review](phase-2a-evm-compatibility-gate-review.md).
-The next decision is whether to own a standards-conforming EIP-1057/ProgPoW
-implementation or continue screening for a maintained candidate with an
-existing EVM-header fit.
-
-The expanded screen has now identified C4 as a maintained source lead, but it
-does not change that decision: it is not a drop-in EVM/Core-Geth engine. See
-[the C4 screen](./phase-2a-c4-quai-kawpow-source-screen.md).
+The historical source screen is closed by ADR-0004's bounded KawPoW development
+selection. The next gate is the isolated GPU/miner measurement programme in
+[Phase 2A KawPoW GPU and Miner Gate](phase-2a-kawpow-gpu-miner-gate.md), followed
+by a separately specified node work-submission protocol. Neither gate changes
+the current Ethash devnet or settles the production algorithm.
 
 ## Change Log
 
@@ -113,3 +109,4 @@ does not change that decision: it is not a drop-in EVM/Core-Geth engine. See
 | 0.1 | 2026-08-23 | Initial C1/C2/C3 GPU PoW source screen |
 | 0.2 | 2026-08-23 | Recorded accepted bounded-height migration policy and opened the isolated C2 source/vector spike |
 | 0.3 | 2026-08-23 | Recorded the C4 Quai KawPoW maintained-source lead and its no-reuse boundary |
+| 0.4 | 2026-08-23 | Reconciled the screen with ADR-0004 and linked the GPU/miner gate |

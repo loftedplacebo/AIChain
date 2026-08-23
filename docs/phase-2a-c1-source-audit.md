@@ -2,8 +2,8 @@
 
 | Field | Value |
 |---|---|
-| Status | Complete for C1 decision gate |
-| Version | 0.1 |
+| Status | Complete — source finding retained; implementation disposition superseded by ADR-0004 |
+| Version | 0.2 |
 | Audit date | 2026-08-23 |
 | Scope | C1 pinned `cpp-kawpow` reference only |
 
@@ -31,8 +31,8 @@ The pinned public API uses signed `int` block numbers in:
 ## Conclusion
 
 **C1 does not satisfy the original maintained canonical 64-bit implementation
-criterion.** The implementation is valid for isolated vector, mapping, and CPU
-benchmark work. The subsequent [GPU PoW Source Screen](phase-2a-gpu-pow-source-screen.md)
+criterion.** The implementation is valid for vector, mapping, CPU benchmark,
+and bounded development-engine work under the later ADR. The subsequent [GPU PoW Source Screen](phase-2a-gpu-pow-source-screen.md)
 found the same bounded-height pattern in the established candidates audited, so
 the programme now requires an explicit bounded-height migration strategy rather
 than a custom cryptographic variant. C1 is not suitable for an AIChain
@@ -46,11 +46,21 @@ consensus-engine proposal without one of the following:
 Option 2 would create a custom cryptographic/protocol variant and is **not
 recommended** during Phase 2A.
 
+## Subsequent Decision
+
+[ADR-0004](decisions/0004-kawpow-phase-2a-development-selection.md) accepted
+the bounded-height migration strategy and selected KawPoW as the
+lowest-maintenance Phase 2A development path. That decision does not invalidate
+this audit. It authorises a disabled `consensus/kawpowengine` wrapper with
+explicit height guards; it does not authorise registration in
+`CreateConsensusEngine`, a miner, genesis, or the shared devnet.
+
 ## Disposition
 
-- Keep C1 as a completed off-the-shelf verifier and CPU-control candidate.
+- Keep C1 as the pinned verifier and CPU-control source behind the disabled
+  Phase 2A engine wrapper.
 - Do not attach C1 to `CreateConsensusEngine`, a miner, genesis, or the shared
-  devnet.
+  devnet without later gates and an explicit decision.
 - Do not remove the explicit C1 height and target guards.
 - Before any implementation escalation, record whether the bounded-height
   migration strategy is accepted for the candidate programme.
@@ -60,3 +70,4 @@ recommended** during Phase 2A.
 | Version | Date | Change |
 |---|---|---|
 | 0.1 | 2026-08-23 | Initial source/API audit and C1 disposition |
+| 0.2 | 2026-08-23 | Preserved the source finding while recording ADR-0004's bounded engine-spike authorisation |

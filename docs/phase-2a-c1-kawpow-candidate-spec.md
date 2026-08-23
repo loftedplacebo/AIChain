@@ -2,17 +2,19 @@
 
 | Field | Value |
 |---|---|
-| Status | Accepted for isolated C1 testing only |
-| Version | 0.1 |
+| Status | Superseded in part by ADR-0004 — disabled Phase 2A engine spike authorised |
+| Version | 0.2 |
 | Last updated | 2026-08-23 |
 | Scope | `aichain/phase-2a-kawpow-spike` only |
-| L1-001 status | **TBD — no mining-algorithm selection** |
+| L1-001 status | **KawPoW selected for Phase 2A development only; production selection remains TBD** |
 
 ## Purpose
 
 Define the narrow rules used by the C1 KawPoW/ProgPoW candidate verifier so
-tests cannot silently choose consensus behaviour. These rules do not alter
-Core-Geth engine selection, the VPS/laptop devnet, genesis, mining, or any
+tests cannot silently choose consensus behaviour. These rules originally
+limited C1 to an isolated verifier. [ADR-0004](decisions/0004-kawpow-phase-2a-development-selection.md)
+subsequently authorised a disabled Core-Geth engine boundary under these same
+rules. They still do not alter the VPS/laptop devnet, genesis, mining, or any
 public-network behaviour.
 
 ## Candidate Rules
@@ -31,7 +33,8 @@ public-network behaviour.
 - C1 does not select KawPoW as AIChain's final PoW algorithm.
 - C1 does not set a launched chain's block interval, minimum difficulty, or
   issuance rule.
-- C1 does not authorise an engine, miner, genesis, RPC, or devnet change.
+- C1 alone does not authorise a miner, genesis, RPC, or devnet change. The
+  disabled engine boundary is authorised separately by ADR-0004.
 - C1 does not claim the 32-bit reference API is adequate for the final L1.
 
 ## Required Tests
@@ -48,7 +51,7 @@ public-network behaviour.
 
 ## Exit Criteria for C1
 
-Before C1 can move toward an engine-integration proposal:
+Before C1 can move toward production activation or a shared-devnet proposal:
 
 1. A documented disposition exists for the 32-bit height limitation, supported
    by a maintained/canonical implementation or an explicit future protocol
@@ -57,18 +60,21 @@ Before C1 can move toward an engine-integration proposal:
    protocol owner and migration treatment.
 3. Repeated CPU, GPU-mining, block-import, and multi-node measurements are
    recorded.
-4. L1-001 is resolved through an ADR; this document alone cannot resolve it.
+4. L1-001 is resolved for production through a later ADR; ADR-0004 resolves
+   only the bounded Phase 2A development selection.
 
 ## C1 Source-Audit Disposition
 
 The source audit in [Phase 2A C1 Source Audit](phase-2a-c1-source-audit.md)
 found no maintained, released canonical 64-bit block-height API in the selected
-reference repository. C1 therefore remains an isolated test and benchmark
-candidate; it must not proceed to consensus-engine integration on this source
-basis.
+reference repository. ADR-0004 later accepted the explicit bounded-height
+migration policy and authorised the disabled engine wrapper. The finding still
+prevents silent production adoption and does not authorise engine registration,
+genesis, mining RPC, or a shared-devnet change.
 
 ## Change Log
 
 | Version | Date | Change |
 |---|---|---|
 | 0.1 | 2026-08-23 | Initial candidate-only rules agreed for C1 testing |
+| 0.2 | 2026-08-23 | Reconciled the historical C1 boundary with ADR-0004's disabled engine authorisation |
