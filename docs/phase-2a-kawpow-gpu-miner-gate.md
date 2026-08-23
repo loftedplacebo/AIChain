@@ -2,8 +2,8 @@
 
 | Field | Value |
 |---|---|
-| Status | G1 prepared; G2 registry implemented, wire/API transport pending |
-| Version | 0.3 |
+| Status | G1 ready; G2 service tested in memory, node integration pending |
+| Version | 0.4 |
 | Last updated | 2026-08-23 |
 | Governing decision | [ADR-0004](./decisions/0004-kawpow-phase-2a-development-selection.md) |
 
@@ -135,3 +135,4 @@ NVIDIA procedure is reproducible.
 | 0.1 | 2026-08-23 | Defined the isolated GPU, node-interoperability, and network gates |
 | 0.2 | 2026-08-23 | Linked the committed development work-protocol specification |
 | 0.3 | 2026-08-23 | Recorded the bounded work registry and retained the no-RPC boundary |
+| 0.4 | 2026-08-23 | Recorded strict wire and in-memory service tests; node exposure remains disabled |

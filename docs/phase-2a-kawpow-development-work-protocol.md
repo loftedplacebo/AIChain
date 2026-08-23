@@ -2,8 +2,8 @@
 
 | Field | Value |
 |---|---|
-| Status | Accepted; bounded work registry implemented, transport pending |
-| Version | 0.2 |
+| Status | Registry, strict codec, and unregistered service implemented; node integration pending |
+| Version | 0.3 |
 | Last updated | 2026-08-23 |
 | Governing decision | [ADR-0004](./decisions/0004-kawpow-phase-2a-development-selection.md) |
 | Production status | **TBD — this is not a public mining API or launch protocol** |
@@ -172,9 +172,17 @@ Core-Geth commit `499ae19` implements the transport-independent work registry:
 - one-time acceptance and duplicate rejection; and
 - a real C1 seal path plus concurrent race-detector coverage.
 
-No RPC method is registered. The next slice is strict wire decoding and API
-tests around the registry; endpoint registration remains a later explicit
-step.
+Core-Geth commit `2bb7d0f` adds strict canonical wire encoding and decoding. It
+rejects unknown or duplicate fields, missing fields, wrong versions,
+noncanonical hexadecimal values, wrong lengths, non-string fields, and trailing
+JSON.
+
+Core-Geth commit `724f3d9` adds the service behavior and exercises the proposed
+`aichain_getKawpowWork` and `aichain_submitKawpowWork` methods through an
+in-memory Core-Geth RPC server. It enforces the 4 KiB submission limit and
+stable rejection statuses. The service deliberately does not register itself;
+an explicit node integration, local exposure controls, rate limiting, template
+provider, and block-import callback remain pending.
 
 ## Change Log
 
@@ -182,3 +190,4 @@ step.
 |---|---|---|
 | 0.1 | 2026-08-23 | Initial development-only node/miner work contract |
 | 0.2 | 2026-08-23 | Recorded the tested bounded work-registry implementation |
+| 0.3 | 2026-08-23 | Recorded strict wire decoding and the tested but unregistered RPC service |
