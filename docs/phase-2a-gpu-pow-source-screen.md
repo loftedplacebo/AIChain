@@ -2,8 +2,8 @@
 
 | Field | Value |
 |---|---|
-| Status | Initial screen complete — no candidate selected |
-| Version | 0.1 |
+| Status | Bounded-height policy accepted; no candidate selected |
+| Version | 0.2 |
 | Last updated | 2026-08-23 |
 | Decision affected | L1-001 — still **TBD** |
 
@@ -65,15 +65,34 @@ Instead, the decision gate should require a **bounded-height migration plan**:
 This makes the limit visible and governable without pretending it does not
 exist. It does not select C1 or C2.
 
+## Accepted Candidate-Programme Policy
+
+On 2026-08-23, AIChain accepted the bounded-height migration strategy for
+isolated Phase 2A candidate work. For every candidate using a bounded-height
+reference API, the spike must:
+
+1. Enforce the reference implementation's documented range before crossing a
+   language or native-API boundary.
+2. Treat the range as a candidate constraint, not as a silently inherited L1
+   rule.
+3. Require a consensus-upgrade decision well before the range could be
+   exhausted by the selected launch block interval.
+4. Keep high-volume AI receipt throughput in batching/rollup layers rather
+   than reducing the PoW block interval to compensate.
+
+This authorises source/vector compatibility work for C2 FiroPoW. It does not
+select FiroPoW, change any consensus engine, or activate a network rule.
+
 ## Next Gate
 
-Before C2 implementation work, decide whether the bounded-height migration
-strategy is acceptable for the AIChain PoW candidate programme. If accepted,
-perform a C2 FiroPoW source/vector compatibility spike in a disposable
-worktree; if not, continue the source screen with a different mining model.
+Perform a C2 FiroPoW source/vector compatibility spike in an isolated
+Core-Geth development boundary. The spike must begin with official vectors,
+record the exact source revision and licence, and remain outside consensus
+engine selection, mining, genesis, and devnet configuration.
 
 ## Change Log
 
 | Version | Date | Change |
 |---|---|---|
 | 0.1 | 2026-08-23 | Initial C1/C2/C3 GPU PoW source screen |
+| 0.2 | 2026-08-23 | Recorded accepted bounded-height migration policy and opened the isolated C2 source/vector spike |

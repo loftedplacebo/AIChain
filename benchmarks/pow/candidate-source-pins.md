@@ -11,7 +11,8 @@ These pins identify the first upstream materials to inspect during the CPU-side 
 |---|---|---|---|---|
 | C1: ProgPoW/KawPoW family | Mining/tooling reference — not an AIChain dependency | [RavenCommunity/kawpowminer](https://github.com/RavenCommunity/kawpowminer) | `632f6ea0a5cd09e2c6443374dbe6db0a767715ba` | GPL-3.0 toolchain reference only. Do not import into Core-Geth. |
 | C1: ProgPoW/KawPoW family | CPU conformance reference | [RavenCommunity/cpp-kawpow](https://github.com/RavenCommunity/cpp-kawpow) | `061d341011ca341e1f506c52b571f5fd64a0df71` | Apache-2.0; contains the deterministic ProgPoW vector suite used by `run-c1-kawpow-vector-check.ps1`. |
-| C2: Autolykos v2 | Protocol implementation reference | [ergoplatform/ergo](https://github.com/ergoplatform/ergo) | `c313356950fe69ef406c2ee031204079a05ea7d7` | Identify exact Autolykos v2 implementation/specification and test vectors; assess Core-Geth integration delta. |
+| C2: FiroPoW | CPU conformance/source compatibility reference | [firoorg/firo](https://github.com/firoorg/firo) | `adba4310a1b118f879cb16013c669ea8b7dae01f` | MIT-licensed repository. Start from its included FiroPoW vectors; preserve its signed-`int` verifier-height boundary. |
+| C3: Autolykos v2 | Protocol implementation reference | [ergoplatform/ergo](https://github.com/ergoplatform/ergo) | `c313356950fe69ef406c2ee031204079a05ea7d7` | Retained for source-screen reference only; not a Phase 2A integration candidate. |
 
 The initially inspected `DNS/kawpow` pin (`4b08dc2becc1d879728ea41bc4925d8f051a453e`) is **not** used for C1 conformance: its README advertised a test-vector path absent from that pinned checkout. Retain this observation as a reproducibility finding, not as a claim about all versions of that project.
 

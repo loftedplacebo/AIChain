@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Active, development-only preparation |
-| Version | 0.9 |
+| Version | 1.0 |
 | Last updated | 2026-08-23 |
 | Decision affected | L1-001 — no selection made |
 
@@ -76,6 +76,24 @@ On 2026-08-23, five short local control runs of the complete header-to-reference
 
 GitHub Actions remain disabled on the newly created fork. They were not enabled as part of this work; enabling third-party inherited workflows is a separate repository-security decision.
 
+### C2 FiroPoW CPU conformance evidence
+
+Following acceptance of the bounded-height migration policy, the fork now
+contains [`consensus/firopow`](../node/core-geth/consensus/firopow), a second
+disabled-by-default boundary. It pins the official MIT-licensed
+`firoorg/firo` source at `adba4310a1b118f879cb16013c669ea8b7dae01f` as a
+nested submodule and runs the first official FiroPoW vector through a CPU CGo
+bridge. The pinned Go 1.21.13 and LLVM/MinGW toolchain passed the positive
+vector, tampered-mix rejection, and invalid-height rejection on 2026-08-23.
+
+Firo's optional Boost-based global-context helper is intentionally not built:
+the boundary owns its small, mutex-protected single-epoch light-context cache
+instead. This avoids adding a Boost dependency to the candidate spike and is
+not a production cache design. The source verifier API uses a signed `int`
+height, so C2 rejects a height outside `0..2,147,483,647` before native
+conversion. C2 has no header mapping, target conversion, `consensus.Engine`,
+engine-selection, mining, genesis, or devnet call path.
+
 ## Spike rules
 
 - Work only in an isolated Core-Geth development branch or disposable worktree.
@@ -88,7 +106,7 @@ GitHub Actions remain disabled on the newly created fork. They were not enabled 
 ## Staged implementation sequence
 
 1. Pin upstream candidate revision, licence, specification, and test-vector source in a run manifest. **C1 complete.**
-2. Add a minimal verifier adapter and deterministic Go unit tests for valid, invalid, malformed, and wrong-difficulty seals. **C1 adapter, vector, tamper, cache-rotation, concurrent-use, Core-Geth header-mapping tests, and an isolated fork boundary are complete.**
+2. Add a minimal verifier adapter and deterministic Go unit tests for valid, invalid, malformed, and wrong-difficulty seals. **C1 adapter, vector, tamper, cache-rotation, concurrent-use, Core-Geth header-mapping tests, and an isolated fork boundary are complete. C2 has an official vector, tamper, and range-rejection CPU boundary; header/target mapping is intentionally not started.**
 3. Package the pinned native reference verifier behind the fork boundary, then measure CPU block-verification latency and memory before adding mining support. **Native-in-fork package and deterministic vector test complete; full Core-Geth block-validation measurement pending.**
 4. Add development-only sealing/miner integration.
 5. Use rented NVIDIA and AMD GPU environments for mining throughput, VRAM, power, and multi-node network measurements.
@@ -96,7 +114,17 @@ GitHub Actions remain disabled on the newly created fork. They were not enabled 
 
 ## Immediate next work
 
-The initial C1/C2/C3 source screen is complete. Established GPU-oriented candidates audited so far use bounded 32-bit height APIs; the screen recommends an explicit bounded-height migration plan instead of inventing an AIChain-specific 64-bit cryptographic variant. See [GPU PoW Source Screen](phase-2a-gpu-pow-source-screen.md). Before C2 implementation, record whether that strategy is acceptable for the candidate programme. GPU rental is still needed only for development mining and performance stages.
+The C1/C2/C3 source screen and C2 source/vector compatibility control are
+complete. Established GPU-oriented candidates audited so far use bounded
+32-bit height APIs; the accepted policy requires an explicit pre-limit
+consensus migration rather than an AIChain-specific 64-bit cryptographic
+variant. See [GPU PoW Source Screen](phase-2a-gpu-pow-source-screen.md) and
+[C2 FiroPoW Candidate Rules](phase-2a-c2-firopow-candidate-spec.md).
+
+Next, record equivalent cached CPU verification controls for C2 and compare
+their memory/latency with C1 before considering candidate-specific
+header/target mapping. GPU rental is still needed only for development mining
+and performance stages.
 
 ## Change log
 
@@ -111,3 +139,4 @@ The initial C1/C2/C3 source screen is complete. Established GPU-oriented candida
 | 0.7 | 2026-08-23 | Recorded and enforced the agreed C1 candidate minimum difficulty and target-encoding rules |
 | 0.8 | 2026-08-23 | Recorded C1 source-audit result; C1 remains a benchmark control and is not eligible for engine integration |
 | 0.9 | 2026-08-23 | Added the C1/C2/C3 GPU PoW source screen and bounded-height migration recommendation |
+| 1.0 | 2026-08-23 | Recorded accepted bounded-height policy and C2 FiroPoW official-vector CPU boundary |
