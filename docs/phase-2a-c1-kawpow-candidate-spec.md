@@ -59,6 +59,14 @@ Before C1 can move toward an engine-integration proposal:
    recorded.
 4. L1-001 is resolved through an ADR; this document alone cannot resolve it.
 
+## C1 Source-Audit Disposition
+
+The source audit in [Phase 2A C1 Source Audit](phase-2a-c1-source-audit.md)
+found no maintained, released canonical 64-bit block-height API in the selected
+reference repository. C1 therefore remains an isolated test and benchmark
+candidate; it must not proceed to consensus-engine integration on this source
+basis.
+
 ## Change Log
 
 | Version | Date | Change |
