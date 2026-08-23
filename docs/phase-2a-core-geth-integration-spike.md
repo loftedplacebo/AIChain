@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Active, development-only preparation |
-| Version | 0.5 |
+| Version | 0.6 |
 | Last updated | 2026-08-23 |
 | Decision affected | L1-001 — no selection made |
 
@@ -68,6 +68,8 @@ This package does **not** implement `consensus.Engine`, engine selection, mining
 
 The end-to-end candidate test also made two unresolved compatibility constraints concrete. The pinned reference API accepts only a signed 32-bit block number, and Core-Geth's existing `2^256 / difficulty` convention is not representable in a 256-bit C1 boundary at difficulty 1. The candidate rejects both cases rather than silently changing them. They must be resolved in the future consensus specification before any engine integration.
 
+The direct CGo bridge is covered by the same height-range rule and rejects an out-of-range Go value before converting it to the reference API's C `int`. This prevents an accidental truncation path while the limitation remains unresolved.
+
 ### Header-verification performance control
 
 On 2026-08-23, five short local control runs of the complete header-to-reference-verifier path had a median cached-epoch CPU verification time of **2.645 ms per header**, with **2,032 Go bytes** and **26 Go allocations** per operation. The matching parallel control had a 2.854 ms median but is constrained by the candidate's intentionally conservative mutex-protected one-epoch cache. These figures establish a local CPU control only; they are not mining speed, block-import throughput, sustained full-node capacity, or network TPS. Raw runs and constraints are in [the benchmark manifest](../benchmarks/pow/runs/2026-08-23-c1-core-geth-header-verifier-control.json).
@@ -105,3 +107,4 @@ Evaluate and document safe resolution options for the C1 height and target-bound
 | 0.3 | 2026-08-23 | Added the pinned native C1 reference verifier within the isolated fork boundary and recorded its focused build/test result |
 | 0.4 | 2026-08-23 | Added end-to-end header-derived candidate verification tests and recorded the height/target compatibility constraints they exposed |
 | 0.5 | 2026-08-23 | Added five-run cached and parallel CPU header-verification controls with raw benchmark manifest |
+| 0.6 | 2026-08-23 | Added direct native-bridge height-range rejection test and guard |
