@@ -3,8 +3,8 @@
 | Field | Value |
 |---|---|
 | Status | Active, development-only preparation |
-| Version | 0.1 |
-| Last updated | 2026-08-22 |
+| Version | 0.3 |
+| Last updated | 2026-08-23 |
 | Decision affected | L1-001 — no selection made |
 
 ## Purpose
@@ -62,7 +62,7 @@ Before the fork boundary was added, the isolated spike imported the pinned Core-
 
 ### AIChain Core-Geth candidate boundary
 
-The AIChain fork now contains [`consensus/kawpow`](../node/core-geth/consensus/kawpow), a small, disabled-by-default C1 boundary. It maps a Core-Geth header to an explicit candidate verifier input and includes focused tests that compare its pre-seal hash to the existing Ethash implementation and reject non-positive difficulty. On 2026-08-23, the pinned Go 1.21.13 toolchain passed `go test -v ./consensus/kawpow`.
+The AIChain fork now contains [`consensus/kawpow`](../node/core-geth/consensus/kawpow), a small, disabled-by-default C1 boundary. It maps a Core-Geth header to an explicit candidate verifier input and embeds the Apache-2.0 `cpp-kawpow` reference source as a nested submodule pinned at `061d341011ca341e1f506c52b571f5fd64a0df71`. Focused tests compare its pre-seal hash to the existing Ethash implementation, reject non-positive difficulty, execute a known ProgPoW vector through the native bridge, and reject a tampered mix. On 2026-08-23, the pinned Go 1.21.13 and LLVM/MinGW toolchains passed `go test -v ./consensus/kawpow` in **4.315 seconds**.
 
 This package does **not** implement `consensus.Engine`, engine selection, mining, genesis changes, or a network rule. The shared VPS/laptop devnet remains on its existing configuration.
 
@@ -81,14 +81,14 @@ GitHub Actions remain disabled on the newly created fork. They were not enabled 
 
 1. Pin upstream candidate revision, licence, specification, and test-vector source in a run manifest. **C1 complete.**
 2. Add a minimal verifier adapter and deterministic Go unit tests for valid, invalid, malformed, and wrong-difficulty seals. **C1 adapter, vector, tamper, cache-rotation, concurrent-use, Core-Geth header-mapping tests, and an isolated fork boundary are complete.**
-3. Package the pinned native reference verifier behind the fork boundary, then measure CPU block-verification latency and memory before adding mining support. **Adapter microbenchmark control complete; native-in-fork and full Core-Geth block-validation measurements pending.**
+3. Package the pinned native reference verifier behind the fork boundary, then measure CPU block-verification latency and memory before adding mining support. **Native-in-fork package and deterministic vector test complete; full Core-Geth block-validation measurement pending.**
 4. Add development-only sealing/miner integration.
 5. Use rented NVIDIA and AMD GPU environments for mining throughput, VRAM, power, and multi-node network measurements.
 6. Produce a candidate comparison report; only then consider an L1-001 ADR.
 
 ## Immediate next work
 
-Bring the pinned C1 reference verifier and its conformance vectors into the fork's isolated candidate build, without connecting it to `CreateConsensusEngine`. The initial CPU target remains deterministic verification; GPU rental is needed only for development mining and performance stages.
+Add a header-derived positive/negative verification test that connects the candidate mapping to the in-fork reference bridge, still without connecting it to `CreateConsensusEngine`. The initial CPU target remains deterministic verification; GPU rental is needed only for development mining and performance stages.
 
 ## Change log
 
@@ -96,3 +96,4 @@ Bring the pinned C1 reference verifier and its conformance vectors into the fork
 |---|---|---|
 | 0.1 | 2026-08-22 | Recorded consensus seam, CPU baseline, and isolated-spike rules |
 | 0.2 | 2026-08-23 | Recorded AIChain-owned fork, isolated candidate boundary, local focused-test result, and intentionally disabled fork CI |
+| 0.3 | 2026-08-23 | Added the pinned native C1 reference verifier within the isolated fork boundary and recorded its focused build/test result |
