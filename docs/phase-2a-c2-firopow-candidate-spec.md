@@ -64,6 +64,12 @@ The pinned Windows Go 1.21.13 / LLVM-MinGW CPU control passed on 2026-08-23:
 
 No target/header mapping or network-facing integration was exercised.
 
+The subsequent source review confirmed that Firo's canonical header commitment
+and compact-target model do not directly map to Core-Geth without a separate
+AIChain protocol choice. See [C2 FiroPoW Header-Mapping Review](phase-2a-c2-firopow-header-mapping-review.md).
+Accordingly, C2 remains a CPU verifier control and not a header-derived
+candidate boundary.
+
 ## Local CPU Verification Control
 
 Five short warmed serial controls of the official-vector verifier had a median

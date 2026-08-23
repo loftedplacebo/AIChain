@@ -137,9 +137,14 @@ variant. See [GPU PoW Source Screen](phase-2a-gpu-pow-source-screen.md) and
 The C2 cached CPU control is complete and comparable with C1. The accepted
 [PoW Header and Target Mapping Contract](phase-2a-pow-header-target-mapping-contract.md)
 now separates candidate-neutral adapter safety rules from candidate-specific
-cryptographic mapping. Next, perform the C2 FiroPoW header/target source review
-under that contract. GPU rental is still needed only for development mining and
-performance stages.
+cryptographic mapping. The C2 source review found that Firo's Bitcoin-style
+header commitment and compact target cannot be silently mapped onto Core-Geth;
+see [C2 FiroPoW Header-Mapping Review](phase-2a-c2-firopow-header-mapping-review.md).
+
+Next, decide whether to specify an AIChain-native EVM header/target mapping
+for a shortlisted candidate or retain C1/C2 as verifier controls while
+screening for a more direct EVM fit. GPU rental is still needed only for
+development mining and performance stages.
 
 ## Change log
 
@@ -157,3 +162,4 @@ performance stages.
 | 1.0 | 2026-08-23 | Recorded accepted bounded-height policy and C2 FiroPoW official-vector CPU boundary |
 | 1.1 | 2026-08-23 | Added five-run C2 warmed CPU verifier control and C1 comparison evidence |
 | 1.2 | 2026-08-23 | Added candidate-neutral header/target mapping contract before C2 mapping work |
+| 1.3 | 2026-08-23 | Recorded C2 source-review result: Firo header/target rules require a separate AIChain design decision |

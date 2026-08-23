@@ -56,14 +56,16 @@ is correct for every candidate.
 |---|---|---|
 | Source revision | `cpp-kawpow` `061d341…` | `firoorg/firo` `adba431…` |
 | Native height range | `0..2,147,483,647` | `0..2,147,483,647` |
-| Header commitment | Current Core-Geth Ethash-style pre-seal RLP hash; tested only as C1 candidate mapping | **TBD — must be derived from FiroPoW's rules and tested against its source/vector evidence** |
-| Nonce interpretation | `header.Nonce.Uint64()` in current C1 boundary | **TBD** |
-| Mix field | `header.MixDigest`; tested only as C1 candidate mapping | **TBD** |
-| Difficulty/target | Candidate-only `floor(2^256 / difficulty)`, unsigned 256-bit big-endian, minimum difficulty 2 | **TBD — must not inherit C1's rule without evidence** |
+| Header commitment | Current Core-Geth Ethash-style pre-seal RLP hash; tested only as C1 candidate mapping | Firo source serializes a distinct Bitcoin-style six-field header; no compatible Core-Geth preimage selected |
+| Nonce interpretation | `header.Nonce.Uint64()` in current C1 boundary | Firo uses a separate 64-bit nonce, but Core-Geth placement and byte order are **TBD** |
+| Mix field | `header.MixDigest`; tested only as C1 candidate mapping | Firo verifies a separate mix hash; carrier and semantics in Core-Geth are **TBD** |
+| Difficulty/target | Candidate-only `floor(2^256 / difficulty)`, unsigned 256-bit big-endian, minimum difficulty 2 | Firo decodes compact `nBits`; Core-Geth conversion is **TBD** and must not inherit C1's rule |
 
-The C1 mapping is useful evidence, not a reusable default. C2 must establish
-its own fields and target semantics from pinned FiroPoW source and official
-test vectors before it can obtain a `HeaderTo…` function.
+The C1 mapping is useful evidence, not a reusable default. The C2 source
+review found that FiroPoW's canonical header/target model is materially
+different from Core-Geth's; see [C2 FiroPoW Header-Mapping Review](phase-2a-c2-firopow-header-mapping-review.md).
+No `HeaderTo…` function is justified until a separate AIChain-native mapping
+decision is made and independently vectorised.
 
 ## Required Candidate Mapping Tests
 
@@ -92,4 +94,3 @@ If the required mapping cannot be demonstrated from the pinned source and
 official vectors without importing unrelated Firo consensus rules, record that
 as a candidate limitation rather than filling the gap with an AIChain-specific
 assumption.
-
