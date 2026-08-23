@@ -173,6 +173,12 @@ and demonstrates that the development difficulty helper matches Core-Geth's
 existing calculation across multiple timestamp deltas. This remains an
 inactive development boundary, not a production retarget rule.
 
+The engine-level batch test preserves result order across valid, invalid, and
+valid headers. A local concurrent control completed 64 valid seal checks across
+16 workers, and the complete `consensus/kawpowengine` package passed Go's race
+detector. These are bounded correctness controls, not sustained throughput or
+denial-of-service capacity measurements.
+
 ## Change log
 
 | Version | Date | Change |
@@ -195,3 +201,4 @@ inactive development boundary, not a production retarget rule.
 | 1.6 | 2026-08-23 | Recorded the disabled engine boundary and focused fail-closed mining test result |
 | 1.7 | 2026-08-23 | Added passing KawPoW engine rejection matrix and recorded the independent local Ethash cache-cleanup baseline failure |
 | 1.8 | 2026-08-23 | Resolved the Windows Ethash cache-test portability issue; full focused regression passes; added positive seal, tamper, VerifyHeader, and difficulty-equivalence tests |
+| 1.9 | 2026-08-23 | Added ordered batch verification and concurrent engine controls; race-enabled package test passes |

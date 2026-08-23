@@ -97,7 +97,7 @@ be selected by a devnet genesis/configuration.
 | VerifyHeader seal-flag integration | Complete |
 | Development difficulty equivalence | Complete |
 | Existing Ethash plus KawPoW regression | Complete |
-| Parallel/batch header validation and cache/DoS load | Pending |
+| Parallel/batch header validation and cache/DoS load | Complete local control: ordered batch results and 64 concurrent validations pass; race detector passes |
 | Isolated NVIDIA and AMD miner measurement | Pending |
 | Node work-distribution and GPU seal submission | Pending; no RPC is authorised yet |
 | Devnet genesis/engine switch | Blocked until prior gates pass |
