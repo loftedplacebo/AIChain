@@ -65,7 +65,7 @@ Example after building the pinned miner on the rented host:
 
 ```bash
 bash ./scripts/run-kawpow-gpu-control.sh \
-  /opt/kawpowminer/build/kawpowminer/kawpowminer \
+  /opt/kawpowminer/build-aichain-g1/kawpowminer/kawpowminer \
   /tmp/aichain-kawpow-g1 \
   42 \
   300
