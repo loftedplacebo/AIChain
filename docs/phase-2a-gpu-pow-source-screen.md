@@ -94,10 +94,12 @@ final algorithm remains **TBD**.
 
 ## Next Gate
 
-Perform a C2 FiroPoW source/vector compatibility spike in an isolated
-Core-Geth development boundary. The spike must begin with official vectors,
-record the exact source revision and licence, and remain outside consensus
-engine selection, mining, genesis, and devnet configuration.
+The C2 source/vector spike and header-mapping review are complete. Under
+accepted ADR-0003, no current candidate may advance to engine work as-is; see
+[EVM-Compatibility Gate Review](phase-2a-evm-compatibility-gate-review.md).
+The next decision is whether to own a standards-conforming EIP-1057/ProgPoW
+implementation or continue screening for a maintained candidate with an
+existing EVM-header fit.
 
 ## Change Log
 

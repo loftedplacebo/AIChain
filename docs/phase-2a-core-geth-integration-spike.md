@@ -143,8 +143,10 @@ see [C2 FiroPoW Header-Mapping Review](phase-2a-c2-firopow-header-mapping-review
 
 Next, decide whether to specify an AIChain-native EVM header/target mapping
 for a shortlisted candidate or retain C1/C2 as verifier controls while
-screening for a more direct EVM fit. GPU rental is still needed only for
-development mining and performance stages.
+screening for a more direct EVM fit. The completed
+[EVM-Compatibility Gate Review](phase-2a-evm-compatibility-gate-review.md)
+finds no current engine-ready candidate and defines the next decision paths.
+GPU rental is still needed only for development mining and performance stages.
 
 ## Change log
 
@@ -163,3 +165,4 @@ development mining and performance stages.
 | 1.1 | 2026-08-23 | Added five-run C2 warmed CPU verifier control and C1 comparison evidence |
 | 1.2 | 2026-08-23 | Added candidate-neutral header/target mapping contract before C2 mapping work |
 | 1.3 | 2026-08-23 | Recorded C2 source-review result: Firo header/target rules require a separate AIChain design decision |
+| 1.4 | 2026-08-23 | Applied the accepted EVM gate to the candidate set; no candidate may advance to engine work as-is |
