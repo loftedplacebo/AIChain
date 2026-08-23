@@ -46,6 +46,21 @@ does not accept or require a pool URL, wallet, or worker credential. It records
 the binary checksum, bounded runtime, stdout/stderr, and one-second
 `nvidia-smi` telemetry. Raw output must be written outside the repository.
 
+The companion
+[`scripts/build-kawpow-gpu-control.sh`](../scripts/build-kawpow-gpu-control.sh)
+refuses any source revision other than the pinned commit, checks recursive
+submodule state, and builds exactly one CUDA or OpenCL backend. It installs no
+system packages and performs no clone itself.
+
+Example pinned checkout and CUDA build:
+
+```bash
+git clone https://github.com/RavenCommunity/kawpowminer.git /opt/kawpowminer
+git -C /opt/kawpowminer checkout 632f6ea0a5cd09e2c6443374dbe6db0a767715ba
+git -C /opt/kawpowminer submodule update --init --recursive
+bash ./scripts/build-kawpow-gpu-control.sh /opt/kawpowminer /opt/kawpowminer/build-aichain-g1 cuda
+```
+
 Example after building the pinned miner on the rented host:
 
 ```bash
