@@ -83,6 +83,15 @@ reference API, the spike must:
 This authorises source/vector compatibility work for C2 FiroPoW. It does not
 select FiroPoW, change any consensus engine, or activate a network rule.
 
+## EVM-Compatibility Selection Gate
+
+Accepted [ADR-0003](./decisions/0003-evm-native-pow-header-compatibility.md)
+requires the final PoW candidate to work with one Core-Geth/EVM-derived
+canonical header model. A standalone verifier is insufficient if its canonical
+source requires importing another network's header serialization or target
+model. Candidate-specific adapter rules must be explicit and vectorised; the
+final algorithm remains **TBD**.
+
 ## Next Gate
 
 Perform a C2 FiroPoW source/vector compatibility spike in an isolated

@@ -75,13 +75,13 @@ Only then write the L1-001 ADR. Until then, Ethash remains a development-only en
 
 ## Header-Compatibility Gate
 
-The proposed [ADR-0003](./decisions/0003-evm-native-pow-header-compatibility.md)
+Accepted [ADR-0003](./decisions/0003-evm-native-pow-header-compatibility.md)
 adds EVM-native canonical-header compatibility to the candidate-selection gate.
 It responds to the C2 FiroPoW mapping review: a standalone verifier is not
 enough when its source assumes another chain's header and target model. The
-proposal preserves a single Core-Geth-derived canonical header and requires
+decision preserves a single Core-Geth-derived canonical header and requires
 candidate-specific mapping rules to be separately specified and vectorised.
-It is **not accepted yet** and does not resolve L1-001.
+It does not resolve L1-001.
 
 ## Change Log
 

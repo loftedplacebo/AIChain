@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Proposed — requires explicit acceptance before protocol work relies on it |
+| Status | Accepted for Phase 2A candidate selection |
 | Date | 2026-08-23 |
 | Decision ID | L1-001 selection criteria; L1-002 protocol-change boundary |
 | Scope | Phase 2A candidate evaluation only |
@@ -20,7 +20,7 @@ Importing Firo's header model or silently converting Core-Geth fields into it
 would create unreviewed AIChain consensus rules. Keeping both header models
 would weaken EVM tooling compatibility and add upgrade complexity.
 
-## Proposed Decision
+## Decision
 
 Adopt the following as a **selection criterion**, not an algorithm selection:
 
@@ -77,13 +77,17 @@ Adopt the following as a **selection criterion**, not an algorithm selection:
   leader.
 - A post-quantum account/signature migration.
 
-## Acceptance Criteria
+## What This Does Not Decide
 
-This ADR can move to **Accepted** only when the project explicitly confirms
-the proposed selection criterion. It does not close L1-001. A final L1-001 ADR
-must additionally include candidate benchmarks, attack analysis, a quantum
-threat assessment, exact consensus rules, GPU/NVIDIA/AMD measurements, and an
-activation/rollback plan.
+This ADR does not close L1-001. A final L1-001 ADR must additionally include
+candidate benchmarks, attack analysis, a quantum-threat assessment, exact
+consensus rules, GPU/NVIDIA/AMD measurements, and an activation/rollback plan.
+
+## Acceptance Record
+
+Accepted by the AIChain project on 2026-08-23: retain EVM compatibility as a
+mandatory PoW candidate-selection criterion while keeping the final mining
+algorithm undecided.
 
 ## References
 
@@ -91,4 +95,3 @@ activation/rollback plan.
 - [C2 FiroPoW Header-Mapping Review](../phase-2a-c2-firopow-header-mapping-review.md)
 - [C1 Source Audit](../phase-2a-c1-source-audit.md)
 - [Phase 2A Consensus Recommendation](../phase-2a-consensus-recommendation.md)
-
