@@ -88,6 +88,22 @@ be selected by a devnet genesis/configuration.
 - Cache sizing under node load and final DoS limits.
 - Testnet transition, reward schedule, and all production L1-001 values.
 
+## Current Gate Status
+
+| Gate | Status |
+|---|---|
+| Disabled engine compiles and cannot mine | Complete |
+| Valid seal and malformed/tampered seal tests | Complete |
+| VerifyHeader seal-flag integration | Complete |
+| Development difficulty equivalence | Complete |
+| Existing Ethash plus KawPoW regression | Complete |
+| Parallel/batch header validation and cache/DoS load | Pending |
+| Isolated NVIDIA and AMD miner measurement | Pending |
+| Node work-distribution and GPU seal submission | Pending; no RPC is authorised yet |
+| Devnet genesis/engine switch | Blocked until prior gates pass |
+
+See [KawPoW GPU and Miner Gate](./phase-2a-kawpow-gpu-miner-gate.md).
+
 ## Non-Goals
 
 - Quantum-resistance claims.

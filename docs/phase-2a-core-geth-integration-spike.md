@@ -160,12 +160,18 @@ path, `go test -v ./consensus/kawpowengine` passed on 2026-08-23 in 3.883
 seconds. It is not registered by chain configuration.
 
 The focused KawPoW verifier and engine suites pass together. The wider local
-Ethash regression control currently has a separate, reproducible Windows
-baseline failure in `TestEthashCaches`: its cache-file cleanup assertion sees
-five files where the upstream test expects no more than four. The same failure
-occurred on an immediate single-test rerun. No Ethash code or test was changed
-to mask it, and this must be resolved or explicitly characterised before a
-devnet engine-switch gate can close.
+Ethash regression initially exposed a Windows portability issue in
+`TestEthashCaches`: the test counted temporary generation files and assumed
+Unix unlink behaviour for memory-mapped caches. The test now counts only
+finalized files and uses the exact Windows retention bound of on-disk caches,
+in-memory mapped caches, and one future cache. The targeted test and the full
+Ethash/KawPoW/KawPoW-engine regression set pass together.
+
+The engine test matrix now also proves a valid header seal, rejects altered
+mix, nonce, and difficulty, verifies that `VerifyHeader` honours its seal flag,
+and demonstrates that the development difficulty helper matches Core-Geth's
+existing calculation across multiple timestamp deltas. This remains an
+inactive development boundary, not a production retarget rule.
 
 ## Change log
 
@@ -188,3 +194,4 @@ devnet engine-switch gate can close.
 | 1.5 | 2026-08-23 | Recorded ADR-0004 KawPoW Phase 2A development selection and opened disabled-by-default engine design work |
 | 1.6 | 2026-08-23 | Recorded the disabled engine boundary and focused fail-closed mining test result |
 | 1.7 | 2026-08-23 | Added passing KawPoW engine rejection matrix and recorded the independent local Ethash cache-cleanup baseline failure |
+| 1.8 | 2026-08-23 | Resolved the Windows Ethash cache-test portability issue; full focused regression passes; added positive seal, tamper, VerifyHeader, and difficulty-equivalence tests |
