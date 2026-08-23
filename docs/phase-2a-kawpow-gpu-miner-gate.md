@@ -2,8 +2,8 @@
 
 | Field | Value |
 |---|---|
-| Status | G1 ready; G2 service tested in memory, node integration pending |
-| Version | 0.4 |
+| Status | G1 NVIDIA control complete; AMD repeat and G2 node integration pending |
+| Version | 0.5 |
 | Last updated | 2026-08-23 |
 | Governing decision | [ADR-0004](./decisions/0004-kawpow-phase-2a-development-selection.md) |
 
@@ -58,8 +58,19 @@ Example pinned checkout and CUDA build:
 git clone https://github.com/RavenCommunity/kawpowminer.git /opt/kawpowminer
 git -C /opt/kawpowminer checkout 632f6ea0a5cd09e2c6443374dbe6db0a767715ba
 git -C /opt/kawpowminer submodule update --init --recursive
-bash ./scripts/build-kawpow-gpu-control.sh /opt/kawpowminer /opt/kawpowminer/build-aichain-g1 cuda
+git -C /opt/kawpowminer apply \
+  /opt/aichain/patches/kawpowminer/0001-gcc13-cstdint.patch
+AICHAIN_KAWPOW_COMPUTE=86 \
+AICHAIN_KAWPOW_CXX_FLAGS=-DPTHREAD_STACK_MIN=16384 \
+  bash ./scripts/build-kawpow-gpu-control.sh \
+  /opt/kawpowminer /opt/kawpowminer/build-aichain-g1 cuda
 ```
+
+The compatibility patch adds one missing standard-library include required by
+GCC 13. The compile definition accommodates glibc 2.39, while `COMPUTE=86`
+limits CUDA output to the tested RTX 3060 architecture and avoids architectures
+removed from CUDA 12. These are build-compatibility settings; they do not alter
+KawPoW behavior.
 
 Example after building the pinned miner on the rented host:
 
@@ -75,6 +86,11 @@ The inspected miner revision is
 `RavenCommunity/kawpowminer@632f6ea0a5cd09e2c6443374dbe6db0a767715ba`.
 Its GPL-3.0 source remains an external measurement tool and must not become a
 Core-Geth dependency.
+
+The first NVIDIA control result is recorded in
+[KawPoW G1 RTX 3060 Result](../benchmarks/pow/kawpow-g1-rtx3060-2026-08-23.md).
+It establishes a reproducible NVIDIA baseline only; it does not close G1 until
+the AMD/OpenCL repeat is complete.
 
 ## Stage G2 — Node Interoperability
 
@@ -136,3 +152,4 @@ NVIDIA procedure is reproducible.
 | 0.2 | 2026-08-23 | Linked the committed development work-protocol specification |
 | 0.3 | 2026-08-23 | Recorded the bounded work registry and retained the no-RPC boundary |
 | 0.4 | 2026-08-23 | Recorded strict wire and in-memory service tests; node exposure remains disabled |
+| 0.5 | 2026-08-23 | Recorded the completed RTX 3060 control and reproducible modern-toolchain compatibility settings |

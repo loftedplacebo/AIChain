@@ -11,6 +11,8 @@ fi
 source_dir="$1"
 build_dir="${2:-$source_dir/build-aichain-g1}"
 backend="${3:-cuda}"
+compute_arch="${AICHAIN_KAWPOW_COMPUTE:-}"
+compat_cxx_flags="${AICHAIN_KAWPOW_CXX_FLAGS:-}"
 
 if [[ "$source_dir" != /* || "$build_dir" != /* ]]; then
   echo "Source and build paths must be absolute." >&2
@@ -22,6 +24,10 @@ if [[ ! -d "$source_dir/.git" ]]; then
 fi
 if [[ "$backend" != "cuda" && "$backend" != "opencl" ]]; then
   echo "Backend must be cuda or opencl." >&2
+  exit 2
+fi
+if [[ -n "$compute_arch" && ! "$compute_arch" =~ ^[0-9]+$ ]]; then
+  echo "AICHAIN_KAWPOW_COMPUTE must be a CUDA compute capability without punctuation (for example 86)." >&2
   exit 2
 fi
 
@@ -54,11 +60,22 @@ else
   opencl_flag=ON
 fi
 
-cmake -S "$source_dir" -B "$build_dir" \
-  -DETHASHCUDA="$cuda_flag" \
-  -DETHASHCL="$opencl_flag" \
-  -DAPICORE=ON \
+cmake_args=(
+  -S "$source_dir"
+  -B "$build_dir"
+  -DETHASHCUDA="$cuda_flag"
+  -DETHASHCL="$opencl_flag"
+  -DAPICORE=ON
   -DCMAKE_BUILD_TYPE=Release
+)
+if [[ -n "$compute_arch" ]]; then
+  cmake_args+=("-DCOMPUTE=$compute_arch")
+fi
+if [[ -n "$compat_cxx_flags" ]]; then
+  cmake_args+=("-DCMAKE_CXX_FLAGS=$compat_cxx_flags")
+fi
+
+cmake "${cmake_args[@]}"
 cmake --build "$build_dir" --parallel "$(nproc)"
 
 mapfile -t miner_binaries < <(find "$build_dir" -type f -name kawpowminer -perm -111)

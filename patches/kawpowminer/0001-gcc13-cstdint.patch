@@ -1,0 +1,10 @@
+diff --git a/libdevcore/vector_ref.h b/libdevcore/vector_ref.h
+index 00a24e58d..7f6bf2e71 100644
+--- a/libdevcore/vector_ref.h
++++ b/libdevcore/vector_ref.h
+@@ -3,4 +3,5 @@
+ #include <cassert>
++#include <cstdint>
+ #include <cstring>
+ #include <string>
+ #include <type_traits>
