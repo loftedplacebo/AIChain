@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Active, development-only preparation |
-| Version | 1.0 |
+| Version | 1.2 |
 | Last updated | 2026-08-23 |
 | Decision affected | L1-001 — no selection made |
 
@@ -134,11 +134,12 @@ consensus migration rather than an AIChain-specific 64-bit cryptographic
 variant. See [GPU PoW Source Screen](phase-2a-gpu-pow-source-screen.md) and
 [C2 FiroPoW Candidate Rules](phase-2a-c2-firopow-candidate-spec.md).
 
-The C2 cached CPU control is complete and comparable with C1. Next, define a
-candidate-neutral Core-Geth header/target mapping contract before implementing
-candidate-specific mapping. This must state what can be shared across C1/C2
-and which algorithm parameters remain separate. GPU rental is still needed
-only for development mining and performance stages.
+The C2 cached CPU control is complete and comparable with C1. The accepted
+[PoW Header and Target Mapping Contract](phase-2a-pow-header-target-mapping-contract.md)
+now separates candidate-neutral adapter safety rules from candidate-specific
+cryptographic mapping. Next, perform the C2 FiroPoW header/target source review
+under that contract. GPU rental is still needed only for development mining and
+performance stages.
 
 ## Change log
 
@@ -155,3 +156,4 @@ only for development mining and performance stages.
 | 0.9 | 2026-08-23 | Added the C1/C2/C3 GPU PoW source screen and bounded-height migration recommendation |
 | 1.0 | 2026-08-23 | Recorded accepted bounded-height policy and C2 FiroPoW official-vector CPU boundary |
 | 1.1 | 2026-08-23 | Added five-run C2 warmed CPU verifier control and C1 comparison evidence |
+| 1.2 | 2026-08-23 | Added candidate-neutral header/target mapping contract before C2 mapping work |
