@@ -159,6 +159,14 @@ error from `Seal`. With the pinned MinGW runtime on the local test process
 path, `go test -v ./consensus/kawpowengine` passed on 2026-08-23 in 3.883
 seconds. It is not registered by chain configuration.
 
+The focused KawPoW verifier and engine suites pass together. The wider local
+Ethash regression control currently has a separate, reproducible Windows
+baseline failure in `TestEthashCaches`: its cache-file cleanup assertion sees
+five files where the upstream test expects no more than four. The same failure
+occurred on an immediate single-test rerun. No Ethash code or test was changed
+to mask it, and this must be resolved or explicitly characterised before a
+devnet engine-switch gate can close.
+
 ## Change log
 
 | Version | Date | Change |
@@ -179,3 +187,4 @@ seconds. It is not registered by chain configuration.
 | 1.4 | 2026-08-23 | Applied the accepted EVM gate to the candidate set; no candidate may advance to engine work as-is |
 | 1.5 | 2026-08-23 | Recorded ADR-0004 KawPoW Phase 2A development selection and opened disabled-by-default engine design work |
 | 1.6 | 2026-08-23 | Recorded the disabled engine boundary and focused fail-closed mining test result |
+| 1.7 | 2026-08-23 | Added passing KawPoW engine rejection matrix and recorded the independent local Ethash cache-cleanup baseline failure |

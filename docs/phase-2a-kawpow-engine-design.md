@@ -45,6 +45,16 @@ The mapping is candidate-only until the following are committed as public,
 versioned vectors: valid seal, tampered mix, wrong nonce, byte-order mismatch,
 wrong target, non-positive difficulty, and height boundary.
 
+## Development Difficulty Boundary
+
+Until a KawPoW-specific difficulty algorithm is specified and independently
+tested, the disabled engine delegates calculation to the existing Ethash
+development baseline. This is a containment choice, not a production KawPoW
+rule: it keeps a temporary engine experiment from silently selecting a block
+interval, retarget behaviour, or economic parameter. A dedicated KawPoW
+difficulty specification and test vectors are required before any engine can
+be selected by a devnet genesis/configuration.
+
 ## Implementation Order
 
 1. Create an engine package that satisfies the Core-Geth interface while
