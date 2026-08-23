@@ -2,8 +2,8 @@
 
 | Field | Value |
 |---|---|
-| Status | Complete — no current candidate may advance to engine work |
-| Version | 0.1 |
+| Status | Expanded screen complete — no current candidate may advance to engine work |
+| Version | 0.2 |
 | Last updated | 2026-08-23 |
 | Governing decision | [ADR-0003](./decisions/0003-evm-native-pow-header-compatibility.md) |
 | L1-001 status | **TBD — no mining algorithm selected** |
@@ -24,6 +24,7 @@ the accepted EVM compatibility rule.
 | C2 FiroPoW | GPU-targeted | Does not directly fit: hashes Firo's Bitcoin-style header and compact target | Official source active | CPU verifier control only; no Core-Geth mapping without a separate AIChain-native profile decision |
 | C3 Autolykos v2 | GPU-memory-hard | Different header/client model | Official source active | Not a Phase 2A engine candidate |
 | EIP-1057 / ProgPoW source check | Designed for Ethereum-style PoW | Conceptually aligned | The standard is marked stagnant; current `chfast/ethash` at `17e80309…` (2025-06-08) exposes Ethash but no ProgPoW API | Not a maintained off-the-shelf implementation candidate |
+| C4 Quai KawPoW source lead | GPU-oriented KawPoW implementation | A generic `headerHash + nonce + uint64 height` verifier entry is closer to the EVM envelope, but is not yet an AIChain mapping | Active Go source, but the host repository is GPL-3.0 with mixed file provenance and Quai-specific PoEM/merged-mining assumptions | Source lead only; no code reuse, dependency, or engine work authorised |
 
 ## What This Does Not Mean
 
@@ -74,6 +75,32 @@ maintenance burden of a standards-conforming EIP-1057/ProgPoW implementation.
 Otherwise take **Path B** and keep the present candidates as well-instrumented
 controls. Do not take Path C merely to unblock C2.
 
+## Path B Expanded-Screen Result — C4 Quai KawPoW
+
+The screen located an actively maintained KawPoW implementation in the official
+Quai Go node source, pinned at
+`208b67554a9078086c8de7c9ab0a9b5af2d9d567` (2026-08-19). Its exposed
+`VerifyKawpowShare(headerHash, nonce, blockNumber)` boundary and internal
+`uint64` block-height handling are materially closer to ADR-0003's
+single-header envelope than C2's foreign serialized header model. The source
+also includes real-block and deterministic behaviour tests.
+
+It is **not** an AIChain integration candidate yet:
+
+- Quai's overall protocol uses PoEM, multi-algorithm/merged-mining paths, and
+  its own work-object/header rules; AIChain must not inherit any of those
+  consensus rules.
+- The host repository is GPL-3.0 and individual KawPoW files carry mixed
+  provenance/headers. No source may be copied, imported, or linked until a
+  licence and dependency-boundary review says exactly what is permissible.
+- Its tests establish behaviour within Quai's protocol context, not a
+  completed AIChain header-mapping or independent conformance proof.
+
+Therefore C4 is recorded as a **source lead only**. The only authorised next
+investigation is a read-only provenance/licence review and independent
+comparison against publicly available KawPoW vectors. That work must not
+import Quai source into Core-Geth or change the devnet.
+
 ## Evidence References
 
 - [EIP-1057: ProgPoW](https://eips.ethereum.org/EIPS/eip-1057) — marked
@@ -84,4 +111,4 @@ controls. Do not take Path C merely to unblock C2.
   API/source review found Ethash rather than an exported ProgPoW API.
 - [C1 source audit](./phase-2a-c1-source-audit.md) and
   [C2 mapping review](./phase-2a-c2-firopow-header-mapping-review.md).
-
+- [C4 Quai KawPoW source screen](./phase-2a-c4-quai-kawpow-source-screen.md).

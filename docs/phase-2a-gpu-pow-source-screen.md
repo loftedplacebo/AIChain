@@ -2,8 +2,8 @@
 
 | Field | Value |
 |---|---|
-| Status | Bounded-height policy accepted; no candidate selected |
-| Version | 0.2 |
+| Status | Bounded-height policy accepted; expanded screen complete; no candidate selected |
+| Version | 0.3 |
 | Last updated | 2026-08-23 |
 | Decision affected | L1-001 — still **TBD** |
 
@@ -23,6 +23,7 @@ benchmark or security audit.
 | C3 Autolykos v2 | Official Ergo source is active; memory-hard GPU mining ecosystem and efficient validation path | Production header and history interfaces use Scala `Int` | Do not integrate in Phase 2A; it also has a different node/model and height boundary |
 | FishHash | Open source implementation and specification available | Repository labels itself a work in progress | Exclude from current consensus candidates |
 | kHeavyHash | Clear reference implementations exist | Public reference material explicitly expects ASIC implementations | Exclude: inconsistent with the GPU/ASIC-resistance objective |
+| C4 Quai KawPoW source lead | Active Go KawPoW implementation with a generic hash/nonce/`uint64`-height entry point and local real-block tests | The overall source is bound to Quai-specific PoEM/work-object/merged-mining paths | Source lead only; direct reuse is not authorised pending a licence/provenance review and independent vector comparison |
 
 ## Audit Evidence
 
@@ -101,9 +102,14 @@ The next decision is whether to own a standards-conforming EIP-1057/ProgPoW
 implementation or continue screening for a maintained candidate with an
 existing EVM-header fit.
 
+The expanded screen has now identified C4 as a maintained source lead, but it
+does not change that decision: it is not a drop-in EVM/Core-Geth engine. See
+[the C4 screen](./phase-2a-c4-quai-kawpow-source-screen.md).
+
 ## Change Log
 
 | Version | Date | Change |
 |---|---|---|
 | 0.1 | 2026-08-23 | Initial C1/C2/C3 GPU PoW source screen |
 | 0.2 | 2026-08-23 | Recorded accepted bounded-height migration policy and opened the isolated C2 source/vector spike |
+| 0.3 | 2026-08-23 | Recorded the C4 Quai KawPoW maintained-source lead and its no-reuse boundary |
