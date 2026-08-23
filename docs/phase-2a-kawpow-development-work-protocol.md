@@ -2,8 +2,8 @@
 
 | Field | Value |
 |---|---|
-| Status | Accepted development-only specification; implementation pending |
-| Version | 0.1 |
+| Status | Accepted; bounded work registry implemented, transport pending |
+| Version | 0.2 |
 | Last updated | 2026-08-23 |
 | Governing decision | [ADR-0004](./decisions/0004-kawpow-phase-2a-development-selection.md) |
 | Production status | **TBD — this is not a public mining API or launch protocol** |
@@ -160,8 +160,25 @@ The first implementation target is a local, disposable single-node harness.
 Genesis activation, public exposure, pool protocols, rewards, production
 difficulty, and launch economics remain **TBD**.
 
+## Implementation Progress
+
+Core-Geth commit `499ae19` implements the transport-independent work registry:
+
+- deterministic, domain-separated opaque work identifiers;
+- node-owned immutable header templates and targets;
+- 10–300 second lifetime and maximum 64 active records;
+- bounded concurrent CPU verification;
+- canonical-parent and expiry checks before and after verification;
+- one-time acceptance and duplicate rejection; and
+- a real C1 seal path plus concurrent race-detector coverage.
+
+No RPC method is registered. The next slice is strict wire decoding and API
+tests around the registry; endpoint registration remains a later explicit
+step.
+
 ## Change Log
 
 | Version | Date | Change |
 |---|---|---|
 | 0.1 | 2026-08-23 | Initial development-only node/miner work contract |
+| 0.2 | 2026-08-23 | Recorded the tested bounded work-registry implementation |
