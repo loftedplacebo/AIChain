@@ -37,10 +37,10 @@ def main():
         "version": current["version"], "workId": "0x" + "00" * 32,
         "nonce": "0x0000000000000000", "mixDigest": "0x" + "00" * 32,
     }])
-    duplicate = call(args.node_rpc, "aichain_submitKawpowWork", [{
-        "version": current["version"], "workId": accepted["workId"],
-        "nonce": accepted["nonce"], "mixDigest": accepted["mixDigest"],
-    }])
+    duplicate = next((entry for entry in entries if entry.get("workId") == accepted["workId"]
+                      and entry.get("status") == "duplicate"), None)
+    if duplicate is None:
+        raise SystemExit("audit log contains no node-returned duplicate rejection for accepted work")
     observed = {"malformed": malformed, "invalid": invalid, "stale": stale,
                 "duplicate": duplicate, "gpuAccepted": accepted}
     expected = {"malformed": "malformed", "invalid": "invalid-seal", "stale": "stale",

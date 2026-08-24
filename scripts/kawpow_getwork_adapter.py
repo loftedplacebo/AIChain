@@ -64,7 +64,7 @@ class Adapter:
     def __init__(self, node: NodeRPC, audit_log: Path | None = None):
         self.node = node
         self.audit_log = audit_log
-        self._work: OrderedDict[str, str] = OrderedDict()
+        self._work: OrderedDict[str, dict[str, Any]] = OrderedDict()
         self._lock = threading.Lock()
 
     def dispatch(self, method: str, params: Any) -> Any:
@@ -91,7 +91,7 @@ class Adapter:
             raise ValueError("height must be an Ethereum quantity")
         int(height, 16)
         with self._lock:
-            self._work[header_hash] = work_id
+            self._work[header_hash] = work
             self._work.move_to_end(header_hash)
             while len(self._work) > MAX_TRACKED_WORK:
                 self._work.popitem(last=False)
@@ -104,23 +104,27 @@ class Adapter:
         header_hash = _fixed_hex(params[1], 32, "headerHash")
         mix_digest = _fixed_hex(params[2], 32, "mixDigest")
         with self._lock:
-            work_id = self._work.get(header_hash)
-        if work_id is None:
+            work = self._work.get(header_hash)
+        if work is None:
             self._audit(None, header_hash, nonce, mix_digest, {"accepted": False, "status": "unknown-adapter-work"})
             return False
+        work_id = work["workId"]
         submission = {"version": WORK_VERSION, "workId": work_id, "nonce": nonce, "mixDigest": mix_digest}
         result = self.node.call("aichain_submitKawpowWork", [submission])
         if not isinstance(result, dict) or not isinstance(result.get("accepted"), bool):
             raise ValueError("malformed node submission response")
-        self._audit(work_id, header_hash, nonce, mix_digest, result)
+        self._audit(work, header_hash, nonce, mix_digest, result)
         return result["accepted"]
 
-    def _audit(self, work_id: str | None, header_hash: str, nonce: str, mix_digest: str,
+    def _audit(self, work: dict[str, Any] | None, header_hash: str, nonce: str, mix_digest: str,
                result: dict[str, Any]) -> None:
         if self.audit_log is None:
             return
-        entry = {"timestamp": int(time.time()), "workId": work_id, "headerHash": header_hash, "nonce": nonce,
+        entry = {"timestamp": int(time.time()), "workId": work.get("workId") if work else None,
+                 "headerHash": header_hash, "nonce": nonce,
                  "mixDigest": mix_digest, **result}
+        if work:
+            entry.update({key: work.get(key) for key in ("parentHash", "height", "seedHash", "target", "expiresAt")})
         with self._lock:
             self.audit_log.parent.mkdir(parents=True, exist_ok=True)
             with self.audit_log.open("a", encoding="utf-8") as output:
