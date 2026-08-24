@@ -2,9 +2,9 @@
 
 | Field | Value |
 |---|---|
-| Status | G1 NVIDIA control complete; AMD repeat and G2 node integration pending |
-| Version | 0.5 |
-| Last updated | 2026-08-23 |
+| Status | G1 NVIDIA control and G2 node interoperability complete; AMD repeat and G3 pending |
+| Version | 0.6 |
+| Last updated | 2026-08-24 |
 | Governing decision | [ADR-0004](./decisions/0004-kawpow-phase-2a-development-selection.md) |
 
 ## Purpose
@@ -92,10 +92,10 @@ The first NVIDIA control result is recorded in
 It establishes a reproducible NVIDIA baseline only; it does not close G1 until
 the AMD/OpenCL repeat is complete.
 
-## Stage G2 — Node Interoperability
+## Stage G2 — Node Interoperability — Complete
 
-The disabled engine has no mining implementation and `Seal` fails closed. The
-development-only wire contract is now specified in
+The engine remains disabled by default and is enabled only by the explicit
+`--aichain.kawpowdev` flag. The development-only wire contract is specified in
 [KawPoW Development Work Protocol](phase-2a-kawpow-development-work-protocol.md).
 Implementation must preserve its requirements for:
 
@@ -107,9 +107,7 @@ Implementation must preserve its requirements for:
    sizes; and
 6. explicit separation from standard Ethereum JSON-RPC methods.
 
-Only then may a miner receive work, submit a candidate seal, and have a local
-development node validate it. The initial endpoint must remain disabled by
-default and bound to localhost unless an SSH tunnel is used.
+G2 passed on 2026-08-24: the pinned RTX 3060 miner solved a real Core-Geth block-1 template, the node verified it on CPU, and normal block import made it canonical. Malformed, invalid-seal, stale/unknown, and duplicate submissions were rejected. See [G2 Node-to-GPU KawPoW Interoperability](phase-2a-g2-node-gpu-interoperability.md).
 
 ## Stage G3 — Network Measurement
 
@@ -153,3 +151,4 @@ NVIDIA procedure is reproducible.
 | 0.3 | 2026-08-23 | Recorded the bounded work registry and retained the no-RPC boundary |
 | 0.4 | 2026-08-23 | Recorded strict wire and in-memory service tests; node exposure remains disabled |
 | 0.5 | 2026-08-23 | Recorded the completed RTX 3060 control and reproducible modern-toolchain compatibility settings |
+| 0.6 | 2026-08-24 | Recorded G2 pass: real node work, RTX 3060 solution, CPU verification, canonical import, and negative rejection matrix |

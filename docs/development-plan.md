@@ -3,12 +3,12 @@
 | Field | Value |
 |---|---|
 | Status | Living delivery plan |
-| Document version | 0.6 |
-| Last updated | 2026-08-22 |
+| Document version | 0.7 |
+| Last updated | 2026-08-24 |
 | Architecture inputs | [Core L1 Architecture and Tooling](./core-l1-architecture-and-tooling.md); [AI Verification & ZK Architecture](./ai-verification-and-zk-architecture.md) |
 | Schedule | Dates, durations, staffing, and owners are **TBD** |
 | Decision state | This plan sequences open decisions; it does not settle them |
-| Delivery status | Phase 1A complete for development; Phase 1B development-validation milestone complete; stable protocol decision gate DG-2 remains open |
+| Delivery status | Phase 1 development-validation complete; Phase 2A G2 complete and G3 next; stable protocol decision gates remain open |
 
 ## 1. Objective
 
@@ -135,7 +135,9 @@ Security, privacy, compatibility, documentation, and operations run across every
 
 **Goal:** Replace temporary development assumptions with measured and explicitly approved network rules.
 
-**Next active work:** define the decision rubric and benchmark harness for GPU-friendly PoW candidates before selecting any algorithm. The rubric must separately assess present-day GPU accessibility, ASIC/centralisation exposure, implementation maturity, verification/propagation cost, DoS resistance, upgrade path, and quantum-threat assumptions. Existing Ethash mining remains development-only.
+**Current status:** KawPoW is selected only for Phase 2A development evaluation. G1 has a reproducible RTX 3060 control and G2 has produced a real disposable-chain block from node-issued work with independent CPU verification and canonical import. The existing Ethash devnet remains unchanged.
+
+**Next active work:** run G3 with a separate CPU-only validator node, then measure propagation, synchronization, restart, stale/reorganization behavior, and AVR batch capacity. Complete the AMD/OpenCL G1 repeat before treating GPU accessibility as demonstrated across vendors. Production difficulty, retargeting, economics, and final **L1-001** approval remain **TBD**.
 
 **Primary outputs**
 
@@ -341,5 +343,6 @@ This is a development-validation milestone, not a final AVR protocol release. **
 | 0.4 | 2026-08-19 | Made capacity, batching/rollups, and confirmation performance mandatory at every phase | DG-10; targets remain TBD |
 | 0.5 | 2026-08-22 | Recorded Phase 1B development-validation completion and Phase 2A/2B next work | DG-2 remains open; L1-001 and ZK-001–005 remain TBD |
 | 0.6 | 2026-08-22 | Started Phase 2 evaluation charters without selecting PoW or ZK choices | [Phase 2 Evaluation Charter](./phase-2-evaluation-charter.md) |
+| 0.7 | 2026-08-24 | Recorded G1 NVIDIA and G2 real node-to-GPU KawPoW results; set G3 and AMD repeat as next work | [G2 Node-to-GPU Interoperability](./phase-2a-g2-node-gpu-interoperability.md) |
 | 0.1 | 2026-08-18 | Initial phased development plan | Architecture documents v0.1 |
 | X.Y | YYYY-MM-DD | Describe the change | Decision ID or link |

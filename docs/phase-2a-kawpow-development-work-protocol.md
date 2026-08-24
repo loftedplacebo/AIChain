@@ -2,9 +2,9 @@
 
 | Field | Value |
 |---|---|
-| Status | Registry, strict codec, and unregistered service implemented; node integration pending |
-| Version | 0.3 |
-| Last updated | 2026-08-23 |
+| Status | G2 implementation and disposable node/GPU interoperability test complete |
+| Version | 0.4 |
+| Last updated | 2026-08-24 |
 | Governing decision | [ADR-0004](./decisions/0004-kawpow-phase-2a-development-selection.md) |
 | Production status | **TBD — this is not a public mining API or launch protocol** |
 
@@ -177,12 +177,21 @@ rejects unknown or duplicate fields, missing fields, wrong versions,
 noncanonical hexadecimal values, wrong lengths, non-string fields, and trailing
 JSON.
 
-Core-Geth commit `724f3d9` adds the service behavior and exercises the proposed
+Core-Geth commit `724f3d9` added the service behavior and exercised the proposed
 `aichain_getKawpowWork` and `aichain_submitKawpowWork` methods through an
 in-memory Core-Geth RPC server. It enforces the 4 KiB submission limit and
-stable rejection statuses. The service deliberately does not register itself;
-an explicit node integration, local exposure controls, rate limiting, template
-provider, and block-import callback remain pending.
+stable rejection statuses.
+
+Core-Geth commits `e0d7d15` and `161a468` complete G2. The service registers
+only under explicit `--aichain.kawpowdev` opt-in, rejects non-loopback network
+transports, rate-limits bounded client sets, obtains fully finalized sealing
+templates, verifies at most two submissions concurrently on CPU, and imports a
+verified complete block through normal chain validation. Import acceptance is
+transactional: an import failure releases the work reservation for retry.
+
+The RTX 3060 interoperability run accepted block 1 and rejected malformed,
+invalid-seal, stale/unknown, and duplicate submissions. The shared Ethash
+devnet was not modified. See [G2 Node-to-GPU KawPoW Interoperability](phase-2a-g2-node-gpu-interoperability.md).
 
 ## Change Log
 
@@ -191,3 +200,4 @@ provider, and block-import callback remain pending.
 | 0.1 | 2026-08-23 | Initial development-only node/miner work contract |
 | 0.2 | 2026-08-23 | Recorded the tested bounded work-registry implementation |
 | 0.3 | 2026-08-23 | Recorded strict wire decoding and the tested but unregistered RPC service |
+| 0.4 | 2026-08-24 | Recorded opt-in local-only integration, finalized templates, transactional import, bounded verification, and passing RTX 3060 G2 run |

@@ -2,9 +2,9 @@
 
 | Field | Value |
 |---|---|
-| Status | Active, development-only KawPoW integration preparation |
-| Version | 1.5 |
-| Last updated | 2026-08-23 |
+| Status | G2 node-to-GPU integration complete; G3 network validation next |
+| Version | 2.0 |
+| Last updated | 2026-08-24 |
 | Decision affected | L1-001 — KawPoW selected for Phase 2A development only |
 
 ## Purpose
@@ -15,7 +15,7 @@ production activation.
 
 ## Confirmed Core-Geth boundary
 
-The AIChain-owned Core-Geth fork is [`loftedplacebo/core-geth`](https://github.com/loftedplacebo/core-geth). Phase 2A work is published on `aichain/phase-2a-kawpow-spike`; the parent repository pins that fork as its `node/core-geth` submodule source. The upstream `etclabscore/core-geth` remote remains a read-only comparison source.
+The AIChain-owned Core-Geth fork is [`loftedplacebo/core-geth`](https://github.com/loftedplacebo/core-geth). Phase 2A work is published on `new-dag-dev`; the parent repository pins that fork as its `node/core-geth` submodule source. The upstream `etclabscore/core-geth` remote remains a read-only comparison source.
 
 The pinned Core-Geth source exposes a consensus-engine interface at `consensus/consensus.go`. The current Ethash implementation is contained under `consensus/ethash/`, including header verification, seal validation, seal-hash construction, and local sealing.
 
@@ -122,7 +122,7 @@ C2 verifier-control manifest](../benchmarks/pow/runs/2026-08-23-c2-firopow-cpu-v
 
 1. Pin upstream candidate revision, licence, specification, and test-vector source in a run manifest. **C1 complete.**
 2. Add a minimal verifier adapter and deterministic Go unit tests for valid, invalid, malformed, and wrong-difficulty seals. **C1 adapter, vector, tamper, cache-rotation, concurrent-use, Core-Geth header-mapping tests, and an isolated fork boundary are complete. C2 has an official vector, tamper, and range-rejection CPU boundary; header/target mapping is intentionally not started.**
-3. Package the pinned native reference verifier behind the fork boundary, then measure CPU block-verification latency and memory before adding mining support. **Native-in-fork package and deterministic vector test complete; full Core-Geth block-validation measurement pending.**
+3. Package the pinned native reference verifier behind the fork boundary, then measure CPU block verification before adding network mining support. **Complete through the G2 normal block-import path; broader G3 capacity measurement remains pending.**
 4. Add development-only sealing/miner integration. **Next.**
 5. Use rented NVIDIA and AMD GPU environments for mining throughput, VRAM, power, and multi-node network measurements.
 6. Produce the production-selection report; only then consider activating the
@@ -149,7 +149,7 @@ KawPoW is now the Phase 2A development candidate under
 immediate implementation task is a disabled-by-default development-only
 `consensus.Engine` design and its header/seal/difficulty test matrix. It must
 not repoint the devnet, alter genesis, or add production mining support.
-GPU rental remains needed only after the CPU engine controls pass.
+The CPU engine controls passed before GPU rental began; the completed rental evidence is recorded in the G1 and G2 reports.
 
 The first disabled engine boundary is now present in the AIChain Core-Geth
 fork at `consensus/kawpowengine`. It delegates only existing non-seal
@@ -179,6 +179,8 @@ valid headers. A local concurrent control completed 64 valid seal checks across
 detector. These are bounded correctness controls, not sustained throughput or
 denial-of-service capacity measurements.
 
+G2 completed on 2026-08-24. The opt-in node issued a finalized block template through a local-only, rate-limited `aichain` RPC; the thin adapter translated it for the pinned RTX 3060 miner; and the node's CPU verifier accepted and imported block 1 through normal chain validation. The live test found a pending-snapshot/finalized-template mismatch, which was fixed and covered by focused and race-enabled regressions before the passing rerun. See [G2 Node-to-GPU KawPoW Interoperability](phase-2a-g2-node-gpu-interoperability.md).
+
 ## Change log
 
 | Version | Date | Change |
@@ -202,3 +204,4 @@ denial-of-service capacity measurements.
 | 1.7 | 2026-08-23 | Added passing KawPoW engine rejection matrix and recorded the independent local Ethash cache-cleanup baseline failure |
 | 1.8 | 2026-08-23 | Resolved the Windows Ethash cache-test portability issue; full focused regression passes; added positive seal, tamper, VerifyHeader, and difficulty-equivalence tests |
 | 1.9 | 2026-08-23 | Added ordered batch verification and concurrent engine controls; race-enabled package test passes |
+| 2.0 | 2026-08-24 | Recorded opt-in local-only G2 RPC, bounded adapter/workers, live RTX 3060 block production, CPU verification, canonical import, and negative rejection results |

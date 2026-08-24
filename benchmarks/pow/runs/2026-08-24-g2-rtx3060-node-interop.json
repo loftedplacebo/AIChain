@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "0.1.0-draft",
+  "runId": "2026-08-24-g2-rtx3060-node-interop",
+  "recordedAtUtc": "2026-08-24",
+  "classification": "Disposable one-node G2 interoperability proof; not a production network or throughput benchmark",
+  "revisions": {
+    "aichain": "b086bac063d74184b26cbf246aea10553beb1f75",
+    "coreGeth": "161a468cfba17241fb3e3c0ab7cff6afabcde44d",
+    "kawpowminer": "632f6ea0a5cd09e2c6443374dbe6db0a767715ba"
+  },
+  "binaries": {
+    "coreGethSha256": "940b6c36fc515d59f4effafe13c55c6e9ba534d01b8e953e85500c4223d07733",
+    "kawpowminerSha256": "6e152bf814bc71e6a0746dcdc524fbcc780540107d4d6e5badb5b63e616be515"
+  },
+  "host": {
+    "gpu": "NVIDIA GeForce RTX 3060",
+    "gpuComputeCapability": "8.6",
+    "operatingSystem": "Ubuntu 24.04 disposable Vast.ai container",
+    "goVersion": "1.22.2",
+    "cudaVersion": "12.6"
+  },
+  "work": {
+    "version": "0.1.0-dev",
+    "workId": "0x5ca28ad10f841454067bf2c0a8a25c3bd9c001659ce745c2c12af2ca1b6f9c4a",
+    "headerHash": "0x66b7b254d9875f994bef18fcdb0169e7f2cd75511e63c37df49e7f9dbe4e9470",
+    "parentHash": "0x42508803b6fbf999cad8a51ad1f2ea584323412db766774411bbb4246c48560b",
+    "height": "0x1",
+    "seedHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+    "target": "0x0000800000000000000000000000000000000000000000000000000000000000",
+    "expiresAt": "0x6a8ca0ca"
+  },
+  "solution": {
+    "nonce": "0x395ef76334be2f92",
+    "mixDigest": "0xf6f5bd6bbe7f81408a79329be7881b92683ef4bb5164f07b2490edfa242cae76",
+    "status": "accepted"
+  },
+  "importedBlock": {
+    "number": 1,
+    "hash": "0x8603c37f551dde31d2cb4d834a872e7cd162d5fde157307a99d4902102700299",
+    "difficulty": "131072",
+    "totalDifficulty": "262144",
+    "stateRoot": "0xde326ad0f60fa09c1b4d6027594aa886b19904b3f8846781fec171310d5c5d0c",
+    "normalInsertChainImport": true,
+    "cpuSealVerification": true
+  },
+  "rejections": {
+    "malformed": "malformed",
+    "invalidSeal": "invalid-seal",
+    "staleOrUnknown": "stale",
+    "duplicate": "duplicate"
+  },
+  "networkBoundary": {
+    "nodeRpcListener": "127.0.0.1:8545",
+    "adapterListener": "127.0.0.1:18545",
+    "sharedEthashDevnetChanged": false
+  },
+  "retainedArtifacts": {
+    "location": "C:\\AIChain-G2-Results\\2026-08-24-rtx3060",
+    "nodeLogSha256": "3fac4ac41f44f31386e140c705a10e1054b3d0ddc1d4deccfcc99361210c3944",
+    "adapterLogSha256": "0c0de7bbf65bfd53bb63eb76ac246f049b6260df2c4dcf1942c0e913a9a5e916",
+    "solutionsJsonlSha256": "d727a6b4d5fb1b894fbf8007868a78f33ba29c302f51384df4901e202e97f508"
+  },
+  "notes": "The CPU verifier and GPU miner ran on the same disposable host but through separate implementations. G3 adds a separate CPU-only node. The difficulty and genesis are disposable test parameters, not production decisions."
+}
