@@ -15,8 +15,8 @@ fi
 [[ "$role" == mining || "$role" == validator ]] || { echo "Role must be mining or validator." >&2; exit 2; }
 [[ -x "$geth_binary" ]] || { echo "Core-Geth binary is not executable: $geth_binary" >&2; exit 2; }
 [[ -f "$genesis" ]] || { echo "Genesis is missing: $genesis" >&2; exit 2; }
-[[ ! -e "$data_dir/geth/LOCK" ]] || { echo "Data directory is locked: $data_dir" >&2; exit 1; }
-
+# Core-Geth keeps the LOCK path after a clean shutdown and performs the real
+# process-level lock check itself when opening the database.
 mkdir -p "$data_dir"
 if [[ ! -d "$data_dir/geth/chaindata" ]]; then
   "$geth_binary" --datadir "$data_dir" init "$genesis"
@@ -41,4 +41,3 @@ exec "$geth_binary" \
   --http.api "$http_apis" --http.vhosts localhost \
   --authrpc.addr 127.0.0.1 --authrpc.port "$((rpc_port + 1000))" \
   "${role_args[@]}"
-

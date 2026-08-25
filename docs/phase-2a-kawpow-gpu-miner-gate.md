@@ -2,9 +2,9 @@
 
 | Field | Value |
 |---|---|
-| Status | G1 NVIDIA control and G2 node interoperability complete; AMD repeat and G3 pending |
-| Version | 0.6 |
-| Last updated | 2026-08-24 |
+| Status | NVIDIA G1, G2, and G3 complete; AMD/OpenCL repeat and production gates pending |
+| Version | 0.7 |
+| Last updated | 2026-08-25 |
 | Governing decision | [ADR-0004](./decisions/0004-kawpow-phase-2a-development-selection.md) |
 
 ## Purpose
@@ -109,9 +109,9 @@ Implementation must preserve its requirements for:
 
 G2 passed on 2026-08-24: the pinned RTX 3060 miner solved a real Core-Geth block-1 template, the node verified it on CPU, and normal block import made it canonical. Malformed, invalid-seal, stale/unknown, and duplicate submissions were rejected. See [G2 Node-to-GPU KawPoW Interoperability](phase-2a-g2-node-gpu-interoperability.md).
 
-## Stage G3 — Network Measurement
+## Stage G3 — Network Measurement — Complete for NVIDIA
 
-After G2 passes locally:
+G3 completed the following disposable-network scope:
 
 - run a disposable one-node KawPoW development chain;
 - add a second validator node that never needs a GPU;
@@ -119,10 +119,24 @@ After G2 passes locally:
   synchronization, and reorganisation behavior;
 - replay fixed AVR batch workloads and report logical-receipt throughput
   separately from block-production rate; and
-- destroy the disposable chain state after results and non-sensitive manifests
-  are captured.
+- shut down the disposable network after results and non-sensitive manifests
+  are captured; retain or destroy raw state only under the recorded evidence
+  policy.
 
-The existing shared Ethash devnet must not be repointed for G1 or G2.
+The separate CPU-only validator accepted and synchronized GPU-produced blocks,
+recovered after downtime and clean restart, rejected the focused malformed and
+invalid cases, and reorganised from a five-block competing branch to the
+greater-work main branch. A 60-block soak completed with matching final state,
+and AVR batch-size controls demonstrated the expected separation between
+transaction TPS and logical receipt throughput. See
+[G3 Two-Node KawPoW Network Validation](phase-2a-g3-network-validation.md).
+
+The disposable processes were shut down after evidence capture. Host-local
+runtime state was retained temporarily for audit rather than deleted; its
+ephemeral credential material was not copied into the evidence archive and is
+not committed.
+
+The existing shared Ethash devnet must not be repointed for G1, G2, or G3.
 
 ## Rental Trigger
 
@@ -152,3 +166,4 @@ NVIDIA procedure is reproducible.
 | 0.4 | 2026-08-23 | Recorded strict wire and in-memory service tests; node exposure remains disabled |
 | 0.5 | 2026-08-23 | Recorded the completed RTX 3060 control and reproducible modern-toolchain compatibility settings |
 | 0.6 | 2026-08-24 | Recorded G2 pass: real node work, RTX 3060 solution, CPU verification, canonical import, and negative rejection matrix |
+| 0.7 | 2026-08-25 | Recorded NVIDIA G3 pass: separate CPU validator, sync/restart, invalid-input suite, controlled reorg, AVR batching, resources, and soak |

@@ -3,12 +3,12 @@
 | Field | Value |
 |---|---|
 | Status | Living delivery plan |
-| Document version | 0.7 |
-| Last updated | 2026-08-24 |
+| Document version | 0.8 |
+| Last updated | 2026-08-25 |
 | Architecture inputs | [Core L1 Architecture and Tooling](./core-l1-architecture-and-tooling.md); [AI Verification & ZK Architecture](./ai-verification-and-zk-architecture.md) |
 | Schedule | Dates, durations, staffing, and owners are **TBD** |
 | Decision state | This plan sequences open decisions; it does not settle them |
-| Delivery status | Phase 1 development-validation complete; Phase 2A G2 complete and G3 next; stable protocol decision gates remain open |
+| Delivery status | Phase 1 development-validation complete; Phase 2A NVIDIA G3 complete; AMD repeat and production decision gates remain open |
 
 ## 1. Objective
 
@@ -135,9 +135,9 @@ Security, privacy, compatibility, documentation, and operations run across every
 
 **Goal:** Replace temporary development assumptions with measured and explicitly approved network rules.
 
-**Current status:** KawPoW is selected only for Phase 2A development evaluation. G1 has a reproducible RTX 3060 control and G2 has produced a real disposable-chain block from node-issued work with independent CPU verification and canonical import. The existing Ethash devnet remains unchanged.
+**Current status:** KawPoW is selected only for Phase 2A development evaluation. NVIDIA G1, G2, and G3 are complete: a separate CPU-only validator accepted GPU-mined blocks, synchronized after downtime, recovered after clean restarts, followed greater work through a controlled reorganisation, and processed individual and batched AVR traffic. The existing Ethash devnet remains unchanged.
 
-**Next active work:** run G3 with a separate CPU-only validator node, then measure propagation, synchronization, restart, stale/reorganization behavior, and AVR batch capacity. Complete the AMD/OpenCL G1 repeat before treating GPU accessibility as demonstrated across vendors. Production difficulty, retargeting, economics, and final **L1-001** approval remain **TBD**.
+**Next active work:** complete the AMD/OpenCL repeat, define and test candidate difficulty/retarget and block-interval rules, extend the soak and partition tests to more independent hosts, and complete the quantum-threat assessment. Production difficulty, retargeting, economics, and final **L1-001** approval remain **TBD**. See [G3 Two-Node KawPoW Network Validation](./phase-2a-g3-network-validation.md).
 
 **Primary outputs**
 
@@ -344,5 +344,6 @@ This is a development-validation milestone, not a final AVR protocol release. **
 | 0.5 | 2026-08-22 | Recorded Phase 1B development-validation completion and Phase 2A/2B next work | DG-2 remains open; L1-001 and ZK-001–005 remain TBD |
 | 0.6 | 2026-08-22 | Started Phase 2 evaluation charters without selecting PoW or ZK choices | [Phase 2 Evaluation Charter](./phase-2-evaluation-charter.md) |
 | 0.7 | 2026-08-24 | Recorded G1 NVIDIA and G2 real node-to-GPU KawPoW results; set G3 and AMD repeat as next work | [G2 Node-to-GPU Interoperability](./phase-2a-g2-node-gpu-interoperability.md) |
+| 0.8 | 2026-08-25 | Recorded passing NVIDIA G3 propagation, recovery, adversarial fork, AVR capacity, resource, and soak results; retained AMD and production gates | [G3 Two-Node KawPoW Network Validation](./phase-2a-g3-network-validation.md) |
 | 0.1 | 2026-08-18 | Initial phased development plan | Architecture documents v0.1 |
 | X.Y | YYYY-MM-DD | Describe the change | Decision ID or link |

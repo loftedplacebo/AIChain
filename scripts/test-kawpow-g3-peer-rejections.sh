@@ -10,5 +10,5 @@ CGO_ENABLED=1 go test -count=1 -run \
   'TestNewBlockExceedsLimits|TestNewBlockUndecodableBody|TestNewBlockInvalidBodyKeepsPeer|TestNewBlockSanityCheck' \
   ./eth/protocols/eth
 CGO_ENABLED=1 go test -count=1 -run \
-  'TestVerifySealRejectsMalformedCandidateInputs|TestVerifySealAcceptsValidAndRejectsTampering|TestVerifyHeaderHonoursSealFlag|TestVerifyHeadersPreservesResultOrder' \
+  'TestVerifySealRejectsMalformedCandidateInputs|TestVerifySealAcceptsValidAndRejectsTampering|TestVerifyHeaderHonoursSealFlag|TestVerifyHeadersPreservesResultOrder|TestVerifyHeadersDelegatesContinuousStructuralBatch' \
   ./consensus/kawpowengine

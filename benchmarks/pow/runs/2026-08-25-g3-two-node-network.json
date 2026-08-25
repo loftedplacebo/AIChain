@@ -1,0 +1,110 @@
+{
+  "schema": "aichain.kawpow-g3-network-result",
+  "schemaVersion": "0.1.0-draft",
+  "status": "pass-with-development-harness-limitations",
+  "date": "2026-08-25",
+  "scope": "isolated disposable KawPoW chain; existing Ethash devnet unchanged",
+  "source": {
+    "aichainCoreGethCommit": "8f0886b26a489a9632d6ec29115a591e2781329a",
+    "coreGethBinarySha256": "a4d357ff14e87ad0877ca3f5cb88b82e95aaca74d0799c9ff0563d1c45c26a92",
+    "minerCommit": "632f6ea0a5cd09e2c6443374dbe6db0a767715ba",
+    "minerBinarySha256": "6e152b02f9021a33cc9704b0cfd4eb8f0a974f7bd4a7ce8a1c0905a33182f391"
+  },
+  "topology": {
+    "miningNode": "rented RTX 3060 host; Core-Geth plus loopback adapter and external miner",
+    "validatorNode": "separate VPS; CPU-only Core-Geth; no miner or GPU software",
+    "transport": "private SSH-relayed P2P; node and adapter RPC remained loopback-only"
+  },
+  "consensus": {
+    "baselineStartHeight": 13,
+    "baselineEndHeight": 25,
+    "baselineMeanBlockProductionMs": 3953.7795818181817,
+    "baselinePropagationObservationUpperBoundMs": 100,
+    "soakStartHeight": 194,
+    "soakEndHeight": 254,
+    "soakBlockCount": 60,
+    "soakMeanBlockProductionMs": 4014.2917508474575,
+    "soakPropagationObservationUpperBoundMs": 200,
+    "naturalSoakStaleBlocksObserved": 0,
+    "finalHeight": 258,
+    "finalCanonicalHash": "0x474c396eb4e6064cc84a1c45efa1e81e73beb1ed88d57818fbee458764df80a1"
+  },
+  "synchronizationAndRecovery": {
+    "validatorOfflineFromHeight": 29,
+    "catchUpRecordedHeight": 72,
+    "catchUpEndToEndMs": 84833,
+    "catchUpBlocks": 43,
+    "catchUpBlocksPerSecondIncludingManualPeerDelay": 0.5068785745531715,
+    "catchUpMeasurementQualification": "diagnostic lower bound; includes a manual peer-reconnection delay and continued mining",
+    "restartBaselineHeight": 111,
+    "restartBaselineHash": "0xe51924151e29016efb8925d560288d89a9db4ecddbd459e92b42ba392e688499",
+    "postRestartProgressHeight": 113,
+    "postRestartProgressHash": "0x03555f82c4533154786e344b911fb1395442f09ff400d882c5d1c5aa318939e9"
+  },
+  "forkChoice": {
+    "commonAncestorHeight": 113,
+    "forkTipHeight": 118,
+    "forkBlock114": "0x8bd7db168100867fcf7282973792fb08f7e6bc33539e50c9c3e5dac67521a192",
+    "mainTipHeight": 123,
+    "mainBlock114": "0x4d746c28ea60bcb8d1f143be661ddb3b3fc347549251022606d995cb3d27e700",
+    "mainTipHash": "0xcd1455939e021778a34b9b4c734d7a507e09561d91016c7d0b42bc449ff41e3d",
+    "validatorReorgMs": 5274,
+    "forcedStaleBranchBlocks": 5,
+    "forcedScenarioStaleFraction": 0.3333333333333333
+  },
+  "validation": {
+    "validatorImportSamples": 186,
+    "meanValidatorImportMs": 22.13951075268817,
+    "p95ValidatorImportMs": 44.66,
+    "maxValidatorImportMs": 555.035,
+    "peerRejectionSuite": "pass",
+    "rejectedClasses": [
+      "oversized new-block message",
+      "undecodable body",
+      "invalid body",
+      "malformed seal inputs",
+      "tampered seal",
+      "discontinuous structural header batch"
+    ]
+  },
+  "resources": {
+    "sampleDurationSeconds": 299,
+    "gpuMiningNode": {
+      "meanCpuPercentOneCore": 2.1731168402392287,
+      "p95CpuPercentOneCore": 5.705318051902643,
+      "maxRssBytes": 124903424,
+      "diskGrowthBytes": 172212,
+      "networkReceiveDeltaBytes": 268727,
+      "networkSendDeltaBytes": 326321,
+      "meanGpuUtilizationPercent": 67.23508771929825,
+      "meanGpuPowerW": 101.47663157894736,
+      "maxGpuMemoryMiB": 1154.0
+    },
+    "cpuOnlyValidator": {
+      "meanCpuPercentOneCore": 1.209082900403153,
+      "p95CpuPercentOneCore": 4.943074032037185,
+      "maxRssBytes": 108990464,
+      "diskGrowthBytes": 142739,
+      "networkReceiveDeltaBytes": 278061,
+      "networkSendDeltaBytes": 199437
+    }
+  },
+  "avr": {
+    "individual50AllConfirmedTransactionTps": 1.0587045464230296,
+    "batch1AllConfirmedLogicalReceiptTps": 1.190620728912825,
+    "batch10AllConfirmedLogicalReceiptTps": 7.589271135431385,
+    "batch100AllConfirmedLogicalReceiptTps": 27.754825292808647,
+    "batch1000AllConfirmedLogicalReceiptTps": 217.65855953307593,
+    "batch1000BroadcastLogicalReceiptTps": 1257.9308847109048
+  },
+  "limitations": [
+    "KawPoW remains selected only for Phase 2A development; production L1-001 is open.",
+    "Difficulty, retargeting, timing, rewards, economics, and launch parameters remain TBD.",
+    "The pinned miner retains solved work too long; the G3 harness restarts only the external miner after each accepted height.",
+    "Propagation is an observation upper bound set by polling resolution across an SSH-relayed topology.",
+    "The catch-up measurement includes manual peer-reconnection delay and is not a clean capacity benchmark.",
+    "The soak is five minutes of resource sampling plus a 60-block observation, not a long-duration public testnet run.",
+    "Only NVIDIA/CUDA was measured; the AMD/OpenCL repeat remains open.",
+    "No permanent ASIC-resistance or quantum-resistance claim is made."
+  ]
+}

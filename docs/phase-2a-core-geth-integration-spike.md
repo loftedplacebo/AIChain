@@ -2,9 +2,9 @@
 
 | Field | Value |
 |---|---|
-| Status | G2 node-to-GPU integration complete; G3 network validation next |
-| Version | 2.0 |
-| Last updated | 2026-08-24 |
+| Status | NVIDIA G3 network validation complete; AMD and production gates remain open |
+| Version | 2.1 |
+| Last updated | 2026-08-25 |
 | Decision affected | L1-001 — KawPoW selected for Phase 2A development only |
 
 ## Purpose
@@ -122,9 +122,9 @@ C2 verifier-control manifest](../benchmarks/pow/runs/2026-08-23-c2-firopow-cpu-v
 
 1. Pin upstream candidate revision, licence, specification, and test-vector source in a run manifest. **C1 complete.**
 2. Add a minimal verifier adapter and deterministic Go unit tests for valid, invalid, malformed, and wrong-difficulty seals. **C1 adapter, vector, tamper, cache-rotation, concurrent-use, Core-Geth header-mapping tests, and an isolated fork boundary are complete. C2 has an official vector, tamper, and range-rejection CPU boundary; header/target mapping is intentionally not started.**
-3. Package the pinned native reference verifier behind the fork boundary, then measure CPU block verification before adding network mining support. **Complete through the G2 normal block-import path; broader G3 capacity measurement remains pending.**
-4. Add development-only sealing/miner integration. **Next.**
-5. Use rented NVIDIA and AMD GPU environments for mining throughput, VRAM, power, and multi-node network measurements.
+3. Package the pinned native reference verifier behind the fork boundary, then measure CPU block verification before adding network mining support. **Complete through NVIDIA G3 two-node propagation, recovery, reorganisation, AVR capacity, and soak measurement.**
+4. Add development-only sealing/miner integration. **Complete through the opt-in G3 harness; production integration remains gated.**
+5. Use rented NVIDIA and AMD GPU environments for mining throughput, VRAM, power, and multi-node network measurements. **NVIDIA complete; AMD/OpenCL pending.**
 6. Produce the production-selection report; only then consider activating the
    final L1-001 rule.
 
@@ -181,6 +181,14 @@ denial-of-service capacity measurements.
 
 G2 completed on 2026-08-24. The opt-in node issued a finalized block template through a local-only, rate-limited `aichain` RPC; the thin adapter translated it for the pinned RTX 3060 miner; and the node's CPU verifier accepted and imported block 1 through normal chain validation. The live test found a pending-snapshot/finalized-template mismatch, which was fixed and covered by focused and race-enabled regressions before the passing rerun. See [G2 Node-to-GPU KawPoW Interoperability](phase-2a-g2-node-gpu-interoperability.md).
 
+G3 completed on 2026-08-25. The published fork fixed externally sealed block
+broadcast and continuous downloaded-header verification, then passed separate-
+host propagation, downtime catch-up, clean restart, invalid-input controls, a
+controlled greater-work reorganisation, AVR load, resource sampling, and a
+60-block soak. The pinned external miner's stale-job behavior required a
+bounded test supervisor; production miner protocol remains **TBD**. See
+[G3 Two-Node KawPoW Network Validation](phase-2a-g3-network-validation.md).
+
 ## Change log
 
 | Version | Date | Change |
@@ -205,3 +213,4 @@ G2 completed on 2026-08-24. The opt-in node issued a finalized block template th
 | 1.8 | 2026-08-23 | Resolved the Windows Ethash cache-test portability issue; full focused regression passes; added positive seal, tamper, VerifyHeader, and difficulty-equivalence tests |
 | 1.9 | 2026-08-23 | Added ordered batch verification and concurrent engine controls; race-enabled package test passes |
 | 2.0 | 2026-08-24 | Recorded opt-in local-only G2 RPC, bounded adapter/workers, live RTX 3060 block production, CPU verification, canonical import, and negative rejection results |
+| 2.1 | 2026-08-25 | Recorded NVIDIA G3 two-node propagation, batch-sync fix, restart/reorg behavior, AVR capacity, resources, and soak evidence |
