@@ -48,7 +48,8 @@ merkle_root() {
 
 prepared_file="$(mktemp)"
 transactions_file="$(mktemp)"
-trap 'rm -f "$prepared_file" "$transactions_file" "${password_file:-}"' EXIT
+cleanup_password_file=false
+trap 'rm -f "$prepared_file" "$transactions_file"; [[ "$cleanup_password_file" == true ]] && rm -f "${password_file:-}"' EXIT
 
 root_started_ns="$(date +%s%N)"
 receipt_count=0
@@ -71,12 +72,18 @@ if [[ -z "$keystore" ]]; then
     echo "No keystore file found in $KEYSTORE_DIR." >&2
     exit 1
 fi
-password_file="$(mktemp)"
-chmod 600 "$password_file"
-read -r -s -p "Keystore password: " keystore_password
-echo
-printf '%s' "$keystore_password" > "$password_file"
-unset keystore_password
+if [[ -n "${KEYSTORE_PASSWORD_FILE:-}" ]]; then
+    password_file="$KEYSTORE_PASSWORD_FILE"
+    [[ -f "$password_file" ]] || { echo "Password file not found: $password_file" >&2; exit 1; }
+else
+    password_file="$(mktemp)"
+    chmod 600 "$password_file"
+    cleanup_password_file=true
+    read -r -s -p "Keystore password: " keystore_password
+    echo
+    printf '%s' "$keystore_password" > "$password_file"
+    unset keystore_password
+fi
 
 nonce="$($FOUNDRY_BIN/cast nonce "$SENDER_ADDRESS" --block pending --rpc-url "$RPC_URL")"
 batch_count=0
@@ -93,7 +100,7 @@ done < "$prepared_file"
 broadcast_finished_ns="$(date +%s%N)"
 
 confirmed_file="$(mktemp)"
-trap 'rm -f "$prepared_file" "$transactions_file" "$confirmed_file" "${password_file:-}"' EXIT
+trap 'rm -f "$prepared_file" "$transactions_file" "$confirmed_file"; [[ "$cleanup_password_file" == true ]] && rm -f "${password_file:-}"' EXIT
 while IFS=$'\t' read -r root leaf_count transaction_nonce transaction_hash; do
     receipt="$($FOUNDRY_BIN/cast receipt "$transaction_hash" --rpc-url "$RPC_URL")"
     block_number="$(awk '$1 == "blockNumber" {print $2; exit}' <<<"$receipt")"

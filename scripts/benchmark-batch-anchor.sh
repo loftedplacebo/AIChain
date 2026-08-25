@@ -50,19 +50,26 @@ if [[ -z "$keystore" ]]; then
     exit 1
 fi
 
-password_file="$(mktemp)"
-chmod 600 "$password_file"
-trap 'rm -f "$password_file"' EXIT
-read -r -s -p "Keystore password: " keystore_password
-echo
-printf '%s' "$keystore_password" > "$password_file"
-unset keystore_password
+if [[ -n "${KEYSTORE_PASSWORD_FILE:-}" ]]; then
+    password_file="$KEYSTORE_PASSWORD_FILE"
+    [[ -f "$password_file" ]] || { echo "Password file not found: $password_file" >&2; exit 1; }
+    cleanup_password_file=false
+else
+    password_file="$(mktemp)"
+    chmod 600 "$password_file"
+    cleanup_password_file=true
+    read -r -s -p "Keystore password: " keystore_password
+    echo
+    printf '%s' "$keystore_password" > "$password_file"
+    unset keystore_password
+fi
+trap '[[ "$cleanup_password_file" == true ]] && rm -f "$password_file"' EXIT
 
 started_ns="$(date +%s%N)"
 batch_count=0
 receipt_count=0
 records_file="$(mktemp)"
-trap 'rm -f "$password_file" "$records_file"' EXIT
+trap '[[ "$cleanup_password_file" == true ]] && rm -f "$password_file"; rm -f "$records_file"' EXIT
 
 while IFS= read -r batch_json; do
     mapfile -t leaves < <(python3 -c 'import json,sys; print("\n".join(json.loads(sys.stdin.read())))' <<<"$batch_json")
