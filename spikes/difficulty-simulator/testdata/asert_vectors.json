@@ -1,0 +1,48 @@
+{
+  "SchemaVersion": "0.1.0",
+  "TargetSeconds": 10,
+  "HalfLife": 3600,
+  "AnchorHeight": 0,
+  "AnchorTime": 0,
+  "AnchorTarget": "1766847064778384329583297500742918515827483896875618958121606201292",
+  "MinTarget": "1766847064778384329583297500742918515827483896875618958121606",
+  "MaxTarget": "1766847064778384329583297500742918515827483896875618958121606201292619776",
+  "Vectors": [
+    {
+      "Name": "on-schedule",
+      "CandidateHeight": 1,
+      "CandidateTimestamp": 10,
+      "ExpectedTarget": "1766847064778384329583297500742918515827483896875618958121606201292"
+    },
+    {
+      "Name": "half-life-late",
+      "CandidateHeight": 1,
+      "CandidateTimestamp": 3610,
+      "ExpectedTarget": "3533694129556768659166595001485837031654967793751237916243212402584"
+    },
+    {
+      "Name": "half-life-early",
+      "CandidateHeight": 361,
+      "CandidateTimestamp": 10,
+      "ExpectedTarget": "883423532389192164791648750371459257913741948437809479060803100646"
+    },
+    {
+      "Name": "fractional-late",
+      "CandidateHeight": 1,
+      "CandidateTimestamp": 1810,
+      "ExpectedTarget": "2498486097431518392330970956174457253048648722214525014113795976234"
+    },
+    {
+      "Name": "fractional-early",
+      "CandidateHeight": 181,
+      "CandidateTimestamp": 10,
+      "ExpectedTarget": "1249243048715759196165485478087228626524324361107262507056897988117"
+    },
+    {
+      "Name": "negative-schedule-error",
+      "CandidateHeight": 100,
+      "CandidateTimestamp": 995,
+      "ExpectedTarget": "1765135108165020263956336145284892769279707938204787631769056122041"
+    }
+  ]
+}

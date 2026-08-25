@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Living delivery plan |
-| Document version | 0.9 |
+| Document version | 0.10 |
 | Last updated | 2026-08-25 |
 | Architecture inputs | [Core L1 Architecture and Tooling](./core-l1-architecture-and-tooling.md); [AI Verification & ZK Architecture](./ai-verification-and-zk-architecture.md) |
 | Schedule | Dates, durations, staffing, and owners are **TBD** |
@@ -137,7 +137,7 @@ Security, privacy, compatibility, documentation, and operations run across every
 
 **Current status:** KawPoW is selected only for Phase 2A development evaluation. NVIDIA G1, G2, and G3 are complete: a separate CPU-only validator accepted GPU-mined blocks, synchronized after downtime, recovered after clean restarts, followed greater work through a controlled reorganisation, and processed individual and batched AVR traffic. The existing Ethash devnet remains unchanged.
 
-**Next active work:** simulate and test the 10-second, ASERT-led [difficulty and block-timing proposal](./phase-2a-difficulty-and-block-timing-proposal.md) against the Ethash and LWMA controls; then complete the AMD/OpenCL repeat, extend soak/partition tests, and complete the quantum-threat assessment. Production difficulty, retargeting, economics, and final **L1-001/L1-003** approval remain **TBD**.
+**Next active work:** integrate the conditionally selected 10-second/30-minute ASERT development parameters from the completed [difficulty simulation](./phase-2a-difficulty-simulation-results.md) into a fresh disposable KawPoW chain; then complete the AMD/OpenCL repeat, multi-host interval trials, extended soak/partition tests, and quantum-threat assessment. Production difficulty, block interval, economics, and final **L1-001/L1-003** approval remain **TBD**.
 
 **Primary outputs**
 
@@ -346,5 +346,6 @@ This is a development-validation milestone, not a final AVR protocol release. **
 | 0.7 | 2026-08-24 | Recorded G1 NVIDIA and G2 real node-to-GPU KawPoW results; set G3 and AMD repeat as next work | [G2 Node-to-GPU Interoperability](./phase-2a-g2-node-gpu-interoperability.md) |
 | 0.8 | 2026-08-25 | Recorded passing NVIDIA G3 propagation, recovery, adversarial fork, AVR capacity, resource, and soak results; retained AMD and production gates | [G3 Two-Node KawPoW Network Validation](./phase-2a-g3-network-validation.md) |
 | 0.9 | 2026-08-25 | Added an ASERT-led 10-second development proposal with Ethash/LWMA controls and explicit simulation, timestamp, reorg, and activation gates | [Difficulty and Block-Timing Proposal](./phase-2a-difficulty-and-block-timing-proposal.md) |
+| 0.10 | 2026-08-25 | Completed the deterministic difficulty matrix and conditionally selected 10-second/30-minute ASERT for isolated node integration | [Difficulty Simulation Results](./phase-2a-difficulty-simulation-results.md) |
 | 0.1 | 2026-08-18 | Initial phased development plan | Architecture documents v0.1 |
 | X.Y | YYYY-MM-DD | Describe the change | Decision ID or link |

@@ -2,8 +2,8 @@
 
 | Field | Value |
 |---|---|
-| Status | **Proposal for simulation and development testing — not accepted protocol** |
-| Document version | 0.1 |
+| Status | **Simulation completed — conditional development selection recorded** |
+| Document version | 0.2 |
 | Last updated | 2026-08-25 |
 | Decisions affected | L1-001 mining algorithm; L1-003 network and genesis parameters |
 | Depends on | [G3 Two-Node KawPoW Network Validation](./phase-2a-g3-network-validation.md) |
@@ -15,8 +15,8 @@ implementation spike:
 
 - **Target block interval:** 10 seconds.
 - **Difficulty family:** integer-only, per-block ASERT.
-- **Initial half-life for testing:** 3,600 seconds (one hour).
-- **Mandatory comparison sweep:** 1,800, 3,600, and 7,200 seconds.
+- **Development integration half-life:** 1,800 seconds (30 minutes).
+- **Completed comparison sweep:** 1,800, 3,600, and 7,200 seconds.
 - **Header format:** retain the existing EVM-compatible `difficulty`,
   `timestamp`, `nonce`, and `mixHash` fields.
 - **Fork choice:** retain greatest valid accumulated work.
@@ -28,6 +28,11 @@ implementation spike:
 
 These are candidate values for testing. They do not close **L1-001** or
 **L1-003**, select mainnet parameters, or authorize production activation.
+
+The simulation has now completed. Its evidence advances a 10-second target and
+a 1,800-second ASERT half-life to the isolated integration spike. See
+[Difficulty Simulation Results](./phase-2a-difficulty-simulation-results.md).
+The production values remain **TBD**.
 
 ## 2. Why Ten Seconds
 
@@ -108,7 +113,7 @@ where:
 - `actual_elapsed_seconds` is measured from the anchor timing reference;
 - `height_delta` is the number of scheduled block intervals since the anchor;
 - `target_seconds` starts at the proposed 10 seconds; and
-- `half_life_seconds` starts at 3,600 for testing.
+- `half_life_seconds` is 1,800 for the isolated integration candidate.
 
 The implementation must use deterministic integer/fixed-point arithmetic. No
 floating-point operation may influence consensus.
@@ -237,8 +242,8 @@ The candidate may advance toward public testnet only after:
 | Item | Proposal state |
 |---|---|
 | Production block interval | **TBD**; 10 seconds leads the 5/10/15-second trial |
-| Production difficulty algorithm | **TBD**; ASERT leads simulation |
-| ASERT half-life | **TBD**; test 30/60/120 minutes |
+| Production difficulty algorithm | **TBD**; ASERT selected only for isolated integration |
+| ASERT half-life | **TBD** for production; 30 minutes selected for isolated integration after the 30/60/120-minute sweep |
 | Maximum target/minimum difficulty | **TBD**, derived from measured launch hash rate |
 | Timestamp rule beyond current Core-Geth checks | **TBD** |
 | Adjustment clamp | **TBD**; none assumed |
@@ -252,3 +257,4 @@ The candidate may advance toward public testnet only after:
 | Version | Date | Change |
 |---|---|---|
 | 0.1 | 2026-08-25 | Proposed 10-second ASERT-led simulation, alternatives, safeguards, and acceptance gates |
+| 0.2 | 2026-08-25 | Linked the completed simulation and its conditional 10-second/30-minute development selection |

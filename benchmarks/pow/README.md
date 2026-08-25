@@ -11,3 +11,14 @@ For each candidate run:
 
 The initial benchmark protocol is in [the Phase 2A shortlist](../../docs/phase-2a-pow-candidate-shortlist.md).
 
+## Difficulty simulation
+
+The standalone simulator is under
+[spikes/difficulty-simulator](../../spikes/difficulty-simulator/README.md).
+Its committed full report is
+[2026-08-25-difficulty-simulation.json](./runs/2026-08-25-difficulty-simulation.json).
+
+Verify it from the repository root with:
+
+    python scripts/verify-difficulty-vectors.py
+    python scripts/verify-difficulty-simulation.py
