@@ -1,7 +1,7 @@
 use aichain_zk_policy_core::{Input, PublicValues};
 use sp1_sdk::{
-    blocking::{Prover, ProverClient},
-    include_elf, Elf, SP1Stdin,
+    blocking::{ProveRequest, Prover, ProverClient},
+    include_elf, Elf, ProvingKey, SP1Stdin,
 };
 use std::{env, fs, time::Instant};
 

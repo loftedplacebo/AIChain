@@ -25,6 +25,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            spikes/zk-statement/sp1-policy-evaluation/target
+          key: sp1-v6.5.0-${{ runner.os }}-${{ hashFiles('spikes/zk-statement/sp1-policy-evaluation/**/Cargo.toml') }}
       - name: Install protocol-buffer compiler
         run: |
           sudo apt-get update

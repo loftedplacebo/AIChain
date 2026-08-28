@@ -26,6 +26,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            spikes/zk-statement/risc0-policy-evaluation/target
+          key: risc0-v3.0.3-${{ runner.os }}-${{ hashFiles('spikes/zk-statement/risc0-policy-evaluation/**/Cargo.toml') }}
       - name: Install RISC Zero guest toolchain
         run: |
           curl --fail --location --retry 3 https://risczero.com/install | bash
