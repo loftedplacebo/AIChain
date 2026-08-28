@@ -1,0 +1,46 @@
+name: ZK reference conformance
+
+on:
+  push:
+    paths:
+      - ".github/workflows/zk-reference.yml"
+      - "fixtures/zk/**"
+      - "spikes/zk-statement/**"
+      - "sdk/go/zkpolicystatement/**"
+      - "sdk/typescript/**"
+  pull_request:
+    paths:
+      - ".github/workflows/zk-reference.yml"
+      - "fixtures/zk/**"
+      - "spikes/zk-statement/**"
+      - "sdk/go/zkpolicystatement/**"
+      - "sdk/typescript/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  conformance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: sdk/go/go.mod
+      - name: Python reference tests
+        run: python -m unittest discover -s spikes/zk-statement/python -p 'test_*.py'
+      - name: TypeScript SDK tests
+        run: npm test --prefix sdk/typescript
+      - name: Go formatting
+        run: test -z "$(gofmt -l sdk/go/zkpolicystatement)"
+      - name: Go SDK tests
+        working-directory: sdk/go
+        run: go test ./...
