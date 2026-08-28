@@ -1,0 +1,56 @@
+{
+  "schema": "aichain.kawpow-asert-live-validation",
+  "schemaVersion": "0.1.0-draft",
+  "date": "2026-08-28",
+  "scope": "Disposable development chains only; not production performance or parameters",
+  "source": {
+    "aichainCommit": "1e5c43a",
+    "coreGethCommit": "59ba79d84681ef1e70ecbf9b179133496ac71a59",
+    "linuxBinarySha256": "8b2e02390fe267b321e4128af5d916b6f3c73e67f0826073f8f8b45bd432931d",
+    "minerCommit": "632f6ea0a5cd09e2c6443374dbe6db0a767715ba"
+  },
+  "topology": [
+    "Vast.ai NVIDIA RTX 3060 mining node",
+    "Contabo VPS CPU-only full validator",
+    "Windows laptop CPU-only full validator"
+  ],
+  "consensusProfile": {
+    "algorithm": "KawPoW",
+    "difficulty": "integer ASERT v1",
+    "halfLifeSeconds": 1800,
+    "activationBlock": 1,
+    "uncles": "disabled",
+    "allowedTargetSeconds": [5, 10, 15]
+  },
+  "calibratedTimingSamples": [
+    {"targetSeconds": 5, "blocks": 20, "meanSeconds": 7.2631578947368425, "medianSeconds": 6, "p95Seconds": 14, "initialDifficulty": 63554165},
+    {"targetSeconds": 10, "blocks": 100, "meanSeconds": 10.565656565656566, "medianSeconds": 8, "p95Seconds": 21, "meanDifficulty": 127108329.29},
+    {"targetSeconds": 15, "blocks": 20, "meanSeconds": 12.736842105263158, "medianSeconds": 11, "p95Seconds": 34, "initialDifficulty": 190662495}
+  ],
+  "operationalEvidence": {
+    "threeMachineCanonicalAcceptance": true,
+    "overnightMinerHeight": 5297,
+    "validatorsDisconnectedAtHeight": 1712,
+    "catchupBlockCount": 3585,
+    "catchupMilliseconds": 20324,
+    "cleanValidatorRestart": true,
+    "reorg": {
+      "sharedHeight": 5313,
+      "branchATipBeforeReorg": 5321,
+      "branchAChildHashAt5314": "0x3f23b4cadf52e05502bc4407251cd3b0348eca60b08ebf6c4d42e212b3d398f2",
+      "branchBChildHashAt5314": "0xfa945ced3a99260c5841651266520b55ec4f93a834169dcca78fd1359633c681",
+      "branchATotalDifficulty": "355066196062",
+      "branchBTotalDifficultyWhenCompared": "355150311330",
+      "validatorReorgMilliseconds": 10821,
+      "laptopAcceptedBranchB": true,
+      "vpsAcceptedBranchB": true
+    },
+    "submissionRejections": ["malformed", "invalid-seal", "stale", "duplicate"]
+  },
+  "avrTraffic": {
+    "individual": {"transactions": 20, "confirmedTransactionsPerSecond": 1.0354162319478089},
+    "batch10": {"logicalReceipts": 100, "confirmedTransactionsPerSecond": 0.9927000751681233, "confirmedLogicalReceiptsPerSecond": 9.927000751681232},
+    "batch100": {"logicalReceipts": 1000, "confirmedTransactionsPerSecond": 0.8050835731482535, "confirmedLogicalReceiptsPerSecond": 80.50835731482535}
+  },
+  "conclusion": "The isolated ASERT implementation passed the planned development hardening gates. Ten seconds remains the preferred development target; production parameters remain TBD."
+}

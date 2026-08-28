@@ -1,0 +1,164 @@
+{
+  "schema": "aichain.g3-individual-avr-benchmark",
+  "schemaVersion": "0.1.0-draft",
+  "scope": "disposable two-node KawPoW G3 network",
+  "seed": "asert10-individual",
+  "contract": "0xFcda1E530727107c01b8f9Fc3e0304DF92944CAd",
+  "transactionCount": 20,
+  "logicalReceiptCount": 20,
+  "broadcastSeconds": 15.999632651,
+  "allConfirmedSeconds": 19.315903482,
+  "broadcastTransactionTps": 1.2500286997995527,
+  "allConfirmedTransactionTps": 1.0354162319478089,
+  "allConfirmedLogicalReceiptTps": 1.0354162319478089,
+  "blocksUsed": [
+    104,
+    105,
+    106,
+    107,
+    108
+  ],
+  "meanGasUsed": 111477.2,
+  "transactions": [
+    {
+      "nonce": 2,
+      "transactionHash": "0x3df72e94192f935e2f92b7fdfff6e1d3bf18a936c6ecf4e06069fc119bf8bb7e",
+      "submittedNs": 1787859819311840242,
+      "blockNumber": 104,
+      "gasUsed": 111479
+    },
+    {
+      "nonce": 3,
+      "transactionHash": "0xc7cc14d3a1d4c50d175deee9762fb9c85b4a7c3c022e1ee8d24f56c36c64ccb8",
+      "submittedNs": 1787859820098549100,
+      "blockNumber": 105,
+      "gasUsed": 111479
+    },
+    {
+      "nonce": 4,
+      "transactionHash": "0xa7b4dc9fae99de7cabd556e215ffa58986d04397e4276658083879fff6b381ee",
+      "submittedNs": 1787859820893900665,
+      "blockNumber": 105,
+      "gasUsed": 111479
+    },
+    {
+      "nonce": 5,
+      "transactionHash": "0xe047876b428979599375b5916f780a3fe4d4d50b1a07865a62a0460384c5da84",
+      "submittedNs": 1787859821681458603,
+      "blockNumber": 105,
+      "gasUsed": 111467
+    },
+    {
+      "nonce": 6,
+      "transactionHash": "0x78f1cf22083c14a19f8d86b1602a796ba3fba5e6fa8298f87177e9255554b845",
+      "submittedNs": 1787859822537861964,
+      "blockNumber": 105,
+      "gasUsed": 111479
+    },
+    {
+      "nonce": 7,
+      "transactionHash": "0x9b9e814684b69841d45c3f61f7fb167f3bffdfb8bf99c655988bee677c08fa46",
+      "submittedNs": 1787859823332670016,
+      "blockNumber": 105,
+      "gasUsed": 111479
+    },
+    {
+      "nonce": 8,
+      "transactionHash": "0xe97d950133fbfef30a445874e7678313914970e94a5308a5fc6af2e06e37f315",
+      "submittedNs": 1787859824124962916,
+      "blockNumber": 106,
+      "gasUsed": 111479
+    },
+    {
+      "nonce": 9,
+      "transactionHash": "0xc50c62f0c1dc5c9a07730438d709b0cd5029d3b600132e554c9fdfd67ba2210a",
+      "submittedNs": 1787859824920996164,
+      "blockNumber": 106,
+      "gasUsed": 111467
+    },
+    {
+      "nonce": 10,
+      "transactionHash": "0xd65cadfc8491eda89a5119b8a52513e3e2725b811f7ff170fbdf962d504ae0ba",
+      "submittedNs": 1787859825708784110,
+      "blockNumber": 106,
+      "gasUsed": 111479
+    },
+    {
+      "nonce": 11,
+      "transactionHash": "0x6ae8a734a4e34f53f53a9e9be66365ff65153355f9372fd2dadadd48b1314356",
+      "submittedNs": 1787859826515339740,
+      "blockNumber": 106,
+      "gasUsed": 111479
+    },
+    {
+      "nonce": 12,
+      "transactionHash": "0x90d6ef85756a15f3b4c2c98bdbb2e7319cdf884ef35d221d9c3a857a8114f572",
+      "submittedNs": 1787859827309443031,
+      "blockNumber": 106,
+      "gasUsed": 111479
+    },
+    {
+      "nonce": 13,
+      "transactionHash": "0xc8ab10ca91db7848dc966f010da28c404fd8bcc13d94c4ab79aba6b3ec3185d9",
+      "submittedNs": 1787859828099876500,
+      "blockNumber": 107,
+      "gasUsed": 111479
+    },
+    {
+      "nonce": 14,
+      "transactionHash": "0x422a8ecd2a7b6298328ca8361f5a39b0d2780d4ce96105ba4fa6cb626e42d06d",
+      "submittedNs": 1787859828889592349,
+      "blockNumber": 107,
+      "gasUsed": 111479
+    },
+    {
+      "nonce": 15,
+      "transactionHash": "0x97b4d65e1b527c0ea06b5ae56d81f56fcaf62a6790767d66f577b7bca1ffe9c9",
+      "submittedNs": 1787859829675329989,
+      "blockNumber": 107,
+      "gasUsed": 111467
+    },
+    {
+      "nonce": 16,
+      "transactionHash": "0x98f2de2a95ada808f2ab42f9312a7604c401f920aca5242654c2f2a8123512cd",
+      "submittedNs": 1787859830484270793,
+      "blockNumber": 107,
+      "gasUsed": 111479
+    },
+    {
+      "nonce": 17,
+      "transactionHash": "0xad7829fe86ca04aa108ba4deb218adcfec15abf47f617037bbf59ad4e48b1aa3",
+      "submittedNs": 1787859831277110964,
+      "blockNumber": 107,
+      "gasUsed": 111479
+    },
+    {
+      "nonce": 18,
+      "transactionHash": "0xa15ade0af6d5ed9f94bbdba02ff72a207580cc5a3c3cec7e30a6964be62db068",
+      "submittedNs": 1787859832116731428,
+      "blockNumber": 108,
+      "gasUsed": 111479
+    },
+    {
+      "nonce": 19,
+      "transactionHash": "0x1948da9245498969248ca92939020d69e0a598bd7d7517c2c29cc3d4e0576fc0",
+      "submittedNs": 1787859832903858602,
+      "blockNumber": 108,
+      "gasUsed": 111479
+    },
+    {
+      "nonce": 20,
+      "transactionHash": "0xef495705e3e77cf4382e2872cc46cd17475c9bc3502a8a2ab8151ce89566595f",
+      "submittedNs": 1787859833692574417,
+      "blockNumber": 108,
+      "gasUsed": 111479
+    },
+    {
+      "nonce": 21,
+      "transactionHash": "0xbed68999e75625908047655bc345dd42e996f6fe40d85a8a403636315433882f",
+      "submittedNs": 1787859834523159428,
+      "blockNumber": 108,
+      "gasUsed": 111479
+    }
+  ]
+}

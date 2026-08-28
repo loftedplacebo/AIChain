@@ -1,0 +1,99 @@
+{
+  "schema": "aichain.capacity-benchmark-report",
+  "schemaVersion": "0.1.0-draft",
+  "scope": "three-node-disposable-KawPoW-ASERT-10s",
+  "batchAnchor": "0xD5C77a15Ef4582A4B0512F3b81ea5f5Bdb558e44",
+  "receiptCount": 100,
+  "batchTransactionCount": 10,
+  "configuredBatchSize": 10,
+  "seed": "asert10-b10",
+  "rootConstructionSeconds": 1.976321905,
+  "broadcastSeconds": 7.633049293,
+  "allConfirmedSecondsFromBroadcast": 10.073536056,
+  "broadcastTransactionTps": 1.3100924173476316,
+  "broadcastLogicalReceiptTps": 13.100924173476315,
+  "allConfirmedTransactionTps": 0.9927000751681233,
+  "allConfirmedLogicalReceiptTps": 9.927000751681232,
+  "batches": [
+    {
+      "batchRoot": "0xb8d1a105226bed740791f93d32b85a388ba4330112b9ee094e0ef073a961c55a",
+      "leafCount": 10,
+      "nonce": 22,
+      "transactionHash": "0xaea0997e31016a9b71093075478337fe9ebc73280d00854229bc469198e08abe",
+      "blockNumber": 110,
+      "gasUsed": 92831
+    },
+    {
+      "batchRoot": "0x86b44749bcfc8abc69ea8510d965a3bd722adc14d86296ce7df3b22488848101",
+      "leafCount": 10,
+      "nonce": 23,
+      "transactionHash": "0xfb3dc4cdc4fa1da718570681d9a6e324ef2888a6601a5f8f73238ee88f309631",
+      "blockNumber": 110,
+      "gasUsed": 92831
+    },
+    {
+      "batchRoot": "0x7e4d94ce5d5cb9457dbbcff9bc95ca3d28b5d0bb9016cdb5f9c4d6ba009a84fe",
+      "leafCount": 10,
+      "nonce": 24,
+      "transactionHash": "0x8b740023a94b4b9f57048f0b4dfa91bdc7b541715707227f87e386ae832f8e8f",
+      "blockNumber": 110,
+      "gasUsed": 92819
+    },
+    {
+      "batchRoot": "0x1a79fd3e657858e8bf773ffd8db30f7b2977d902e927420cb1ff9d3846bd3bb4",
+      "leafCount": 10,
+      "nonce": 25,
+      "transactionHash": "0x3c7245006e63ad4ab9c84d6e8c75ac8701d21bb7fcf754eed40520f8b501af50",
+      "blockNumber": 110,
+      "gasUsed": 92831
+    },
+    {
+      "batchRoot": "0x6f36b9aee855d3b4a1892dfca13ba1bf4778ba1b9e8223cd21ea790753a6f19f",
+      "leafCount": 10,
+      "nonce": 26,
+      "transactionHash": "0x22ca7a5ece57f0c365e3fef68ba6c6a8b900202ef9590ef1f0937e719b438293",
+      "blockNumber": 111,
+      "gasUsed": 92831
+    },
+    {
+      "batchRoot": "0x216e7b31d004c521ece850f91e9f7290c65ed80f4e970283e3522d08e3bd5162",
+      "leafCount": 10,
+      "nonce": 27,
+      "transactionHash": "0x7c70aeba39ffbd03e2068027ccf2dd607253f2cd50525a6ede28ce62913878f6",
+      "blockNumber": 111,
+      "gasUsed": 92831
+    },
+    {
+      "batchRoot": "0x0e86ce9d23b0819daac245b623086d2ccf780d46751ba4ab08babe2f2dbc8433",
+      "leafCount": 10,
+      "nonce": 28,
+      "transactionHash": "0x65ca23f29e9f6902f4dac5f18539b13e32ceb371a41a0fe74c590d120bfbae77",
+      "blockNumber": 111,
+      "gasUsed": 92831
+    },
+    {
+      "batchRoot": "0x8de257aa7840c3a4b780b8799dffccc86d1402000eef5a6ffbcb0efc8e9a3928",
+      "leafCount": 10,
+      "nonce": 29,
+      "transactionHash": "0x889ebe38c9cc53b26b8097c22be702069748bf99279c1562b8d0e182c3e594d5",
+      "blockNumber": 111,
+      "gasUsed": 92819
+    },
+    {
+      "batchRoot": "0x3b10268c2d8b4581ea0125c6182f046936b026a6df2243a2e2711be6d30028da",
+      "leafCount": 10,
+      "nonce": 30,
+      "transactionHash": "0x5518deb052b2da2361cb8d50b6d7f6db4df2a81bf5044fef6ec396887a808b7a",
+      "blockNumber": 111,
+      "gasUsed": 92819
+    },
+    {
+      "batchRoot": "0xa16073a77590bec48999c3c33c7fb9c527755896d625c9aeb11f0ed1d25c3b37",
+      "leafCount": 10,
+      "nonce": 31,
+      "transactionHash": "0xb1d9521b244bc47070acfd2e5fc7b8f87a8d638383a78d21ba70d51ab30c9745",
+      "blockNumber": 111,
+      "gasUsed": 92831
+    }
+  ]
+}

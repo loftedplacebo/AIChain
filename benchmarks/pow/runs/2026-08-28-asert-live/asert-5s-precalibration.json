@@ -1,0 +1,272 @@
+{
+  "schema": "aichain.kawpow-asert-live-trial",
+  "schemaVersion": "0.1.0-draft",
+  "scope": "disposable development chain; not production performance",
+  "targetSeconds": 5,
+  "halfLifeSeconds": 1800,
+  "topology": "RTX miner; VPS and laptop CPU validators",
+  "chainId": 2026082705,
+  "sample": {
+    "firstBlock": 3,
+    "lastBlock": 32,
+    "blockCount": 30,
+    "transactionCount": 0,
+    "intervalCount": 29,
+    "meanIntervalSeconds": 4.068965517241379,
+    "medianIntervalSeconds": 4,
+    "p95IntervalSeconds": 4,
+    "minimumIntervalSeconds": 4,
+    "maximumIntervalSeconds": 6,
+    "meanDifficulty": 163291.06666666668
+  },
+  "submissionAudit": {
+    "statusCounts": {
+      "accepted": 32,
+      "duplicate": 296
+    },
+    "acceptedSolutions": 32,
+    "acceptedUniqueBlocks": 32
+  },
+  "blocks": [
+    {
+      "number": 3,
+      "hash": "0x05144199bf47f619cc6a846d4c67d99cf2459dfea59e77aaef07f55a28533181",
+      "parentHash": "0x0ecd7d77ce3efa35d2676d7686723dd5a42acbca0f45e272c586a66f8c2ebff6",
+      "timestamp": 1787897010,
+      "difficulty": 162454,
+      "transactionCount": 0
+    },
+    {
+      "number": 4,
+      "hash": "0xff77a5090d01b68d557c055571faf2134a13fbab2b133bdb2d85e8ff3e0f1cae",
+      "parentHash": "0x05144199bf47f619cc6a846d4c67d99cf2459dfea59e77aaef07f55a28533181",
+      "timestamp": 1787897014,
+      "difficulty": 162518,
+      "transactionCount": 0
+    },
+    {
+      "number": 5,
+      "hash": "0x82de4dff265b5aa50af98625e2da3015a6038a3fc9d7da852f2faa545ca1fce1",
+      "parentHash": "0xff77a5090d01b68d557c055571faf2134a13fbab2b133bdb2d85e8ff3e0f1cae",
+      "timestamp": 1787897018,
+      "difficulty": 162579,
+      "transactionCount": 0
+    },
+    {
+      "number": 6,
+      "hash": "0x4ceedf064596bc399651fa46f8c4928a6d6f0a47abf1f2b51f8770104fad1730",
+      "parentHash": "0x82de4dff265b5aa50af98625e2da3015a6038a3fc9d7da852f2faa545ca1fce1",
+      "timestamp": 1787897022,
+      "difficulty": 162643,
+      "transactionCount": 0
+    },
+    {
+      "number": 7,
+      "hash": "0x333905101aa4f2a1f02aa1709143f56d10fb26c9886fedd97a460480244bd6d8",
+      "parentHash": "0x4ceedf064596bc399651fa46f8c4928a6d6f0a47abf1f2b51f8770104fad1730",
+      "timestamp": 1787897026,
+      "difficulty": 162705,
+      "transactionCount": 0
+    },
+    {
+      "number": 8,
+      "hash": "0x98e6e98a299403991626d6cbf5f581ae17c796d6dae048511799485612f11d14",
+      "parentHash": "0x333905101aa4f2a1f02aa1709143f56d10fb26c9886fedd97a460480244bd6d8",
+      "timestamp": 1787897030,
+      "difficulty": 162769,
+      "transactionCount": 0
+    },
+    {
+      "number": 9,
+      "hash": "0xaecc626a9488ac07ea2c846b3596347eb0153a0a9a1b0db7fa14f0ee224bc7c1",
+      "parentHash": "0x98e6e98a299403991626d6cbf5f581ae17c796d6dae048511799485612f11d14",
+      "timestamp": 1787897034,
+      "difficulty": 162831,
+      "transactionCount": 0
+    },
+    {
+      "number": 10,
+      "hash": "0x0a06f8f54240b8a84a9a6dbacf5b0a6bf22e2812509512b2a832ee9832236696",
+      "parentHash": "0xaecc626a9488ac07ea2c846b3596347eb0153a0a9a1b0db7fa14f0ee224bc7c1",
+      "timestamp": 1787897038,
+      "difficulty": 162893,
+      "transactionCount": 0
+    },
+    {
+      "number": 11,
+      "hash": "0xb872748ee3d96e716f67e66f529c137ad30ce7c2af40f2d7e790e905d72b9030",
+      "parentHash": "0x0a06f8f54240b8a84a9a6dbacf5b0a6bf22e2812509512b2a832ee9832236696",
+      "timestamp": 1787897042,
+      "difficulty": 162957,
+      "transactionCount": 0
+    },
+    {
+      "number": 12,
+      "hash": "0x80323134a118675abd2ad256bfde845862fe190cfef54d767098469ee03c1989",
+      "parentHash": "0xb872748ee3d96e716f67e66f529c137ad30ce7c2af40f2d7e790e905d72b9030",
+      "timestamp": 1787897046,
+      "difficulty": 163019,
+      "transactionCount": 0
+    },
+    {
+      "number": 13,
+      "hash": "0x98840b1eb3db7948f45227aafc87d5a882d95b7efa961b56a946241ddb24e3cf",
+      "parentHash": "0x80323134a118675abd2ad256bfde845862fe190cfef54d767098469ee03c1989",
+      "timestamp": 1787897050,
+      "difficulty": 163083,
+      "transactionCount": 0
+    },
+    {
+      "number": 14,
+      "hash": "0x338f0eda34ef50d71a2e647d47b803c1f3d495a292cc280b76b1aa17fa4ae4d2",
+      "parentHash": "0x98840b1eb3db7948f45227aafc87d5a882d95b7efa961b56a946241ddb24e3cf",
+      "timestamp": 1787897054,
+      "difficulty": 163145,
+      "transactionCount": 0
+    },
+    {
+      "number": 15,
+      "hash": "0x5e3e1d937b79aec5d401e136015e24f336d9f2f53d843ea199521b235b57e35e",
+      "parentHash": "0x338f0eda34ef50d71a2e647d47b803c1f3d495a292cc280b76b1aa17fa4ae4d2",
+      "timestamp": 1787897060,
+      "difficulty": 163083,
+      "transactionCount": 0
+    },
+    {
+      "number": 16,
+      "hash": "0x185d6822342d16d024b330fae4bf568e7b69bc5342b9ceb0882ea19ae2c65145",
+      "parentHash": "0x5e3e1d937b79aec5d401e136015e24f336d9f2f53d843ea199521b235b57e35e",
+      "timestamp": 1787897064,
+      "difficulty": 163145,
+      "transactionCount": 0
+    },
+    {
+      "number": 17,
+      "hash": "0x628dae42dc5dbcaf0d89d2f3ae1cb184af44c4209d5bff7e6bf831c5f93769b6",
+      "parentHash": "0x185d6822342d16d024b330fae4bf568e7b69bc5342b9ceb0882ea19ae2c65145",
+      "timestamp": 1787897068,
+      "difficulty": 163207,
+      "transactionCount": 0
+    },
+    {
+      "number": 18,
+      "hash": "0xddcb8482ba6ede748aa7b5a5df4ceb0ee8752ee181634a1bfd364a978958b939",
+      "parentHash": "0x628dae42dc5dbcaf0d89d2f3ae1cb184af44c4209d5bff7e6bf831c5f93769b6",
+      "timestamp": 1787897072,
+      "difficulty": 163271,
+      "transactionCount": 0
+    },
+    {
+      "number": 19,
+      "hash": "0x62288017d0f39eb057599cd671a081a13dce093f48406a962dcc2fc7dd738301",
+      "parentHash": "0xddcb8482ba6ede748aa7b5a5df4ceb0ee8752ee181634a1bfd364a978958b939",
+      "timestamp": 1787897076,
+      "difficulty": 163334,
+      "transactionCount": 0
+    },
+    {
+      "number": 20,
+      "hash": "0xa68b8acba99b7796d051bee2df91f71e33614d22e1bb8764c7a11f9f047b28d3",
+      "parentHash": "0x62288017d0f39eb057599cd671a081a13dce093f48406a962dcc2fc7dd738301",
+      "timestamp": 1787897080,
+      "difficulty": 163398,
+      "transactionCount": 0
+    },
+    {
+      "number": 21,
+      "hash": "0xa40d86f5c851c52832496eeee5b8bd2c59124ca9b254cb372a393a2099bfd6af",
+      "parentHash": "0xa68b8acba99b7796d051bee2df91f71e33614d22e1bb8764c7a11f9f047b28d3",
+      "timestamp": 1787897084,
+      "difficulty": 163460,
+      "transactionCount": 0
+    },
+    {
+      "number": 22,
+      "hash": "0x3b5c894187144fd514ec2011fc8175b30422d9745879121747e42581168ca928",
+      "parentHash": "0xa40d86f5c851c52832496eeee5b8bd2c59124ca9b254cb372a393a2099bfd6af",
+      "timestamp": 1787897088,
+      "difficulty": 163523,
+      "transactionCount": 0
+    },
+    {
+      "number": 23,
+      "hash": "0x39f64d845f737a257d07b8f44c7c2105ec91e22c755cd2c24e1d98d385dfdddc",
+      "parentHash": "0x3b5c894187144fd514ec2011fc8175b30422d9745879121747e42581168ca928",
+      "timestamp": 1787897092,
+      "difficulty": 163587,
+      "transactionCount": 0
+    },
+    {
+      "number": 24,
+      "hash": "0x01f97a2c0df133babad66675b11a8672ed295f0d7f97901c830a82c16bdb9a72",
+      "parentHash": "0x39f64d845f737a257d07b8f44c7c2105ec91e22c755cd2c24e1d98d385dfdddc",
+      "timestamp": 1787897096,
+      "difficulty": 163650,
+      "transactionCount": 0
+    },
+    {
+      "number": 25,
+      "hash": "0x5da65cdae70fc0ebe3f83c1593840587a00898a6bebc9d894fa0fc515c3128e2",
+      "parentHash": "0x01f97a2c0df133babad66675b11a8672ed295f0d7f97901c830a82c16bdb9a72",
+      "timestamp": 1787897100,
+      "difficulty": 163715,
+      "transactionCount": 0
+    },
+    {
+      "number": 26,
+      "hash": "0xa35568d4efcbe9d0dd6922ff9632a5ebde6aee4f3d52b838d80e6446a71e10d6",
+      "parentHash": "0x5da65cdae70fc0ebe3f83c1593840587a00898a6bebc9d894fa0fc515c3128e2",
+      "timestamp": 1787897104,
+      "difficulty": 163777,
+      "transactionCount": 0
+    },
+    {
+      "number": 27,
+      "hash": "0xb5326f7ce3827dce4b501974d7e7eb8850eb00b69aef9ad6e2772c86dd5aa02d",
+      "parentHash": "0xa35568d4efcbe9d0dd6922ff9632a5ebde6aee4f3d52b838d80e6446a71e10d6",
+      "timestamp": 1787897108,
+      "difficulty": 163840,
+      "transactionCount": 0
+    },
+    {
+      "number": 28,
+      "hash": "0xb36de56a799ebd1301419216bbb6c0dff134acdac9172a8d6535cad2a8f50baa",
+      "parentHash": "0xb5326f7ce3827dce4b501974d7e7eb8850eb00b69aef9ad6e2772c86dd5aa02d",
+      "timestamp": 1787897112,
+      "difficulty": 163903,
+      "transactionCount": 0
+    },
+    {
+      "number": 29,
+      "hash": "0x098d1ce51cc366c4a295a2fb54bc542eacb0006379dc68c5c2a86b0fe0da73bf",
+      "parentHash": "0xb36de56a799ebd1301419216bbb6c0dff134acdac9172a8d6535cad2a8f50baa",
+      "timestamp": 1787897116,
+      "difficulty": 163966,
+      "transactionCount": 0
+    },
+    {
+      "number": 30,
+      "hash": "0x4402886c44e80d2239fe86a53700113dbd0d5eb4cc3f9d14f1074b1eae46cdf5",
+      "parentHash": "0x098d1ce51cc366c4a295a2fb54bc542eacb0006379dc68c5c2a86b0fe0da73bf",
+      "timestamp": 1787897120,
+      "difficulty": 164030,
+      "transactionCount": 0
+    },
+    {
+      "number": 31,
+      "hash": "0x5de143c32092b655de87f027d0cd9479fd15e01aa439fde63d9310d79896fc54",
+      "parentHash": "0x4402886c44e80d2239fe86a53700113dbd0d5eb4cc3f9d14f1074b1eae46cdf5",
+      "timestamp": 1787897124,
+      "difficulty": 164091,
+      "transactionCount": 0
+    },
+    {
+      "number": 32,
+      "hash": "0x6480a7cb6b7d23ba3f54c988ec5a1127cc73c2532695d669979bb0fe456c8df6",
+      "parentHash": "0x5de143c32092b655de87f027d0cd9479fd15e01aa439fde63d9310d79896fc54",
+      "timestamp": 1787897128,
+      "difficulty": 164156,
+      "transactionCount": 0
+    }
+  ]
+}

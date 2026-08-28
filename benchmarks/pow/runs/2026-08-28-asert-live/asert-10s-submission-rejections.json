@@ -1,0 +1,43 @@
+{
+  "malformed": {
+    "accepted": false,
+    "status": "malformed"
+  },
+  "invalid": {
+    "accepted": false,
+    "status": "invalid-seal"
+  },
+  "stale": {
+    "accepted": false,
+    "status": "stale"
+  },
+  "duplicate": {
+    "timestamp": 1787859481,
+    "workId": "0x69a3259a8dd9d2bee4aa420dcd939b17edeaee2cc12fde91e651bd4d638d423c",
+    "headerHash": "0x0217238a6c53f751fec114452c2e9c265b365286f4cbe4857a39a1805f020ab4",
+    "nonce": "0xa6afc34d423c63b1",
+    "mixDigest": "0x801680e80a8f3cc785bfae7c456a4e0608bfee7f52682666b67852feceaba2fb",
+    "accepted": false,
+    "status": "duplicate",
+    "parentHash": "0x95538ec234b94dea6316ffd761a8934af2609ce6044518b21f8fe00d04b4a1c4",
+    "height": "0x13",
+    "seedHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+    "target": "0x0000399ba182f80acb616b826a45cbe91d17d9c40d562b9015f45fbd79a79d22",
+    "expiresAt": "0x6a909252"
+  },
+  "gpuAccepted": {
+    "timestamp": 1787859481,
+    "workId": "0x69a3259a8dd9d2bee4aa420dcd939b17edeaee2cc12fde91e651bd4d638d423c",
+    "headerHash": "0x0217238a6c53f751fec114452c2e9c265b365286f4cbe4857a39a1805f020ab4",
+    "nonce": "0xa6afc34d423bee91",
+    "mixDigest": "0x749019f608700115e6512ef5ca669de14307b575ce7a0fa851e9982dc268b4a4",
+    "accepted": true,
+    "status": "accepted",
+    "blockHash": "0x438849e039b4facebc5f75b53ce8c50349ce5be293f8ee94d130c2a902a1bb01",
+    "parentHash": "0x95538ec234b94dea6316ffd761a8934af2609ce6044518b21f8fe00d04b4a1c4",
+    "height": "0x13",
+    "seedHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+    "target": "0x0000399ba182f80acb616b826a45cbe91d17d9c40d562b9015f45fbd79a79d22",
+    "expiresAt": "0x6a909252"
+  }
+}
