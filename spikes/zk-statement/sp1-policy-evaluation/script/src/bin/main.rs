@@ -38,5 +38,11 @@ fn main() {
     client
         .verify(&proof, pk.verifying_key(), None)
         .expect("independently verify SP1 proof");
+    let public: PublicValues =
+        serde_json::from_slice(proof.public_values.as_slice()).expect("decode proof public values");
+    assert_eq!(
+        public, input.expected_public,
+        "proof/public fixture mismatch"
+    );
     println!("{{\"stack\":\"sp1\",\"mode\":\"prove-and-verify\",\"fixture\":\"{}\",\"elapsedMs\":{},\"receiptId\":\"{}\"}}", fixture.replace('\\', "/"), started.elapsed().as_millis(), input.expected_public.receipt_id);
 }

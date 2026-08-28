@@ -1,0 +1,38 @@
+name: SP1 ZK-001 proof and verification
+
+on:
+  push:
+    paths:
+      - ".github/workflows/sp1-proof-and-verify.yml"
+      - "fixtures/zk/policy-evaluation-v0.1.0-draft.json"
+      - "spikes/zk-statement/sp1-policy-evaluation/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sp1-zk-001-proof-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  prove-and-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: spikes/zk-statement/sp1-policy-evaluation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Install pinned SP1 distribution
+        env:
+          SP1_DIR: ${{ runner.temp }}/aichain-sp1
+        run: |
+          curl -L https://sp1up.succinct.xyz | bash
+          "$SP1_DIR/bin/sp1up" --version v6.5.0
+          echo "$SP1_DIR/bin" >> "$GITHUB_PATH"
+      - name: Generate and independently verify a proof
+        run: |
+          cargo prove --version
+          cargo run --release -p aichain-sp1-policy-evaluation-script -- --prove ../../../fixtures/zk/policy-evaluation-v0.1.0-draft.json
