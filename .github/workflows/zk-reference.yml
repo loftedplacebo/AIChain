@@ -38,7 +38,7 @@ jobs:
       - name: Python reference tests
         run: python -m unittest discover -s spikes/zk-statement/python -p 'test_*.py'
       - name: TypeScript SDK tests
-        run: npm test --prefix sdk/typescript
+        run: node --test sdk/typescript/zk-policy-statement.test.js
       - name: Go formatting
         run: test -z "$(gofmt -l sdk/go/zkpolicystatement)"
       - name: Go SDK tests
