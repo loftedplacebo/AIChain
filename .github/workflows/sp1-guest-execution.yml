@@ -31,4 +31,4 @@ jobs:
       - name: Execute the ZK-001 guest against the golden fixture
         run: |
           cargo prove --version
-          cargo run --release -p aichain-sp1-policy-evaluation-script -- ../../../fixtures/zk/policy-evaluation-v0.1.0-draft.json
+          cargo run --release -p aichain-sp1-policy-evaluation-script -- --execute ../../../fixtures/zk/policy-evaluation-v0.1.0-draft.json
