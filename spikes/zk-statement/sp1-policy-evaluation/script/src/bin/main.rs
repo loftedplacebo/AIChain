@@ -1,7 +1,7 @@
 use aichain_zk_policy_core::{Input, PublicValues};
 use sp1_sdk::{
     blocking::{ProveRequest, Prover, ProverClient},
-    include_elf, Elf, ProvingKey, SP1Stdin,
+    include_elf, Elf, ProvingKey, SP1PublicValues, SP1Stdin,
 };
 use std::{env, fs, time::Instant};
 
@@ -87,7 +87,7 @@ fn main() {
             "SP1 proof must contain committed public values"
         );
         tampered_public_values[0] ^= 1;
-        tampered_proof.public_values = tampered_public_values.into();
+        tampered_proof.public_values = SP1PublicValues::from(tampered_public_values.as_slice());
         assert!(
             client.verify(&tampered_proof, pk.verifying_key(), None).is_err(),
             "SP1 verifier accepted tampered committed public values"
