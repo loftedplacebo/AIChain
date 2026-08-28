@@ -25,13 +25,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
-      - name: Install pinned SP1 distribution
-        env:
-          SP1_DIR: ${{ runner.temp }}/aichain-sp1
+      - name: Install pinned SP1 distribution without GitHub API lookup
         run: |
-          curl -L https://sp1up.succinct.xyz | bash
-          "$SP1_DIR/bin/sp1up" --version v6.5.0
-          echo "$SP1_DIR/bin" >> "$GITHUB_PATH"
+          mkdir -p "$HOME/.sp1/bin" "$HOME/.sp1/toolchains" "$RUNNER_TEMP/aichain-sp1-toolchain"
+          curl --fail --location --retry 3 https://github.com/succinctlabs/sp1/releases/download/v6.5.0/cargo_prove_v6.5.0_linux_amd64.tar.gz | tar -xz -C "$HOME/.sp1/bin"
+          curl --fail --location --retry 3 https://github.com/succinctlabs/rust/releases/download/succinct-1.94.0-64bit/rust-toolchain-x86_64-unknown-linux-gnu.tar.gz | tar -xz -C "$RUNNER_TEMP/aichain-sp1-toolchain"
+          mv "$RUNNER_TEMP/aichain-sp1-toolchain" "$HOME/.sp1/toolchains/ci"
+          rustup toolchain link succinct "$HOME/.sp1/toolchains/ci"
+          echo "$HOME/.sp1/bin" >> "$GITHUB_PATH"
       - name: Generate and independently verify a proof
         run: |
           cargo prove --version
