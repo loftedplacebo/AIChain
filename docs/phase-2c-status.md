@@ -17,8 +17,8 @@
 ## RISC Zero
 
 - Candidate baseline: stable `3.0.3`.
-- Adapter: next implementation task, using the same Rust semantic core and fixture.
-- No result is recorded yet.
+- Adapter: guest scaffold implemented, using the same Rust semantic core and fixture as SP1.
+- Guest execution, proof generation, verification, and EVM integration: not yet run.
 
 ## Halo2
 
