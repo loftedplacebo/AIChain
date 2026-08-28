@@ -11,19 +11,20 @@
 - Version pinned: `6.5.0`.
 - Semantic core: implemented and tested against the shared golden vector in Linux CI.
 - Guest: implemented; reconstructs the receipt ID, commitments root, result commitment, identity bindings, statement ID, and program commitment from the witness before committing public values.
-- Guest execution: automated workflow added; pending its first completed run.
-- Cryptographic proof, EVM verifier export, Solidity deployment, gas measurements, and negative proof verification: not yet complete.
+- Guest execution and native proof/verification workflows: implemented. The original bootstrap failed because the GitHub-hosted runner hit an unauthenticated GitHub API rate limit while SP1 fetched its toolchain; the workflow now uses direct, pinned release assets. The repaired runs are in progress and remain the source of truth for execution evidence.
+- Proof-public-value binding: the host runner decodes the verified proof journal and requires an exact match with the shared fixture.
+- EVM verifier export, Solidity deployment, gas measurements, and negative proof verification: not yet complete.
 
 ## RISC Zero
 
 - Candidate baseline: stable `3.0.3`.
-- Adapter: guest scaffold implemented, using the same Rust semantic core and fixture as SP1.
-- Guest execution, proof generation, verification, and EVM integration: not yet run.
+- Adapter and host harness: implemented, using the same Rust semantic core and fixture as SP1. The host requires an exact public-journal match and independently verifies the receipt.
+- The initial Linux build exposed a workspace-membership error, now corrected. The repaired proof-and-verification run is in progress; EVM integration has not started.
 
 ## Halo2
 
-- Not started.
-- It remains an evaluation candidate; a bespoke-circuit effort spike will be used to decide whether a full prototype is proportionate.
+- A feasibility assessment is complete in [Phase 2C Halo2 Feasibility](./phase-2c-halo2-feasibility.md).
+- It remains an evaluation candidate. A bespoke-circuit spike is deliberately deferred until comparable SP1/RISC Zero measurements and a frozen public-input encoding exist.
 
 ## Evidence Discipline
 
