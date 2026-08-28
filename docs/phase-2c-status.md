@@ -11,15 +11,15 @@
 - Version pinned: `6.5.0`.
 - Semantic core: implemented and tested against the shared golden vector in Linux CI.
 - Guest: implemented; reconstructs the receipt ID, commitments root, result commitment, identity bindings, statement ID, and program commitment from the witness before committing public values.
-- Guest execution and native proof/verification workflows: implemented. The original bootstrap failed because the GitHub-hosted runner hit an unauthenticated GitHub API rate limit while SP1 fetched its toolchain; the workflow now uses direct, pinned release assets. The repaired runs are in progress and remain the source of truth for execution evidence.
+- Guest execution and native proof/verification workflows: completed successfully. The evidence is recorded in [Phase 2C Native Proof Evidence](./phase-2c-native-proof-evidence.md).
 - Proof-public-value binding: the host runner decodes the verified proof journal and requires an exact match with the shared fixture.
-- EVM verifier export, Solidity deployment, gas measurements, and negative proof verification: not yet complete.
+- EVM verifier export, Solidity deployment, gas measurements, and cryptographic negative-proof verification: not yet complete.
 
 ## RISC Zero
 
 - Candidate baseline: stable `3.0.3`.
 - Adapter and host harness: implemented, using the same Rust semantic core and fixture as SP1. The host requires an exact public-journal match and independently verifies the receipt.
-- The initial Linux build exposed a workspace-membership error, now corrected. The repaired proof-and-verification run is in progress; EVM integration has not started.
+- Native receipt generation and independent verification: completed successfully. The evidence is recorded in [Phase 2C Native Proof Evidence](./phase-2c-native-proof-evidence.md). EVM integration has not started.
 
 ## Halo2
 
