@@ -3,12 +3,12 @@
 | Field | Value |
 |---|---|
 | Status | Living delivery plan |
-| Document version | 0.11 |
+| Document version | 0.12 |
 | Last updated | 2026-08-28 |
 | Architecture inputs | [Core L1 Architecture and Tooling](./core-l1-architecture-and-tooling.md); [AI Verification & ZK Architecture](./ai-verification-and-zk-architecture.md) |
 | Schedule | Dates, durations, staffing, and owners are **TBD** |
 | Decision state | This plan sequences open decisions; it does not settle them |
-| Delivery status | Phase 1 development-validation complete; Phase 2A NVIDIA G3 and isolated ASERT live validation complete; AMD repeat and production decision gates remain open |
+| Delivery status | Phase 1 complete; Phase 2A NVIDIA and isolated ASERT validation complete; AMD/multi-miner work deferred to testnet; Phase 2B ZK specification is next |
 
 ## 1. Objective
 
@@ -137,7 +137,7 @@ Security, privacy, compatibility, documentation, and operations run across every
 
 **Current status:** KawPoW is selected only for Phase 2A development evaluation. NVIDIA G1, G2, G3, and the isolated ASERT live-validation milestone are complete. RTX-mined 5/10/15-second ASERT profiles propagated to CPU-only validators on two independent machines; the 10-second profile passed overnight operation, a 3,585-block catch-up, clean restarts, a controlled greater-work reorganisation, rejection tests, and individual/batched AVR traffic. The existing Ethash devnet remains unchanged.
 
-**Next active work:** use the completed [ASERT live validation](./phase-2a-asert-live-validation.md) as the PoW baseline, then complete the AMD/OpenCL repeat, multi-miner geographic trial, extended adversarial/partition work, and quantum-threat assessment. In parallel, Phase 2B can specify the ZK statement and benchmark candidate proof stacks without changing consensus. Production difficulty, block interval, economics, and final **L1-001/L1-003** approval remain **TBD**.
+**Next active work:** use the completed [ASERT live validation](./phase-2a-asert-live-validation.md) as the development PoW baseline. AMD/OpenCL interoperability, independently operated multi-miner geography, heterogeneous fork tests, and launch hash-rate calibration are deferred to the closed/public-testnet gates because the required hardware is not currently available. Phase 2B now becomes the active phase: specify the ZK statement and benchmark candidate proof stacks without changing consensus. Production difficulty, block interval, economics, and final **L1-001/L1-003** approval remain **TBD**.
 
 **Primary outputs**
 
@@ -217,6 +217,9 @@ Security, privacy, compatibility, documentation, and operations run across every
 - Monitoring, incident response, backup/recovery, and key-handling runbooks.
 - External security-review scope and release acceptance targets.
 - Sustained-load and burst-load exercises for receipt ingestion, batch construction, proof queues, P2P propagation, block/state growth, reorganization recovery, and explorer/indexer lag.
+- AMD/OpenCL mining interoperability and recovery tests.
+- At least three independently operated GPU miners across at least two regions, including heterogeneous NVIDIA/AMD fork, propagation, stale/orphan, and hash-rate shock measurements.
+- Launch-difficulty calibration from representative aggregate testnet hash rate.
 
 **Exit gate**
 
@@ -297,14 +300,15 @@ A gate closes only when its decision is recorded in the relevant architecture do
 
 ## 8. Immediate Next Increment
 
-The first implementation increment should:
+The active increment is now defined in [Next Development Phases](./next-development-phases.md):
 
-1. Resolve **L1-002** by selecting and documenting the Core-Geth baseline.
-2. Establish reproducible builds, automated baseline tests, and a decision-record process.
-3. Draft AVR v0 semantics, canonical serialization, and shared test vectors.
-4. Build a contract/event-based AVR prototype on a local EVM network without treating that placement as final.
-5. Define the PoW evaluation criteria and candidate benchmark harness, including quantum-threat assessment criteria, without selecting an algorithm prematurely.
-6. Define the first useful ZK claim and public inputs before comparing candidate stacks.
+1. Record the exact **ZK-001** proof statement, public inputs, private witness, assurance boundary, and non-claims.
+2. Build its deterministic reference program and cross-language positive/negative fixtures.
+3. Benchmark RISC Zero, SP1, and Halo2 against the same statement.
+4. Select and deploy one disposable alpha verifier.
+5. Consolidate AVR assurance levels, SDK parity, proof-aware batching, explorer indexing, and organisation disclosure.
+6. Produce the integrated alpha while retaining the completed KawPoW/ASERT development profile.
+7. Acquire/rent AMD and independently operated GPU capacity when preparing the closed testnet, then close the deferred mining gates there.
 
 ## 8.1 Completed Phase 1B Development Validation (2026-08-22)
 
@@ -348,5 +352,6 @@ This is a development-validation milestone, not a final AVR protocol release. **
 | 0.9 | 2026-08-25 | Added an ASERT-led 10-second development proposal with Ethash/LWMA controls and explicit simulation, timestamp, reorg, and activation gates | [Difficulty and Block-Timing Proposal](./phase-2a-difficulty-and-block-timing-proposal.md) |
 | 0.10 | 2026-08-25 | Completed the deterministic difficulty matrix and conditionally selected 10-second/30-minute ASERT for isolated node integration | [Difficulty Simulation Results](./phase-2a-difficulty-simulation-results.md) |
 | 0.11 | 2026-08-28 | Completed isolated ASERT implementation and live 5/10/15-second three-machine validation, including soak, catch-up, restarts, reorg, rejection paths, and AVR load | [ASERT Live Validation](./phase-2a-asert-live-validation.md) |
+| 0.12 | 2026-08-28 | Deferred AMD/OpenCL and geographically distributed multi-miner tests to the testnet gates; made ZK-001 the active task and mapped the alpha/testnet/asset sequence | [Next Development Phases](./next-development-phases.md) |
 | 0.1 | 2026-08-18 | Initial phased development plan | Architecture documents v0.1 |
 | X.Y | YYYY-MM-DD | Describe the change | Decision ID or link |
