@@ -1,4 +1,3 @@
 [workspace]
-members = ["lib", "program", "script"]
+members = ["lib", "program", "program-wrong-key", "script"]
 resolver = "2"
-

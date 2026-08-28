@@ -48,3 +48,4 @@ jobs:
         run: |
           cargo prove --version
           cargo run --release -p aichain-sp1-policy-evaluation-script -- --prove ../../../fixtures/zk/policy-evaluation-v0.1.0-draft.json
+          cargo run --release -p aichain-sp1-policy-evaluation-script -- --security-tests ../../../fixtures/zk/policy-evaluation-v0.1.0-draft.json

@@ -37,5 +37,7 @@ jobs:
         run: |
           curl --fail --location --retry 3 https://risczero.com/install | bash
           "$HOME/.risc0/bin/rzup" install
-      - name: Build, prove, and independently verify the shared fixture
-        run: cargo run --release -p aichain-risc0-policy-evaluation-host -- ../../../fixtures/zk/policy-evaluation-v0.1.0-draft.json
+      - name: Build, prove, independently verify, and run security negatives
+        run: |
+          cargo run --release -p aichain-risc0-policy-evaluation-host -- --prove ../../../fixtures/zk/policy-evaluation-v0.1.0-draft.json
+          cargo run --release -p aichain-risc0-policy-evaluation-host -- --security-tests ../../../fixtures/zk/policy-evaluation-v0.1.0-draft.json
