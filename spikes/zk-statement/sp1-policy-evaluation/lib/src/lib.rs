@@ -302,4 +302,28 @@ mod tests {
         input.private_witness.action.amount = 1001;
         assert!(verify(&input).is_err());
     }
+
+    #[test]
+    fn rejects_a_tampered_private_policy() {
+        let mut input: Input = serde_json::from_str(FIXTURE).expect("fixture");
+        input.private_witness.policy.max_amount = 500;
+        assert!(verify(&input).is_err());
+    }
+
+    #[test]
+    fn rejects_substituted_public_bindings() {
+        for field in ["receipt", "root", "result", "program", "statement"] {
+            let mut input: Input = serde_json::from_str(FIXTURE).expect("fixture");
+            let replacement = format!("0x{}", "ff".repeat(32));
+            match field {
+                "receipt" => input.expected_public.receipt_id = replacement,
+                "root" => input.expected_public.commitments_root = replacement,
+                "result" => input.expected_public.result_commitment = replacement,
+                "program" => input.expected_public.program_commitment = replacement,
+                "statement" => input.expected_public.statement_id = replacement,
+                _ => unreachable!(),
+            }
+            assert!(verify(&input).is_err(), "{field} substitution accepted");
+        }
+    }
 }
