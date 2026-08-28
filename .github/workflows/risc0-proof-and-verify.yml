@@ -1,0 +1,30 @@
+name: RISC Zero ZK-001 proof and verification
+
+on:
+  push:
+    paths:
+      - ".github/workflows/risc0-proof-and-verify.yml"
+      - "fixtures/zk/policy-evaluation-v0.1.0-draft.json"
+      - "spikes/zk-statement/risc0-policy-evaluation/**"
+      - "spikes/zk-statement/sp1-policy-evaluation/lib/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: risc0-zk-001-proof-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  prove-and-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: spikes/zk-statement/risc0-policy-evaluation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Build, prove, and independently verify the shared fixture
+        run: cargo run --release -p aichain-risc0-policy-evaluation-host -- ../../../fixtures/zk/policy-evaluation-v0.1.0-draft.json
