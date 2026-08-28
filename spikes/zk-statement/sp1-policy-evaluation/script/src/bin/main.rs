@@ -67,9 +67,18 @@ fn main() {
             aichain_zk_policy_core::verify(&invalid_private_input).is_err(),
             "invalid private witness passed the shared statement"
         );
+        let (invalid_output, _) = client
+            .execute(ELF, stdin_for(&invalid_private_input))
+            .run()
+            .expect("execute invalid SP1 guest input");
+        let invalid_public = serde_json::from_slice::<PublicValues>(invalid_output.as_slice());
         assert!(
-            client.execute(ELF, stdin_for(&invalid_private_input)).run().is_err(),
-            "SP1 guest accepted an invalid private witness"
+            invalid_public
+                .as_ref()
+                .ok()
+                .and_then(|actual| require_expected_public(actual, &input.expected_public).ok())
+                .is_none(),
+            "SP1 guest emitted public values accepted as the valid AVR binding"
         );
 
         let wrong_pk = client
