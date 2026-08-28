@@ -36,6 +36,6 @@ jobs:
       - name: Install RISC Zero guest toolchain
         run: |
           curl --fail --location --retry 3 https://risczero.com/install | bash
-          "$HOME/.risc0/bin/rzup" install rust
+          "$HOME/.risc0/bin/rzup" install
       - name: Build, prove, and independently verify the shared fixture
         run: cargo run --release -p aichain-risc0-policy-evaluation-host -- ../../../fixtures/zk/policy-evaluation-v0.1.0-draft.json
