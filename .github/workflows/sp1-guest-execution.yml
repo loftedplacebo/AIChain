@@ -11,6 +11,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: sp1-zk-001-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   execute-guest:
     runs-on: ubuntu-latest
