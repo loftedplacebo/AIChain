@@ -25,6 +25,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
+      - name: Install protocol-buffer compiler
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes protobuf-compiler
       - name: Install pinned SP1 distribution without GitHub API lookup
         run: |
           mkdir -p "$HOME/.sp1/bin" "$HOME/.sp1/toolchains" "$RUNNER_TEMP/aichain-sp1-toolchain"
