@@ -9,6 +9,7 @@ __pycache__/
 # Build outputs
 bin/
 build/
+/artifacts/zk/
 
 # Local network state and secrets
 /devnet/

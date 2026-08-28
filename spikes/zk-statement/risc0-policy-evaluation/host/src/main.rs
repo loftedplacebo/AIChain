@@ -2,8 +2,31 @@ use aichain_risc0_policy_evaluation_methods::{
     AICHAIN_RISC0_POLICY_EVALUATION_GUEST_ELF, AICHAIN_RISC0_POLICY_EVALUATION_GUEST_ID,
 };
 use aichain_zk_policy_core::{Input, PublicValues};
-use risc0_zkvm::{default_prover, ExecutorEnv};
+use risc0_ethereum_contracts::encode_seal;
+use risc0_zkvm::{
+    default_prover,
+    sha::{Digest, Digestible},
+    ExecutorEnv, ProverOpts,
+};
+use serde::Serialize;
 use std::{env, fs, time::Instant};
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct EvmExport {
+    format: &'static str,
+    stack: &'static str,
+    stack_version: &'static str,
+    statement_version: &'static str,
+    image_id: String,
+    journal: String,
+    journal_digest: String,
+    seal: String,
+    seal_bytes: usize,
+    journal_bytes: usize,
+    proving_elapsed_ms: u128,
+    receipt_id: String,
+}
 
 fn require_expected_public(actual: &PublicValues, expected: &PublicValues) -> Result<(), &'static str> {
     if actual == expected {
@@ -25,11 +48,42 @@ fn prove(input: &Input) -> risc0_zkvm::Receipt {
         .receipt
 }
 
+fn prove_groth16(input: &Input) -> risc0_zkvm::Receipt {
+    let execution_env = ExecutorEnv::builder()
+        .write(input)
+        .expect("encode private input")
+        .build()
+        .expect("build executor environment");
+    default_prover()
+        .prove_with_opts(
+            execution_env,
+            AICHAIN_RISC0_POLICY_EVALUATION_GUEST_ELF,
+            &ProverOpts::groth16(),
+        )
+        .expect("generate EVM-compatible RISC Zero Groth16 receipt")
+        .receipt
+}
+
+fn hex_bytes(bytes: &[u8]) -> String {
+    const HEX: &[u8; 16] = b"0123456789abcdef";
+    let mut value = String::with_capacity(2 + bytes.len() * 2);
+    value.push_str("0x");
+    for byte in bytes {
+        value.push(HEX[(byte >> 4) as usize] as char);
+        value.push(HEX[(byte & 0x0f) as usize] as char);
+    }
+    value
+}
+
+fn hex_digest(digest: &Digest) -> String {
+    format!("0x{digest}")
+}
+
 fn main() {
     let mut args = env::args().skip(1);
     let mode = args.next().unwrap_or_else(|| "--prove".to_string());
-    if mode != "--prove" && mode != "--security-tests" {
-        panic!("usage: aichain-risc0-policy-evaluation-host [--prove|--security-tests] [fixture]");
+    if mode != "--prove" && mode != "--security-tests" && mode != "--evm-export" {
+        panic!("usage: aichain-risc0-policy-evaluation-host [--prove|--security-tests|--evm-export] [fixture] [output]");
     }
     let fixture = args
         .next()
@@ -37,6 +91,47 @@ fn main() {
     let input: Input =
         serde_json::from_slice(&fs::read(&fixture).expect("read fixture")).expect("parse fixture");
     let started = Instant::now();
+    if mode == "--evm-export" {
+        let output_path = args
+            .next()
+            .unwrap_or_else(|| "aichain-risc0-evm-proof.json".to_string());
+        let receipt = prove_groth16(&input);
+        receipt
+            .verify(AICHAIN_RISC0_POLICY_EVALUATION_GUEST_ID)
+            .expect("independently verify exported Groth16 receipt");
+        let public: PublicValues = receipt.journal.decode().expect("decode Groth16 journal");
+        require_expected_public(&public, &input.expected_public)
+            .expect("Groth16 receipt/public fixture mismatch");
+        let seal = encode_seal(&receipt).expect("encode Groth16 seal for EVM");
+        let image_id = Digest::from(AICHAIN_RISC0_POLICY_EVALUATION_GUEST_ID);
+        let export = EvmExport {
+            format: "aichain.risc0-evm-proof-export",
+            stack: "risc0",
+            stack_version: "3.0.3",
+            statement_version: "0.1.0-draft",
+            image_id: hex_digest(&image_id),
+            journal: hex_bytes(&receipt.journal.bytes),
+            journal_digest: hex_digest(&receipt.journal.digest()),
+            seal: hex_bytes(&seal),
+            seal_bytes: seal.len(),
+            journal_bytes: receipt.journal.bytes.len(),
+            proving_elapsed_ms: started.elapsed().as_millis(),
+            receipt_id: public.receipt_id,
+        };
+        fs::write(
+            &output_path,
+            serde_json::to_vec_pretty(&export).expect("encode EVM proof export"),
+        )
+        .expect("write EVM proof export");
+        println!(
+            "{{\"stack\":\"risc0\",\"mode\":\"evm-export\",\"output\":\"{}\",\"elapsedMs\":{},\"sealBytes\":{},\"journalBytes\":{}}}",
+            output_path.replace('\\', "/"),
+            export.proving_elapsed_ms,
+            export.seal_bytes,
+            export.journal_bytes
+        );
+        return;
+    }
     let receipt = prove(&input);
     let public: PublicValues = receipt.journal.decode().expect("decode public journal");
     require_expected_public(&public, &input.expected_public).expect("receipt/public fixture mismatch");
