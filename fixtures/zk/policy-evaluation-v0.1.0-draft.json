@@ -1,0 +1,38 @@
+{
+  "statementVersion": "0.1.0-draft",
+  "publicMetadata": {
+    "issuer": "0x82f0165d1b77c69978e4127d347023680f685365",
+    "organizationId": "0x7550d2eadaa6602b06879e581f21ec46469c1325f4a5731e7db99ea9e677141a",
+    "authorityCommitment": "0x5a4e0654d0c7b9b2c8e3c40bae47e94b95b81aad794c5a7ccafa82a516b56bb4",
+    "claimedAtEpochSeconds": 1787421900
+  },
+  "privateWitness": {
+    "action": {"operation": "transfer", "resource": "research-budget", "amount": 750},
+    "configuration": {"enforceAmount": true, "enforceResource": true},
+    "policy": {
+      "allowedOperations": ["transfer"],
+      "allowedResources": ["research-budget"],
+      "maxAmount": 1000
+    },
+    "blindings": {
+      "input": "0x0101010101010101010101010101010101010101010101010101010101010101",
+      "output": "0x0202020202020202020202020202020202020202020202020202020202020202",
+      "configuration": "0x0303030303030303030303030303030303030303030303030303030303030303",
+      "policy": "0x0404040404040404040404040404040404040404040404040404040404040404"
+    },
+    "modelCommitment": "0x0505050505050505050505050505050505050505050505050505050505050505",
+    "providerCommitment": "0x0606060606060606060606060606060606060606060606060606060606060606"
+  },
+  "expectedPublic": {
+    "authorityCommitment": "0x5a4e0654d0c7b9b2c8e3c40bae47e94b95b81aad794c5a7ccafa82a516b56bb4",
+    "claimedAtEpochSeconds": 1787421900,
+    "commitmentsRoot": "0xf96933a7e5d46de2658f6d131e99b0f8b5904cbcf26bab45a7233f4af22ac6a1",
+    "decision": "allow",
+    "issuer": "0x82f0165d1b77c69978e4127d347023680f685365",
+    "organizationId": "0x7550d2eadaa6602b06879e581f21ec46469c1325f4a5731e7db99ea9e677141a",
+    "programCommitment": "0xed5bf71b45e018bf3e4ac2e85b71c947c590238381f275e55bfb74817c921143",
+    "receiptId": "0xde239d25bc76016b92256da94013ca347646522ea4faf7fbe57e22c6ec42b316",
+    "resultCommitment": "0x7fa827020d2c39667ad22f3157a5810f891216c83293cd098e19e019b0cbc506",
+    "statementId": "0xb2e610b6867e9bb7ca96d2205ddb84ed2809c46c5856167df0e4751a185c56c6"
+  }
+}

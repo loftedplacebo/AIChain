@@ -3,8 +3,8 @@
 | Field | Value |
 |---|---|
 | Status | Living design document |
-| Document version | 0.6 |
-| Last updated | 2026-08-22 |
+| Document version | 0.7 |
+| Last updated | 2026-08-28 |
 | Protocol/schema version | **TBD** |
 | Decision state | Product direction agreed; unresolved items are marked **TBD** |
 | Companion document | [Core L1 Architecture and Tooling](./core-l1-architecture-and-tooling.md) |
@@ -138,6 +138,12 @@ These are evaluation candidates, not selected components:
 
 Evaluation should cover proof-generation performance, on-chain verification cost, aggregation or recursion support, developer complexity, security maturity, tooling, and L1/EVM integration. No candidate should be presented as chosen until an explicit decision is recorded.
 
+### 6.3 First Evaluation Statement
+
+The first stack-comparison workload is the draft [private policy-evaluation statement](./zk-001-policy-evaluation-statement.md). It proves that committed private action, policy, and configuration values were evaluated by a versioned deterministic program and that the result is bound to an Authorised AVR.
+
+This resolves ZK-001 only for Phase 2B evaluation. Production finalisation, authority validation, aggregation, stack choice, and verifier integration remain open. See [ADR-0005](./decisions/0005-zk-001-policy-evaluation-statement.md).
+
 ## 7. Privacy Principles
 
 - Keep raw prompts, private context, outputs, credentials, and proprietary policy material off-chain.
@@ -228,7 +234,7 @@ For an unproved receipt, the `zk` section may be absent or may explicitly state 
 | AVR-004 | Attester identity, signature, authorization, revocation, and trust model | TBD |
 | AVR-005 | Timestamp sources and verification semantics | TBD |
 | AVR-006 | On-chain anchor format, events/indexing, and external data references | TBD |
-| ZK-001 | Exact statements and public inputs to prove | TBD |
+| ZK-001 | Exact statements and public inputs to prove | Phase 2B evaluation statement accepted: private policy evaluation `0.1.0-draft`; production finalisation TBD. See [ADR-0005](./decisions/0005-zk-001-policy-evaluation-statement.md). |
 | ZK-002 | ZK stack selection: RISC Zero, SP1, Halo2, or another evaluated option | TBD |
 | ZK-003 | Individual and aggregate proof design | TBD |
 | ZK-004 | On-chain verifier integration, cost limits, upgrades, and security review | TBD |
@@ -237,7 +243,7 @@ For an unproved receipt, the `zk` section may be absent or may explicitly state 
 | ID-001 | Identity model for organisations, agents, models, and machines | TBD |
 | ID-002 | Credential issuance, delegation, authorization, and revocation model | TBD |
 | ID-003 | Configuration, policy, and authority reference/registry model | TBD |
-| ZK-005 | Initial private policy/authority claims eligible for ZK evaluation | TBD |
+| ZK-005 | Initial private policy/authority claims eligible for ZK evaluation | Private policy/configuration evaluation selected for the first spike; authority is publicly bound but not proved. Further authority claims TBD. |
 | SCALE-001 | Receipt batching, aggregation, recursion, and throughput strategy | TBD |
 | SCALE-002 | Workload, confirmation-latency, block/state/indexer-growth, and capacity targets | TBD |
 | ARCH-002 | Enterprise deployment model | Agreed: Organisation Verification Ledger (OVL) plus AIChain anchoring is the default; customer-specific private L1 is deferred. See [ADR-0002](./decisions/0002-organisational-verification-ledger.md). |

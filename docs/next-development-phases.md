@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Active delivery roadmap |
-| Document version | 0.1 |
+| Document version | 0.2 |
 | Last updated | 2026-08-28 |
 | Starting point | Phase 1 complete; NVIDIA KawPoW/ASERT development validation complete |
 | Current constraint | No AMD GPU or additional independent GPU miners available |
@@ -11,7 +11,7 @@
 
 ## 1. Immediate Direction
 
-The next active phase is **Phase 2B: ZK statement and stack evaluation**. It can proceed on the laptop and VPS without another mining GPU and without changing the selected development consensus profile.
+The next active phase is **Phase 2B: ZK statement and stack evaluation**. ZK-001 is now defined for evaluation with a shared golden vector and reference implementations. The next task is implementing and benchmarking candidate proof stacks; it does not require another mining GPU.
 
 The following tasks are deferred—not waived—to the closed/public-testnet programme:
 
@@ -47,6 +47,8 @@ This deliberately does not claim that a frontier model reasoned correctly, that 
 4. Deterministic reference verification program.
 5. Positive, tampered, substituted, wrong-version, and replay test vectors.
 6. Threat model covering prover dishonesty, public-input substitution, verifier upgrades, and information leakage.
+
+Current status: items 1–6 have initial implementations for the `0.1.0-draft` evaluation statement. The threat model must be revisited against every real prover and verifier. See [ZK-001](./zk-001-policy-evaluation-statement.md), [Threat Model](./zk-001-threat-model.md), and [ADR-0005](./decisions/0005-zk-001-policy-evaluation-statement.md).
 
 ### Exit gate
 
