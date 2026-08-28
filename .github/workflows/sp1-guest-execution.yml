@@ -1,0 +1,29 @@
+name: SP1 ZK-001 guest execution
+
+on:
+  push:
+    paths:
+      - ".github/workflows/sp1-guest-execution.yml"
+      - "fixtures/zk/policy-evaluation-v0.1.0-draft.json"
+      - "spikes/zk-statement/sp1-policy-evaluation/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  execute-guest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: spikes/zk-statement/sp1-policy-evaluation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Install SP1 CLI
+        run: cargo install sp1-cli --version 6.5.0 --locked
+      - name: Install SP1 guest toolchain
+        run: cargo prove install-toolchain
+      - name: Execute the ZK-001 guest against the golden fixture
+        run: cargo run --release -p aichain-sp1-policy-evaluation-script -- ../../../fixtures/zk/policy-evaluation-v0.1.0-draft.json
