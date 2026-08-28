@@ -1,0 +1,18 @@
+[package]
+name = "aichain-sp1-policy-evaluation-script"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[[bin]]
+name = "aichain-sp1-policy-evaluation"
+path = "src/bin/main.rs"
+
+[dependencies]
+aichain-zk-policy-core = { path = "../lib" }
+serde_json = "1.0"
+sp1-sdk = { version = "=6.5.0", features = ["blocking"] }
+
+[build-dependencies]
+sp1-build = "=6.5.0"
+

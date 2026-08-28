@@ -6,6 +6,7 @@ on:
       - ".github/workflows/zk-reference.yml"
       - "fixtures/zk/**"
       - "spikes/zk-statement/**"
+      - "spikes/zk-statement/sp1-policy-evaluation/**"
       - "sdk/go/zkpolicystatement/**"
       - "sdk/typescript/**"
   pull_request:
@@ -13,6 +14,7 @@ on:
       - ".github/workflows/zk-reference.yml"
       - "fixtures/zk/**"
       - "spikes/zk-statement/**"
+      - "spikes/zk-statement/sp1-policy-evaluation/**"
       - "sdk/go/zkpolicystatement/**"
       - "sdk/typescript/**"
   workflow_dispatch:
@@ -35,6 +37,7 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version-file: sdk/go/go.mod
+      - uses: dtolnay/rust-toolchain@stable
       - name: Python reference tests
         run: python -m unittest discover -s spikes/zk-statement/python -p 'test_*.py'
       - name: TypeScript SDK tests
@@ -44,3 +47,6 @@ jobs:
       - name: Go SDK tests
         working-directory: sdk/go
         run: go test ./...
+      - name: Rust ZK-001 semantic-core tests
+        working-directory: spikes/zk-statement/sp1-policy-evaluation
+        run: cargo test -p aichain-zk-policy-core

@@ -1,0 +1,11 @@
+[package]
+name = "aichain-sp1-policy-evaluation-program"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+aichain-zk-policy-core = { path = "../lib" }
+serde_json = "1.0"
+sp1-zkvm = "=6.5.0"
+
