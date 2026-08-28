@@ -1,14 +1,34 @@
 use aichain_zk_policy_core::{Input, PublicValues};
+use serde::Serialize;
 use sp1_sdk::{
     blocking::{ProveRequest, Prover, ProverClient},
-    include_elf, Elf, ProvingKey, SP1PublicValues, SP1Stdin,
+    include_elf, Elf, HashableKey, ProvingKey, SP1PublicValues, SP1Stdin,
 };
-use std::{env, fs, time::Instant};
+use std::{env, fs, path::Path, time::Instant};
 
 const ELF: Elf = include_elf!("aichain-sp1-policy-evaluation-program");
 const WRONG_KEY_ELF: Elf = include_elf!("aichain-sp1-policy-evaluation-wrong-key-program");
 
-fn require_expected_public(actual: &PublicValues, expected: &PublicValues) -> Result<(), &'static str> {
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct EvmExport<'a> {
+    format: &'static str,
+    stack: &'static str,
+    stack_version: &'static str,
+    statement_version: &'static str,
+    verifier_key: String,
+    public_values: String,
+    proof: String,
+    proof_bytes: usize,
+    public_values_bytes: usize,
+    proving_elapsed_ms: u128,
+    receipt_id: &'a str,
+}
+
+fn require_expected_public(
+    actual: &PublicValues,
+    expected: &PublicValues,
+) -> Result<(), &'static str> {
     if actual == expected {
         Ok(())
     } else {
@@ -25,8 +45,12 @@ fn stdin_for(input: &Input) -> SP1Stdin {
 fn main() {
     let mut args = env::args().skip(1);
     let mode = args.next().unwrap_or_else(|| "--execute".to_string());
-    if mode != "--execute" && mode != "--prove" && mode != "--security-tests" {
-        panic!("usage: aichain-sp1-policy-evaluation [--execute|--prove|--security-tests] [fixture]");
+    if mode != "--execute"
+        && mode != "--prove"
+        && mode != "--security-tests"
+        && mode != "--evm-export"
+    {
+        panic!("usage: aichain-sp1-policy-evaluation [--execute|--prove|--security-tests|--evm-export] [fixture] [export-path]");
     }
     let fixture = args
         .next()
@@ -36,7 +60,10 @@ fn main() {
     let client = ProverClient::from_env();
     let started = Instant::now();
     if mode == "--execute" {
-        let (output, report) = client.execute(ELF, stdin_for(&input)).run().expect("execute SP1 guest");
+        let (output, report) = client
+            .execute(ELF, stdin_for(&input))
+            .run()
+            .expect("execute SP1 guest");
         let public: PublicValues =
             serde_json::from_slice(output.as_slice()).expect("decode public values");
         require_expected_public(&public, &input.expected_public)
@@ -45,16 +72,61 @@ fn main() {
         return;
     }
     let pk = client.setup(ELF).expect("set up SP1 program");
-    let proof = client
-        .prove(&pk, stdin_for(&input))
-        .run()
-        .expect("generate SP1 proof");
+    let proof = if mode == "--evm-export" {
+        client
+            .prove(&pk, stdin_for(&input))
+            .groth16()
+            .run()
+            .expect("generate SP1 Groth16 proof")
+    } else {
+        client
+            .prove(&pk, stdin_for(&input))
+            .run()
+            .expect("generate SP1 proof")
+    };
     client
         .verify(&proof, pk.verifying_key(), None)
         .expect("independently verify SP1 proof");
     let public: PublicValues =
         serde_json::from_slice(proof.public_values.as_slice()).expect("decode proof public values");
-    require_expected_public(&public, &input.expected_public).expect("proof/public fixture mismatch");
+    require_expected_public(&public, &input.expected_public)
+        .expect("proof/public fixture mismatch");
+    if mode == "--evm-export" {
+        let output_path = args.next().expect("--evm-export requires an export path");
+        let proof_bytes = proof.bytes();
+        let public_values = proof.public_values.to_vec();
+        let export = EvmExport {
+            format: "sp1-groth16-evm-v1",
+            stack: "sp1",
+            stack_version: "6.5.0",
+            statement_version: "ZK-001-v0.1.0-draft",
+            verifier_key: pk.verifying_key().bytes32(),
+            public_values: format!("0x{}", hex::encode(&public_values)),
+            proof: format!("0x{}", hex::encode(&proof_bytes)),
+            proof_bytes: proof_bytes.len(),
+            public_values_bytes: public_values.len(),
+            proving_elapsed_ms: started.elapsed().as_millis(),
+            receipt_id: &public.receipt_id,
+        };
+        if let Some(parent) = Path::new(&output_path).parent() {
+            fs::create_dir_all(parent).expect("create SP1 EVM export directory");
+        }
+        fs::write(
+            &output_path,
+            serde_json::to_vec_pretty(&export).expect("encode SP1 EVM export"),
+        )
+        .expect("write SP1 EVM export");
+        println!(
+            "{{\"stack\":\"sp1\",\"mode\":\"groth16-evm-export\",\"fixture\":\"{}\",\"export\":\"{}\",\"elapsedMs\":{},\"proofBytes\":{},\"publicValuesBytes\":{},\"receiptId\":\"{}\"}}",
+            fixture.replace('\\', "/"),
+            output_path.replace('\\', "/"),
+            export.proving_elapsed_ms,
+            export.proof_bytes,
+            export.public_values_bytes,
+            export.receipt_id
+        );
+        return;
+    }
     if mode == "--security-tests" {
         let mut invalid_private_input = input.clone();
         invalid_private_input.private_witness.action.amount = invalid_private_input
@@ -85,7 +157,9 @@ fn main() {
             .setup(WRONG_KEY_ELF)
             .expect("set up distinct negative-test program");
         assert!(
-            client.verify(&proof, wrong_pk.verifying_key(), None).is_err(),
+            client
+                .verify(&proof, wrong_pk.verifying_key(), None)
+                .is_err(),
             "SP1 proof verified under a different program verification key"
         );
 
@@ -98,7 +172,9 @@ fn main() {
         tampered_public_values[0] ^= 1;
         tampered_proof.public_values = SP1PublicValues::from(tampered_public_values.as_slice());
         assert!(
-            client.verify(&tampered_proof, pk.verifying_key(), None).is_err(),
+            client
+                .verify(&tampered_proof, pk.verifying_key(), None)
+                .is_err(),
             "SP1 verifier accepted tampered committed public values"
         );
 
