@@ -21,9 +21,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
-      - name: Install SP1 CLI
-        run: cargo install sp1-cli --version 6.5.0 --locked
-      - name: Install SP1 guest toolchain
-        run: cargo prove install-toolchain
+      - name: Install pinned SP1 distribution
+        env:
+          SP1_DIR: ${{ runner.temp }}/aichain-sp1
+        run: |
+          curl -L https://sp1up.succinct.xyz | bash
+          "$SP1_DIR/bin/sp1up" --version v6.5.0
+          echo "$SP1_DIR/bin" >> "$GITHUB_PATH"
       - name: Execute the ZK-001 guest against the golden fixture
-        run: cargo run --release -p aichain-sp1-policy-evaluation-script -- ../../../fixtures/zk/policy-evaluation-v0.1.0-draft.json
+        run: |
+          cargo prove --version
+          cargo run --release -p aichain-sp1-policy-evaluation-script -- ../../../fixtures/zk/policy-evaluation-v0.1.0-draft.json
