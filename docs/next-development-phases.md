@@ -3,15 +3,15 @@
 | Field | Value |
 |---|---|
 | Status | Active delivery roadmap |
-| Document version | 0.2 |
-| Last updated | 2026-08-28 |
+| Document version | 0.3 |
+| Last updated | 2026-08-29 |
 | Starting point | Phase 1 complete; NVIDIA KawPoW/ASERT development validation complete |
 | Current constraint | No AMD GPU or additional independent GPU miners available |
 | Principle | Continue software/product work now; move hardware-diversity and multi-miner tests to the testnet gates |
 
 ## 1. Immediate Direction
 
-The next active phase is **Phase 2B: ZK statement and stack evaluation**. ZK-001 is now defined for evaluation with a shared golden vector and reference implementations. The next task is implementing and benchmarking candidate proof stacks; it does not require another mining GPU.
+The active work remains **Phase 2C: ZK stack evaluation**. ZK-001, native SP1/RISC Zero proofs, security negatives, byte-identical public values, and disposable EVM verifier trials are complete. The next task is the repeated benchmark and ZK-002–004 decision package; it does not require another mining GPU.
 
 The following tasks are deferred—not waived—to the closed/public-testnet programme:
 
@@ -91,6 +91,8 @@ These remain evaluation candidates, not settled choices.
 
 - **ZK-002–004** are resolved to alpha scope.
 - A valid proof verifies on-chain and all required negative vectors fail.
+
+Current status: the interoperability portion of this exit gate is complete for SP1 and RISC Zero. The benchmark sample, stack recommendation, aggregation scope, and verifier/upgrade decisions remain open. See [Phase 2C EVM Verifier Evidence](./phase-2c-evm-verifier-evidence.md).
 
 ## 4. Phase 2D — AVR Product and Scale Foundation
 
@@ -216,19 +218,19 @@ Bridge confirmation rules must be materially stricter than ordinary AVR confirma
 
 ## 10. Immediate Next Task
 
-Create the **ZK-001 Proof Statement Specification** containing:
+Execute the **Phase 2B repeated benchmark and decision package**:
 
-- the exact claim;
-- public and private inputs;
-- commitment/domain-separation rules;
-- assurance boundary and non-claims;
-- positive/negative fixtures; and
-- benchmark acceptance criteria for RISC Zero, SP1, and Halo2.
+- five warm-ups and at least ten measured proofs per viable candidate;
+- median, p95, minimum, maximum, and exact peak-memory results;
+- trusted-setup, audit, verifier-governance, and upgrade review;
+- an explicit alpha aggregation decision; and
+- the ZK-002 stack recommendation without overstating the ZK-001 claim.
 
-This is the highest-value task that does not depend on additional mining hardware.
+This is the highest-value remaining Phase 2 task that does not depend on additional mining hardware.
 
 ## 11. Change Log
 
 | Version | Date | Change |
 |---|---|---|
 | 0.1 | 2026-08-28 | Deferred hardware-diversity tests to testnet and mapped ZK, AVR, alpha, testnet, and asset phases |
+| 0.3 | 2026-08-29 | Recorded Phase 2C SP1/RISC Zero EVM interoperability and made the repeated benchmark/decision package the immediate task |

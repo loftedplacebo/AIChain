@@ -1,0 +1,77 @@
+{
+  "schemaVersion": "aichain.zk.evm-evidence.v1",
+  "evidenceDate": "2026-08-29",
+  "status": "interoperability-complete-production-selection-open",
+  "statement": "ZK-001-policy-evaluation-0.1.0-draft",
+  "fixture": "fixtures/zk/policy-evaluation-v0.1.0-draft.json",
+  "environment": {
+    "chain": "anvil-disposable",
+    "chainId": 31337,
+    "bind": "127.0.0.1:9545",
+    "foundryVersion": "1.7.1",
+    "cpu": "12-vCPU AMD EPYC virtual machine",
+    "memoryGiB": 47
+  },
+  "sharedPublicValues": {
+    "byteIdentical": true,
+    "bytes": 714,
+    "receiptId": "0xde239d25bc76016b92256da94013ca347646522ea4faf7fbe57e22c6ec42b316"
+  },
+  "candidates": {
+    "risc0": {
+      "sdkVersion": "3.0.3",
+      "evmContractsVersion": "3.0.0",
+      "verifierSourceTag": "v3.0.0",
+      "verifierSourceCommit": "32aa0b6f23ddd02dd93fc71717667606e5c7db86",
+      "proofBytes": 260,
+      "publicValuesBytes": 714,
+      "proofElapsedMs": 149230,
+      "wrapperWallSeconds": 151.39,
+      "maxRssKiB": 4799064,
+      "verificationGasUsed": 250152,
+      "verificationGasEstimate": 256152,
+      "verifierDeploymentGas": 1258873,
+      "verifierRuntimeBytes": 5313,
+      "verificationTransaction": "0x2d878865d88f768dfd5969675a5b3f2a6a558085f034f1d2817df60b1e7b6f4c",
+      "negativeTests": {
+        "alteredProof": "rejected",
+        "wrongImageId": "rejected",
+        "alteredJournal": "rejected"
+      }
+    },
+    "sp1": {
+      "sdkVersion": "6.5.0",
+      "circuitVersion": "v6.1.0",
+      "verifierSourceTag": "v6.1.1",
+      "verifierSourceCommit": "d3629729c3216eb51bd4859d027a8eb729399fa4",
+      "proofBytes": 356,
+      "publicValuesBytes": 714,
+      "firstAcceptedProofElapsedMs": 1692686,
+      "warmProofElapsedMs": 475035,
+      "warmWrapperWallSeconds": 502.94,
+      "warmMaxRssKiB": 19060372,
+      "verificationGasUsed": 263715,
+      "verificationGasEstimate": 269910,
+      "warmVerificationGasEstimate": 269922,
+      "verifierDeploymentGas": 2634905,
+      "verifierRuntimeBytes": 11974,
+      "verificationTransaction": "0xd51ed66b57a851ce147399026f78f25225f044d9f51ef7f48057904a8c7d9e38",
+      "negativeTests": {
+        "alteredProof": "rejected",
+        "wrongVerifierKey": "rejected",
+        "alteredPublicValues": "rejected"
+      }
+    }
+  },
+  "decisionState": {
+    "zk002StackSelection": "TBD",
+    "zk003Aggregation": "TBD",
+    "zk004VerifierAndUpgrades": "TBD",
+    "halo2": "deferred-under-existing-feasibility-gate"
+  },
+  "limitations": [
+    "Single-host feasibility evidence is not the repeated Phase 2B production benchmark sample.",
+    "No production verifier deployment or stack selection is represented.",
+    "Trusted setup, audit, upgrade governance, aggregation, and operational queueing remain open gates."
+  ]
+}

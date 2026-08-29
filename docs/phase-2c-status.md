@@ -2,9 +2,9 @@
 
 | Field | Value |
 |---|---|
-| Status | In progress |
+| Status | Candidate interoperability complete; production benchmark gate remains open |
 | Evaluation statement | ZK-001 policy evaluation `0.1.0-draft` |
-| Last updated | 2026-08-28 |
+| Last updated | 2026-08-29 |
 
 ## SP1
 
@@ -13,13 +13,14 @@
 - Guest: implemented; reconstructs the receipt ID, commitments root, result commitment, identity bindings, statement ID, and program commitment from the witness before committing public values.
 - Guest execution and native proof/verification workflows: completed successfully. The evidence is recorded in [Phase 2C Native Proof Evidence](./phase-2c-native-proof-evidence.md).
 - Proof-public-value binding: the host runner decodes the verified proof journal and requires an exact match with the shared fixture.
-- EVM verifier export, Solidity deployment, gas measurements, and cryptographic negative-proof verification: not yet complete.
+- Groth16 EVM export, official Solidity verifier deployment, gas measurement, and on-chain negative tests: completed. See [Phase 2C EVM Verifier Evidence](./phase-2c-evm-verifier-evidence.md).
 
 ## RISC Zero
 
 - Candidate baseline: stable `3.0.3`.
 - Adapter and host harness: implemented, using the same Rust semantic core and fixture as SP1. The host requires an exact public-journal match and independently verifies the receipt.
-- Native receipt generation and independent verification: completed successfully. The evidence is recorded in [Phase 2C Native Proof Evidence](./phase-2c-native-proof-evidence.md). EVM integration has not started.
+- Native receipt generation and independent verification: completed successfully. The evidence is recorded in [Phase 2C Native Proof Evidence](./phase-2c-native-proof-evidence.md).
+- Groth16 EVM export, official Solidity verifier deployment, gas measurement, and on-chain negative tests: completed. See [Phase 2C EVM Verifier Evidence](./phase-2c-evm-verifier-evidence.md).
 
 ## Halo2
 
@@ -28,4 +29,4 @@
 
 ## Evidence Discipline
 
-No system is selected. A successful guest execution proves only that the zkVM can execute the agreed program and emit the expected public values. A stack becomes viable for alpha only after cryptographic proof generation, independent verification, binding/substitution negatives, an EVM verifier demonstration, measurements, and security/privacy review.
+No system is selected. Both zkVM candidates have crossed the prototype interoperability gate, including byte-identical public values and real EVM verification. Production selection still requires the repeated benchmark sample defined in the Phase 2B plan, security/privacy and verifier-upgrade review, trusted-setup assessment, and an explicit ZK-002 decision.

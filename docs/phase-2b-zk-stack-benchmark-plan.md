@@ -2,14 +2,16 @@
 
 | Field | Value |
 |---|---|
-| Status | Ready for implementation |
+| Status | Interoperability snapshot complete; repeated production sample pending |
 | Workload | ZK-001 policy evaluation `0.1.0-draft` |
 | Candidates | RISC Zero, SP1, Halo2 |
-| Last updated | 2026-08-28 |
+| Last updated | 2026-08-29 |
 
 ## Purpose
 
 Compare proof systems using the same claim, fixture, public inputs, host hardware, and acceptance tests. No candidate is selected by this plan.
+
+The first single-run EVM interoperability snapshot is recorded in [Phase 2C EVM Verifier Evidence](./phase-2c-evm-verifier-evidence.md). It proves the harness and verifier paths work; it does not replace the repeated measurement protocol below.
 
 ## Required Candidate Prototype
 
@@ -41,4 +43,3 @@ Run five warm-ups and at least ten measured proofs per candidate on the same mac
 ## Acceptance Gate
 
 A recommendation requires reproducible results, exact golden-vector agreement, all negative vectors passing, a disposable EVM-chain verifier demonstration, and an explicit assurance/privacy review. The recommendation must separate measured facts from engineering judgment and keep ZK-003 aggregation scope explicit.
-

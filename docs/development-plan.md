@@ -3,12 +3,12 @@
 | Field | Value |
 |---|---|
 | Status | Living delivery plan |
-| Document version | 0.13 |
-| Last updated | 2026-08-28 |
+| Document version | 0.14 |
+| Last updated | 2026-08-29 |
 | Architecture inputs | [Core L1 Architecture and Tooling](./core-l1-architecture-and-tooling.md); [AI Verification & ZK Architecture](./ai-verification-and-zk-architecture.md) |
 | Schedule | Dates, durations, staffing, and owners are **TBD** |
 | Decision state | This plan sequences open decisions; it does not settle them |
-| Delivery status | Phase 1 complete; Phase 2A NVIDIA and isolated ASERT validation complete; AMD/multi-miner work deferred to testnet; Phase 2B ZK-001 reference statement implemented and stack evaluation is next |
+| Delivery status | Phase 1 complete; Phase 2A NVIDIA and isolated ASERT validation complete; AMD/multi-miner work deferred to testnet; Phase 2C SP1/RISC Zero EVM interoperability complete; repeated benchmark and ZK-002 decision remain open |
 
 ## 1. Objective
 
@@ -159,7 +159,9 @@ Security, privacy, compatibility, documentation, and operations run across every
 
 **Goal:** Select a ZK approach against precise AVR claims and measurable requirements.
 
-**Next active work:** specify and evaluate one narrow deterministic wrapper claim first: a committed receipt action was evaluated against a committed policy/configuration under a versioned rule set. This is not a claim of frontier-model inference correctness.
+**Current status:** ZK-001 `0.1.0-draft`, its shared fixture, native security tests, SP1/RISC Zero Groth16 exports, byte-identical public values, and official-verifier EVM trials are complete. See [Phase 2C Status](./phase-2c-status.md) and [EVM Verifier Evidence](./phase-2c-evm-verifier-evidence.md).
+
+**Next active work:** execute the repeated benchmark protocol, review trusted setup and verifier governance/upgrades, decide initial aggregation scope, then record ZK-002–004. This is not a claim of frontier-model inference correctness.
 
 **Primary outputs**
 
@@ -353,5 +355,6 @@ This is a development-validation milestone, not a final AVR protocol release. **
 | 0.10 | 2026-08-25 | Completed the deterministic difficulty matrix and conditionally selected 10-second/30-minute ASERT for isolated node integration | [Difficulty Simulation Results](./phase-2a-difficulty-simulation-results.md) |
 | 0.11 | 2026-08-28 | Completed isolated ASERT implementation and live 5/10/15-second three-machine validation, including soak, catch-up, restarts, reorg, rejection paths, and AVR load | [ASERT Live Validation](./phase-2a-asert-live-validation.md) |
 | 0.12 | 2026-08-28 | Deferred AMD/OpenCL and geographically distributed multi-miner tests to the testnet gates; made ZK-001 the active task and mapped the alpha/testnet/asset sequence | [Next Development Phases](./next-development-phases.md) |
+| 0.14 | 2026-08-29 | Recorded SP1/RISC Zero native security and EVM verifier interoperability, while leaving repeated benchmarks and ZK-002–004 open | [Phase 2C EVM Verifier Evidence](./phase-2c-evm-verifier-evidence.md) |
 | 0.1 | 2026-08-18 | Initial phased development plan | Architecture documents v0.1 |
 | X.Y | YYYY-MM-DD | Describe the change | Decision ID or link |

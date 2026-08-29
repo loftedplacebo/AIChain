@@ -14,6 +14,8 @@
 | SP1 `6.5.0` | Guest execution and exact public-value comparison | Success | 10m 50s | 10m 04s | [GitHub Actions run 33174016401](https://github.com/loftedplacebo/AIChain/actions/runs/33174016401) |
 | SP1 `6.5.0` | Native proof generation, independent verification, and exact proof-public-value comparison | Success | 11m 19s | 10m 06s | [GitHub Actions run 33174016376](https://github.com/loftedplacebo/AIChain/actions/runs/33174016376) |
 | RISC Zero `3.0.3` | Native receipt generation, independent verification, and exact journal-public-value comparison | Success | 9m 01s | 7m 50s | [GitHub Actions run 33174125313](https://github.com/loftedplacebo/AIChain/actions/runs/33174125313) |
+| SP1 `6.5.0` | Invalid witness, wrong verifier key, tampered public values, and wrong receipt binding | Success | 10m 35s | Included in proof workflow | [GitHub Actions run 33208474701](https://github.com/loftedplacebo/AIChain/actions/runs/33208474701) |
+| RISC Zero `3.0.3` | Invalid witness, wrong image ID, tampered journal, and wrong receipt binding | Success | 10m 47s | Included in proof workflow | [GitHub Actions run 33206774076](https://github.com/loftedplacebo/AIChain/actions/runs/33206774076) |
 
 The workflow durations include fresh-runner setup, dependency compilation, guest compilation, and toolchain installation. They are evidence of successful interoperability, not comparable proving-time benchmarks.
 
@@ -26,11 +28,10 @@ The workflow durations include fresh-runner setup, dependency compilation, guest
 
 ## What remains unproved
 
-- Tampered-proof, wrong-key, wrong-receipt, and proof-substitution rejection at the cryptographic layer.
-- Comparable warm-cache proving time, proof size, peak memory, and verifier latency.
-- EVM-compatible proof generation, Solidity verification, deployment, or gas cost.
+- The five-warm-up and ten-measured-proof sample required for a production stack recommendation.
+- Formal verifier latency distribution, dependency/build-size comparison, and repeated peak-memory distribution.
 - Aggregation, production security, trusted-setup policy, or a final stack selection.
 
 ## Next gate
 
-Implement the cryptographic negative-proof suite for both candidates. Only after those tests pass should either candidate advance to an EVM verifier trial.
+The native negative-proof gate and EVM verifier trial are complete. Continue with the repeated benchmark, assurance/privacy review, verifier governance and upgrade design, trusted-setup assessment, and an explicit ZK-002 stack decision. See [Phase 2C EVM Verifier Evidence](./phase-2c-evm-verifier-evidence.md).
