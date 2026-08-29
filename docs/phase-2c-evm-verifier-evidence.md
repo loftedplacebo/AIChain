@@ -59,6 +59,14 @@ The candidate-reported proof elapsed excludes the preceding cold Rust release co
 
 Addresses and transaction hashes belong only to the disposable local chain and are evidence identifiers, not production deployments.
 
+## Repository validation
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Aligned RISC Zero proof, independent verification, and native security negatives | Success | [GitHub Actions run 33237911170](https://github.com/loftedplacebo/AIChain/actions/runs/33237911170) |
+| SP1 proof, independent verification, native security negatives, and EVM-export compilation | Success | [GitHub Actions run 33211403991](https://github.com/loftedplacebo/AIChain/actions/runs/33211403991) |
+| Shared ZK reference conformance after encoding alignment | Success | [GitHub Actions run 33237911166](https://github.com/loftedplacebo/AIChain/actions/runs/33237911166) |
+
 ## Negative evidence
 
 | Stack | Altered proof | Wrong program/image | Altered public values/journal | Result |

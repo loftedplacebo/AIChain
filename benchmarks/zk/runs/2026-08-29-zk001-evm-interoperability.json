@@ -17,6 +17,11 @@
     "bytes": 714,
     "receiptId": "0xde239d25bc76016b92256da94013ca347646522ea4faf7fbe57e22c6ec42b316"
   },
+  "ci": {
+    "risc0ProofAndSecurity": "https://github.com/loftedplacebo/AIChain/actions/runs/33237911170",
+    "sp1ProofSecurityAndExportCompile": "https://github.com/loftedplacebo/AIChain/actions/runs/33211403991",
+    "sharedReferenceConformance": "https://github.com/loftedplacebo/AIChain/actions/runs/33237911166"
+  },
   "candidates": {
     "risc0": {
       "sdkVersion": "3.0.3",
