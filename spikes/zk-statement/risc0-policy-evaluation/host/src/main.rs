@@ -28,7 +28,10 @@ struct EvmExport {
     receipt_id: String,
 }
 
-fn require_expected_public(actual: &PublicValues, expected: &PublicValues) -> Result<(), &'static str> {
+fn require_expected_public(
+    actual: &PublicValues,
+    expected: &PublicValues,
+) -> Result<(), &'static str> {
     if actual == expected {
         Ok(())
     } else {
@@ -99,7 +102,8 @@ fn main() {
         receipt
             .verify(AICHAIN_RISC0_POLICY_EVALUATION_GUEST_ID)
             .expect("independently verify exported Groth16 receipt");
-        let public: PublicValues = receipt.journal.decode().expect("decode Groth16 journal");
+        let public: PublicValues = serde_json::from_slice(&receipt.journal.bytes)
+            .expect("decode Groth16 public JSON journal");
         require_expected_public(&public, &input.expected_public)
             .expect("Groth16 receipt/public fixture mismatch");
         let seal = encode_seal(&receipt).expect("encode Groth16 seal for EVM");
@@ -133,8 +137,10 @@ fn main() {
         return;
     }
     let receipt = prove(&input);
-    let public: PublicValues = receipt.journal.decode().expect("decode public journal");
-    require_expected_public(&public, &input.expected_public).expect("receipt/public fixture mismatch");
+    let public: PublicValues =
+        serde_json::from_slice(&receipt.journal.bytes).expect("decode public JSON journal");
+    require_expected_public(&public, &input.expected_public)
+        .expect("receipt/public fixture mismatch");
     receipt
         .verify(AICHAIN_RISC0_POLICY_EVALUATION_GUEST_ID)
         .expect("independently verify RISC Zero receipt");
