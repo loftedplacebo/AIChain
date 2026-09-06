@@ -24,7 +24,7 @@ Protected assets are the privacy of the action, policy, configuration, and reaso
 | False authority/provenance inference | Documentation states organisation and authority are bindings only | UI/API must not label these properties “verified” without separate checks |
 | Timestamp overclaim | Timestamp is explicitly described as claimed | Compose with inclusion-time and trusted-time evidence where required |
 | Model/provider overclaim | Commitments are opaque and unopened | Separate provenance statements or attestations |
-| Verifier upgrade attack | Program commitment is explicit | Governance, allowlist, timelock, rollback, and historical-verifier policy under ZK-004 |
+| Verifier upgrade attack | Program commitment is explicit | Alpha mitigation: immutable version IDs, 48-hour scheduled activation, distinct guardian, pause/retirement, and historical digest records under ADR-0008; independent review and operations rehearsal remain required |
 | Unsound or compromised proof stack | No stack selected | Security maturity review, independent audit, pinned reproducible toolchains |
 | Prover side channels | Not addressed by semantic reference | Benchmark and document memory, logs, crash artifacts, and hardware isolation |
 | Verification/proving denial of service | Narrow bounded statement and fixed input shape | Measure gas, cap proof/input sizes, queue/rate-limit proving and submission |
@@ -38,4 +38,3 @@ Every candidate must reject altered action, policy, configuration, decision/resu
 ## Residual Risk
 
 The reference programs test semantic agreement only; they are not zero-knowledge proofs. Until a candidate prover and verifier pass the benchmark, negative vectors, privacy review, and security review, no receipt may be described as ZK-proved by this project.
-

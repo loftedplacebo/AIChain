@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | RISC Zero selected for initial ZK-001 implementation; release hardening remains open |
+| Status | ZK-001–004 alpha scope complete; public-release review and deployment gates remain open |
 | Evaluation statement | ZK-001 policy evaluation `0.1.0-draft` |
 | Last updated | 2026-08-29 |
 
@@ -38,11 +38,16 @@ ZK-003 is also resolved for alpha: individual proofs may be grouped in
 proof-aware Merkle batches, while recursive aggregation is deferred. See
 [ADR-0007](./decisions/0007-zk-003-individual-proof-batches.md).
 
+ZK-004 is resolved for alpha by an immutable version registry and pinned RISC
+Zero adapter with a 48-hour activation delay, resource caps, separate owner and
+guardian, pause, and permanent retirement paths. See
+[ADR-0008](./decisions/0008-zk-004-verifier-governance-and-limits.md).
+
 ## Evidence Discipline
 
 Both zkVM candidates crossed the prototype interoperability gate, including
 byte-identical public values and real EVM verification. RISC Zero is selected
-for the initial ZK-001 implementation. Production release still requires the
-remaining security/privacy, verifier-governance, trusted-setup, versioning,
-resource-limit, and any future aggregation work described in ADR-0006 and
-ADR-0007.
+for the initial ZK-001 implementation and the alpha verifier lifecycle is
+defined. Public release still requires independent security review, a real
+pinned-adapter deployment, operational rehearsal, public-input encoding review,
+and load evidence described in ADR-0008.

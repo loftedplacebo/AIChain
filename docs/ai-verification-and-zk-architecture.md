@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Living design document |
-| Document version | 1.0 |
+| Document version | 1.1 |
 | Last updated | 2026-09-06 |
 | Protocol/schema version | **TBD** |
 | Decision state | Product direction agreed; unresolved items are marked **TBD** |
@@ -25,7 +25,7 @@ AI inference and agent execution remain off-chain. The chain records the verific
 | Committed context | Model, provider, configuration, and policy; input/output artifacts as applicable | Agreed direction; schema TBD |
 | ZK proofs | Optional; individual and aggregated proofs may be supported | Agreed direction; design TBD |
 | Proof generation | Off-chain | Agreed |
-| Proof verification | On-chain | Agreed; verifier interface TBD |
+| Proof verification | On-chain | Alpha lifecycle and RISC Zero adapter accepted; see ADR-0008 |
 | Privacy | Minimize public data and keep sensitive AI content off-chain | Agreed principle |
 | Initial ZK stack | RISC Zero | Selected for the initial ZK-001 AVR proof implementation; see ADR-0006 |
 
@@ -124,7 +124,7 @@ A block timestamp establishes inclusion under the chain's rules; by itself, it d
 
 A ZK proof establishes only the statement encoded by its program or circuit and the inputs bound to that statement. It does not establish broader AI correctness unless that property is explicitly represented and proved.
 
-Receipts without proofs remain possible, but have a different assurance level. For alpha, the selected mode is an individual RISC Zero proof with optional proof-aware Merkle batching. The prover role, final verifier interface, resource limits, upgrade policy, and any future recursive aggregation design remain **TBD**.
+Receipts without proofs remain possible, but have a different assurance level. For alpha, the selected mode is an individual RISC Zero proof with optional proof-aware Merkle batching. The version lifecycle, resource envelope, and adapter boundary are defined in ADR-0008; public-release review, deployment configuration, and any future recursive aggregation design remain open.
 
 ### 6.1.1 Initial Proof-Batching Scope
 
@@ -249,7 +249,7 @@ For an unproved receipt, the `zk` section may be absent or may explicitly state 
 | ZK-001 | Exact statements and public inputs to prove | Phase 2B evaluation statement accepted: private policy evaluation `0.1.0-draft`; production finalisation TBD. See [ADR-0005](./decisions/0005-zk-001-policy-evaluation-statement.md). |
 | ZK-002 | ZK stack selection: RISC Zero, SP1, Halo2, or another evaluated option | Resolved: RISC Zero selected for the initial ZK-001 implementation. See [ADR-0006](./decisions/0006-risc-zero-initial-proof-stack-selection.md). |
 | ZK-003 | Individual and aggregate proof design | Resolved for alpha: individual RISC Zero proofs plus proof-aware Merkle batches; recursive/aggregate proofs deferred. See [ADR-0007](./decisions/0007-zk-003-individual-proof-batches.md). |
-| ZK-004 | On-chain verifier integration, cost limits, upgrades, and security review | TBD |
+| ZK-004 | On-chain verifier integration, cost limits, upgrades, and security review | Resolved for alpha: immutable version registry, RISC Zero adapter, 48-hour activation delay, caps, owner/guardian separation, and emergency retirement. Independent review and production deployment remain public-release gates. See [ADR-0008](./decisions/0008-zk-004-verifier-governance-and-limits.md). |
 | PRIV-001 | Disclosure profiles and off-chain storage, access, and retention model | TBD |
 | AVR-007 | Versioned receipt profiles for AI and autonomous-machine domains | TBD |
 | ID-001 | Identity model for organisations, agents, models, and machines | TBD |
@@ -288,4 +288,5 @@ For an unproved receipt, the `zk` section may be absent or may explicitly state 
 | 0.8 | 2026-08-22 | Added historical-authorisation prototype boundary | ID-004 remains partially unresolved |
 | 0.9 | 2026-09-06 | Selected RISC Zero for the initial ZK-001 proof implementation after repeated benchmark and EVM interoperability evidence | ZK-002; ADR-0006 |
 | 1.0 | 2026-09-06 | Selected individual-proof Merkle batches for alpha and deferred recursive aggregation | ZK-003; ADR-0007 |
+| 1.1 | 2026-09-06 | Defined alpha RISC Zero verifier lifecycle, caps, and governance controls | ZK-004; ADR-0008 |
 | X.Y | YYYY-MM-DD | Describe the change | Decision ID or link |

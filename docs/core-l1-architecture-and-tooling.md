@@ -3,8 +3,8 @@
 | Field | Value |
 |---|---|
 | Status | Living design document |
-| Document version | 0.3 |
-| Last updated | 2026-08-18 |
+| Document version | 0.4 |
+| Last updated | 2026-09-06 |
 | Decision state | Core architecture agreed; unresolved items are marked **TBD** |
 | Scope | Base-layer architecture, protocol foundation, and primary tooling |
 | Companion document | [AI Verification & ZK Architecture](./ai-verification-and-zk-architecture.md) |
@@ -32,7 +32,7 @@ The implementation will begin as a **fork of Core-Geth**, retain the **Ethereum 
 | Node API | Ethereum JSON-RPC plus AI extensions | Standard EVM access and AI-specific functions | Agreed; extension schema TBD |
 | Client SDKs | Python and TypeScript | AI and application integrations | Agreed |
 | Explorer | Blockscout | EVM-compatible chain explorer | Agreed |
-| Product layer | AI Verification Receipts and ZK verification | Anchors and verifies claims about off-chain AI activity | Agreed; detailed design TBD |
+| Product layer | AI Verification Receipts and ZK verification | Anchors and verifies claims about off-chain AI activity | RISC Zero selected for initial ZK-001 alpha path; see ADR-0006–0008 |
 
 ## 3. High-Level Architecture
 
@@ -74,7 +74,7 @@ Simplified transaction flow:
 - **Quantum-resilience boundary:** This requirement currently applies to mining-algorithm selection. It does not, by itself, make wallet or account signatures quantum-resistant; the broader cryptographic migration posture remains a separate future decision.
 - **Native coin:** Use for gas and mining rewards is agreed. Supply, issuance, reward schedule, denomination, and other economic parameters are TBD.
 - **API compatibility:** Ethereum JSON-RPC plus AI extensions is agreed. Exact extension methods, parameters, and lifecycle rules are TBD.
-- **ZK implementation:** ZK verification is part of the architecture. The proof system and verifier design remain evaluation items in the companion document.
+- **ZK implementation:** RISC Zero is selected for the initial ZK-001 alpha path. Its versioned verifier lifecycle, caps, and governance controls are specified in the companion document; independent review and public deployment remain release gates.
 
 ## 5. Open Decisions
 
@@ -101,6 +101,7 @@ No option should be treated as selected until it is explicitly recorded as an ag
 | Version | Date | Change | Decision reference |
 |---|---|---|---|
 | 0.3 | 2026-08-18 | Pinned Core-Geth development baseline | L1-002; ADR-0001 |
+| 0.4 | 2026-09-06 | Recorded the initial RISC Zero alpha verifier path and lifecycle controls | ZK-002–004; ADR-0006–0008 |
 | 0.2 | 2026-08-18 | Added quantum-resilience requirement to PoW selection | L1-001 |
 | 0.1 | 2026-08-16 | Initial architecture and tooling baseline | Agreed core product direction |
 | X.Y | YYYY-MM-DD | Describe the change | Decision ID or link |
