@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Candidate interoperability complete; production benchmark gate remains open |
+| Status | RISC Zero selected for initial ZK-001 implementation; release hardening remains open |
 | Evaluation statement | ZK-001 policy evaluation `0.1.0-draft` |
 | Last updated | 2026-08-29 |
 
@@ -27,6 +27,17 @@
 - A feasibility assessment is complete in [Phase 2C Halo2 Feasibility](./phase-2c-halo2-feasibility.md).
 - It remains an evaluation candidate. A bespoke-circuit spike is deliberately deferred until comparable SP1/RISC Zero measurements and a frozen public-input encoding exist.
 
+## Selection
+
+The completed repeated benchmark and EVM interoperability evidence support the
+accepted ZK-002 decision: **RISC Zero is the initial AIChain AVR proof stack**.
+See [Repeated Benchmark Results](./phase-2c-repeated-benchmark-results.md)
+and [ADR-0006](./decisions/0006-risc-zero-initial-proof-stack-selection.md).
+
 ## Evidence Discipline
 
-No system is selected. Both zkVM candidates have crossed the prototype interoperability gate, including byte-identical public values and real EVM verification. Production selection still requires the repeated benchmark sample defined in the Phase 2B plan, security/privacy and verifier-upgrade review, trusted-setup assessment, and an explicit ZK-002 decision.
+Both zkVM candidates crossed the prototype interoperability gate, including
+byte-identical public values and real EVM verification. RISC Zero is selected
+for the initial ZK-001 implementation. Production release still requires the
+remaining security/privacy, verifier-governance, trusted-setup, versioning,
+resource-limit, and aggregation-scope work described in ADR-0006.

@@ -3,15 +3,15 @@
 | Field | Value |
 |---|---|
 | Status | Active delivery roadmap |
-| Document version | 0.3 |
-| Last updated | 2026-08-29 |
+| Document version | 0.4 |
+| Last updated | 2026-09-06 |
 | Starting point | Phase 1 complete; NVIDIA KawPoW/ASERT development validation complete |
 | Current constraint | No AMD GPU or additional independent GPU miners available |
 | Principle | Continue software/product work now; move hardware-diversity and multi-miner tests to the testnet gates |
 
 ## 1. Immediate Direction
 
-The active work remains **Phase 2C: ZK stack evaluation**. ZK-001, native SP1/RISC Zero proofs, security negatives, byte-identical public values, and disposable EVM verifier trials are complete. The next task is the repeated benchmark and ZK-002–004 decision package; it does not require another mining GPU.
+The active work is now **ZK release hardening and Phase 2D scale foundation**. ZK-001, native SP1/RISC Zero proofs, security negatives, byte-identical public values, disposable EVM verifier trials, and the repeated benchmark are complete. RISC Zero is selected for the initial ZK-001 proof implementation under [ADR-0006](./decisions/0006-risc-zero-initial-proof-stack-selection.md). ZK-003–004 remain release gates.
 
 The following tasks are deferred—not waived—to the closed/public-testnet programme:
 
@@ -66,7 +66,8 @@ Current status: items 1–6 have initial implementations for the `0.1.0-draft` e
 - SP1; and
 - Halo2 where its circuit model is appropriate.
 
-These remain evaluation candidates, not settled choices.
+RISC Zero is selected for the initial ZK-001 implementation. SP1 remains an
+evaluated alternative; Halo2 remains deferred for this initial statement.
 
 ### Measurements
 
@@ -92,7 +93,7 @@ These remain evaluation candidates, not settled choices.
 - **ZK-002–004** are resolved to alpha scope.
 - A valid proof verifies on-chain and all required negative vectors fail.
 
-Current status: the interoperability portion of this exit gate is complete for SP1 and RISC Zero. The benchmark sample, stack recommendation, aggregation scope, and verifier/upgrade decisions remain open. See [Phase 2C EVM Verifier Evidence](./phase-2c-evm-verifier-evidence.md).
+Current status: the interoperability and repeated benchmark portions are complete, and RISC Zero is selected under ZK-002. Aggregation scope and verifier/upgrade decisions remain open. See [Repeated Benchmark Results](./phase-2c-repeated-benchmark-results.md) and [ADR-0006](./decisions/0006-risc-zero-initial-proof-stack-selection.md).
 
 ## 4. Phase 2D — AVR Product and Scale Foundation
 

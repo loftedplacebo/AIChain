@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "aichain.zk.proof-benchmark-summary.v1",
+  "evidenceDate": "2026-08-29",
+  "host": "12-vCPU AMD EPYC virtual machine, 47 GiB RAM",
+  "fixture": "fixtures/zk/policy-evaluation-v0.1.0-draft.json",
+  "protocol": {
+    "warmupCount": 5,
+    "measurementCount": 10,
+    "publicValuesBytes": 714,
+    "receiptId": "0xde239d25bc76016b92256da94013ca347646522ea4faf7fbe57e22c6ec42b316"
+  },
+  "candidates": {
+    "risc0": {
+      "stackVersion": "3.0.3",
+      "proofBytes": 260,
+      "proofElapsedMs": { "min": 149003, "median": 152920, "p95": 161234, "max": 161234 },
+      "wallSeconds": { "min": 151.33, "median": 155.34, "p95": 163.92, "max": 163.92 },
+      "maxRssKiB": { "min": 4798484, "median": 4798936, "p95": 4799552, "max": 4799552 }
+    },
+    "sp1": {
+      "stackVersion": "6.5.0",
+      "proofBytes": 356,
+      "proofElapsedMs": { "min": 422580, "median": 433613, "p95": 458516, "max": 458516 },
+      "wallSeconds": { "min": 451.20, "median": 462.70, "p95": 486.43, "max": 486.43 },
+      "maxRssKiB": { "min": 17882312, "median": 18302492, "p95": 18684520, "max": 18684520 }
+    }
+  }
+}

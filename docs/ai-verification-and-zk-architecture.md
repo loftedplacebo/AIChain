@@ -3,8 +3,8 @@
 | Field | Value |
 |---|---|
 | Status | Living design document |
-| Document version | 0.7 |
-| Last updated | 2026-08-28 |
+| Document version | 0.9 |
+| Last updated | 2026-09-06 |
 | Protocol/schema version | **TBD** |
 | Decision state | Product direction agreed; unresolved items are marked **TBD** |
 | Companion document | [Core L1 Architecture and Tooling](./core-l1-architecture-and-tooling.md) |
@@ -27,7 +27,7 @@ AI inference and agent execution remain off-chain. The chain records the verific
 | Proof generation | Off-chain | Agreed |
 | Proof verification | On-chain | Agreed; verifier interface TBD |
 | Privacy | Minimize public data and keep sensitive AI content off-chain | Agreed principle |
-| Candidate ZK stacks | RISC Zero, SP1, and Halo2 | Evaluation items only; none selected |
+| Initial ZK stack | RISC Zero | Selected for the initial ZK-001 AVR proof implementation; see ADR-0006 |
 
 ## 3. Logical Flow
 
@@ -128,13 +128,16 @@ Receipts without proofs remain possible, but have a different assurance level. T
 
 ### 6.2 Candidate Stacks
 
-These are evaluation candidates, not selected components:
+RISC Zero is selected for the initial ZK-001 AVR proof implementation. SP1
+remains a tested alternative and Halo2 remains deferred for the initial zkVM
+statement. This does not settle aggregation, verifier governance, or a
+mainnet deployment. See [ADR-0006](./decisions/0006-risc-zero-initial-proof-stack-selection.md).
 
 | Candidate | Category | Status |
 |---|---|---|
-| RISC Zero | zkVM candidate | Evaluate |
-| SP1 | zkVM candidate | Evaluate |
-| Halo2 | Circuit/proving-framework candidate | Evaluate |
+| RISC Zero | zkVM | Selected for initial ZK-001 implementation |
+| SP1 | zkVM | Evaluated alternative; not required at runtime |
+| Halo2 | Circuit/proving framework | Deferred for this initial statement |
 
 Evaluation should cover proof-generation performance, on-chain verification cost, aggregation or recursion support, developer complexity, security maturity, tooling, and L1/EVM integration. No candidate should be presented as chosen until an explicit decision is recorded.
 
@@ -235,7 +238,7 @@ For an unproved receipt, the `zk` section may be absent or may explicitly state 
 | AVR-005 | Timestamp sources and verification semantics | TBD |
 | AVR-006 | On-chain anchor format, events/indexing, and external data references | TBD |
 | ZK-001 | Exact statements and public inputs to prove | Phase 2B evaluation statement accepted: private policy evaluation `0.1.0-draft`; production finalisation TBD. See [ADR-0005](./decisions/0005-zk-001-policy-evaluation-statement.md). |
-| ZK-002 | ZK stack selection: RISC Zero, SP1, Halo2, or another evaluated option | TBD |
+| ZK-002 | ZK stack selection: RISC Zero, SP1, Halo2, or another evaluated option | Resolved: RISC Zero selected for the initial ZK-001 implementation. See [ADR-0006](./decisions/0006-risc-zero-initial-proof-stack-selection.md). |
 | ZK-003 | Individual and aggregate proof design | TBD |
 | ZK-004 | On-chain verifier integration, cost limits, upgrades, and security review | TBD |
 | PRIV-001 | Disclosure profiles and off-chain storage, access, and retention model | TBD |
@@ -274,4 +277,5 @@ For an unproved receipt, the `zk` section may be absent or may explicitly state 
 | 0.6 | 2026-08-22 | Accepted organisational-ledger, privacy, assurance, scaling, and crypto-agility directions | ADR-0002; detailed protocol values remain TBD |
 | 0.7 | 2026-08-22 | Added additive authorised-AVR prototype boundary | Development-only; final credential/trust decisions remain TBD |
 | 0.8 | 2026-08-22 | Added historical-authorisation prototype boundary | ID-004 remains partially unresolved |
+| 0.9 | 2026-09-06 | Selected RISC Zero for the initial ZK-001 proof implementation after repeated benchmark and EVM interoperability evidence | ZK-002; ADR-0006 |
 | X.Y | YYYY-MM-DD | Describe the change | Decision ID or link |

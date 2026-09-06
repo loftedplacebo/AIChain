@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Interoperability snapshot complete; repeated production sample pending |
+| Status | Repeated RISC Zero/SP1 benchmark complete; ZK-002 decision recorded |
 | Workload | ZK-001 policy evaluation `0.1.0-draft` |
 | Candidates | RISC Zero, SP1, Halo2 |
 | Last updated | 2026-08-29 |
@@ -42,4 +42,4 @@ Run five warm-ups and at least ten measured proofs per candidate on the same mac
 
 ## Acceptance Gate
 
-A recommendation requires reproducible results, exact golden-vector agreement, all negative vectors passing, a disposable EVM-chain verifier demonstration, and an explicit assurance/privacy review. The recommendation must separate measured facts from engineering judgment and keep ZK-003 aggregation scope explicit.
+A recommendation requires reproducible results, exact golden-vector agreement, all negative vectors passing, a disposable EVM-chain verifier demonstration, and an explicit assurance/privacy review. These requirements are met for the initial stack selection; see [Repeated Benchmark Results](./phase-2c-repeated-benchmark-results.md) and [ADR-0006](./decisions/0006-risc-zero-initial-proof-stack-selection.md). ZK-003 aggregation scope remains explicit and unresolved.

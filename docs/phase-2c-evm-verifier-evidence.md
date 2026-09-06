@@ -2,7 +2,7 @@
 
 | Field | Value |
 | --- | --- |
-| Status | Interoperability trial complete; no production stack selected |
+| Status | Interoperability trial complete; subsequent ZK-002 selection recorded in ADR-0006 |
 | Evidence date | 2026-08-29 |
 | Statement | ZK-001 policy evaluation `0.1.0-draft` |
 | Fixture | `fixtures/zk/policy-evaluation-v0.1.0-draft.json` |
@@ -15,7 +15,7 @@ RISC Zero and SP1 each generated a real Groth16 proof, independently verified it
 
 `0xde239d25bc76016b92256da94013ca347646522ea4faf7fbe57e22c6ec42b316`
 
-This closes the prototype interoperability gate. It does not close ZK-002 or select a production proof stack.
+This closes the prototype interoperability gate. The subsequent repeated benchmark and explicit project decision selected RISC Zero for the initial ZK-001 implementation; see [Repeated Benchmark Results](./phase-2c-repeated-benchmark-results.md) and [ADR-0006](./decisions/0006-risc-zero-initial-proof-stack-selection.md). It does not by itself settle aggregation, verifier governance, or public-network deployment.
 
 ## Version pins
 
