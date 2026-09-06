@@ -15,6 +15,8 @@
     "test:zk:batch": "node --test ./sdk/typescript/zk-proof-batch.test.js",
     "test:avr:presentation": "node --test ./sdk/typescript/avr-presentation.test.js",
     "test:avr:anchor": "node --test ./sdk/typescript/avr-anchor-verifier.test.js",
+    "test:avr:rpc": "node --test ./sdk/typescript/avr-rpc-server.test.js",
+    "avr:rpc": "node ./sdk/typescript/avr-rpc-server.js",
     "zk:batch": "node ./sdk/typescript/zk-proof-batch-cli.js",
     "avr:derive": "node ./sdk/typescript/avr-cli.js derive",
     "ovl:seal": "node ./sdk/typescript/ovl-cli.js seal",

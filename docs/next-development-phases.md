@@ -225,11 +225,14 @@ applications canonical, proof-aware assurance presentation around the existing
 `0.1.0` and `0.2.0` receipt profiles without changing live anchors or standard
 Ethereum RPC.
 
-The next milestone is to draft the versioned AI JSON-RPC surface and connect
-the verified anchor data to an indexer-facing receipt lookup. The RPC surface
-must remain opt-in, preserve standard Ethereum JSON-RPC, be IPC/localhost-only,
-and define bounded request, proof and batch handling before any public endpoint
-is exposed.
+The versioned local AI JSON-RPC draft and indexer-facing receipt lookup are now
+implemented as an explicitly opt-in, loopback-only reference sidecar. See
+[Phase 2D Local AVR JSON-RPC Draft](./phase-2d-avr-rpc-draft.md). Standard
+Ethereum JSON-RPC remains untouched.
+
+Next, build a durable event indexer with reorganisation rollback plus batch
+manifest/inclusion retrieval, then exercise it against a disposable node before
+considering any Core-Geth-integrated API.
 
 ## 11. Change Log
 
@@ -239,3 +242,4 @@ is exposed.
 | 0.3 | 2026-08-29 | Recorded Phase 2C SP1/RISC Zero EVM interoperability and made the repeated benchmark/decision package the immediate task |
 | 0.7 | 2026-09-06 | Completed first Phase 2D alpha: additive AVR presentation schema, assurance states, and Python/TypeScript reference parity; anchor-event validation and AI RPC remain next |
 | 0.8 | 2026-09-06 | Added standard-RPC anchor-event validation with confirmation checks and mandatory batch inclusion proof; versioned AI RPC/indexer work is next |
+| 0.9 | 2026-09-06 | Added opt-in localhost-only AVR RPC reference service and indexed presentation lookup; durable reorg-aware indexing remains next |
