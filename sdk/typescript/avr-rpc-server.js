@@ -8,12 +8,13 @@ const path = require("node:path");
 const { JsonRpcProvider } = require("ethers");
 const { assuranceSummary, validatePresentation } = require("./avr-presentation");
 const { verifyPresentationAnchor } = require("./avr-anchor-verifier");
+const { lookupReceipt, validateState } = require("./avr-event-indexer");
 
 const MAX_BODY_BYTES = 1_048_576;
 const MAX_PRESENTATIONS = 1_024;
 const MAX_CONFIRMATIONS = 256;
 const BYTES32 = /^0x[0-9a-fA-F]{64}$/;
-const METHODS = new Set(["aichain_getAvrPresentation", "aichain_getAvrSummary", "aichain_verifyAvrAnchor", "aichain_avrRpcInfo"]);
+const METHODS = new Set(["aichain_getAvrPresentation", "aichain_getAvrSummary", "aichain_getAvrIndexEntry", "aichain_verifyAvrAnchor", "aichain_avrRpcInfo"]);
 
 function rpcError(id, code, message, data = undefined) {
   const error = { code, message };
@@ -47,7 +48,12 @@ function loadPresentationsDirectory(directory) {
   });
 }
 
-async function dispatch(request, { index, provider }) {
+function readIndexState(indexStatePath) {
+  if (!indexStatePath) return null;
+  return validateState(JSON.parse(fs.readFileSync(indexStatePath, "utf8")));
+}
+
+async function dispatch(request, { index, provider, indexStatePath = null }) {
   if (!request || request.jsonrpc !== "2.0" || typeof request.method !== "string" || !METHODS.has(request.method)) {
     return rpcError(request?.id, -32601, "Method not found");
   }
@@ -63,6 +69,16 @@ async function dispatch(request, { index, provider }) {
   }
   const receiptId = normaliseReceiptId(params[0]);
   if (!receiptId || params.length < 1) return rpcError(request.id, -32602, "First param must be a bytes32 receiptId");
+  if (request.method === "aichain_getAvrIndexEntry") {
+    if (params.length !== 1) return rpcError(request.id, -32602, "aichain_getAvrIndexEntry accepts one param");
+    if (!indexStatePath) return rpcError(request.id, -32001, "Durable AVR event index is not configured");
+    try {
+      const entry = lookupReceipt(readIndexState(indexStatePath), receiptId);
+      return entry ? rpcResult(request.id, entry) : rpcError(request.id, -32004, "AVR receipt is not indexed on-chain");
+    } catch (error) {
+      return rpcError(request.id, -32000, "Durable AVR event index is unavailable", error instanceof Error ? error.message : String(error));
+    }
+  }
   const presentation = index.get(receiptId);
   if (!presentation) return rpcError(request.id, -32004, "AVR receipt not indexed");
   if (request.method === "aichain_getAvrPresentation") {
@@ -84,7 +100,7 @@ async function dispatch(request, { index, provider }) {
   }
 }
 
-function createLocalAvrRpcServer({ index, provider }) {
+function createLocalAvrRpcServer({ index, provider, indexStatePath = null }) {
   if (!(index instanceof Map)) throw new Error("index must be a Map");
   return http.createServer((request, response) => {
     if (request.method !== "POST" || request.url !== "/") {
@@ -109,7 +125,7 @@ function createLocalAvrRpcServer({ index, provider }) {
       let payload;
       try { payload = JSON.parse(Buffer.concat(chunks).toString("utf8")); }
       catch { payload = null; }
-      const result = payload === null ? rpcError(null, -32700, "Parse error") : await dispatch(payload, { index, provider });
+      const result = payload === null ? rpcError(null, -32700, "Parse error") : await dispatch(payload, { index, provider, indexStatePath });
       response.writeHead(200, { "content-type": "application/json", "cache-control": "no-store" }).end(JSON.stringify(result));
     });
   });
@@ -119,12 +135,12 @@ function requireLoopbackOptIn(environment = process.env) {
   if (environment.AICHAIN_ENABLE_AVR_RPC !== "1") throw new Error("Refusing to start: set AICHAIN_ENABLE_AVR_RPC=1 explicitly");
 }
 
-async function startLocalAvrRpc({ port = 18645, presentationsDirectory, ethereumRpcUrl = "http://127.0.0.1:8545", environment = process.env } = {}) {
+async function startLocalAvrRpc({ port = 18645, presentationsDirectory, ethereumRpcUrl = "http://127.0.0.1:8545", indexStatePath = null, environment = process.env } = {}) {
   requireLoopbackOptIn(environment);
   if (!Number.isInteger(port) || port < 1024 || port > 65535) throw new Error("port must be an integer between 1024 and 65535");
   if (!presentationsDirectory) throw new Error("presentationsDirectory is required");
   const index = createPresentationIndex(loadPresentationsDirectory(presentationsDirectory));
-  const server = createLocalAvrRpcServer({ index, provider: new JsonRpcProvider(ethereumRpcUrl) });
+  const server = createLocalAvrRpcServer({ index, provider: new JsonRpcProvider(ethereumRpcUrl), indexStatePath });
   await new Promise((resolve, reject) => {
     server.once("error", reject);
     server.listen(port, "127.0.0.1", resolve);
@@ -138,7 +154,8 @@ async function main() {
   const directory = option("--presentations-dir");
   const port = Number(option("--port") ?? 18645);
   const ethereumRpcUrl = option("--ethereum-rpc") ?? "http://127.0.0.1:8545";
-  const server = await startLocalAvrRpc({ port, presentationsDirectory: directory, ethereumRpcUrl });
+  const indexStatePath = option("--index-state") ?? null;
+  const server = await startLocalAvrRpc({ port, presentationsDirectory: directory, ethereumRpcUrl, indexStatePath });
   console.log(`AIChain AVR development RPC listening on http://127.0.0.1:${port}/ (indexed presentations: ${loadPresentationsDirectory(directory).length})`);
   for (const signal of ["SIGINT", "SIGTERM"]) process.on(signal, () => server.close(() => process.exit(0)));
 }

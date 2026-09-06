@@ -6,6 +6,7 @@ const path = require("node:path");
 const test = require("node:test");
 const { createPresentation } = require("./avr-presentation");
 const { createPresentationIndex, createLocalAvrRpcServer, dispatch, requireLoopbackOptIn } = require("./avr-rpc-server");
+const { newState } = require("./avr-event-indexer");
 
 const fixture = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "..", "fixtures", "avr", "receipt-v0.1.0-draft.json"), "utf8"));
 const presentation = createPresentation(fixture, { level: "commitment-only" });
@@ -31,6 +32,17 @@ test("requires explicit enablement and validates method parameters", async () =>
   assert.doesNotThrow(() => requireLoopbackOptIn({ AICHAIN_ENABLE_AVR_RPC: "1" }));
   assert.equal((await dispatch({ jsonrpc: "2.0", id: 1, method: "aichain_getAvrPresentation", params: [] }, { index })).error.code, -32602);
   assert.equal((await dispatch({ jsonrpc: "2.0", id: 2, method: "aichain_verifyAvrAnchor", params: [presentation.receiptId, 257] }, { index })).error.code, -32602);
+});
+
+test("returns durable anchor lookup separately from the presentation index", async () => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), "aichain-rpc-index-"));
+  const state = newState(20260822, 1);
+  state.individual[presentation.receiptId.toLowerCase()] = { receiptId: presentation.receiptId, blockNumber: 1, blockHash: `0x${"11".repeat(32)}`, transactionHash: `0x${"22".repeat(32)}`, logIndex: 0 };
+  const statePath = path.join(directory, "state.json");
+  fs.writeFileSync(statePath, JSON.stringify(state));
+  const response = await dispatch({ jsonrpc: "2.0", id: 4, method: "aichain_getAvrIndexEntry", params: [presentation.receiptId] }, { index: new Map(), indexStatePath: statePath });
+  assert.equal(response.result.mode, "individual");
+  assert.equal(response.result.anchor.blockNumber, 1);
 });
 
 test("serves JSON-RPC only from an actual local server", async () => {

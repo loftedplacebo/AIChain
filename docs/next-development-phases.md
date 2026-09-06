@@ -230,9 +230,14 @@ implemented as an explicitly opt-in, loopback-only reference sidecar. See
 [Phase 2D Local AVR JSON-RPC Draft](./phase-2d-avr-rpc-draft.md). Standard
 Ethereum JSON-RPC remains untouched.
 
-Next, build a durable event indexer with reorganisation rollback plus batch
-manifest/inclusion retrieval, then exercise it against a disposable node before
-considering any Core-Geth-integrated API.
+The [durable AVR event indexer](./phase-2d-durable-avr-indexer.md) is now
+implemented and passed an isolated Core-Geth node integration test. It retains
+persistent cursors, rolls back replaced checkpoints, and returns batch
+manifest/inclusion evidence. It does not change Core-Geth.
+
+Next, define queueing/backpressure, batch-size and fee-estimation policy and
+run receipt/batch load measurements against the indexer before deciding whether
+Blockscout receipt views or a node-integrated API are warranted.
 
 ## 11. Change Log
 
@@ -243,3 +248,4 @@ considering any Core-Geth-integrated API.
 | 0.7 | 2026-09-06 | Completed first Phase 2D alpha: additive AVR presentation schema, assurance states, and Python/TypeScript reference parity; anchor-event validation and AI RPC remain next |
 | 0.8 | 2026-09-06 | Added standard-RPC anchor-event validation with confirmation checks and mandatory batch inclusion proof; versioned AI RPC/indexer work is next |
 | 0.9 | 2026-09-06 | Added opt-in localhost-only AVR RPC reference service and indexed presentation lookup; durable reorg-aware indexing remains next |
+| 1.0 | 2026-09-06 | Added persistent AVR event index, canonical checkpoint rollback, batch manifest/inclusion lookup, RPC bridge and disposable Core-Geth integration evidence |

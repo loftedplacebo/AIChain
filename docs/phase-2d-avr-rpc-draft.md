@@ -51,6 +51,7 @@ reverse-proxied or added to firewall rules.
 | `aichain_avrRpcInfo` | `[]` | Version, methods and static limits | Read-only |
 | `aichain_getAvrPresentation` | `[receiptId]` | Indexed presentation | `receiptId` is bytes32 |
 | `aichain_getAvrSummary` | `[receiptId]` | Assurance summary | Does not establish anchor validity |
+| `aichain_getAvrIndexEntry` | `[receiptId]` | Durable individual/batch anchor entry | Requires `--index-state` |
 | `aichain_verifyAvrAnchor` | `[receiptId, minimumConfirmations?]` | Anchor verification | Confirmation range: 1–256 |
 
 Unknown or standard methods return `-32601`; malformed parameters return
@@ -63,10 +64,11 @@ At startup the sidecar reads up to 1,024 JSON presentation files, each at most
 keyed by lower-case receipt ID. It does not scan blocks, persist a database,
 follow reorgs, or infer a receipt from an arbitrary transaction.
 
-This is an **indexer-facing lookup reference**, not a production indexer. The
-next package must add durable event cursors, block-hash checkpoints and reorg
-rollback, contract/profile ABI versioning, batch manifest/inclusion retrieval,
-bounded caching/pagination/rate limits, and a disclosure-storage privacy policy.
+The [durable event indexer](./phase-2d-durable-avr-indexer.md) now supplies
+cursors, block-hash checkpoint rollback, batch manifests and inclusion
+retrieval. It remains an alpha file-backed index, not a production indexer.
+Durable database, caching/pagination/rate limits and disclosure-storage privacy
+policy remain open.
 
 ## Verification and release gates
 
