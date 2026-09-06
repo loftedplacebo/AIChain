@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Active delivery roadmap |
-| Document version | 0.6 |
+| Document version | 0.7 |
 | Last updated | 2026-09-06 |
 | Starting point | Phase 1 complete; NVIDIA KawPoW/ASERT development validation complete |
 | Current constraint | No AMD GPU or additional independent GPU miners available |
@@ -219,15 +219,16 @@ Bridge confirmation rules must be materially stricter than ordinary AVR confirma
 
 ## 10. Immediate Next Task
 
-Execute the **Phase 2B repeated benchmark and decision package**:
+The first Phase 2D milestone is complete: the additive
+[`AVR Presentation 0.3.0-alpha`](./phase-2d-avr-presentation-alpha.md) gives
+applications canonical, proof-aware assurance presentation around the existing
+`0.1.0` and `0.2.0` receipt profiles without changing live anchors or standard
+Ethereum RPC.
 
-- five warm-ups and at least ten measured proofs per viable candidate;
-- median, p95, minimum, maximum, and exact peak-memory results;
-- trusted-setup, audit, verifier-governance, and upgrade review;
-- an explicit alpha aggregation decision; and
-- the ZK-002 stack recommendation without overstating the ZK-001 claim.
-
-This is the highest-value remaining Phase 2 task that does not depend on additional mining hardware.
+Next, implement node/indexer-backed anchor validation and draft the versioned
+AI JSON-RPC surface. It must remain opt-in, preserve standard Ethereum JSON-RPC,
+and define bounded request, proof and batch handling before any public endpoint
+is exposed.
 
 ## 11. Change Log
 
@@ -235,3 +236,4 @@ This is the highest-value remaining Phase 2 task that does not depend on additio
 |---|---|---|
 | 0.1 | 2026-08-28 | Deferred hardware-diversity tests to testnet and mapped ZK, AVR, alpha, testnet, and asset phases |
 | 0.3 | 2026-08-29 | Recorded Phase 2C SP1/RISC Zero EVM interoperability and made the repeated benchmark/decision package the immediate task |
+| 0.7 | 2026-09-06 | Completed first Phase 2D alpha: additive AVR presentation schema, assurance states, and Python/TypeScript reference parity; anchor-event validation and AI RPC remain next |

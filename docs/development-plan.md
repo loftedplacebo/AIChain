@@ -8,7 +8,7 @@
 | Architecture inputs | [Core L1 Architecture and Tooling](./core-l1-architecture-and-tooling.md); [AI Verification & ZK Architecture](./ai-verification-and-zk-architecture.md) |
 | Schedule | Dates, durations, staffing, and owners are **TBD** |
 | Decision state | This plan sequences open decisions; it does not settle them |
-| Delivery status | Phase 1 complete; Phase 2A NVIDIA and isolated ASERT validation complete; AMD/multi-miner work deferred to testnet; Phase 2C ZK-002–004 alpha scope complete; public-release ZK review/deployment gates remain open |
+| Delivery status | Phase 1 complete; Phase 2A NVIDIA and isolated ASERT validation complete; AMD/multi-miner work deferred to testnet; Phase 2C ZK-002–004 alpha scope complete; Phase 2D AVR Presentation `0.3.0-alpha` implemented; public-release ZK review/deployment gates remain open |
 
 ## 1. Objective
 
