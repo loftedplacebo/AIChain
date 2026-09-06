@@ -102,7 +102,7 @@ SHA-256 is retained for compatibility with the current draft AVR. Production com
 
 A verifier accepts only when the proof is valid for the exact program commitment and every public input matches. Wrong receipt, root, result, statement/program version, identity binding, timestamp, malformed encoding, or unsatisfied witness must fail.
 
-A later aggregate proof must preserve an unambiguous binding to every covered receipt and statement version. Aggregation design remains **TBD** under ZK-003.
+A later aggregate proof must preserve an unambiguous binding to every covered receipt and statement version. Alpha deliberately supports individual proofs and proof-aware Merkle batches only; recursive aggregation is deferred under [ADR-0007](./decisions/0007-zk-003-individual-proof-batches.md).
 
 ## 8. Reference Artifacts
 
@@ -117,6 +117,6 @@ These are semantic references for stack evaluation, not a production prover or c
 ## 9. Remaining Decisions
 
 - ZK-002: proof stack selection.
-- ZK-003: individual versus aggregate proof design.
+- ZK-003: resolved for alpha by [ADR-0007](./decisions/0007-zk-003-individual-proof-batches.md); future recursive aggregation remains separate work.
 - ZK-004: verifier interface, gas/resource limits, upgrades, and security review.
 - Final AVR schema, commitment primitive, authority validation, and disclosure profiles.

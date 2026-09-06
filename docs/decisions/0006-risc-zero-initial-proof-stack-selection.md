@@ -46,8 +46,8 @@ that RISC Zero is universally best or permanently immutable.
 
 ## Explicitly not decided
 
-- **ZK-003:** aggregation, recursion, batching, queueing, and retry semantics
-  are not in the initial individual-proof scope and remain TBD.
+- **ZK-003:** resolved subsequently by ADR-0007 for alpha: individual proofs
+  and proof-aware Merkle batches; recursive aggregation remains deferred.
 - **ZK-004:** the production verifier ownership, upgrade authority, timelock,
   emergency response, audit acceptance criteria, gas/resource caps, and
   migration process remain TBD. A disposable EVM deployment is evidence, not
@@ -67,8 +67,9 @@ Before a public or production network relies on this path:
    host binding, verifier integration, and public-input encoding;
 2. specify verifier ownership, upgrade/migration controls, pause/emergency
    behavior, version coexistence, and audit trail under ZK-004;
-3. define individual-proof resource limits and an explicit ZK-003 aggregation
-   decision, with queue/load and failure/retry tests;
+3. define individual-proof resource limits and complete the deferred
+   recursion/aggregation benchmark, queue/load, and failure/retry work before
+   any aggregate-proof release;
 4. repeat the benchmark on the intended production-class prover environment;
 5. validate any pinned dependency/version update against all positive and
    negative vectors and the EVM verifier; and

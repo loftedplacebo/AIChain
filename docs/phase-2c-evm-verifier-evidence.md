@@ -88,7 +88,7 @@ Before ZK-002 can close:
 2. record median, p95, minimum, maximum, and exact peak memory for both candidates;
 3. review trusted-setup and verifier-upgrade assumptions;
 4. complete assurance and privacy review for the frozen public encoding;
-5. define whether aggregation is in or out of the first release under ZK-003; and
+5. define whether aggregation is in or out of the first release under ZK-003; this was subsequently resolved for alpha as out of scope in ADR-0007; and
 6. record the stack decision and rationale in the architecture decision log.
 
 Halo2 remains deferred under the existing feasibility decision. This evidence does not reject it.

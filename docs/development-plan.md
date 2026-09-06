@@ -3,12 +3,12 @@
 | Field | Value |
 |---|---|
 | Status | Living delivery plan |
-| Document version | 0.15 |
+| Document version | 0.16 |
 | Last updated | 2026-09-06 |
 | Architecture inputs | [Core L1 Architecture and Tooling](./core-l1-architecture-and-tooling.md); [AI Verification & ZK Architecture](./ai-verification-and-zk-architecture.md) |
 | Schedule | Dates, durations, staffing, and owners are **TBD** |
 | Decision state | This plan sequences open decisions; it does not settle them |
-| Delivery status | Phase 1 complete; Phase 2A NVIDIA and isolated ASERT validation complete; AMD/multi-miner work deferred to testnet; Phase 2C ZK-002 complete with RISC Zero selected; ZK-003–004 release hardening remain open |
+| Delivery status | Phase 1 complete; Phase 2A NVIDIA and isolated ASERT validation complete; AMD/multi-miner work deferred to testnet; Phase 2C ZK-002–003 complete for alpha; ZK-004 release hardening remains open |
 
 ## 1. Objective
 
@@ -161,7 +161,7 @@ Security, privacy, compatibility, documentation, and operations run across every
 
 **Current status:** ZK-001 `0.1.0-draft`, its shared fixture, native security tests, SP1/RISC Zero Groth16 exports, byte-identical public values, and official-verifier EVM trials are complete. See [Phase 2C Status](./phase-2c-status.md) and [EVM Verifier Evidence](./phase-2c-evm-verifier-evidence.md).
 
-**Current status:** the repeated RISC Zero/SP1 benchmark is complete and RISC Zero is selected for the initial ZK-001 proof implementation under [ADR-0006](./decisions/0006-risc-zero-initial-proof-stack-selection.md). The next active work is ZK-003/ZK-004 release hardening: define aggregation scope, verifier governance/upgrades, resource limits, and security review. This is not a claim of frontier-model inference correctness.
+**Current status:** RISC Zero is selected for the initial ZK-001 proof implementation under [ADR-0006](./decisions/0006-risc-zero-initial-proof-stack-selection.md). ZK-003 is resolved for alpha: individual proofs plus proof-aware Merkle batches, with recursive aggregation deferred under [ADR-0007](./decisions/0007-zk-003-individual-proof-batches.md). The next active work is ZK-004: verifier governance/upgrades, resource limits, and security review. This is not a claim of frontier-model inference correctness.
 
 **Primary outputs**
 
@@ -357,5 +357,6 @@ This is a development-validation milestone, not a final AVR protocol release. **
 | 0.12 | 2026-08-28 | Deferred AMD/OpenCL and geographically distributed multi-miner tests to the testnet gates; made ZK-001 the active task and mapped the alpha/testnet/asset sequence | [Next Development Phases](./next-development-phases.md) |
 | 0.14 | 2026-08-29 | Recorded SP1/RISC Zero native security and EVM verifier interoperability, while leaving repeated benchmarks and ZK-002–004 open | [Phase 2C EVM Verifier Evidence](./phase-2c-evm-verifier-evidence.md) |
 | 0.15 | 2026-09-06 | Recorded repeated benchmark evidence and accepted RISC Zero as the initial ZK-001 proof stack | [ADR-0006](./decisions/0006-risc-zero-initial-proof-stack-selection.md) |
+| 0.16 | 2026-09-06 | Defined alpha individual-proof batching and deferred recursive aggregation | [ADR-0007](./decisions/0007-zk-003-individual-proof-batches.md) |
 | 0.1 | 2026-08-18 | Initial phased development plan | Architecture documents v0.1 |
 | X.Y | YYYY-MM-DD | Describe the change | Decision ID or link |

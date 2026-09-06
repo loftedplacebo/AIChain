@@ -12,6 +12,8 @@
     "test:historical-audit:typescript": "node --test ./sdk/typescript/historical-audit.test.js",
     "test:ovl:typescript": "node --test ./sdk/typescript/organisational-ledger.test.js",
     "test:organisation-view:typescript": "node --test ./sdk/typescript/organisation-view.test.js",
+    "test:zk:batch": "node --test ./sdk/typescript/zk-proof-batch.test.js",
+    "zk:batch": "node ./sdk/typescript/zk-proof-batch-cli.js",
     "avr:derive": "node ./sdk/typescript/avr-cli.js derive",
     "ovl:seal": "node ./sdk/typescript/ovl-cli.js seal",
     "organisation:report": "node ./sdk/typescript/organisation-view-cli.js report",

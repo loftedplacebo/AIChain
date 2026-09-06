@@ -34,10 +34,15 @@ accepted ZK-002 decision: **RISC Zero is the initial AIChain AVR proof stack**.
 See [Repeated Benchmark Results](./phase-2c-repeated-benchmark-results.md)
 and [ADR-0006](./decisions/0006-risc-zero-initial-proof-stack-selection.md).
 
+ZK-003 is also resolved for alpha: individual proofs may be grouped in
+proof-aware Merkle batches, while recursive aggregation is deferred. See
+[ADR-0007](./decisions/0007-zk-003-individual-proof-batches.md).
+
 ## Evidence Discipline
 
 Both zkVM candidates crossed the prototype interoperability gate, including
 byte-identical public values and real EVM verification. RISC Zero is selected
 for the initial ZK-001 implementation. Production release still requires the
 remaining security/privacy, verifier-governance, trusted-setup, versioning,
-resource-limit, and aggregation-scope work described in ADR-0006.
+resource-limit, and any future aggregation work described in ADR-0006 and
+ADR-0007.

@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Living design document |
-| Document version | 0.9 |
+| Document version | 1.0 |
 | Last updated | 2026-09-06 |
 | Protocol/schema version | **TBD** |
 | Decision state | Product direction agreed; unresolved items are marked **TBD** |
@@ -124,7 +124,16 @@ A block timestamp establishes inclusion under the chain's rules; by itself, it d
 
 A ZK proof establishes only the statement encoded by its program or circuit and the inputs bound to that statement. It does not establish broader AI correctness unless that property is explicitly represented and proved.
 
-Receipts without proofs remain possible, but have a different assurance level. The prover role, proof statement, public inputs, verifier interface, aggregation design, limits, and upgrade policy are **TBD**.
+Receipts without proofs remain possible, but have a different assurance level. For alpha, the selected mode is an individual RISC Zero proof with optional proof-aware Merkle batching. The prover role, final verifier interface, resource limits, upgrade policy, and any future recursive aggregation design remain **TBD**.
+
+### 6.1.1 Initial Proof-Batching Scope
+
+RISC Zero individual proofs are the accepted alpha path. A versioned
+proof-aware Merkle batch may bind individual proof claims to a common root for
+distribution and optional L1 anchoring, but it is **not** an aggregate proof:
+each proof remains independently verified. Recursive aggregation is deferred.
+See [ADR-0007](./decisions/0007-zk-003-individual-proof-batches.md) and
+[ZK-003 Proof-Aware Batching](./zk-003-proof-batching.md).
 
 ### 6.2 Candidate Stacks
 
@@ -239,7 +248,7 @@ For an unproved receipt, the `zk` section may be absent or may explicitly state 
 | AVR-006 | On-chain anchor format, events/indexing, and external data references | TBD |
 | ZK-001 | Exact statements and public inputs to prove | Phase 2B evaluation statement accepted: private policy evaluation `0.1.0-draft`; production finalisation TBD. See [ADR-0005](./decisions/0005-zk-001-policy-evaluation-statement.md). |
 | ZK-002 | ZK stack selection: RISC Zero, SP1, Halo2, or another evaluated option | Resolved: RISC Zero selected for the initial ZK-001 implementation. See [ADR-0006](./decisions/0006-risc-zero-initial-proof-stack-selection.md). |
-| ZK-003 | Individual and aggregate proof design | TBD |
+| ZK-003 | Individual and aggregate proof design | Resolved for alpha: individual RISC Zero proofs plus proof-aware Merkle batches; recursive/aggregate proofs deferred. See [ADR-0007](./decisions/0007-zk-003-individual-proof-batches.md). |
 | ZK-004 | On-chain verifier integration, cost limits, upgrades, and security review | TBD |
 | PRIV-001 | Disclosure profiles and off-chain storage, access, and retention model | TBD |
 | AVR-007 | Versioned receipt profiles for AI and autonomous-machine domains | TBD |
@@ -278,4 +287,5 @@ For an unproved receipt, the `zk` section may be absent or may explicitly state 
 | 0.7 | 2026-08-22 | Added additive authorised-AVR prototype boundary | Development-only; final credential/trust decisions remain TBD |
 | 0.8 | 2026-08-22 | Added historical-authorisation prototype boundary | ID-004 remains partially unresolved |
 | 0.9 | 2026-09-06 | Selected RISC Zero for the initial ZK-001 proof implementation after repeated benchmark and EVM interoperability evidence | ZK-002; ADR-0006 |
+| 1.0 | 2026-09-06 | Selected individual-proof Merkle batches for alpha and deferred recursive aggregation | ZK-003; ADR-0007 |
 | X.Y | YYYY-MM-DD | Describe the change | Decision ID or link |

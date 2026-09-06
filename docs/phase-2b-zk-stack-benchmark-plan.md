@@ -42,4 +42,4 @@ Run five warm-ups and at least ten measured proofs per candidate on the same mac
 
 ## Acceptance Gate
 
-A recommendation requires reproducible results, exact golden-vector agreement, all negative vectors passing, a disposable EVM-chain verifier demonstration, and an explicit assurance/privacy review. These requirements are met for the initial stack selection; see [Repeated Benchmark Results](./phase-2c-repeated-benchmark-results.md) and [ADR-0006](./decisions/0006-risc-zero-initial-proof-stack-selection.md). ZK-003 aggregation scope remains explicit and unresolved.
+A recommendation requires reproducible results, exact golden-vector agreement, all negative vectors passing, a disposable EVM-chain verifier demonstration, and an explicit assurance/privacy review. These requirements are met for the initial stack selection; see [Repeated Benchmark Results](./phase-2c-repeated-benchmark-results.md) and [ADR-0006](./decisions/0006-risc-zero-initial-proof-stack-selection.md). ZK-003 is explicitly resolved for alpha in [ADR-0007](./decisions/0007-zk-003-individual-proof-batches.md): individual proofs and proof-aware batches, with recursive aggregation deferred.

@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Active delivery roadmap |
-| Document version | 0.4 |
+| Document version | 0.5 |
 | Last updated | 2026-09-06 |
 | Starting point | Phase 1 complete; NVIDIA KawPoW/ASERT development validation complete |
 | Current constraint | No AMD GPU or additional independent GPU miners available |
@@ -11,7 +11,7 @@
 
 ## 1. Immediate Direction
 
-The active work is now **ZK release hardening and Phase 2D scale foundation**. ZK-001, native SP1/RISC Zero proofs, security negatives, byte-identical public values, disposable EVM verifier trials, and the repeated benchmark are complete. RISC Zero is selected for the initial ZK-001 proof implementation under [ADR-0006](./decisions/0006-risc-zero-initial-proof-stack-selection.md). ZK-003–004 remain release gates.
+The active work is now **ZK-004 release hardening and Phase 2D scale foundation**. ZK-001, native SP1/RISC Zero proofs, security negatives, byte-identical public values, disposable EVM verifier trials, and the repeated benchmark are complete. RISC Zero is selected for the initial ZK-001 proof implementation under [ADR-0006](./decisions/0006-risc-zero-initial-proof-stack-selection.md); ZK-003 selects individual-proof Merkle batches for alpha and defers recursion under [ADR-0007](./decisions/0007-zk-003-individual-proof-batches.md).
 
 The following tasks are deferred—not waived—to the closed/public-testnet programme:
 
@@ -90,10 +90,10 @@ evaluated alternative; Halo2 remains deferred for this initial statement.
 
 ### Exit gate
 
-- **ZK-002–004** are resolved to alpha scope.
+- **ZK-002–003** are resolved to alpha scope; ZK-004 verifier hardening remains required before a release that relies on this path.
 - A valid proof verifies on-chain and all required negative vectors fail.
 
-Current status: the interoperability and repeated benchmark portions are complete, and RISC Zero is selected under ZK-002. Aggregation scope and verifier/upgrade decisions remain open. See [Repeated Benchmark Results](./phase-2c-repeated-benchmark-results.md) and [ADR-0006](./decisions/0006-risc-zero-initial-proof-stack-selection.md).
+Current status: the interoperability and repeated benchmark portions are complete, RISC Zero is selected under ZK-002, and the alpha batching scope is defined under ZK-003. Verifier/upgrade decisions remain open. See [ADR-0006](./decisions/0006-risc-zero-initial-proof-stack-selection.md) and [ADR-0007](./decisions/0007-zk-003-individual-proof-batches.md).
 
 ## 4. Phase 2D — AVR Product and Scale Foundation
 
