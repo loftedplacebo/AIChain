@@ -230,14 +230,14 @@ implemented as an explicitly opt-in, loopback-only reference sidecar. See
 [Phase 2D Local AVR JSON-RPC Draft](./phase-2d-avr-rpc-draft.md). Standard
 Ethereum JSON-RPC remains untouched.
 
-The [durable AVR event indexer](./phase-2d-durable-avr-indexer.md) is now
-implemented and passed an isolated Core-Geth node integration test. It retains
-persistent cursors, rolls back replaced checkpoints, and returns batch
-manifest/inclusion evidence. It does not change Core-Geth.
+Phase 2D alpha is complete. Its scale/operational controls and deliberately
+bounded measurements are recorded in [Scale and Operations Alpha](./phase-2d-scale-and-operations-alpha.md).
+The AVR explorer view is local/loopback-only and links to the existing private
+Blockscout spike without changing Blockscout or Core-Geth.
 
-Next, define queueing/backpressure, batch-size and fee-estimation policy and
-run receipt/batch load measurements against the indexer before deciding whether
-Blockscout receipt views or a node-integrated API are warranted.
+Next is **Phase 3 integrated alpha**: combine the development chain, AVR SDK,
+authority path, RISC Zero proof flow, bounded batching, local RPC/indexer and
+private explorer into one clean-environment reproducible demonstration.
 
 ## 11. Change Log
 
@@ -249,3 +249,4 @@ Blockscout receipt views or a node-integrated API are warranted.
 | 0.8 | 2026-09-06 | Added standard-RPC anchor-event validation with confirmation checks and mandatory batch inclusion proof; versioned AI RPC/indexer work is next |
 | 0.9 | 2026-09-06 | Added opt-in localhost-only AVR RPC reference service and indexed presentation lookup; durable reorg-aware indexing remains next |
 | 1.0 | 2026-09-06 | Added persistent AVR event index, canonical checkpoint rollback, batch manifest/inclusion lookup, RPC bridge and disposable Core-Geth integration evidence |
+| 1.1 | 2026-09-06 | Completed Phase 2D alpha scale/operations policy, bounded ingress/micro-batching reference, local load measurement and explorer-safe lookup; Phase 3 is next |

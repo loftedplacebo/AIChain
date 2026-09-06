@@ -18,6 +18,7 @@
     "test:avr:rpc": "node --test ./sdk/typescript/avr-rpc-server.test.js",
     "avr:rpc": "node ./sdk/typescript/avr-rpc-server.js",
     "avr:index": "node ./sdk/typescript/avr-event-indexer-cli.js",
+    "test:avr:ingress": "node --test ./sdk/typescript/avr-ingress-queue.test.js",
     "zk:batch": "node ./sdk/typescript/zk-proof-batch-cli.js",
     "avr:derive": "node ./sdk/typescript/avr-cli.js derive",
     "ovl:seal": "node ./sdk/typescript/ovl-cli.js seal",

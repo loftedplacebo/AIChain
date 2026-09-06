@@ -9,12 +9,13 @@ const { JsonRpcProvider } = require("ethers");
 const { assuranceSummary, validatePresentation } = require("./avr-presentation");
 const { verifyPresentationAnchor } = require("./avr-anchor-verifier");
 const { lookupReceipt, validateState } = require("./avr-event-indexer");
+const { buildExplorerView } = require("./avr-explorer-view");
 
 const MAX_BODY_BYTES = 1_048_576;
 const MAX_PRESENTATIONS = 1_024;
 const MAX_CONFIRMATIONS = 256;
 const BYTES32 = /^0x[0-9a-fA-F]{64}$/;
-const METHODS = new Set(["aichain_getAvrPresentation", "aichain_getAvrSummary", "aichain_getAvrIndexEntry", "aichain_verifyAvrAnchor", "aichain_avrRpcInfo"]);
+const METHODS = new Set(["aichain_getAvrPresentation", "aichain_getAvrSummary", "aichain_getAvrIndexEntry", "aichain_getAvrExplorerEntry", "aichain_verifyAvrAnchor", "aichain_avrRpcInfo"]);
 
 function rpcError(id, code, message, data = undefined) {
   const error = { code, message };
@@ -88,6 +89,15 @@ async function dispatch(request, { index, provider, indexStatePath = null }) {
   if (request.method === "aichain_getAvrSummary") {
     if (params.length !== 1) return rpcError(request.id, -32602, "aichain_getAvrSummary accepts one param");
     return rpcResult(request.id, assuranceSummary(presentation));
+  }
+  if (request.method === "aichain_getAvrExplorerEntry") {
+    if (params.length > 2) return rpcError(request.id, -32602, "aichain_getAvrExplorerEntry accepts receiptId and optional explorer base URL");
+    if (params.length === 2 && (typeof params[1] !== "string" || !/^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?(\/.*)?$/.test(params[1]))) return rpcError(request.id, -32602, "Explorer base URL must be loopback HTTP(S)");
+    if (!indexStatePath) return rpcError(request.id, -32001, "Durable AVR event index is not configured");
+    try {
+      const entry = lookupReceipt(readIndexState(indexStatePath), receiptId);
+      return entry ? rpcResult(request.id, buildExplorerView(presentation, entry, params[1] ?? null)) : rpcError(request.id, -32004, "AVR receipt is not indexed on-chain");
+    } catch (error) { return rpcError(request.id, -32000, "Explorer entry is unavailable", error instanceof Error ? error.message : String(error)); }
   }
   if (params.length > 2 || (params.length === 2 && (!Number.isInteger(params[1]) || params[1] < 1 || params[1] > MAX_CONFIRMATIONS))) {
     return rpcError(request.id, -32602, `aichain_verifyAvrAnchor accepts receiptId and optional confirmations (1-${MAX_CONFIRMATIONS})`);
