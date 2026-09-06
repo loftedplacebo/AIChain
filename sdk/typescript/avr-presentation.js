@@ -30,13 +30,16 @@ function deriveUnderlyingReceipt(receipt) {
 }
 
 function validateAnchor(anchor) {
-  if (!exactKeys(anchor, new Set(["mode", "chainId", "contract", "transactionHash"]))) {
+  if (anchor === null || typeof anchor !== "object" || Array.isArray(anchor)
+    || !Object.keys(anchor).every((key) => new Set(["mode", "chainId", "contract", "transactionHash", "batch"]).has(key))
+    || !["mode", "chainId", "contract", "transactionHash"].every((key) => Object.hasOwn(anchor, key))) {
     throw new Error("anchor must contain mode, chainId, contract, and transactionHash");
   }
   if (!new Set(["individual", "batch"]).has(anchor.mode)) throw new Error("anchor.mode must be individual or batch");
   if (!Number.isInteger(anchor.chainId) || anchor.chainId < 0) throw new Error("anchor.chainId must be a non-negative integer");
   if (!ADDRESS.test(anchor.contract)) throw new Error("anchor.contract must be an EVM address");
   if (!BYTES32.test(anchor.transactionHash)) throw new Error("anchor.transactionHash must be a bytes32 transaction hash");
+  if (anchor.mode !== "batch" && anchor.batch !== undefined) throw new Error("anchor.batch is only valid for batch mode");
 }
 
 function validateProof(proof) {

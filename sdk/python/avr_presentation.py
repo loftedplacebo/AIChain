@@ -29,7 +29,7 @@ def _derive_underlying_receipt(receipt: dict) -> dict:
 
 
 def _validate_anchor(anchor: dict) -> None:
-    if not _exact_keys(anchor, {"mode", "chainId", "contract", "transactionHash"}):
+    if not isinstance(anchor, dict) or not {"mode", "chainId", "contract", "transactionHash"}.issubset(anchor) or not set(anchor).issubset({"mode", "chainId", "contract", "transactionHash", "batch"}):
         raise ValueError("anchor must contain mode, chainId, contract, and transactionHash")
     if anchor["mode"] not in {"individual", "batch"}:
         raise ValueError("anchor.mode must be individual or batch")
@@ -39,6 +39,8 @@ def _validate_anchor(anchor: dict) -> None:
         raise ValueError("anchor.contract must be an EVM address")
     if not isinstance(anchor["transactionHash"], str) or not BYTES32.fullmatch(anchor["transactionHash"]):
         raise ValueError("anchor.transactionHash must be a bytes32 transaction hash")
+    if anchor["mode"] != "batch" and "batch" in anchor:
+        raise ValueError("anchor.batch is only valid for batch mode")
 
 
 def _validate_proof(proof: dict) -> None:

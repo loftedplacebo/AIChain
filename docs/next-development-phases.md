@@ -225,8 +225,9 @@ applications canonical, proof-aware assurance presentation around the existing
 `0.1.0` and `0.2.0` receipt profiles without changing live anchors or standard
 Ethereum RPC.
 
-Next, implement node/indexer-backed anchor validation and draft the versioned
-AI JSON-RPC surface. It must remain opt-in, preserve standard Ethereum JSON-RPC,
+The next milestone is to draft the versioned AI JSON-RPC surface and connect
+the verified anchor data to an indexer-facing receipt lookup. The RPC surface
+must remain opt-in, preserve standard Ethereum JSON-RPC, be IPC/localhost-only,
 and define bounded request, proof and batch handling before any public endpoint
 is exposed.
 
@@ -237,3 +238,4 @@ is exposed.
 | 0.1 | 2026-08-28 | Deferred hardware-diversity tests to testnet and mapped ZK, AVR, alpha, testnet, and asset phases |
 | 0.3 | 2026-08-29 | Recorded Phase 2C SP1/RISC Zero EVM interoperability and made the repeated benchmark/decision package the immediate task |
 | 0.7 | 2026-09-06 | Completed first Phase 2D alpha: additive AVR presentation schema, assurance states, and Python/TypeScript reference parity; anchor-event validation and AI RPC remain next |
+| 0.8 | 2026-09-06 | Added standard-RPC anchor-event validation with confirmation checks and mandatory batch inclusion proof; versioned AI RPC/indexer work is next |

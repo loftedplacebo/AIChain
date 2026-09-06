@@ -73,11 +73,17 @@ recursive proof aggregation is live; that remains deliberately deferred.
 ## Anchor location
 
 An optional `anchor` records `mode` (`individual` or `batch`), `chainId`,
-contract address, and transaction hash. It is a location hint for a client or
-indexer. This first alpha does not claim confirmation/finality from the mere
-presence of that object. A later work package will query the node, validate
-the appropriate event and inclusion path, and define confirmations, retry and
-reorganisation semantics.
+contract address, and transaction hash. It is a location hint until checked.
+For batch mode it can additionally carry `batch` evidence: the batch root,
+leaf count, batch schema version, and sorted-Merkle siblings for the specific
+receipt. The TypeScript verifier now reads standard local Ethereum JSON-RPC,
+requires a successful transaction and configurable confirmations, validates
+the contract event, and rejects a batch as unverified without that inclusion
+proof. It does not call any AI-specific RPC method.
+
+The Python SDK accepts the same portable presentation shape but does not yet
+include an RPC client; its current role is deterministic offline creation and
+validation. RPC-client parity is an explicitly open Phase 2D item.
 
 ## Privacy boundary
 
@@ -107,7 +113,7 @@ authority claims. The shared commitment-only vector derives presentation ID:
 
 - Formal schema governance and a stable semver release.
 - Verification of EIP-191 signature recovery in this presentation helper.
-- Node/indexer-backed anchor-event and confirmation validation.
+- Python RPC-client parity for anchor-event and confirmation validation.
 - Batch manifests, data availability, inclusion proofs, retry and reorg policy.
 - Versioned AI JSON-RPC methods and rate/fee/backpressure controls.
 - Blockscout receipt/proof views and organisation disclosure UX.

@@ -14,6 +14,7 @@
     "test:organisation-view:typescript": "node --test ./sdk/typescript/organisation-view.test.js",
     "test:zk:batch": "node --test ./sdk/typescript/zk-proof-batch.test.js",
     "test:avr:presentation": "node --test ./sdk/typescript/avr-presentation.test.js",
+    "test:avr:anchor": "node --test ./sdk/typescript/avr-anchor-verifier.test.js",
     "zk:batch": "node ./sdk/typescript/zk-proof-batch-cli.js",
     "avr:derive": "node ./sdk/typescript/avr-cli.js derive",
     "ovl:seal": "node ./sdk/typescript/ovl-cli.js seal",
