@@ -112,7 +112,18 @@ async function dispatch(request, { index, provider, indexStatePath = null }) {
 
 function createLocalAvrRpcServer({ index, provider, indexStatePath = null }) {
   if (!(index instanceof Map)) throw new Error("index must be a Map");
-  return http.createServer((request, response) => {
+  let active = 0, windowStart = Date.now(), requests = 0;
+  const server = http.createServer((request, response) => {
+    if (Date.now() - windowStart >= 1000) { windowStart = Date.now(); requests = 0; }
+    if (active >= 16 || ++requests > 100) { response.writeHead(429).end(); return; }
+    active++;
+    let released = false;
+    const release = () => { if (!released) { released = true; active--; } };
+    response.once('close',release); response.once('finish',release);
+    // Loopback binding alone does not prevent browser-driven requests or DNS rebinding.
+    if (!/^(127\.0\.0\.1|localhost)(:\d+)?$/.test(request.headers.host ?? '') || request.headers.origin) {
+      response.writeHead(403).end(); return;
+    }
     if (request.method !== "POST" || request.url !== "/") {
       response.writeHead(404).end();
       return;
@@ -139,6 +150,9 @@ function createLocalAvrRpcServer({ index, provider, indexStatePath = null }) {
       response.writeHead(200, { "content-type": "application/json", "cache-control": "no-store" }).end(JSON.stringify(result));
     });
   });
+  server.requestTimeout = 15000; server.headersTimeout = 10000;
+  server.setTimeout(15000, socket => socket.destroy()); server.maxConnections = 32;
+  return server;
 }
 
 function requireLoopbackOptIn(environment = process.env) {

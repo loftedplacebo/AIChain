@@ -4,6 +4,10 @@ New Dag is an independent EVM-compatible Proof-of-Work L1 whose core product is 
 
 ## Current Development Baseline
 
+See [Phase 3 integrated alpha](./docs/phase-3-integrated-alpha.md) for the
+reproducible receipt, authority, proof, batching and lookup demonstration,
+measured results and remaining release gates.
+
 - Core-Geth submodule: `node/core-geth`
 - Upstream release: `v1.12.23`
 - Pinned commit: `96b2afc`

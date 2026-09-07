@@ -2,7 +2,7 @@
 const { createManifest } = require("./avr-event-indexer");
 const { validatePresentation } = require("./avr-presentation");
 
-const DEFAULT_POLICY = Object.freeze({ microBatchMs: 250, maxQueueReceipts: 10_000, maxBatchReceipts: 1_000, maxAttempts: 3 });
+const DEFAULT_POLICY = Object.freeze({ microBatchMs: 250, maxQueueReceipts: 10_000, maxBatchReceipts: 1_000, maxAttempts: 3, maxPresentationBytes: 16384 });
 
 class AvrIngressQueue {
   constructor(policy = {}) {
@@ -11,11 +11,14 @@ class AvrIngressQueue {
     this.pending = []; this.records = new Map(); this.sequence = 0;
   }
   submit(presentation, now = Date.now()) {
+    if (Buffer.byteLength(JSON.stringify(presentation)) > this.policy.maxPresentationBytes) return {accepted:false,status:'rejected-presentation-too-large'};
     validatePresentation(presentation);
     const receiptId = presentation.receiptId.toLowerCase();
     const existing = this.records.get(receiptId);
     if (existing) return { accepted: false, duplicate: true, receiptId, status: existing.status };
-    if (this.pending.length >= this.policy.maxQueueReceipts) return { accepted: false, duplicate: false, receiptId, status: "rejected-queue-full" };
+    // Bound retained deduplication state as well as pending work. Alpha queues
+    // must be rotated explicitly after reconciliation, never silently evicted.
+    if (this.records.size >= this.policy.maxQueueReceipts) return { accepted: false, duplicate: false, receiptId, status: "rejected-queue-full" };
     const entry = { receiptId, presentation, acceptedAt: now, attempts: 0, status: "accepted", batchId: null, anchor: null };
     this.records.set(receiptId, entry); this.pending.push(entry);
     return { accepted: true, duplicate: false, receiptId, status: entry.status };
@@ -33,9 +36,10 @@ class AvrIngressQueue {
     if (!batch?.receiptIds || !result?.status) throw new Error("batch and result status are required");
     for (const receiptId of batch.receiptIds) {
       const entry = this.records.get(receiptId);
-      if (!entry) continue;
+      if (!entry || entry.batchId !== batch.batchId) continue;
+      if (result.status === "reorged" ? entry.status !== "provisionally-included" : entry.status !== "queued-for-anchor") continue;
       if (result.status === "included") { entry.status = "provisionally-included"; entry.anchor = result.anchor ?? null; }
-      else if (result.status === "reorged") { entry.status = "accepted"; entry.anchor = null; this.pending.push(entry); }
+      else if (result.status === "reorged" && entry.attempts < this.policy.maxAttempts) { entry.status = "accepted"; entry.anchor = null; this.pending.push(entry); }
       else if (result.status === "retryable" && entry.attempts < this.policy.maxAttempts) { entry.status = "accepted"; this.pending.push(entry); }
       else entry.status = "failed";
     }

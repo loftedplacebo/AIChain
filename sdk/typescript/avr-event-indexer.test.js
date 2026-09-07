@@ -85,3 +85,11 @@ test("rejects a manifest whose contents do not resolve to the advertised root", 
   fs.writeFileSync(path.join(manifestsDirectory, "bad.json"), JSON.stringify(manifest));
   await assert.rejects(syncIndex({ provider: mockProvider(chain), contracts, statePath, manifestsDirectory }), /root does not match/);
 });
+test('rejects index configuration changes and log/block races',async()=>{
+ const chain={blocks:{0:{hash:root('0')}},logs:{0:[]}}; const statePath=tempState();
+ await syncIndex({provider:mockProvider(chain),contracts,statePath});
+ await assert.rejects(syncIndex({provider:mockProvider(chain),contracts:contracts.slice(0,1),statePath}),/configuration changed/);
+ chain.blocks[1]={hash:root('1')};chain.logs[1]=[log('ReceiptAnchored',[receiptA,root('a'),issuer,'0.1.0-draft',10],individualContract,1,root('2'),root('d'))];
+ await assert.rejects(syncIndex({provider:mockProvider(chain),contracts,statePath}),/changed during index scan/);
+ assert.equal(JSON.parse(fs.readFileSync(statePath)).nextBlock,1);
+});

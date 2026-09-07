@@ -16,3 +16,14 @@ test("bounds the queue and retries only within the policy", () => {
   queue.submit(first, 0); assert.equal(queue.submit(second, 0).status, "rejected-queue-full"); const batch = queue.drain(1000, true);
   queue.recordAnchorResult(batch, { status: "retryable" }); assert.equal(queue.get(first.receiptId).status, "failed");
 });
+test("recovery callbacks are idempotent, stale results ignored, retained state bounded", () => {
+  const queue = new AvrIngressQueue({maxQueueReceipts:1,maxAttempts:2});
+  const p = presentation(7); queue.submit(p,0); const b = queue.drain(0,true);
+  queue.recordAnchorResult(b,{status:'retryable'}); queue.recordAnchorResult(b,{status:'retryable'});
+  const retry = queue.drain(1,true); assert.equal(retry.receiptIds.length,1);
+  queue.recordAnchorResult(b,{status:'included'}); assert.equal(queue.get(p.receiptId).status,'queued-for-anchor');
+  queue.recordAnchorResult(retry,{status:'included'});
+  queue.recordAnchorResult(retry,{status:'reorged'}); queue.recordAnchorResult(retry,{status:'reorged'});
+  assert.equal(queue.get(p.receiptId).status,'failed'); assert.equal(queue.drain(2,true),null);
+  assert.equal(queue.submit(presentation(8)).accepted,false);
+});

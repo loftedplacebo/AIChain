@@ -1,0 +1,70 @@
+{
+  "schema": "aichain.phase3-internal-evidence",
+  "date": "2026-09-07",
+  "profile": "single disposable Core-Geth --dev, one-second simulated blocks",
+  "result": "passed",
+  "productionOrKawpowCapacityClaim": false,
+  "genesisHash": "0x44e5501c818a769052a833201cd11508b48618e78ae2b95e1950f00226016b42",
+  "proofElapsedMs": 212631,
+  "proofGas": 267251,
+  "sealBytes": 260,
+  "journalBytes": 714,
+  "imageId": "0xa004b6b3c29deeac708a0eb1bd0e7f5b07ddbce69de673c6a91fd73f229969f5",
+  "proofTransaction": "0x855ae87b775f523403d01fe63863d934fc78aecf214d7de65d05e127b029a014",
+  "anchorTransactions": [
+    "0xb501e661c6aa59906ce1b4234628ee2d68993830b62b385957012e985b778167",
+    "0x1cc15818134ae3f600aa8b75d14839f6bfb2640d78cfbf4c3497a77e588165da"
+  ],
+  "batchTransaction": "0xc6dd451fac48591ee370babe9aff5dcff7e75017e1a594056174a24b2821f20c",
+  "checks": ["agent-signature", "authorised-anchor", "unproved-anchor", "real-proof-adapter", "tampered-proof-rejected", "tampered-journal-rejected", "receipt-substitution-rejected", "batch-membership", "persistent-index-resume", "organisation-disclosure", "localhost-rpc-explorer", "revoked-agent-rejected", "python-presentation-validation"],
+  "load": {
+    "logicalReceipts": 1000,
+    "batchTransactions": 10,
+    "concurrency": 2,
+    "includedMs": 4686.956574,
+    "transactionTps": 2.133580681219258,
+    "logicalReceiptTps": 213.3580681219258,
+    "ingestionP95Ms": 0.04458700000000704,
+    "inclusionP95Ms": 1128.3714499999996,
+    "indexMs": 262.3887790000008,
+    "lookup1000Ms": 2059.6524440000003,
+    "indexBytes": 88676,
+    "indexedBlocks": 6,
+    "proofReplayTransaction": "0x85993db7e082c8976a779cdd6f0e6532881d776174fbaae6ee791c547e20d7d8"
+  },
+  "regression": {"javascriptPassed": 48, "pythonPassed": 13},
+  "sustainedLoad": {
+    "status": "passed",
+    "profile": "single-node Core-Geth --dev, closed loop, four concurrent batches; not KawPoW saturation capacity",
+    "requestedSeconds": 300,
+    "elapsedMs": 300095.888048,
+    "logicalReceipts": 32080,
+    "transactions": 480,
+    "batchTransactions": 320,
+    "individualTransactions": 80,
+    "realProofReplays": 80,
+    "logicalReceiptTps": 106.89916549229372,
+    "transactionTps": 1.5994887604831978,
+    "ingressP95Ms": 0.030365000002348097,
+    "batchInclusionP95Ms": 1040.7133909999975,
+    "indexRebuildMs": 16752.474196999974,
+    "checks": ["backpressure", "no-failed-transactions", "all-cycle-lookups", "durable-index-resume", "fresh-index-replay"]
+  },
+  "kawpowMultiPeer": {
+    "status": "passed",
+    "profile": "disposable custom-genesis KawPoW network; one RTX 3060 mining node and one CPU-only VPS validator; authenticated SSH relays; no public JSON-RPC",
+    "acceptedGpuSolutionsAtObservation": 65,
+    "observerHeights": [71, 82],
+    "observerBlocksWithMatchingCanonicalHash": 12,
+    "meanBlockProductionMs": 4045.348018181818,
+    "observerPollIntervalMs": 25,
+    "validatorRestart": {
+      "stoppedAtHeight": 95,
+      "miningHeightAfterDowntime": 104,
+      "validatorHeightAfterRestartAndCatchup": 114
+    },
+    "limitations": ["low-difficulty disposable configuration", "polling-observation propagation timing is bounded by the 25 ms sample interval", "not a public testnet or production capacity result"]
+  },
+  "cleanup": "No disposable node or test processes remained after successful exit",
+  "limitations": ["synthetic actions, not model inference", "prebuilt node and prover prerequisites", "no distributed KawPoW finality measurement", "bounded smoke load, not sustained saturation", "direct proof adapter, not delayed registry governance lifecycle"]
+}

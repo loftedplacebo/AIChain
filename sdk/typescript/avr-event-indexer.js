@@ -151,7 +151,10 @@ function attachManifestsDirectory(state, directory) {
   let attached = 0;
   for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
     if (!entry.isFile() || !entry.name.endsWith(".json")) continue;
-    attachManifest(state, JSON.parse(fs.readFileSync(path.join(directory, entry.name), "utf8")));
+    const manifest = validateManifest(JSON.parse(fs.readFileSync(path.join(directory, entry.name), "utf8")));
+    // A valid manifest can outlive its orphaned anchor. Keep it off the index.
+    if (!state.batches[manifest.batchRoot]) continue;
+    attachManifest(state, manifest);
     attached += 1;
   }
   return attached;
@@ -173,7 +176,14 @@ async function syncIndex({ provider, contracts, statePath, manifestsDirectory = 
   const network = await provider.getNetwork();
   const chainId = Number(network.chainId);
   const state = readState(statePath, chainId, startBlock);
+  const binding = JSON.stringify({genesisHash: (await provider.getBlock(0))?.hash, contracts: [...normalizedContracts].sort((a,b)=>a.address.localeCompare(b.address)), startBlock});
+  if (state.binding && state.binding !== binding) throw new Error('Index network/contracts configuration changed; use a fresh index');
+  if (!state.binding && state.nextBlock !== startBlock) throw new Error('Legacy unbound index must be rebuilt');
+  state.binding = binding;
   const reorged = await rewindForReorg(state, provider);
+  // Rebuild derived maps: an orphan may have overwritten an older canonical
+  // anchor for the same receipt. Alpha favours correctness over rollback speed.
+  if (reorged) { state.individual = {}; state.batches = {}; state.checkpoints = []; state.nextBlock = startBlock; }
   const latest = await provider.getBlockNumber();
   let indexedBlocks = 0;
   for (let blockNumber = state.nextBlock; blockNumber <= latest; blockNumber += 1) {
@@ -181,11 +191,15 @@ async function syncIndex({ provider, contracts, statePath, manifestsDirectory = 
     if (!block?.hash) throw new Error(`Unable to retrieve canonical block ${blockNumber}`);
     for (const contract of normalizedContracts) {
       const logs = await provider.getLogs({ address: contract.address, fromBlock: blockNumber, toBlock: blockNumber });
-      for (const item of parsedEvents(logs, contract)) applyEvent(state, item);
+      for (const item of parsedEvents(logs, contract)) {
+        if (item.log.blockHash.toLowerCase() !== block.hash.toLowerCase()) throw new Error('Chain changed during index scan; retry');
+        applyEvent(state, item);
+      }
     }
     state.checkpoints.push({ number: blockNumber, hash: normaliseHex(block.hash, "block.hash") });
     state.nextBlock = blockNumber + 1; indexedBlocks += 1;
   }
+  if (latest >= startBlock && (await provider.getBlock(latest))?.hash?.toLowerCase() !== state.checkpoints.at(-1)?.hash) throw new Error('Chain changed during index scan; retry');
   const manifestsAttached = attachManifestsDirectory(state, manifestsDirectory);
   state.updatedAt = new Date().toISOString();
   writeState(statePath, state);

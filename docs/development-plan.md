@@ -184,6 +184,11 @@ Security, privacy, compatibility, documentation, and operations run across every
 
 ### Phase 3 — Integrated Alpha
 
+The implemented internal profile and measured results are tracked in
+[Phase 3 Integrated Alpha](./phase-3-integrated-alpha.md). This profile is not
+equivalent to closure of every broader release gate, particularly sustained
+capacity and the selected consensus-profile rerun.
+
 **Goal:** Combine the L1, AVR, SDK, proof, and explorer work into one reproducible internal release.
 
 **Primary outputs**

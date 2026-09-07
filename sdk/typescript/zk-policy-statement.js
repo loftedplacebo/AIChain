@@ -56,7 +56,7 @@ function blindedCommitment(kind, value, blinding) {
   ]));
 }
 
-function derivePublic(metadata, witness) {
+function derivePublic(metadata, witness, receiptOnly = false) {
   exactKeys(metadata, ["issuer", "organizationId", "authorityCommitment", "claimedAtEpochSeconds"], "metadata");
   validateWitness(witness);
   if (!BYTES32.test(metadata.organizationId) || !BYTES32.test(metadata.authorityCommitment)) throw new Error("identity values must be lowercase bytes32");
@@ -78,6 +78,7 @@ function derivePublic(metadata, witness) {
     identity: { authorityCommitment: metadata.authorityCommitment, organizationId: metadata.organizationId },
     issuer, schema: "aichain.authorised-avr", schemaVersion: RECEIPT_VERSION
   };
+  if (receiptOnly) return receipt;
   return {
     authorityCommitment: metadata.authorityCommitment,
     claimedAtEpochSeconds: metadata.claimedAtEpochSeconds,
@@ -96,4 +97,4 @@ function verify(document) {
   return canonicalize(derivePublic(document.publicMetadata, document.privateWitness)) === canonicalize(document.expectedPublic);
 }
 
-module.exports = { derivePublic, evaluate, verify };
+module.exports = { derivePublic, derivePolicyReceipt: (metadata, witness) => derivePublic(metadata, witness, true), evaluate, verify };

@@ -235,9 +235,10 @@ bounded measurements are recorded in [Scale and Operations Alpha](./phase-2d-sca
 The AVR explorer view is local/loopback-only and links to the existing private
 Blockscout spike without changing Blockscout or Core-Geth.
 
-Next is **Phase 3 integrated alpha**: combine the development chain, AVR SDK,
-authority path, RISC Zero proof flow, bounded batching, local RPC/indexer and
-private explorer into one clean-environment reproducible demonstration.
+**Phase 3 integrated alpha is active**: the internal receipt-to-proof-to-lookup
+slice has been exercised. See [the Phase 3 runbook](./phase-3-integrated-alpha.md)
+for reproducibility, measurements and remaining full-release gates. Sustained
+end-to-end capacity is not established by the Phase 2D local smoke measurements.
 
 ## 11. Change Log
 

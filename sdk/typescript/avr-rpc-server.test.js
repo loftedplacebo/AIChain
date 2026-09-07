@@ -58,5 +58,7 @@ test("serves JSON-RPC only from an actual local server", async () => {
     request.on("error", reject); request.end(body);
   });
   assert.equal(response.result.receiptId, presentation.receiptId);
+  const denied = await fetch(`http://127.0.0.1:${port}/`, {method:'POST',headers:{origin:'https://example.invalid'},body});
+  assert.equal(denied.status,403);
   await new Promise((resolve) => server.close(resolve));
 });
