@@ -17,10 +17,10 @@ async function run(mode, directory) {
   directory = path.resolve(directory);
   const read = file => JSON.parse(fs.readFileSync(path.join(directory, file), 'utf8'));
   const write = (file, value) => fs.writeFileSync(path.join(directory, file), JSON.stringify(value, null, 2) + '\n', {mode: 0o600});
-  const provider = new JsonRpcProvider('http://127.0.0.1:18548', undefined, {cacheTimeout: -1});
+  const provider = new JsonRpcProvider(process.env.AICHAIN_PHASE3_RPC_URL || 'http://127.0.0.1:18548', undefined, {cacheTimeout: -1});
   provider.pollingInterval = 250;
   try {
-    assert.equal((await provider.getNetwork()).chainId, 1337n, 'Disposable Core-Geth --dev chain required');
+    assert.equal((await provider.getNetwork()).chainId, 1337n, 'Disposable Core-Geth development chain required');
     const artifact = name => read(`artifacts/${name}.json`);
     const owner = await provider.getSigner(0);
     const deploy = async (name, args=[]) => {
@@ -45,6 +45,19 @@ async function run(mode, directory) {
       write('witness.json', document);
       write('context.json', {agentKey: agent.privateKey, registry: await registry.getAddress(), authorised: await authorised.getAddress(), batch: await batch.getAddress(), genesisHash: (await provider.getBlock(0)).hash});
       console.log('Prepared isolated agent, organisation, authority, contracts and proof witness');
+      return;
+    }
+    if (mode === 'restart') {
+      const context = read('context.json');
+      assert.equal((await provider.getBlock(0)).hash, context.genesisHash, 'genesis changed after restart');
+      const before = await provider.getBlockNumber();
+      const signer = await provider.getSigner(0);
+      const address = await signer.getAddress();
+      const receipt = await (await signer.sendTransaction({to: address, value: 0n})).wait();
+      const after = await provider.getBlockNumber();
+      assert(receipt.status === 1 && after > before, 'signer did not seal a post-restart block');
+      write('restart-report.json', {status:'passed', profile:'disposable CPU-mined Ethash development chain; not AIChain production consensus', genesisHash:context.genesisHash, beforeBlock:before, afterBlock:after, transaction:receipt.hash});
+      console.log(JSON.stringify(read('restart-report.json'), null, 2));
       return;
     }
     assert.equal(mode, 'verify');
@@ -115,7 +128,7 @@ async function run(mode, directory) {
     } finally { await new Promise(resolve=>server.close(resolve)); }
     await (await registry.revokeAgent(metadata.organizationId,agentWallet.address)).wait();
     await assert.rejects(anchor.anchorAuthorisedReceipt.staticCall('0x'+'dd'.repeat(32),presentations[0].commitmentsRoot,metadata.organizationId,metadata.authorityCommitment,'0.2.0-draft'));
-    write('report.json',{scope:'Fresh Core-Geth --dev integration, single node, real RISC Zero proof',chainId:1337,genesisHash:context.genesisHash,receipts:presentations.map(p=>p.receiptId),anchorTransactions:txs,batchTransaction:batchMined.hash,proofTransaction:proofMinedHash(proofReceipt),proofGas:proofReceipt.gasUsed.toString(),imageId:expectedImage,proofDigest:keccak256(proof.seal),checks:['agent-signature','authorised-anchor','unproved-anchor','real-proof-adapter','tampered-proof-rejected','tampered-journal-rejected','receipt-substitution-rejected','batch-membership','persistent-index-resume','organisation-disclosure','localhost-rpc-explorer','revoked-agent-rejected']});
+    write('report.json',{scope:'Fresh Core-Geth custom-genesis CPU-mined Ethash development integration, single node, real RISC Zero proof',chainId:1337,genesisHash:context.genesisHash,receipts:presentations.map(p=>p.receiptId),anchorTransactions:txs,batchTransaction:batchMined.hash,proofTransaction:proofMinedHash(proofReceipt),proofGas:proofReceipt.gasUsed.toString(),imageId:expectedImage,proofDigest:keccak256(proof.seal),checks:['agent-signature','authorised-anchor','unproved-anchor','real-proof-adapter','tampered-proof-rejected','tampered-journal-rejected','receipt-substitution-rejected','batch-membership','persistent-index-resume','organisation-disclosure','localhost-rpc-explorer','revoked-agent-rejected']});
     console.log(JSON.stringify(read('report.json'),null,2));
   } finally { provider.destroy(); }
 }

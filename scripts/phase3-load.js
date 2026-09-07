@@ -8,7 +8,7 @@ const {syncIndex,lookupReceipt}=require('../sdk/typescript/avr-event-indexer');
 async function main(){
  if(process.env.AICHAIN_ENABLE_PHASE3!=='1')throw Error('Explicit alpha opt-in required');
  const dir=path.resolve(process.argv[2]); const read=n=>JSON.parse(fs.readFileSync(path.join(dir,n)));
- const c=read('context.json'); const p=new JsonRpcProvider('http://127.0.0.1:18548',undefined,{cacheTimeout:-1});p.pollingInterval=100;
+ const c=read('context.json'); const p=new JsonRpcProvider(process.env.AICHAIN_PHASE3_RPC_URL||'http://127.0.0.1:18548',undefined,{cacheTimeout:-1});p.pollingInterval=100;
  try{
  assert.equal((await p.getBlock(0)).hash,c.genesisHash);assert.equal((await p.getNetwork()).chainId,1337n);
  const signer=new NonceManager(await p.getSigner(0));

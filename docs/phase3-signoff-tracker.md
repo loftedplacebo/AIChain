@@ -10,7 +10,8 @@ after the outstanding gates pass; do not represent pending gates as completed.
 | Governance boundary tests with a real proof | Passed | Anvil simulated time; 306,420 gas for `verifyAndRecord`; not a real elapsed-time result |
 | Real governance activation delay | Pending | Earliest wall-clock completion: 2026-09-09 05:53:57.989 UTC, plus chain activation condition |
 | KawPoW validator restart and catch-up | Passed, disposable network | Validator stopped cleanly at height 95, GPU miner advanced to 104, then validator restarted, re-peered and caught up to height 114. |
-| Historical `--dev` restart profile | Open, non-deployment path | Existing Core-Geth `--dev` database rejected on restart; preserve evidence and do not claim that particular profile recovers. The KawPoW custom-genesis profile used for the interoperability test did restart cleanly. |
+| Phase 3 development-runner restart | Passed, replacement profile | Fresh custom-genesis CPU-Ethash runner kept its genesis across a clean restart and sealed a post-restart transaction. This runner is development-only, not an AIChain consensus selection. |
+| Historical `--dev` restart profile | Documented legacy limitation | Existing Core-Geth `--dev` database rejected on restart. It is no longer the Phase 3 runner. The live governance-delay trial remains on that isolated legacy profile and must not be restarted before it finishes. |
 
 ## Real delay trial
 
@@ -41,9 +42,9 @@ then verifies the actual proof, caps, role controls, pause, duplicate rejection,
 irreversible retirement and retained historical record. It does not time-warp
 the live trial. Keep it separate from the `simulated` mode on Anvil port 18558.
 
-Do not stop/restart this trial node casually: the upstream development-mode
-restart failure is open. If continuity is lost, investigate and restart the
-trial honestly; never change its delay or rewrite the evidence to pass.
+Do not stop/restart this trial node casually: it uses the historical `--dev`
+profile with a known restart limitation. If continuity is lost, investigate and
+restart the trial honestly; never change its delay or rewrite the evidence to pass.
 
 ## KawPoW multi-peer evidence
 
@@ -68,12 +69,16 @@ it did not alter the VPS development chain or expose public JSON-RPC.
 This proves node-to-GPU-miner-to-independent-validator interoperability. It is
 not a public testnet, an ASIC-resistance result, or a production capacity claim.
 
-## Restart defect
+## Historical restart limitation and replacement
 
 Restarting the earlier isolated dev directory failed with:
 `Bad developer-mode genesis configuration: genesis block difficulty must be > terminalTotalDifficulty`.
 
 The local baseline checks this condition in `node/core-geth/cmd/utils/flags.go`.
-No consensus validation was bypassed and the database was not reset. The current
-live-delay trial started in a fresh directory. Full operational sign-off must
-resolve or explicitly exclude this non-restartable development profile.
+No consensus validation was bypassed and the database was not reset. The Phase 3
+runner now creates a fresh custom-genesis CPU-Ethash development chain rather
+than using `--dev`. Its isolated VPS restart test passed with genesis
+`0x24d05d8933528e9ef98c749406caad7ade04c34dbff34b970c4176391a3141cb`:
+block 0 survived restart and a post-restart transaction advanced the chain from
+block 0 to 1. This resolves runner recovery while retaining the `--dev` behavior
+as a documented Core-Geth baseline limitation.

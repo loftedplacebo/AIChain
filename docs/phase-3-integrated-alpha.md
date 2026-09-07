@@ -10,9 +10,11 @@ The receipt-to-proof-to-lookup internal slice is implemented and has passed a
 complete fresh, bounded Linux reproduction, including the mixed workload.
 This does not close every broader release gate in the development plan.
 
-This profile uses **Core-Geth `--dev` with one-second simulated development
-blocks**, not KawPoW mining. It does not change the operational Ethash devnet,
-consensus decisions, token economics, stablecoin or bridge plans.
+The current reproducible runner uses a fresh **custom-genesis, CPU-mined Ethash
+development chain**, not KawPoW mining. It does not change the operational
+Ethash devnet, consensus decisions, token economics, stablecoin or bridge plans.
+This development profile exists only to exercise EVM, AVR and recovery paths;
+it is not an AIChain consensus candidate.
 
 ```text
 Synthetic agent action + private policy/configuration witness
@@ -68,18 +70,29 @@ export RISC0_HOST_BIN=/absolute/path/to/aichain-risc0-policy-evaluation-host
 bash scripts/run-phase3-alpha.sh
 ```
 
-The runner refuses an occupied port 18548, creates a unique ignored `devnet/`
-directory, builds contracts, starts its own loopback node, generates a fresh proof,
-then checks the complete internal slice. Each test stage has a timeout; the node
-stops on script exit. Do not use operational wallets or the existing devnet.
+The runner refuses an occupied port 18548 by default (set
+`AICHAIN_PHASE3_RPC_PORT` to use another loopback port), creates a unique ignored
+`devnet/` directory, generates a disposable signer/genesis, builds contracts,
+starts its own loopback node, generates a fresh proof, then checks the complete
+internal slice. It cleanly stops and restarts the same node and seals a new
+transaction before exit. Each test stage has a timeout; the node stops on script
+exit. Do not use operational wallets or the existing devnet.
 
 Outputs include `report.json`, `load-report.json`, presentations, proof, disclosure,
 explorer response, manifests and index snapshots. **`context.json` contains a
 disposable private key; `witness.json` contains synthetic private inputs.** Keep
 the run directory private and ignored. Only publish reviewed, non-secret reports.
 
+For a fast node-only recovery check, without a proof host:
+
+```bash
+export CORE_GETH_BIN=/absolute/path/to/core-geth
+bash scripts/test-phase3-custom-genesis-restart.sh
+```
+
 Windows split mode: use `scripts/phase3-alpha.js prepare|verify` over a localhost
-SSH tunnel on 18548, generating the proof on Linux between those steps.
+SSH tunnel on the configured Phase 3 RPC port, generating the proof on Linux
+between those steps.
 `scripts/phase3-python-check.py` validates the resulting presentations with Python.
 
 ## Alpha bounds and recovery
@@ -111,16 +124,18 @@ lookups 4,420 ms. Index size was 89,027 bytes. These are single-node smoke
 measurements, not saturation limits, durable-ingestion performance or KawPoW TPS.
 
 The first clean reproduction passed the product checks but stalled during load
-under `--dev.period 0`. It was stopped; the corrected runner uses one-second
-development blocks and stage timeouts. Do not count the stalled load as passed.
+under `--dev.period 0`. It was stopped; that historical result remains evidence
+only. Do not count the stalled load as passed.
 
-The corrected 2026-09-07 reproduction **passed and exited successfully**. A fresh
-proof took 212,631 ms; verification again cost 267,251 gas. Ten batches confirmed
-in 4,687 ms: 2.134 batch transactions/s and 213.358 logical receipts/s. Inclusion
-p95 was 1,128 ms; indexing took 262 ms and 1,000 lookups took 2,060 ms. The
-88,676-byte index covered six blocks. Node.js 24.8.0 ran directly on the VPS in
-this run, unlike the laptop/SSH run above; the numbers are not directly comparable.
-See [reviewed evidence](./phase3-evidence-2026-09-07.json).
+The corrected 2026-09-07 `--dev` reproduction **passed and exited successfully**.
+A fresh proof took 212,631 ms; verification again cost 267,251 gas. Ten batches
+confirmed in 4,687 ms: 2.134 batch transactions/s and 213.358 logical receipts/s.
+Inclusion p95 was 1,128 ms; indexing took 262 ms and 1,000 lookups took 2,060 ms.
+The 88,676-byte index covered six blocks. A separate custom-genesis restart test
+subsequently passed: the same genesis survived a clean stop/start and sealed a
+post-restart transaction. The complete proof workload will be rerun under the
+replacement profile before any new comparative performance claim. See
+[reviewed evidence](./phase3-evidence-2026-09-07.json).
 Regression suites: 48 JavaScript tests and 13 Python tests passed.
 
 A five-minute sustained mixed run also passed. It submitted 32,080 logical
@@ -131,11 +146,11 @@ The fresh durable-index rebuild took 16.75 seconds. This is a bounded,
 single-node measurement: it establishes the tested operating point and recovery
 path, not public-network or KawPoW capacity.
 
-Broader release gates still require sustained mixed-load/state-growth/recovery
-measurement, a GPU/KawPoW multi-peer product rerun, delayed verifier-registry
-governance integration, installation without prebuilt prover/node prerequisites,
-and public API/security review. No production-ready or full-release-complete
-claim follows from this internal profile.
+Broader release gates still require delayed verifier-registry governance
+integration, a full proof-workload rerun under the replacement profile,
+installation without prebuilt prover/node prerequisites, and public API/security
+review. No production-ready or full-release-complete claim follows from this
+internal profile.
 
 ## Change log
 
