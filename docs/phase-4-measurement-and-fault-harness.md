@@ -99,9 +99,9 @@ python3 scripts/generate-phase4-acceptance-report.py \
 ```
 
 The report identifies missing or failed test classes and source-file digests.
-It deliberately reports `review-required`, never “production ready.” Numeric
-acceptance thresholds remain **TBD** until the operator/hardware matrix and
-economics/confirmation policy are approved.
+Pass the approved closed-testnet policy with `--policy` to evaluate the measured
+network and resource thresholds. It still only reports `review-required`, never
+“production ready.” See [Phase 4 acceptance and monitoring policy](./phase-4-acceptance-and-monitoring-policy.md).
 
 ## Evidence safety
 

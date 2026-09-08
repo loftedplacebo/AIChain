@@ -1,0 +1,51 @@
+{
+  "schema": "aichain.phase4-acceptance-policy",
+  "schemaVersion": "0.1.0-draft",
+  "scope": "closed-testnet candidate gates only; not mainnet parameters or a public capacity claim",
+  "consensusProfile": "kawpow-candidate-asert-10s-development-profile",
+  "requiredSoakSeconds": 86400,
+  "network": {
+    "minimumObservedBlocks": 1000,
+    "targetBlockIntervalMs": 10000,
+    "minimumMeanBlockProductionMs": 7000,
+    "maximumMeanBlockProductionMs": 15000,
+    "maximumP95BlockProductionMs": 45000,
+    "maximumP99BlockProductionMs": 90000,
+    "maximumP95PropagationObservationMs": 2000,
+    "maximumNaturalStaleRate": 0.03,
+    "maximumControlledReorgRecoverySeconds": 60,
+    "maximumValidatorVerificationP95Ms": 150,
+    "maximumValidatorVerificationMs": 1000,
+    "requireCanonicalHashAgreement": true
+  },
+  "ingress": {
+    "maximumQueueReceipts": 10000,
+    "warningQueueReceipts": 8000,
+    "maximumIngressP95Ms": 100,
+    "maximumBatchInclusionP95Ms": 60000,
+    "minimumConfirmedLogicalReceiptTpsAtBatch100": 50,
+    "maximumIndexerLagBlocks": 2,
+    "maximumIndexerRebuildSeconds": 300
+  },
+  "proof": {
+    "maximumProofQueueP95Ms": 300000,
+    "maximumOnChainVerificationGas": 350000,
+    "maximumProofBytes": 1024,
+    "maximumJournalBytes": 2048,
+    "requireMalformedAndBindingRejection": true
+  },
+  "resources": {
+    "maximumValidatorP95CpuPercentOneCore": 80,
+    "maximumValidatorRssBytes": 4294967296,
+    "maximumMinerP95CpuPercentOneCore": 80,
+    "maximumMinerRssBytes": 4294967296,
+    "maximumDataGrowthBytesPer24Hours": 1073741824
+  },
+  "confirmation": {
+    "observedBlocks": 1,
+    "standardBlocks": 6,
+    "highAssuranceBlocks": 30,
+    "bridgeOrIrreversibleExternalActionBlocks": null
+  },
+  "reviewRule": "Any threshold breach, missing required evidence, critical alert, or unresolved security finding blocks Phase 4 exit until an explicit recorded disposition."
+}

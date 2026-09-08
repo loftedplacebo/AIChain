@@ -13,6 +13,7 @@ PLAN_VALIDATOR = ROOT / "scripts" / "validate-phase4-fault-plan.py"
 REPORT_GENERATOR = ROOT / "scripts" / "generate-phase4-acceptance-report.py"
 PLAN = ROOT / "fixtures" / "phase4" / "fault-plan-v0.1.0-draft.json"
 RESULTS = ROOT / "fixtures" / "phase4" / "fault-results-synthetic-v0.1.0.json"
+POLICY = ROOT / "config" / "phase4-acceptance-policy-v0.1.0-draft.json"
 
 
 def test_controlled_fault_plan_requires_closed_testnet_and_approval(tmp_path: Path) -> None:
@@ -42,3 +43,16 @@ def test_acceptance_report_is_review_only_and_identifies_coverage(tmp_path: Path
     assert report["automatedControls"].startswith("none")
     assert report["faultCoverage"]["missing"] == []
     assert report["faultCoverage"]["failed"] == []
+
+
+def test_policy_refuses_to_treat_synthetic_evidence_as_a_real_acceptance_run(tmp_path: Path) -> None:
+    output = tmp_path / "policy-report.json"
+    subprocess.run(
+        [sys.executable, str(REPORT_GENERATOR), "--policy", str(POLICY), "--fault-results", str(RESULTS), "--output", str(output)],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    report = json.loads(output.read_text(encoding="utf-8"))
+    assert report["status"] == "synthetic-input"
+    assert report["policyEvaluation"]["missingEvidence"] == ["real-testnet-evidence"]

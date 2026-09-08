@@ -223,6 +223,9 @@ acceptance gates remain open.
 The companion [Phase 4 measurement and fault-test harness](./phase-4-measurement-and-fault-harness.md)
 defines controlled partition, restart, reorganisation, malformed-submission and
 load coverage without giving an unattended script authority to disrupt nodes.
+The companion [Phase 4 acceptance and monitoring policy](./phase-4-acceptance-and-monitoring-policy.md)
+sets the initial measurable closed-testnet gates and alert responses; it does
+not set production parameters.
 
 **Primary outputs**
 

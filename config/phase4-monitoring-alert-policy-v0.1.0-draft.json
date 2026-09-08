@@ -1,0 +1,56 @@
+{
+  "schema": "aichain.phase4-monitoring-alert-policy",
+  "schemaVersion": "0.1.0-draft",
+  "scope": "closed testnet only; private telemetry; no credentials or endpoints",
+  "signals": [
+    "genesis-and-build-identity",
+    "canonical-head-and-peer-count",
+    "block-production-and-natural-stale-rate",
+    "validator-verification-latency",
+    "reorg-depth-and-recovery",
+    "ingress-queue-and-rejection-reasons",
+    "batch-inclusion-and-confirmation",
+    "proof-queue-time-and-verification-gas",
+    "indexer-lag-and-rebuild",
+    "cpu-memory-disk-and-network-growth"
+  ],
+  "alerts": [
+    {
+      "id": "genesis-or-build-mismatch",
+      "severity": "critical",
+      "condition": "a role reports a genesis or approved-build digest different from the release record",
+      "immediateAction": "quarantine the role from P2P, stop AVR ingress, preserve evidence and investigate; do not reset history"
+    },
+    {
+      "id": "public-rpc-exposure",
+      "severity": "critical",
+      "condition": "a closed-testnet RPC listener is reachable outside the approved private boundary",
+      "immediateAction": "remove external exposure, rotate affected gateway credentials, preserve access evidence and review before resuming ingress"
+    },
+    {
+      "id": "canonical-divergence-or-invalid-acceptance",
+      "severity": "critical",
+      "condition": "independent validators disagree on canonical hash beyond the observation window, or an invalid block/proof/AVR is accepted",
+      "immediateAction": "freeze the affected exercise, preserve datadirs and logs, and open a security investigation"
+    },
+    {
+      "id": "block-or-peer-degradation",
+      "severity": "warning",
+      "condition": "no block for 60 seconds, P95 block interval exceeds 45 seconds, or a required peer is absent for 30 seconds",
+      "immediateAction": "inspect miner hash rate, P2P admission and ASERT inputs; record the event for the acceptance report"
+    },
+    {
+      "id": "queue-or-indexer-pressure",
+      "severity": "warning",
+      "condition": "ingress exceeds 8,000 retained receipts, indexer lag exceeds two blocks, or rebuild exceeds five minutes",
+      "immediateAction": "apply documented backpressure, retain receipts client-side, reconcile the index and do not silently discard work"
+    },
+    {
+      "id": "resource-or-proof-budget-breach",
+      "severity": "warning",
+      "condition": "resource, proof-queue or verification-gas measurement exceeds the approved Phase 4 policy",
+      "immediateAction": "reduce test load or pause the affected queue, preserve measurements and require an explicit policy disposition before continuation"
+    }
+  ],
+  "evidenceRetention": "Store public-safe aggregate reports with hashes; restrict raw logs, private evidence, keys and endpoints."
+}
