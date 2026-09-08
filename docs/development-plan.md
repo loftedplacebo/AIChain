@@ -214,6 +214,12 @@ capacity and the selected consensus-profile rerun.
 
 **Goal:** Exercise the integrated system under controlled, realistic, and adversarial conditions.
 
+**Foundation status (2026-09-08):** the pre-provisioning role model, private
+network policy, manifest gate and reset/upgrade discipline are defined in
+[Phase 4 Closed-testnet deployment foundation](./phase-4-closed-testnet-foundation.md).
+This is not a testnet launch; the hardware-diversity, governance and release
+acceptance gates remain open.
+
 **Primary outputs**
 
 - Reproducible closed-testnet deployment and reset/upgrade process.

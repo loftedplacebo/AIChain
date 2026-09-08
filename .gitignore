@@ -15,6 +15,7 @@ build/
 /devnet/
 .env
 .env.*
+config/closed-testnet.env
 *.key
 *.keystore
 
