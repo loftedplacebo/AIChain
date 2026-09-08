@@ -67,6 +67,9 @@ and resource growth. The monitoring policy defines six initial alerts:
 Neither an alert nor a failed test justifies resetting state or rewriting
 history. Preserve evidence first, then follow the relevant recovery runbook.
 
+The implementation and role-local collection instructions are in the
+[Phase 4 private metrics pipeline](./phase-4-private-metrics-pipeline.md).
+
 ## Report evaluation
 
 The acceptance-report generator now accepts `--policy` and applies its

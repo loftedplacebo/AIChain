@@ -5,6 +5,8 @@ from __future__ import annotations
 import json
 import subprocess
 import sys
+import threading
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 
@@ -14,6 +16,12 @@ REPORT_GENERATOR = ROOT / "scripts" / "generate-phase4-acceptance-report.py"
 PLAN = ROOT / "fixtures" / "phase4" / "fault-plan-v0.1.0-draft.json"
 RESULTS = ROOT / "fixtures" / "phase4" / "fault-results-synthetic-v0.1.0.json"
 POLICY = ROOT / "config" / "phase4-acceptance-policy-v0.1.0-draft.json"
+ALERT_POLICY = ROOT / "config" / "phase4-monitoring-alert-policy-v0.1.0-draft.json"
+COLLECTOR = ROOT / "scripts" / "collect-phase4-metrics.py"
+ALERT_EVALUATOR = ROOT / "scripts" / "evaluate-phase4-alerts.py"
+BUILD_ID = "0x" + "11" * 32
+GENESIS = "0x" + "22" * 32
+HEAD = "0x" + "33" * 32
 
 
 def test_controlled_fault_plan_requires_closed_testnet_and_approval(tmp_path: Path) -> None:
@@ -56,3 +64,47 @@ def test_policy_refuses_to_treat_synthetic_evidence_as_a_real_acceptance_run(tmp
     report = json.loads(output.read_text(encoding="utf-8"))
     assert report["status"] == "synthetic-input"
     assert report["policyEvaluation"]["missingEvidence"] == ["real-testnet-evidence"]
+
+
+def test_loopback_collector_and_alert_evaluator(tmp_path: Path) -> None:
+    class RpcHandler(BaseHTTPRequestHandler):
+        def do_POST(self) -> None:  # noqa: N802
+            request = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
+            method = request["method"]
+            if method == "eth_getBlockByNumber":
+                result = {"hash": GENESIS, "number": "0x0", "timestamp": "0x0"} if request["params"][0] == "0x0" else {"hash": HEAD, "number": "0x7", "timestamp": "0x64"}
+            else:
+                result = {"eth_chainId": "0x539", "net_peerCount": "0x1", "eth_syncing": False}[method]
+            body = json.dumps({"jsonrpc": "2.0", "id": 1, "result": result}).encode()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        def log_message(self, *_: object) -> None:
+            return
+
+    server = ThreadingHTTPServer(("127.0.0.1", 0), RpcHandler)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        snapshot = tmp_path / "snapshot.json"
+        subprocess.run(
+            [sys.executable, str(COLLECTOR), "--role", "validator", "--rpc-url", f"http://127.0.0.1:{server.server_port}",
+             "--build-id", BUILD_ID, "--expected-genesis", GENESIS, "--expected-chain-id", "1337", "--output", str(snapshot)],
+            capture_output=True, text=True, check=True,
+        )
+    finally:
+        server.shutdown()
+        thread.join()
+    alert_output = tmp_path / "alerts.json"
+    subprocess.run(
+        [sys.executable, str(ALERT_EVALUATOR), "--policy", str(ALERT_POLICY), "--snapshot", str(snapshot), "--output", str(alert_output)],
+        capture_output=True, text=True, check=True,
+    )
+    collected = json.loads(snapshot.read_text(encoding="utf-8"))
+    alerts = json.loads(alert_output.read_text(encoding="utf-8"))
+    assert collected["rpcScope"] == "loopback"
+    assert collected["genesisHash"] == GENESIS
+    assert alerts["status"] == "normal"
