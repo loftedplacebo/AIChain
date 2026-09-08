@@ -146,6 +146,14 @@ claiming an in-place upgrade is safe.
 - Claims of ASIC resistance, quantum resistance, production TPS or finality.
 - Production security approval; independent review remains required.
 
+## Interim single-GPU rehearsal
+
+While the required AMD and additional independent miners are unavailable, run
+the scoped [single-GPU / dual-validator rehearsal](./phase-4-single-gpu-rehearsal.md).
+It produces useful synchronization, recovery, AVR/proof and monitoring evidence
+without misrepresenting the result as closure of the full hardware-diversity
+gate.
+
 ## Next implementation increment
 
 The measurement and fault-test harness is now drafted in

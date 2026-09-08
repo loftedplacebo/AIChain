@@ -229,6 +229,10 @@ not set production parameters.
 The [private metrics pipeline](./phase-4-private-metrics-pipeline.md) collects
 loopback-only role snapshots and evaluates identity, canonical-head and peer
 alerts without unattended node-control authority.
+Before AMD and multi-miner capacity is available, the
+[single-GPU / dual-validator rehearsal](./phase-4-single-gpu-rehearsal.md)
+provides the bounded interim test sequence and preserves the full closed-testnet
+hardware gates.
 
 **Primary outputs**
 

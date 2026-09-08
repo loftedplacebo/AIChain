@@ -108,3 +108,22 @@ def test_loopback_collector_and_alert_evaluator(tmp_path: Path) -> None:
     assert collected["rpcScope"] == "loopback"
     assert collected["genesisHash"] == GENESIS
     assert alerts["status"] == "normal"
+
+
+def test_alert_evaluator_escalates_identity_mismatch(tmp_path: Path) -> None:
+    first = {
+        "schema": "aichain.phase4-private-metrics-snapshot", "buildId": BUILD_ID,
+        "genesisHash": GENESIS, "role": "validator", "peerCount": 1,
+        "head": {"number": 7, "hash": HEAD},
+    }
+    second = {**first, "role": "miner", "genesisHash": "0x" + "44" * 32}
+    first_path, second_path, output = tmp_path / "first.json", tmp_path / "second.json", tmp_path / "alerts.json"
+    first_path.write_text(json.dumps(first), encoding="utf-8")
+    second_path.write_text(json.dumps(second), encoding="utf-8")
+    subprocess.run(
+        [sys.executable, str(ALERT_EVALUATOR), "--policy", str(ALERT_POLICY), "--snapshot", str(first_path), "--snapshot", str(second_path), "--output", str(output)],
+        capture_output=True, text=True, check=True,
+    )
+    alerts = json.loads(output.read_text(encoding="utf-8"))
+    assert alerts["status"] == "critical"
+    assert alerts["alerts"] == [{"id": "genesis-or-build-mismatch", "severity": "critical"}]
