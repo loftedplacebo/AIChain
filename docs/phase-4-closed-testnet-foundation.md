@@ -148,7 +148,7 @@ claiming an in-place upgrade is safe.
 
 ## Next implementation increment
 
-Once this foundation is accepted, implement the **measurement and fault-test
-harness**: a role-aware metrics schema, repeatable partition/reorg exercises,
-and an acceptance-report generator. It will consume the approved manifest but
-must not start a network automatically.
+The measurement and fault-test harness is now drafted in
+[Phase 4 Measurement and fault-test harness](./phase-4-measurement-and-fault-harness.md).
+It validates controlled plans and produces review-required evidence reports,
+but does not start a network or execute faults automatically.

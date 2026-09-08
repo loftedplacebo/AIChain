@@ -1,0 +1,12 @@
+{
+  "schema": "aichain.phase4-fault-results",
+  "schemaVersion": "0.1.0-draft",
+  "synthetic": true,
+  "experiments": [
+    {"id": "validator-partition", "kind": "partition", "status": "passed"},
+    {"id": "validator-restart", "kind": "restart", "status": "passed"},
+    {"id": "competing-miner-branch", "kind": "reorg", "status": "passed"},
+    {"id": "invalid-block-and-submission", "kind": "malformed-submission", "status": "passed"},
+    {"id": "bounded-ingress-load", "kind": "load", "status": "passed"}
+  ]
+}

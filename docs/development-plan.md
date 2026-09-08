@@ -220,6 +220,10 @@ network policy, manifest gate and reset/upgrade discipline are defined in
 This is not a testnet launch; the hardware-diversity, governance and release
 acceptance gates remain open.
 
+The companion [Phase 4 measurement and fault-test harness](./phase-4-measurement-and-fault-harness.md)
+defines controlled partition, restart, reorganisation, malformed-submission and
+load coverage without giving an unattended script authority to disrupt nodes.
+
 **Primary outputs**
 
 - Reproducible closed-testnet deployment and reset/upgrade process.

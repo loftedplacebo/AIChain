@@ -1,0 +1,54 @@
+{
+  "schema": "aichain.phase4-controlled-fault-plan",
+  "schemaVersion": "0.1.0-draft",
+  "target": "closed-testnet",
+  "approvalRequired": true,
+  "prohibitedTargets": ["operational-devnet", "public-network"],
+  "experiments": [
+    {
+      "id": "validator-partition",
+      "kind": "partition",
+      "roles": ["validator"],
+      "maxDurationSeconds": 300,
+      "preconditions": ["independent-head-observer", "private-p2p-only"],
+      "rollback": ["restore-approved-peer-links", "wait-for-canonical-catchup"],
+      "expectedInvariants": ["genesis-unchanged", "no-public-rpc", "canonical-chain-recovers"]
+    },
+    {
+      "id": "validator-restart",
+      "kind": "restart",
+      "roles": ["validator"],
+      "maxDurationSeconds": 300,
+      "preconditions": ["approved-backup", "independent-head-observer"],
+      "rollback": ["restart-same-datadir", "wait-for-canonical-catchup"],
+      "expectedInvariants": ["genesis-unchanged", "no-chain-reset", "canonical-chain-recovers"]
+    },
+    {
+      "id": "competing-miner-branch",
+      "kind": "reorg",
+      "roles": ["miner", "validator"],
+      "maxDurationSeconds": 300,
+      "preconditions": ["two-independent-miners", "independent-head-observer"],
+      "rollback": ["restore-approved-peer-links", "wait-for-canonical-catchup"],
+      "expectedInvariants": ["greater-work-wins", "reorg-index-replay", "no-public-rpc"]
+    },
+    {
+      "id": "invalid-block-and-submission",
+      "kind": "malformed-submission",
+      "roles": ["miner", "validator", "ingress"],
+      "maxDurationSeconds": 180,
+      "preconditions": ["isolated-test-account", "rejection-log-capture"],
+      "rollback": ["discard-invalid-input", "verify-canonical-head"],
+      "expectedInvariants": ["invalid-block-rejected", "malformed-avr-rejected", "malformed-proof-rejected"]
+    },
+    {
+      "id": "bounded-ingress-load",
+      "kind": "load",
+      "roles": ["ingress", "indexer", "validator"],
+      "maxDurationSeconds": 900,
+      "preconditions": ["backpressure-enabled", "metrics-collector"],
+      "rollback": ["drain-queue", "reconcile-index"],
+      "expectedInvariants": ["bounded-queue", "deduplication-retained", "indexer-recovers"]
+    }
+  ]
+}
