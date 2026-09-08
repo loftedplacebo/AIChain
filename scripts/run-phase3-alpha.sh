@@ -6,12 +6,15 @@ cd "$(dirname "$0")/.."
 : "${CORE_GETH_BIN:?Set the path to a built Core-Geth binary}"
 : "${RISC0_ETHEREUM_DIR:?Set the pinned risc0-ethereum v3.0.0 checkout}"
 : "${RISC0_HOST_BIN:?Set the built policy-evaluation host binary}"
+: "${RISC0_SERVER_PATH:?Set the compatible r0vm executable used by the IPC prover}"
 for tool in node forge python3 timeout; do command -v "$tool" >/dev/null; done
 node -e 'if(Number(process.versions.node.split(".")[0])<24)process.exit(1)'
 test "$(git -C "$RISC0_ETHEREUM_DIR" rev-parse HEAD)" = 32aa0b6f23ddd02dd93fc71717667606e5c7db86
 CORE_GETH_BIN=$(realpath "$CORE_GETH_BIN")
 RISC0_HOST_BIN=$(realpath "$RISC0_HOST_BIN")
 RISC0_ETHEREUM_DIR=$(realpath "$RISC0_ETHEREUM_DIR")
+RISC0_SERVER_PATH=$(realpath "$RISC0_SERVER_PATH")
+test -x "$RISC0_SERVER_PATH"
 genesis_template=$(realpath config/phase3-disposable-genesis.template.json)
 rpc_port="${AICHAIN_PHASE3_RPC_PORT:-18548}"
 [[ "$rpc_port" =~ ^[0-9]{2,5}$ ]] && (( rpc_port >= 1024 && rpc_port <= 64535 )) || { echo "AICHAIN_PHASE3_RPC_PORT must be 1024–64535" >&2; exit 2; }
@@ -62,7 +65,7 @@ cp "$run/risc0-out/RiscZeroGroth16Verifier.sol/RiscZeroGroth16Verifier.json" "$r
 export AICHAIN_ENABLE_PHASE3=1
 export AICHAIN_PHASE3_RPC_URL="http://127.0.0.1:$rpc_port"
 timeout 120 node scripts/phase3-alpha.js prepare "$run"
-RISC0_DEV_MODE=0 RISC0_PROVER=ipc timeout 1800 "$RISC0_HOST_BIN" --evm-export "$run/witness.json" "$run/proof.json"
+RISC0_DEV_MODE=0 RISC0_PROVER=ipc RISC0_SERVER_PATH="$RISC0_SERVER_PATH" timeout 1800 "$RISC0_HOST_BIN" --evm-export "$run/witness.json" "$run/proof.json"
 cp fixtures/zk/phase3-image-id.txt "$run/image-id.txt"
 timeout 180 node scripts/phase3-alpha.js verify "$run"
 python3 scripts/phase3-python-check.py "$run"

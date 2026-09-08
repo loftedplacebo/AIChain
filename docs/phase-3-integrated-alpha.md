@@ -1,6 +1,6 @@
 # Phase 3 — Integrated internal alpha
 
-Version: 0.1.0-alpha · Updated: 2026-09-07
+Version: 0.1.0-alpha · Updated: 2026-09-08
 
 ## Scope and status
 
@@ -62,11 +62,18 @@ proof's self-reported image into that trust root.
 The official `risc0-ethereum` checkout must be commit
 `32aa0b6f23ddd02dd93fc71717667606e5c7db86`. Its verifier is compiled for
 **Istanbul**, because the default Cancun artifact did not deploy on this node.
+The proof host uses RISC Zero's IPC prover, so `RISC0_SERVER_PATH` must name an
+executable `r0vm`; this is an explicit reproducibility prerequisite, not a
+silently assumed system service. The reviewed replacement run exercised the
+pinned 3.0.3 host with `r0vm` 3.0.6 and had its resulting proof accepted by the
+pinned on-chain verifier. That is integration evidence for this exact
+combination, not a general version-compatibility promise.
 
 ```bash
 export CORE_GETH_BIN=/absolute/path/to/core-geth
 export RISC0_ETHEREUM_DIR=/absolute/path/to/risc0-ethereum
 export RISC0_HOST_BIN=/absolute/path/to/aichain-risc0-policy-evaluation-host
+export RISC0_SERVER_PATH=/absolute/path/to/compatible-r0vm
 bash scripts/run-phase3-alpha.sh
 ```
 
@@ -133,10 +140,20 @@ confirmed in 4,687 ms: 2.134 batch transactions/s and 213.358 logical receipts/s
 Inclusion p95 was 1,128 ms; indexing took 262 ms and 1,000 lookups took 2,060 ms.
 The 88,676-byte index covered six blocks. A separate custom-genesis restart test
 subsequently passed: the same genesis survived a clean stop/start and sealed a
-post-restart transaction. The complete proof workload will be rerun under the
-replacement profile before any new comparative performance claim. See
-[reviewed evidence](./phase3-evidence-2026-09-07.json).
+post-restart transaction. See [reviewed legacy-profile evidence](./phase3-evidence-2026-09-07.json).
 Regression suites: 48 JavaScript tests and 13 Python tests passed.
+
+The replacement custom-genesis workload now also passed in full on 2026-09-08.
+It generated a real proof in **230,130 ms**, verified it through the pinned
+on-chain adapter for **267,227 gas**, ran the JavaScript and Python receipt
+presentations, replayed that proof during the load test, and restarted from the
+same chain state. The bounded 1,000-receipt test confirmed ten batches in
+64,392 ms: **0.155 batch transactions/s; 15.530 logical receipts/s**. Ingress
+p95 was 0.048 ms, inclusion p95 19,793 ms, index construction 313 ms and 1,000
+lookups 1,910 ms. The 88,460-byte index covered six blocks. These measurements
+are a cold, CPU-Ethash development profile and must not be compared with the
+earlier `--dev` figures or used as KawPoW/public-network capacity claims. See
+[replacement-profile evidence](./phase3-custom-genesis-evidence-2026-09-08.json).
 
 A five-minute sustained mixed run also passed. It submitted 32,080 logical
 receipts through 320 batch transactions, 80 individual authorised anchors and
@@ -147,10 +164,9 @@ single-node measurement: it establishes the tested operating point and recovery
 path, not public-network or KawPoW capacity.
 
 Broader release gates still require delayed verifier-registry governance
-integration, a full proof-workload rerun under the replacement profile,
-installation without prebuilt prover/node prerequisites, and public API/security
-review. No production-ready or full-release-complete claim follows from this
-internal profile.
+integration, installation without prebuilt prover/node prerequisites, and public
+API/security review. No production-ready or full-release-complete claim follows
+from this internal profile.
 
 ## Change log
 

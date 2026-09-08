@@ -1,6 +1,6 @@
 # Phase 3 sign-off tracker
 
-Updated: 2026-09-07. **Overall status: incomplete.** Commit/push requested only
+Updated: 2026-09-08. **Overall status: incomplete.** Commit/push requested only
 after the outstanding gates pass; do not represent pending gates as completed.
 
 | Gate | Status | Evidence / next action |
@@ -11,6 +11,7 @@ after the outstanding gates pass; do not represent pending gates as completed.
 | Real governance activation delay | Pending | Earliest wall-clock completion: 2026-09-09 05:53:57.989 UTC, plus chain activation condition |
 | KawPoW validator restart and catch-up | Passed, disposable network | Validator stopped cleanly at height 95, GPU miner advanced to 104, then validator restarted, re-peered and caught up to height 114. |
 | Phase 3 development-runner restart | Passed, replacement profile | Fresh custom-genesis CPU-Ethash runner kept its genesis across a clean restart and sealed a post-restart transaction. This runner is development-only, not an AIChain consensus selection. |
+| Replacement-profile complete proof workload | Passed, bounded profile | Fresh real RISC Zero proof (230,130 ms), pinned on-chain adapter verification (267,227 gas), 1,000-receipt load/replay, JavaScript/Python presentation checks and clean restart/recovery all passed. It is cold CPU-Ethash development evidence, not a comparable TPS or KawPoW result. |
 | Historical `--dev` restart profile | Documented legacy limitation | Existing Core-Geth `--dev` database rejected on restart. It is no longer the Phase 3 runner. The live governance-delay trial remains on that isolated legacy profile and must not be restarted before it finishes. |
 
 ## Real delay trial

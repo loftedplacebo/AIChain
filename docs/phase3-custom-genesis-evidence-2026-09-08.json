@@ -1,0 +1,63 @@
+{
+  "schema": "aichain.phase3-replacement-profile-evidence",
+  "date": "2026-09-08",
+  "profile": "fresh disposable custom-genesis CPU-mined Ethash development chain; single node; not KawPoW or production consensus",
+  "result": "passed",
+  "productionOrKawpowCapacityClaim": false,
+  "genesisHash": "0x520452c1ea9da7fecea02028ebda119e49c783d399c7c22102dec99c8e108642",
+  "proof": {
+    "hostRisc0Version": "3.0.3",
+    "r0vmVersion": "3.0.6",
+    "elapsedMs": 230130,
+    "sealBytes": 260,
+    "journalBytes": 714,
+    "onChainPinnedVerifierAccepted": true,
+    "verificationGas": 267227,
+    "compatibilityScope": "observed integration result for this pinned host, r0vm and verifier combination only"
+  },
+  "checks": [
+    "agent-signature",
+    "authorised-anchor",
+    "unproved-anchor",
+    "real-proof-adapter",
+    "tampered-proof-rejected",
+    "tampered-journal-rejected",
+    "receipt-substitution-rejected",
+    "batch-membership",
+    "persistent-index-resume",
+    "organisation-disclosure",
+    "localhost-rpc-explorer",
+    "revoked-agent-rejected",
+    "python-presentation-validation",
+    "proof-replay",
+    "clean-restart-recovery"
+  ],
+  "load": {
+    "logicalReceipts": 1000,
+    "batchTransactions": 10,
+    "concurrency": 2,
+    "includedMs": 64391.959252,
+    "transactionTps": 0.1552988931562818,
+    "logicalReceiptTps": 15.52988931562818,
+    "ingestionP95Ms": 0.047661000000061904,
+    "inclusionP95Ms": 19792.896056,
+    "indexMs": 312.703204999998,
+    "lookup1000Ms": 1910.449747999999,
+    "indexBytes": 88460,
+    "indexedBlocks": 6
+  },
+  "restart": {
+    "status": "passed",
+    "beforeBlock": 4873,
+    "afterBlock": 4874,
+    "genesisRetained": true
+  },
+  "limitations": [
+    "synthetic actions, not model inference",
+    "single-node CPU-Ethash development profile",
+    "cold Ethash dataset generation materially affects timing",
+    "bounded smoke load, not sustained saturation",
+    "direct proof adapter, not delayed registry-governance activation",
+    "no distributed KawPoW finality measurement"
+  ]
+}
