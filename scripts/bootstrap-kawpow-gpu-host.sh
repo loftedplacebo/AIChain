@@ -33,7 +33,9 @@ fi
 nvidia-smi --query-gpu=name,compute_cap --format=csv,noheader
 
 if [[ ! -d "$project_root/.git" ]]; then
-  git clone --recurse-submodules "$repo_url" "$project_root"
+  # Do not recurse here: Core-Geth carries large test-data submodules. The
+  # explicit updates below fetch only the node and cpp-kawpow dependencies.
+  git clone "$repo_url" "$project_root"
 fi
 git -C "$project_root" fetch --tags origin
 git -C "$project_root" checkout --detach "$repo_ref"
