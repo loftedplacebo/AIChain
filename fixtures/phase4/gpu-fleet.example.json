@@ -1,0 +1,28 @@
+{
+  "schema": "aichain.kawpow-gpu-fleet",
+  "schemaVersion": "0.1.0-draft",
+  "scope": "disposable development network only",
+  "sshIdentity": "/absolute/path/to/ephemeral-ed25519-key",
+  "hosts": [
+    {
+      "id": "miner-a",
+      "role": "miner",
+      "region": "region-one",
+      "address": "203.0.113.10",
+      "port": 22,
+      "user": "root",
+      "expectedGpu": "RTX 3060",
+      "computeCapability": "86"
+    },
+    {
+      "id": "miner-b",
+      "role": "miner",
+      "region": "region-two",
+      "address": "203.0.113.20",
+      "port": 22,
+      "user": "root",
+      "expectedGpu": "RTX 3060",
+      "computeCapability": "86"
+    }
+  ]
+}

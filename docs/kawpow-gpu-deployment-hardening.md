@@ -26,6 +26,23 @@ or production runbook.
 - The supervisor pauses a GPU at 80°C by default. Set
   `AICHAIN_MAX_GPU_TEMP_C=0` only for an explicitly supervised diagnostic.
 
+## Fleet preflight
+
+Use a private copy of `fixtures/phase4/gpu-fleet.example.json` as the inventory.
+It contains host addresses and an SSH identity path, so it is deliberately not
+part of the public run evidence. Validate and collect the manifest with:
+
+```bash
+python3 scripts/validate-kawpow-gpu-fleet.py /absolute/gpu-fleet.json
+bash scripts/preflight-kawpow-gpu-fleet.sh \
+  /absolute/gpu-fleet.json /absolute/evidence/preflight
+```
+
+The preflight is read-only: it verifies SSH reachability, GPU model/compute
+capability and build prerequisites, then writes a public-safe manifest without
+host addresses or identity paths. Starting/stopping disposable nodes remains a
+separate explicitly approved action.
+
 ## Failure modes observed and remediation
 
 | Observation | Cause | Template control |
