@@ -3,15 +3,31 @@
 | Field | Value |
 |---|---|
 | Status | Active delivery roadmap |
-| Document version | 0.7 |
-| Last updated | 2026-09-06 |
-| Starting point | Phase 1 complete; NVIDIA KawPoW/ASERT development validation complete |
+| Document version | 0.8 |
+| Last updated | 2026-09-12 |
+| Starting point | Phase 2D AVR alpha complete; general Verification Receipt `0.4.0-alpha` implemented; Phase 3 integrated alpha active |
 | Current constraint | No AMD GPU or additional independent GPU miners available |
 | Principle | Continue software/product work now; move hardware-diversity and multi-miner tests to the testnet gates |
 
 ## 1. Immediate Direction
 
 The active work is now **Phase 2D AVR product and scale foundation**. ZK-001, native SP1/RISC Zero proofs, security negatives, byte-identical public values, disposable EVM verifier trials, the repeated benchmark, alpha proof batching, and alpha verifier governance are complete. RISC Zero is selected under [ADR-0006](./decisions/0006-risc-zero-initial-proof-stack-selection.md), ZK-003 under [ADR-0007](./decisions/0007-zk-003-individual-proof-batches.md), and ZK-004 under [ADR-0008](./decisions/0008-zk-004-verifier-governance-and-limits.md).
+
+The Phase 2D receipt increment now includes the additive general [Verification
+Receipt `0.4.0-alpha`](./verification-receipt-developer-guide.md). It preserves
+the identifiers, assurance boundaries and contracts of AVR `0.1.0-draft` and
+authorised AVR `0.2.0-draft`, while adding namespaced developer-defined evidence,
+profile pinning, private evidence openings, signatures, receipt links, and
+robotics session/clock metadata. This is an alpha interface, not a stable
+protocol or a replacement for the existing authorised AVR/ZK-001 proof path.
+
+The receipt-specific work now moves through the same Phase 3 integrated-alpha
+gate as the rest of the product. The next gates are: an independent developer
+trial; durable evidence outbox, retention, backup and recovery; typed verifier
+results for profile, signature, authority and proof checks; stable SDK packaging
+and language conformance; and live general-format chain, reorganisation and
+machine-workload validation. These gates close product-readiness gaps; they do
+not advance the deferred consensus or hardware gates.
 
 The following tasks are deferred—not waived—to the closed/public-testnet programme:
 
@@ -109,12 +125,23 @@ Current status: the interoperability and repeated benchmark portions are complet
 - Organisation/private-ledger view based on encrypted off-chain data plus public L1 commitments, not a separate private consensus protocol at this stage.
 - Batch manifest, data-availability, inclusion-proof, retry, and reorganization semantics.
 - Queueing, backpressure, fee estimation, and batch-size policy.
+- General Verification Receipt `0.4.0-alpha`: developer-defined evidence roles,
+  pinned profile specifications, receipt relationships, private salted and
+  streaming commitments, and robotics session/clock metadata.
+- Cross-language conformance vectors, TypeScript/Python CLIs, a robotics example,
+  and a receipt-specific CI workflow.
+- Explicit readiness gates for external developer use, durable evidence custody,
+  verifier-result semantics, stable packaging, and live chain/machine validation.
 
 ### Exit gate
 
 - One external application can create, sign, batch, anchor, query, disclose, and verify a receipt using documented SDK interfaces.
+- One external application can exercise the general receipt envelope with a
+  custom or bundled profile without inventing AI-specific placeholder fields.
 - Private raw AI data is not required on-chain.
 - Individual versus batched throughput and state-growth costs are measured.
+- Unsupported general authority or ZK claims are rejected or reported as
+  unchecked; existing authorised AVR/ZK-001 semantics remain separately bound.
 
 ## 5. Phase 3 — Integrated Alpha
 
@@ -206,24 +233,29 @@ Bridge confirmation rules must be materially stricter than ordinary AVR confirma
 
 ## 9. Recommended Linear Order
 
-1. Define ZK-001 proof statement and public inputs.
-2. Build the deterministic verification program and shared negative vectors.
-3. Benchmark RISC Zero, SP1, and Halo2 against that exact claim.
-4. Select the alpha proof stack and deploy its disposable verifier.
-5. Consolidate AVR schema/assurance levels and SDK parity.
-6. Add proof-aware batching, Blockscout indexing, and organisation disclosure flow.
-7. Produce the integrated alpha.
-8. Prepare the closed testnet and acquire/rent the AMD plus independent GPU capacity required to close the deferred mining gates.
-9. Run public testnet only after closed-testnet security, performance, and operational acceptance.
-10. Evaluate any stablecoin/bridge only through the separately gated asset track.
+1. **Complete the receipt Phase 3 integration gate:** run the independent
+   developer trial, durable evidence-custody/recovery rehearsal, typed verifier
+   result review, stable SDK packaging/conformance, and live general-format
+   chain/reorg validation.
+2. Complete the existing integrated-alpha demonstrations: unproved and proved
+   AVR submission, individual and batched anchoring, proof/public-input
+   substitution rejection, organisation disclosure, explorer lookup and
+   restart/reorg/indexer recovery.
+3. Measure sustained individual-versus-batched receipt/proof load, confirmation
+   latency, state/index growth, queue backpressure and verifier cost.
+4. Prepare the closed testnet and acquire/rent the AMD plus independent GPU
+   capacity required to close the deferred mining gates.
+5. Run public testnet only after closed-testnet security, performance, SDK,
+   receipt, proof and operational acceptance.
+6. Evaluate any stablecoin/bridge only through the separately gated asset track.
 
 ## 10. Immediate Next Task
 
 The first Phase 2D milestone is complete: the additive
 [`AVR Presentation 0.3.0-alpha`](./phase-2d-avr-presentation-alpha.md) gives
 applications canonical, proof-aware assurance presentation around the existing
-`0.1.0` and `0.2.0` receipt profiles without changing live anchors or standard
-Ethereum RPC.
+`0.1.0`, `0.2.0`, and general `0.4.0-alpha` receipt profiles without changing
+legacy live anchors or standard Ethereum RPC.
 
 The versioned local AI JSON-RPC draft and indexer-facing receipt lookup are now
 implemented as an explicitly opt-in, loopback-only reference sidecar. See
@@ -240,6 +272,11 @@ slice has been exercised. See [the Phase 3 runbook](./phase-3-integrated-alpha.m
 for reproducibility, measurements and remaining full-release gates. Sustained
 end-to-end capacity is not established by the Phase 2D local smoke measurements.
 
+The general receipt readiness review records the product-specific gates and
+their limitations in [Verification Receipt Readiness Review](./verification-receipt-readiness-review.md).
+It is subordinate to this roadmap: profile flexibility does not close identity,
+authority, proof, hardware, consensus, security, capacity or public-testnet gates.
+
 ## 11. Change Log
 
 | Version | Date | Change |
@@ -251,3 +288,4 @@ end-to-end capacity is not established by the Phase 2D local smoke measurements.
 | 0.9 | 2026-09-06 | Added opt-in localhost-only AVR RPC reference service and indexed presentation lookup; durable reorg-aware indexing remains next |
 | 1.0 | 2026-09-06 | Added persistent AVR event index, canonical checkpoint rollback, batch manifest/inclusion lookup, RPC bridge and disposable Core-Geth integration evidence |
 | 1.1 | 2026-09-06 | Completed Phase 2D alpha scale/operations policy, bounded ingress/micro-batching reference, local load measurement and explorer-safe lookup; Phase 3 is next |
+| 1.2 | 2026-09-12 | Added general Verification Receipt `0.4.0-alpha`, six use-case profiles, receipt-specific readiness gates, and aligned the next sequence with the active Phase 3 integrated-alpha roadmap |
