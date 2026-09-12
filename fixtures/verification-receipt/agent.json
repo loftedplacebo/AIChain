@@ -1,0 +1,110 @@
+{
+  "profile": {
+    "id": "urn:aichain:profile:agent",
+    "version": "0.4.0-alpha",
+    "subjectKinds": [
+      "core:agent",
+      "core:service"
+    ],
+    "requiredEvidence": [
+      "ai:configuration",
+      "ai:input",
+      "ai:output",
+      "ai:policy"
+    ],
+    "requireStream": false,
+    "requireObservation": false,
+    "specificationDigest": "0x6ea3c17528679c5334520227146836469b0f6f2504f38401f09ea10d8966de23"
+  },
+  "receipt": {
+    "commitments": {
+      "ai:configuration": {
+        "digest": "0xf1b04d103ce0b2210a10795932ccc2b47b2c658b09aa66fcd14d8d198d8989ef",
+        "mediaType": "application/octet-stream",
+        "scheme": "sha256-salted-v1"
+      },
+      "ai:input": {
+        "digest": "0xb226b7fdba11a3b454365a3f8e09c97747d529d75f9fdc7ac8fe7bbfd7c50c55",
+        "mediaType": "application/octet-stream",
+        "scheme": "sha256-salted-v1"
+      },
+      "ai:output": {
+        "digest": "0xfc6bb2295aa2c6f9a9e1d6dc6bec64f5c9fb91d3f4011794cb0f83325757508b",
+        "mediaType": "application/octet-stream",
+        "scheme": "sha256-salted-v1"
+      },
+      "ai:policy": {
+        "digest": "0xc17017c21b8b1f57fdff0f37470bfca9afc2fc0c151486f681fe87779b34741d",
+        "mediaType": "application/octet-stream",
+        "scheme": "sha256-salted-v1"
+      }
+    },
+    "context": {
+      "anchorContract": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "chainId": "20260822"
+    },
+    "event": {
+      "claimedAt": "2026-09-12T12:00:00.000Z",
+      "id": "0x6666666666666666666666666666666666666666666666666666666666666666",
+      "type": "agent:recorded"
+    },
+    "issuer": "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "links": [],
+    "profile": {
+      "id": "urn:aichain:profile:agent",
+      "version": "0.4.0-alpha",
+      "digest": "0x1e20174cd6d4d61f4b87c20fa12a9ddf4c37e8bc67d1e1d14fed659dcbf1d13b"
+    },
+    "schema": "aichain.verification-receipt",
+    "schemaVersion": "0.4.0-alpha",
+    "subject": {
+      "id": "0x5555555555555555555555555555555555555555555555555555555555555555",
+      "kind": "core:agent"
+    }
+  },
+  "expected": {
+    "canonicalReceipt": "{\"commitments\":{\"ai:configuration\":{\"digest\":\"0xf1b04d103ce0b2210a10795932ccc2b47b2c658b09aa66fcd14d8d198d8989ef\",\"mediaType\":\"application/octet-stream\",\"scheme\":\"sha256-salted-v1\"},\"ai:input\":{\"digest\":\"0xb226b7fdba11a3b454365a3f8e09c97747d529d75f9fdc7ac8fe7bbfd7c50c55\",\"mediaType\":\"application/octet-stream\",\"scheme\":\"sha256-salted-v1\"},\"ai:output\":{\"digest\":\"0xfc6bb2295aa2c6f9a9e1d6dc6bec64f5c9fb91d3f4011794cb0f83325757508b\",\"mediaType\":\"application/octet-stream\",\"scheme\":\"sha256-salted-v1\"},\"ai:policy\":{\"digest\":\"0xc17017c21b8b1f57fdff0f37470bfca9afc2fc0c151486f681fe87779b34741d\",\"mediaType\":\"application/octet-stream\",\"scheme\":\"sha256-salted-v1\"}},\"context\":{\"anchorContract\":\"0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"chainId\":\"20260822\"},\"event\":{\"claimedAt\":\"2026-09-12T12:00:00.000Z\",\"id\":\"0x6666666666666666666666666666666666666666666666666666666666666666\",\"type\":\"agent:recorded\"},\"issuer\":\"0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"links\":[],\"profile\":{\"digest\":\"0x1e20174cd6d4d61f4b87c20fa12a9ddf4c37e8bc67d1e1d14fed659dcbf1d13b\",\"id\":\"urn:aichain:profile:agent\",\"version\":\"0.4.0-alpha\"},\"schema\":\"aichain.verification-receipt\",\"schemaVersion\":\"0.4.0-alpha\",\"subject\":{\"id\":\"0x5555555555555555555555555555555555555555555555555555555555555555\",\"kind\":\"core:agent\"}}",
+    "canonicalCommitments": "{\"ai:configuration\":{\"digest\":\"0xf1b04d103ce0b2210a10795932ccc2b47b2c658b09aa66fcd14d8d198d8989ef\",\"mediaType\":\"application/octet-stream\",\"scheme\":\"sha256-salted-v1\"},\"ai:input\":{\"digest\":\"0xb226b7fdba11a3b454365a3f8e09c97747d529d75f9fdc7ac8fe7bbfd7c50c55\",\"mediaType\":\"application/octet-stream\",\"scheme\":\"sha256-salted-v1\"},\"ai:output\":{\"digest\":\"0xfc6bb2295aa2c6f9a9e1d6dc6bec64f5c9fb91d3f4011794cb0f83325757508b\",\"mediaType\":\"application/octet-stream\",\"scheme\":\"sha256-salted-v1\"},\"ai:policy\":{\"digest\":\"0xc17017c21b8b1f57fdff0f37470bfca9afc2fc0c151486f681fe87779b34741d\",\"mediaType\":\"application/octet-stream\",\"scheme\":\"sha256-salted-v1\"}}",
+    "receiptId": "0x15f07787aa3aaaf735ae5191b2d7556c1b86e8cb056e3cb1ef96bf3dd4f3fddf",
+    "commitmentsRoot": "0xf5af834786f2e55a7a1aad9d58d3a7cd7655ee19cf85370c48a579d31d9e4eb4"
+  },
+  "disclosures": {
+    "ai:configuration": {
+      "commitment": {
+        "scheme": "sha256-salted-v1",
+        "mediaType": "application/octet-stream",
+        "digest": "0xf1b04d103ce0b2210a10795932ccc2b47b2c658b09aa66fcd14d8d198d8989ef"
+      },
+      "salt": "0x0101010101010101010101010101010101010101010101010101010101010101",
+      "bytesHex": "66697874757265206f6e6c793a2061693a636f6e66696775726174696f6e20e2809420ce9420f09fa496"
+    },
+    "ai:input": {
+      "commitment": {
+        "scheme": "sha256-salted-v1",
+        "mediaType": "application/octet-stream",
+        "digest": "0xb226b7fdba11a3b454365a3f8e09c97747d529d75f9fdc7ac8fe7bbfd7c50c55"
+      },
+      "salt": "0x0202020202020202020202020202020202020202020202020202020202020202",
+      "bytesHex": "66697874757265206f6e6c793a2061693a696e70757420e2809420ce9420f09fa496"
+    },
+    "ai:output": {
+      "commitment": {
+        "scheme": "sha256-salted-v1",
+        "mediaType": "application/octet-stream",
+        "digest": "0xfc6bb2295aa2c6f9a9e1d6dc6bec64f5c9fb91d3f4011794cb0f83325757508b"
+      },
+      "salt": "0x0303030303030303030303030303030303030303030303030303030303030303",
+      "bytesHex": "66697874757265206f6e6c793a2061693a6f757470757420e2809420ce9420f09fa496"
+    },
+    "ai:policy": {
+      "commitment": {
+        "scheme": "sha256-salted-v1",
+        "mediaType": "application/octet-stream",
+        "digest": "0xc17017c21b8b1f57fdff0f37470bfca9afc2fc0c151486f681fe87779b34741d"
+      },
+      "salt": "0x0404040404040404040404040404040404040404040404040404040404040404",
+      "bytesHex": "66697874757265206f6e6c793a2061693a706f6c69637920e2809420ce9420f09fa496"
+    }
+  },
+  "presentationId": "0xdc7279965cba36fdd34379b2a75d8243d79b4a5a9a63eb19dc50ff3cf9fb938c"
+}

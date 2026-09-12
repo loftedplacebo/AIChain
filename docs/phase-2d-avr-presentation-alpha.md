@@ -4,11 +4,20 @@
 |---|---|
 | Status | Implemented alpha interface; not a final protocol schema |
 | Presentation schema | `aichain.avr-presentation` / `0.3.0-alpha` |
-| Compatibility | Additive wrapper around AVR `0.1.0-draft` and authorised AVR `0.2.0-draft` |
+| Compatibility | Additive wrapper around AVR `0.1.0-draft`, authorised AVR `0.2.0-draft`, and general receipt `0.4.0-alpha` |
 | On-chain impact | None in this milestone |
-| Last updated | 2026-09-06 |
+| Last updated | 2026-09-12 |
 
 ## Purpose
+
+As of 2026-09-12 the wrapper also accepts the additive
+[general receipt 0.4.0-alpha](./verification-receipt-developer-guide.md).
+Existing wrapper/receipt hashes remain unchanged for previous inputs. General
+receipts support commitment-only and issuer-attested presentation claims;
+profile and signature checks remain explicit, and unsupported authority/ZK
+claims are rejected. Their anchor location must match the committed destination.
+The standard-RPC anchor verifier now additionally requires matching canonical
+transaction/block hashes and rejects removed logs.
 
 Applications need a single, portable answer to: *which receipt is this, what
 evidence is being presented, and where was it anchored?* The earlier receipt

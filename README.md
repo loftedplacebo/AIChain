@@ -2,6 +2,16 @@
 
 New Dag is an independent EVM-compatible Proof-of-Work L1 whose core product is the AI Verification Receipt layer. The product direction is a neutral verification and audit layer for autonomous AI, with a long-term ambition to serve as a trust layer for autonomous machines.
 
+## Verification receipt developers
+
+Start with the [general receipt developer guide](./docs/verification-receipt-developer-guide.md)
+and `node examples/verification-receipt.js`. The additive `0.4.0-alpha` format
+supports application-defined evidence, AI and machine profiles, private evidence
+openings, signatures, batching and receipt links. Existing authorized AVR/ZK-001
+flows retain their original format. See the
+[readiness review](./docs/verification-receipt-readiness-review.md) for coverage,
+verification limits and remaining public-release work.
+
 ## Current Development Baseline
 
 See [Phase 3 integrated alpha](./docs/phase-3-integrated-alpha.md) for the

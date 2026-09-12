@@ -3,8 +3,8 @@
 | Field | Value |
 |---|---|
 | Status | Living design document |
-| Document version | 1.1 |
-| Last updated | 2026-09-06 |
+| Document version | 1.2 |
+| Last updated | 2026-09-12 |
 | Protocol/schema version | **TBD** |
 | Decision state | Product direction agreed; unresolved items are marked **TBD** |
 | Companion document | [Core L1 Architecture and Tooling](./core-l1-architecture-and-tooling.md) |
@@ -14,6 +14,14 @@
 The **AI Verification Receipt (AVR) layer is the core product**. It provides a standard way to commit to, attest to, timestamp, and optionally prove defined facts about AI activity on the independent L1.
 
 AI inference and agent execution remain off-chain. The chain records the verification anchor and verifies supported ZK proofs; it does not rerun the AI workload.
+
+The [general Verification Receipt 0.4.0-alpha](./verification-receipt-developer-guide.md)
+adds developer-defined evidence profiles, committed specifications, machine clock
+and stream metadata, private evidence openings and explicit anchor context.
+It uses existing opaque receipt anchors and the presentation/lookup interfaces.
+It does not change the authorized AVR or ZK-001 receipt/public-input bindings;
+general-format authority and proof adapters remain unimplemented. See the
+[readiness review](./verification-receipt-readiness-review.md) for current scope.
 
 ## 2. Agreed Direction
 

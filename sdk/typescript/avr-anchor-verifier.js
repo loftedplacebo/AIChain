@@ -50,16 +50,26 @@ async function verifyPresentationAnchor(presentation, provider, { minimumConfirm
   if (!receipt) return invalid("Anchor transaction was not found");
   if (!receiptSucceeded(receipt)) return invalid("Anchor transaction did not succeed");
   const actualHash = receipt.hash ?? receipt.transactionHash;
-  if (actualHash && !sameHex(actualHash, anchor.transactionHash)) return invalid("Returned transaction receipt hash does not match anchor");
-  if (!Number.isInteger(receipt.blockNumber)) return invalid("Anchor receipt has no canonical block number");
+  if (!sameHex(actualHash, anchor.transactionHash)) return invalid("Returned transaction receipt hash does not match anchor");
+  if (!Number.isSafeInteger(receipt.blockNumber) || receipt.blockNumber < 0) return invalid("Anchor receipt has no canonical block number");
+  if (typeof receipt.blockHash !== 'string' || !BYTES32.test(receipt.blockHash)) return invalid('Anchor receipt has no block hash');
   const latestBlock = await provider.getBlockNumber();
+  if (!Number.isSafeInteger(latestBlock) || latestBlock < 0) return invalid('Node returned an invalid head number');
   const confirmations = Math.max(0, latestBlock - receipt.blockNumber + 1);
   if (confirmations < minimumConfirmations) return invalid("Anchor has insufficient confirmations", { confirmations, minimumConfirmations });
+  const block = await provider.getBlock(receipt.blockNumber);
+  if (!block || block.number !== receipt.blockNumber || !sameHex(block.hash, receipt.blockHash)) {
+    return invalid('Anchor transaction is not in the canonical block', { confirmations });
+  }
+  // Inclusion remains provisional: a later PoW reorganisation can invalidate it.
+  if ((receipt.logs ?? []).some(log => log.removed === true || (log.blockHash && !sameHex(log.blockHash, receipt.blockHash)))) {
+    return invalid('Anchor logs do not match the canonical receipt block', { confirmations });
+  }
 
   const events = parsedAnchorEvents(receipt.logs ?? [], anchor.contract);
   if (anchor.mode === "individual") {
     const expectedAuthorised = presentation.receipt.schema === "aichain.authorised-avr";
-    const event = events.find((item) => item.name === (expectedAuthorised ? "AuthorisedReceiptAnchored" : "ReceiptAnchored"));
+    const event = events.find((item) => item.name === (expectedAuthorised ? "AuthorisedReceiptAnchored" : "ReceiptAnchored") && sameHex(item.args[0], presentation.receiptId));
     if (!event) return invalid("Expected individual AVR anchor event was not found", { confirmations });
     const args = event.args;
     const receiptId = args[0];

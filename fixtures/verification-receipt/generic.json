@@ -1,0 +1,62 @@
+{
+  "profile": {
+    "id": "urn:aichain:profile:generic",
+    "version": "0.4.0-alpha",
+    "subjectKinds": [],
+    "requiredEvidence": [
+      "core:evidence"
+    ],
+    "requireStream": false,
+    "requireObservation": false,
+    "specificationDigest": "0x2ab2232c38b4e5a50c5563cf35b65639fb685b23238c5ae5eab6f03d843001a0"
+  },
+  "receipt": {
+    "commitments": {
+      "core:evidence": {
+        "digest": "0x93188b87a0257814d655b675e88d638d974a27f9e639060cb3a1852c00f8eb27",
+        "mediaType": "application/octet-stream",
+        "scheme": "sha256-salted-v1"
+      }
+    },
+    "context": {
+      "anchorContract": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "chainId": "20260822"
+    },
+    "event": {
+      "claimedAt": "2026-09-12T12:00:00.000Z",
+      "id": "0x6666666666666666666666666666666666666666666666666666666666666666",
+      "type": "generic:recorded"
+    },
+    "issuer": "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "links": [],
+    "profile": {
+      "id": "urn:aichain:profile:generic",
+      "version": "0.4.0-alpha",
+      "digest": "0x1903cbc58446257a73ee15b11d04745460771a1a9a62e7bc649b31a0e08fee64"
+    },
+    "schema": "aichain.verification-receipt",
+    "schemaVersion": "0.4.0-alpha",
+    "subject": {
+      "id": "0x5555555555555555555555555555555555555555555555555555555555555555",
+      "kind": "example:service"
+    }
+  },
+  "expected": {
+    "canonicalReceipt": "{\"commitments\":{\"core:evidence\":{\"digest\":\"0x93188b87a0257814d655b675e88d638d974a27f9e639060cb3a1852c00f8eb27\",\"mediaType\":\"application/octet-stream\",\"scheme\":\"sha256-salted-v1\"}},\"context\":{\"anchorContract\":\"0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"chainId\":\"20260822\"},\"event\":{\"claimedAt\":\"2026-09-12T12:00:00.000Z\",\"id\":\"0x6666666666666666666666666666666666666666666666666666666666666666\",\"type\":\"generic:recorded\"},\"issuer\":\"0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"links\":[],\"profile\":{\"digest\":\"0x1903cbc58446257a73ee15b11d04745460771a1a9a62e7bc649b31a0e08fee64\",\"id\":\"urn:aichain:profile:generic\",\"version\":\"0.4.0-alpha\"},\"schema\":\"aichain.verification-receipt\",\"schemaVersion\":\"0.4.0-alpha\",\"subject\":{\"id\":\"0x5555555555555555555555555555555555555555555555555555555555555555\",\"kind\":\"example:service\"}}",
+    "canonicalCommitments": "{\"core:evidence\":{\"digest\":\"0x93188b87a0257814d655b675e88d638d974a27f9e639060cb3a1852c00f8eb27\",\"mediaType\":\"application/octet-stream\",\"scheme\":\"sha256-salted-v1\"}}",
+    "receiptId": "0xda95d32dfe31793a3e62c3a524e51b0590aec48fd76075f7d33db4abad91a8b6",
+    "commitmentsRoot": "0xc1eb127d16607176c7ade132c7f0b5b68fbe141cf0d168665145143e6b5baf4d"
+  },
+  "disclosures": {
+    "core:evidence": {
+      "commitment": {
+        "scheme": "sha256-salted-v1",
+        "mediaType": "application/octet-stream",
+        "digest": "0x93188b87a0257814d655b675e88d638d974a27f9e639060cb3a1852c00f8eb27"
+      },
+      "salt": "0x0101010101010101010101010101010101010101010101010101010101010101",
+      "bytesHex": "66697874757265206f6e6c793a20636f72653a65766964656e636520e2809420ce9420f09fa496"
+    }
+  },
+  "presentationId": "0xc6fb4d722319568bf2df4a59028f4172b26a3fec069311ccfa568f2e01c89579"
+}

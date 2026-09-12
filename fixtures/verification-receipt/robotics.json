@@ -1,0 +1,107 @@
+{
+  "profile": {
+    "id": "urn:aichain:profile:robotics",
+    "version": "0.4.0-alpha",
+    "subjectKinds": [
+      "core:robot",
+      "core:vehicle",
+      "core:drone",
+      "core:machine"
+    ],
+    "requiredEvidence": [
+      "machine:configuration",
+      "machine:authority",
+      "machine:event"
+    ],
+    "requireStream": true,
+    "requireObservation": true,
+    "specificationDigest": "0x411f0044e5f75dec963b64401dbc187b6e7df3dad64977d6124674bb07c19c9a"
+  },
+  "receipt": {
+    "commitments": {
+      "machine:authority": {
+        "digest": "0x763ada89932896bf800a7fb668f1de05d04547abc46016cd29a9fea279af4d90",
+        "mediaType": "application/octet-stream",
+        "scheme": "sha256-salted-v1"
+      },
+      "machine:configuration": {
+        "digest": "0x66a944cb62a13c9de44b0467216e9430c6ef7df526fea13a3aff14b5bd08234b",
+        "mediaType": "application/octet-stream",
+        "scheme": "sha256-salted-v1"
+      },
+      "machine:event": {
+        "digest": "0x37ed3d361ce5efa775f08f7020ec2dbf8868fe10799a80d960249b251d902541",
+        "mediaType": "application/octet-stream",
+        "scheme": "sha256-salted-v1"
+      }
+    },
+    "context": {
+      "anchorContract": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "chainId": "20260822"
+    },
+    "event": {
+      "claimedAt": "2026-09-12T12:00:00.000Z",
+      "id": "0x6666666666666666666666666666666666666666666666666666666666666666",
+      "observation": {
+        "clock": "monotonic",
+        "ticksNs": "18446744073709551615",
+        "uncertaintyNs": null
+      },
+      "stream": {
+        "id": "0x7777777777777777777777777777777777777777777777777777777777777777",
+        "previousReceiptId": null,
+        "sequence": "0"
+      },
+      "type": "robotics:recorded"
+    },
+    "issuer": "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "links": [],
+    "profile": {
+      "id": "urn:aichain:profile:robotics",
+      "version": "0.4.0-alpha",
+      "digest": "0x5a8efc3da3622cbde0414ca55bcb79d8e3d0d8eb67e21fce4f361c26ffeea00a"
+    },
+    "schema": "aichain.verification-receipt",
+    "schemaVersion": "0.4.0-alpha",
+    "subject": {
+      "id": "0x5555555555555555555555555555555555555555555555555555555555555555",
+      "kind": "core:robot"
+    }
+  },
+  "expected": {
+    "canonicalReceipt": "{\"commitments\":{\"machine:authority\":{\"digest\":\"0x763ada89932896bf800a7fb668f1de05d04547abc46016cd29a9fea279af4d90\",\"mediaType\":\"application/octet-stream\",\"scheme\":\"sha256-salted-v1\"},\"machine:configuration\":{\"digest\":\"0x66a944cb62a13c9de44b0467216e9430c6ef7df526fea13a3aff14b5bd08234b\",\"mediaType\":\"application/octet-stream\",\"scheme\":\"sha256-salted-v1\"},\"machine:event\":{\"digest\":\"0x37ed3d361ce5efa775f08f7020ec2dbf8868fe10799a80d960249b251d902541\",\"mediaType\":\"application/octet-stream\",\"scheme\":\"sha256-salted-v1\"}},\"context\":{\"anchorContract\":\"0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"chainId\":\"20260822\"},\"event\":{\"claimedAt\":\"2026-09-12T12:00:00.000Z\",\"id\":\"0x6666666666666666666666666666666666666666666666666666666666666666\",\"observation\":{\"clock\":\"monotonic\",\"ticksNs\":\"18446744073709551615\",\"uncertaintyNs\":null},\"stream\":{\"id\":\"0x7777777777777777777777777777777777777777777777777777777777777777\",\"previousReceiptId\":null,\"sequence\":\"0\"},\"type\":\"robotics:recorded\"},\"issuer\":\"0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"links\":[],\"profile\":{\"digest\":\"0x5a8efc3da3622cbde0414ca55bcb79d8e3d0d8eb67e21fce4f361c26ffeea00a\",\"id\":\"urn:aichain:profile:robotics\",\"version\":\"0.4.0-alpha\"},\"schema\":\"aichain.verification-receipt\",\"schemaVersion\":\"0.4.0-alpha\",\"subject\":{\"id\":\"0x5555555555555555555555555555555555555555555555555555555555555555\",\"kind\":\"core:robot\"}}",
+    "canonicalCommitments": "{\"machine:authority\":{\"digest\":\"0x763ada89932896bf800a7fb668f1de05d04547abc46016cd29a9fea279af4d90\",\"mediaType\":\"application/octet-stream\",\"scheme\":\"sha256-salted-v1\"},\"machine:configuration\":{\"digest\":\"0x66a944cb62a13c9de44b0467216e9430c6ef7df526fea13a3aff14b5bd08234b\",\"mediaType\":\"application/octet-stream\",\"scheme\":\"sha256-salted-v1\"},\"machine:event\":{\"digest\":\"0x37ed3d361ce5efa775f08f7020ec2dbf8868fe10799a80d960249b251d902541\",\"mediaType\":\"application/octet-stream\",\"scheme\":\"sha256-salted-v1\"}}",
+    "receiptId": "0xd37da6daa55aae4d95083270cdcf4e24d22bf7d8b18a8f5de47079a2300deff7",
+    "commitmentsRoot": "0xd1394a4560d466c7b5212c49b7e9d9ff2a5eb635b7f95b58eb177577d2f82fa2"
+  },
+  "disclosures": {
+    "machine:configuration": {
+      "commitment": {
+        "scheme": "sha256-salted-v1",
+        "mediaType": "application/octet-stream",
+        "digest": "0x66a944cb62a13c9de44b0467216e9430c6ef7df526fea13a3aff14b5bd08234b"
+      },
+      "salt": "0x0101010101010101010101010101010101010101010101010101010101010101",
+      "bytesHex": "66697874757265206f6e6c793a206d616368696e653a636f6e66696775726174696f6e20e2809420ce9420f09fa496"
+    },
+    "machine:authority": {
+      "commitment": {
+        "scheme": "sha256-salted-v1",
+        "mediaType": "application/octet-stream",
+        "digest": "0x763ada89932896bf800a7fb668f1de05d04547abc46016cd29a9fea279af4d90"
+      },
+      "salt": "0x0202020202020202020202020202020202020202020202020202020202020202",
+      "bytesHex": "66697874757265206f6e6c793a206d616368696e653a617574686f7269747920e2809420ce9420f09fa496"
+    },
+    "machine:event": {
+      "commitment": {
+        "scheme": "sha256-salted-v1",
+        "mediaType": "application/octet-stream",
+        "digest": "0x37ed3d361ce5efa775f08f7020ec2dbf8868fe10799a80d960249b251d902541"
+      },
+      "salt": "0x0303030303030303030303030303030303030303030303030303030303030303",
+      "bytesHex": "66697874757265206f6e6c793a206d616368696e653a6576656e7420e2809420ce9420f09fa496"
+    }
+  },
+  "presentationId": "0xe2f6ab7c833ec409193421663ecc3d217e6f3ea1089f1e0297593bd711076beb"
+}

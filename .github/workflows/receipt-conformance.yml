@@ -1,0 +1,42 @@
+name: Receipt SDK conformance
+on:
+  push:
+    paths:
+      - 'sdk/**'
+      - 'spec/**'
+      - 'fixtures/**'
+      - 'examples/verification-receipt.js'
+      - 'package*.json'
+      - '.gitattributes'
+      - '.github/workflows/receipt-conformance.yml'
+  pull_request:
+    paths:
+      - 'sdk/**'
+      - 'spec/**'
+      - 'fixtures/**'
+      - 'examples/verification-receipt.js'
+      - 'package*.json'
+      - '.gitattributes'
+      - '.github/workflows/receipt-conformance.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  sdk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci
+      - run: python -m pip install -r sdk/python/requirements-test.txt
+      - run: node --test sdk/typescript/*.test.js
+      - run: python -m pytest sdk/python -q
+      - run: node examples/verification-receipt.js
+      - run: node sdk/typescript/verification-receipt-cli.js validate-profile build/receipt-example/receipt.json spec/verification-receipt/profiles/robotics.json
+      - run: python sdk/python/verification_receipt_cli.py validate-profile build/receipt-example/receipt.json spec/verification-receipt/profiles/robotics.json

@@ -4,6 +4,8 @@
   "version": "0.1.0",
   "description": "Local development helpers for the AIChain devnet",
   "scripts": {
+    "test:verification-receipt": "node --test ./sdk/typescript/verification-receipt.test.js",
+    "vr:derive": "node ./sdk/typescript/verification-receipt-cli.js derive",
     "submit:laptop-batch": "node ./scripts/submit-laptop-batch.mjs",
     "submit:laptop-avr": "node ./scripts/submit-laptop-avr-anchor.mjs",
     "test:avr:typescript": "node --test ./sdk/typescript/receipt.test.js",

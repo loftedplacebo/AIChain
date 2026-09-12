@@ -3,8 +3,8 @@
 | Field | Value |
 |---|---|
 | Status | Living delivery plan |
-| Document version | 0.17 |
-| Last updated | 2026-09-06 |
+| Document version | 0.18 |
+| Last updated | 2026-09-12 |
 | Architecture inputs | [Core L1 Architecture and Tooling](./core-l1-architecture-and-tooling.md); [AI Verification & ZK Architecture](./ai-verification-and-zk-architecture.md) |
 | Schedule | Dates, durations, staffing, and owners are **TBD** |
 | Decision state | This plan sequences open decisions; it does not settle them |
@@ -326,6 +326,14 @@ A gate closes only when its decision is recorded in the relevant architecture do
 | Capacity and rollups | Reproducible workload generator, individual-versus-batched receipt measurements, queue/backpressure behavior, confirmation distribution, proof aggregation cost/latency, block/state/indexer growth, and P2P propagation under load |
 
 ## 8. Immediate Next Increment
+
+**Receipt product review, 2026-09-12:** the additive general receipt SDK/profile
+increment is implemented with cross-language vectors and existing presentation,
+batching and lookup integration. The [readiness review](./verification-receipt-readiness-review.md)
+defines the next receipt-specific gates: an independent developer trial, durable
+evidence operations, explicit verifier results, stable SDK distribution and live
+general-format validation. These are additional product gates; existing consensus,
+security and public-testnet gates remain in force. DG-2 is not closed by this work.
 
 The active increment is now defined in [Next Development Phases](./next-development-phases.md):
 

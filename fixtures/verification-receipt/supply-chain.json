@@ -1,0 +1,96 @@
+{
+  "profile": {
+    "id": "urn:aichain:profile:supply-chain",
+    "version": "0.4.0-alpha",
+    "subjectKinds": [
+      "core:artifact",
+      "core:agent",
+      "core:service"
+    ],
+    "requiredEvidence": [
+      "supply:materials",
+      "supply:process",
+      "supply:product"
+    ],
+    "requireStream": false,
+    "requireObservation": false,
+    "specificationDigest": "0x237e51c5562e10fc17bba037021e3695bab1b7a9a5fc4d50f47471018af7cddb"
+  },
+  "receipt": {
+    "commitments": {
+      "supply:materials": {
+        "digest": "0xc2e2546183b4b9c8b186f057c4adc99b0e9f6e645ead03e3366b952e4b1fb7a9",
+        "mediaType": "application/octet-stream",
+        "scheme": "sha256-salted-v1"
+      },
+      "supply:process": {
+        "digest": "0x406e6657e7263f51e780b0d956e47bf83a5b216c78de4cf02ce60d9c72f8dbca",
+        "mediaType": "application/octet-stream",
+        "scheme": "sha256-salted-v1"
+      },
+      "supply:product": {
+        "digest": "0x6a1717f265e890624dce0069df3a1764e6cb7c61b3cc854af9db644cee063884",
+        "mediaType": "application/octet-stream",
+        "scheme": "sha256-salted-v1"
+      }
+    },
+    "context": {
+      "anchorContract": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "chainId": "20260822"
+    },
+    "event": {
+      "claimedAt": "2026-09-12T12:00:00.000Z",
+      "id": "0x6666666666666666666666666666666666666666666666666666666666666666",
+      "type": "supply-chain:recorded"
+    },
+    "issuer": "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "links": [],
+    "profile": {
+      "id": "urn:aichain:profile:supply-chain",
+      "version": "0.4.0-alpha",
+      "digest": "0x6506b77a5e40ca36814d28816d0638f79f6fc7a01af52b7878e0e17cdcaf85cc"
+    },
+    "schema": "aichain.verification-receipt",
+    "schemaVersion": "0.4.0-alpha",
+    "subject": {
+      "id": "0x5555555555555555555555555555555555555555555555555555555555555555",
+      "kind": "core:artifact"
+    }
+  },
+  "expected": {
+    "canonicalReceipt": "{\"commitments\":{\"supply:materials\":{\"digest\":\"0xc2e2546183b4b9c8b186f057c4adc99b0e9f6e645ead03e3366b952e4b1fb7a9\",\"mediaType\":\"application/octet-stream\",\"scheme\":\"sha256-salted-v1\"},\"supply:process\":{\"digest\":\"0x406e6657e7263f51e780b0d956e47bf83a5b216c78de4cf02ce60d9c72f8dbca\",\"mediaType\":\"application/octet-stream\",\"scheme\":\"sha256-salted-v1\"},\"supply:product\":{\"digest\":\"0x6a1717f265e890624dce0069df3a1764e6cb7c61b3cc854af9db644cee063884\",\"mediaType\":\"application/octet-stream\",\"scheme\":\"sha256-salted-v1\"}},\"context\":{\"anchorContract\":\"0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"chainId\":\"20260822\"},\"event\":{\"claimedAt\":\"2026-09-12T12:00:00.000Z\",\"id\":\"0x6666666666666666666666666666666666666666666666666666666666666666\",\"type\":\"supply-chain:recorded\"},\"issuer\":\"0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"links\":[],\"profile\":{\"digest\":\"0x6506b77a5e40ca36814d28816d0638f79f6fc7a01af52b7878e0e17cdcaf85cc\",\"id\":\"urn:aichain:profile:supply-chain\",\"version\":\"0.4.0-alpha\"},\"schema\":\"aichain.verification-receipt\",\"schemaVersion\":\"0.4.0-alpha\",\"subject\":{\"id\":\"0x5555555555555555555555555555555555555555555555555555555555555555\",\"kind\":\"core:artifact\"}}",
+    "canonicalCommitments": "{\"supply:materials\":{\"digest\":\"0xc2e2546183b4b9c8b186f057c4adc99b0e9f6e645ead03e3366b952e4b1fb7a9\",\"mediaType\":\"application/octet-stream\",\"scheme\":\"sha256-salted-v1\"},\"supply:process\":{\"digest\":\"0x406e6657e7263f51e780b0d956e47bf83a5b216c78de4cf02ce60d9c72f8dbca\",\"mediaType\":\"application/octet-stream\",\"scheme\":\"sha256-salted-v1\"},\"supply:product\":{\"digest\":\"0x6a1717f265e890624dce0069df3a1764e6cb7c61b3cc854af9db644cee063884\",\"mediaType\":\"application/octet-stream\",\"scheme\":\"sha256-salted-v1\"}}",
+    "receiptId": "0xe121dcb6c15065f50be550283fe425297b52a28a69f7481ffef0a84b668efc0e",
+    "commitmentsRoot": "0x0aacfc170f5c826114b748ae951039ef269814c36997641f65aed18cbf670f56"
+  },
+  "disclosures": {
+    "supply:materials": {
+      "commitment": {
+        "scheme": "sha256-salted-v1",
+        "mediaType": "application/octet-stream",
+        "digest": "0xc2e2546183b4b9c8b186f057c4adc99b0e9f6e645ead03e3366b952e4b1fb7a9"
+      },
+      "salt": "0x0101010101010101010101010101010101010101010101010101010101010101",
+      "bytesHex": "66697874757265206f6e6c793a20737570706c793a6d6174657269616c7320e2809420ce9420f09fa496"
+    },
+    "supply:process": {
+      "commitment": {
+        "scheme": "sha256-salted-v1",
+        "mediaType": "application/octet-stream",
+        "digest": "0x406e6657e7263f51e780b0d956e47bf83a5b216c78de4cf02ce60d9c72f8dbca"
+      },
+      "salt": "0x0202020202020202020202020202020202020202020202020202020202020202",
+      "bytesHex": "66697874757265206f6e6c793a20737570706c793a70726f6365737320e2809420ce9420f09fa496"
+    },
+    "supply:product": {
+      "commitment": {
+        "scheme": "sha256-salted-v1",
+        "mediaType": "application/octet-stream",
+        "digest": "0x6a1717f265e890624dce0069df3a1764e6cb7c61b3cc854af9db644cee063884"
+      },
+      "salt": "0x0303030303030303030303030303030303030303030303030303030303030303",
+      "bytesHex": "66697874757265206f6e6c793a20737570706c793a70726f6475637420e2809420ce9420f09fa496"
+    }
+  },
+  "presentationId": "0xe258e1c63518cbbe342712c2eca56a8a6fff2f29cc7fee811508a9460a1ab449"
+}

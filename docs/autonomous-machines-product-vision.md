@@ -3,8 +3,8 @@
 | Field | Value |
 |---|---|
 | Status | Living product-direction document |
-| Document version | 0.1 |
-| Last updated | 2026-08-19 |
+| Document version | 0.2 |
+| Last updated | 2026-09-12 |
 | Decision state | Product scope expanded; protocol choices remain **TBD** |
 | Architecture inputs | [AI Verification & ZK Architecture](./ai-verification-and-zk-architecture.md); [Core L1 Architecture and Tooling](./core-l1-architecture-and-tooling.md) |
 
@@ -100,7 +100,7 @@ Evaluate aggregation and recursive proofs for high-volume receipts only after in
 | ID-001 | Identity model for organisations, agents, models, and machines | TBD |
 | ID-002 | Credential issuance, delegation, authorization, and revocation model | TBD |
 | ID-003 | Configuration, policy, and authority reference/registry model | TBD |
-| AVR-007 | Receipt profiles for AI, content provenance, and autonomous machines | TBD |
+| AVR-007 | Receipt profiles for AI, content provenance, and autonomous machines | Additive 0.4.0-alpha implemented; stable protocol acceptance remains open. See [developer guide](./verification-receipt-developer-guide.md) |
 | ZK-005 | Initial private policy/authority claims eligible for ZK evaluation | TBD |
 | SCALE-001 | Receipt batching, aggregation, recursion, and throughput strategy | TBD |
 | CONS-001 | Whether useful verification work can ever participate in incentives without weakening consensus security | TBD |
@@ -113,6 +113,11 @@ Evaluate aggregation and recursive proofs for high-volume receipts only after in
 - Update the companion architecture and development-plan documents whenever a product direction changes a concrete scope, dependency, or decision gate.
 
 ## 10. Change Log
+
+The [2026-09-12 readiness review](./verification-receipt-readiness-review.md)
+maps this vision's use cases to the implemented general receipt profiles and
+remaining capture, identity, storage, appraisal and release gates. It does not
+establish hardware safety, physical truth or production readiness.
 
 | Version | Date | Change | Reference |
 |---|---|---|---|

@@ -1,0 +1,18 @@
+{
+  "id": "urn:aichain:profile:robotics",
+  "version": "0.4.0-alpha",
+  "subjectKinds": [
+    "core:robot",
+    "core:vehicle",
+    "core:drone",
+    "core:machine"
+  ],
+  "requiredEvidence": [
+    "machine:configuration",
+    "machine:authority",
+    "machine:event"
+  ],
+  "requireStream": true,
+  "requireObservation": true,
+  "specificationDigest": "0x411f0044e5f75dec963b64401dbc187b6e7df3dad64977d6124674bb07c19c9a"
+}

@@ -9,12 +9,14 @@ const root = path.join(__dirname, "..", "..");
 const receipt = JSON.parse(fs.readFileSync(path.join(root, "fixtures", "avr", "receipt-v0.1.0-draft.json"), "utf8"));
 const contract = "0xE680eEb44688898c108FAf2bF8589d108Fe86fE8";
 const txHash = `0x${"ab".repeat(32)}`;
+const blockHash = `0x${'cd'.repeat(32)}`;
 
 function providerFor(logs, overrides = {}) {
   return {
     getNetwork: async () => ({ chainId: overrides.chainId ?? 20260822n }),
     getBlockNumber: async () => overrides.latestBlock ?? 102,
-    getTransactionReceipt: async () => overrides.receipt ?? { status: 1, hash: txHash, blockNumber: 100, logs }
+    getBlock: async () => overrides.block ?? {number:100, hash:blockHash},
+    getTransactionReceipt: async () => overrides.receipt ?? { status: 1, hash: txHash, blockNumber: 100, blockHash, logs }
   };
 }
 
@@ -43,6 +45,14 @@ test("validates an individual AVR anchor from an ordinary transaction receipt", 
   assert.deepEqual(await verifyPresentationAnchor(presentation, providerFor([log])), {
     valid: true, mode: "individual", confirmations: 3, blockNumber: 100, event: "ReceiptAnchored"
   });
+});
+
+test('rejects orphaned blocks, missing block binding and removed logs despite sufficient depth', async () => {
+  const presentation=createPresentation(receipt,{level:'commitment-only'},{mode:'individual',chainId:20260822,contract,transactionHash:txHash});
+  const log=eventLog('ReceiptAnchored',[presentation.receiptId,presentation.commitmentsRoot,receipt.issuer.toLowerCase(),receipt.schemaVersion,42]);
+  assert.equal((await verifyPresentationAnchor(presentation,providerFor([log],{block:{number:100,hash:`0x${'ef'.repeat(32)}`}}))).reason,'Anchor transaction is not in the canonical block');
+  assert.equal((await verifyPresentationAnchor(presentation,providerFor([log],{receipt:{status:1,hash:txHash,blockNumber:100,logs:[log]}}))).reason,'Anchor receipt has no block hash');
+  assert.equal((await verifyPresentationAnchor(presentation,providerFor([{...log,removed:true}]))).valid,false);
 });
 
 test("requires a matching event, successful transaction and sufficient confirmations", async () => {

@@ -1,0 +1,79 @@
+{
+  "profile": {
+    "id": "urn:aichain:profile:content",
+    "version": "0.4.0-alpha",
+    "subjectKinds": [
+      "core:artifact"
+    ],
+    "requiredEvidence": [
+      "content:artifact",
+      "content:provenance"
+    ],
+    "requireStream": false,
+    "requireObservation": false,
+    "specificationDigest": "0x0e3f08c83b7c80ab488889a55e02cb38d90cc5373c6b31eec728735bf37d0a70"
+  },
+  "receipt": {
+    "commitments": {
+      "content:artifact": {
+        "digest": "0x634fb48b3e6f4218b5de430e1a6096f52aef268cce5050bad0a7395427e35905",
+        "mediaType": "application/octet-stream",
+        "scheme": "sha256-salted-v1"
+      },
+      "content:provenance": {
+        "digest": "0xa7be73e26d4c965e117ae31c570b88c6bdb2604331c38e0deb5a5135bea6f32e",
+        "mediaType": "application/octet-stream",
+        "scheme": "sha256-salted-v1"
+      }
+    },
+    "context": {
+      "anchorContract": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "chainId": "20260822"
+    },
+    "event": {
+      "claimedAt": "2026-09-12T12:00:00.000Z",
+      "id": "0x6666666666666666666666666666666666666666666666666666666666666666",
+      "type": "content:recorded"
+    },
+    "issuer": "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "links": [],
+    "profile": {
+      "id": "urn:aichain:profile:content",
+      "version": "0.4.0-alpha",
+      "digest": "0xe039529abbe853808a0022f29552deff1faa25c893c281c403d12723adef8548"
+    },
+    "schema": "aichain.verification-receipt",
+    "schemaVersion": "0.4.0-alpha",
+    "subject": {
+      "id": "0x5555555555555555555555555555555555555555555555555555555555555555",
+      "kind": "core:artifact"
+    }
+  },
+  "expected": {
+    "canonicalReceipt": "{\"commitments\":{\"content:artifact\":{\"digest\":\"0x634fb48b3e6f4218b5de430e1a6096f52aef268cce5050bad0a7395427e35905\",\"mediaType\":\"application/octet-stream\",\"scheme\":\"sha256-salted-v1\"},\"content:provenance\":{\"digest\":\"0xa7be73e26d4c965e117ae31c570b88c6bdb2604331c38e0deb5a5135bea6f32e\",\"mediaType\":\"application/octet-stream\",\"scheme\":\"sha256-salted-v1\"}},\"context\":{\"anchorContract\":\"0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"chainId\":\"20260822\"},\"event\":{\"claimedAt\":\"2026-09-12T12:00:00.000Z\",\"id\":\"0x6666666666666666666666666666666666666666666666666666666666666666\",\"type\":\"content:recorded\"},\"issuer\":\"0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"links\":[],\"profile\":{\"digest\":\"0xe039529abbe853808a0022f29552deff1faa25c893c281c403d12723adef8548\",\"id\":\"urn:aichain:profile:content\",\"version\":\"0.4.0-alpha\"},\"schema\":\"aichain.verification-receipt\",\"schemaVersion\":\"0.4.0-alpha\",\"subject\":{\"id\":\"0x5555555555555555555555555555555555555555555555555555555555555555\",\"kind\":\"core:artifact\"}}",
+    "canonicalCommitments": "{\"content:artifact\":{\"digest\":\"0x634fb48b3e6f4218b5de430e1a6096f52aef268cce5050bad0a7395427e35905\",\"mediaType\":\"application/octet-stream\",\"scheme\":\"sha256-salted-v1\"},\"content:provenance\":{\"digest\":\"0xa7be73e26d4c965e117ae31c570b88c6bdb2604331c38e0deb5a5135bea6f32e\",\"mediaType\":\"application/octet-stream\",\"scheme\":\"sha256-salted-v1\"}}",
+    "receiptId": "0xa6ca3d953b8806dc64d9e75b543ded73f0273ad28b7dfe34f5ab31f2cf1eb3e8",
+    "commitmentsRoot": "0x33682f120294c3c8fb7bb57e5ab48da369baa5b8f5a4b0a65dcb5c6afc6d4070"
+  },
+  "disclosures": {
+    "content:artifact": {
+      "commitment": {
+        "scheme": "sha256-salted-v1",
+        "mediaType": "application/octet-stream",
+        "digest": "0x634fb48b3e6f4218b5de430e1a6096f52aef268cce5050bad0a7395427e35905"
+      },
+      "salt": "0x0101010101010101010101010101010101010101010101010101010101010101",
+      "bytesHex": "66697874757265206f6e6c793a20636f6e74656e743a617274696661637420e2809420ce9420f09fa496"
+    },
+    "content:provenance": {
+      "commitment": {
+        "scheme": "sha256-salted-v1",
+        "mediaType": "application/octet-stream",
+        "digest": "0xa7be73e26d4c965e117ae31c570b88c6bdb2604331c38e0deb5a5135bea6f32e"
+      },
+      "salt": "0x0202020202020202020202020202020202020202020202020202020202020202",
+      "bytesHex": "66697874757265206f6e6c793a20636f6e74656e743a70726f76656e616e636520e2809420ce9420f09fa496"
+    }
+  },
+  "presentationId": "0x04c6ca829e49d1360d4bb65c5d80958c3ef42859039aa3c661738c5b8ca5480d"
+}

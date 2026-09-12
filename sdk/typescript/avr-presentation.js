@@ -7,6 +7,7 @@
 const crypto = require("node:crypto");
 const { canonicalize, deriveReceipt } = require("./receipt");
 const { deriveAuthorisedReceipt } = require("./authorised-receipt");
+const { SCHEMA: GENERAL_SCHEMA, deriveVerificationReceipt } = require('./verification-receipt');
 
 const DOMAIN = "aichain:avr-presentation:0.3.0-alpha:";
 const BYTES32 = /^0x[0-9a-fA-F]{64}$/;
@@ -26,6 +27,7 @@ function exactKeys(value, expected) {
 function deriveUnderlyingReceipt(receipt) {
   if (receipt?.schema === "aichain.avr") return deriveReceipt(receipt);
   if (receipt?.schema === "aichain.authorised-avr") return deriveAuthorisedReceipt(receipt);
+  if (receipt?.schema === GENERAL_SCHEMA) return deriveVerificationReceipt(receipt);
   throw new Error("Unsupported AVR receipt schema");
 }
 
@@ -61,6 +63,9 @@ function validateAssurance(assurance, receipt) {
     throw new Error("assurance contains unsupported fields");
   }
   if (!ASSURANCE_LEVELS.has(assurance.level)) throw new Error("Unsupported assurance level");
+  if (receipt.schema === GENERAL_SCHEMA && !['commitment-only', 'issuer-attested'].includes(assurance.level)) {
+    throw new Error('General receipts require a separately specified authority/proof adapter; current alpha supports commitment-only and issuer-attested');
+  }
   if (assurance.level === "issuer-attested") {
     if (!exactKeys(assurance.attestation, new Set(["scheme", "signer", "signature"]))) throw new Error("issuer-attested evidence is required");
     if (assurance.attestation.scheme !== "eip191-personal-sign" || !ADDRESS.test(assurance.attestation.signer)
@@ -93,6 +98,13 @@ function validatePresentation(presentation) {
   }
   validateAssurance(presentation.assurance, presentation.receipt);
   if (presentation.anchor !== null) validateAnchor(presentation.anchor);
+  if (presentation.receipt.schema === GENERAL_SCHEMA && presentation.anchor !== null) {
+    const context = presentation.receipt.context;
+    if (!Number.isSafeInteger(presentation.anchor.chainId) || String(presentation.anchor.chainId) !== context.chainId
+      || presentation.anchor.contract.toLowerCase() !== context.anchorContract) {
+      throw new Error('Anchor location does not match signed receipt context');
+    }
+  }
 }
 
 function createPresentation(receipt, assurance, anchor = null) {
@@ -133,7 +145,13 @@ function assuranceSummary(presentation) {
     proofSystem: presentation.assurance.proof?.system ?? null,
     proofVerification: presentation.assurance.proof?.verification ?? null,
     // The SDK never treats a receipt claim as a statement that an AI output is true.
-    scope: "Evidence binds committed AVR data; it does not establish model-output truth."
+    scope: "Evidence binds committed AVR data; it does not establish model-output truth.",
+    ...(presentation.receipt.schema === GENERAL_SCHEMA ? {
+      profile: presentation.receipt.profile,
+      profileValidation: 'not-checked',
+      signatureVerification: 'not-checked',
+      scope: 'Commits evidence and claimed event metadata; does not establish physical truth, safety, authority, or evidence availability.'
+    } : {})
   };
 }
 

@@ -1,0 +1,11 @@
+{
+  "id": "urn:aichain:profile:generic",
+  "version": "0.4.0-alpha",
+  "subjectKinds": [],
+  "requiredEvidence": [
+    "core:evidence"
+  ],
+  "requireStream": false,
+  "requireObservation": false,
+  "specificationDigest": "0x2ab2232c38b4e5a50c5563cf35b65639fb685b23238c5ae5eab6f03d843001a0"
+}

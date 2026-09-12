@@ -1,0 +1,17 @@
+{
+  "id": "urn:aichain:profile:agent",
+  "version": "0.4.0-alpha",
+  "subjectKinds": [
+    "core:agent",
+    "core:service"
+  ],
+  "requiredEvidence": [
+    "ai:configuration",
+    "ai:input",
+    "ai:output",
+    "ai:policy"
+  ],
+  "requireStream": false,
+  "requireObservation": false,
+  "specificationDigest": "0x6ea3c17528679c5334520227146836469b0f6f2504f38401f09ea10d8966de23"
+}

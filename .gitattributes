@@ -1,1 +1,2 @@
 scripts/run-phase3-alpha.sh text eol=lf
+spec/verification-receipt/profiles/*.md text eol=lf

@@ -1,0 +1,14 @@
+{
+  "id": "urn:aichain:profile:content",
+  "version": "0.4.0-alpha",
+  "subjectKinds": [
+    "core:artifact"
+  ],
+  "requiredEvidence": [
+    "content:artifact",
+    "content:provenance"
+  ],
+  "requireStream": false,
+  "requireObservation": false,
+  "specificationDigest": "0x0e3f08c83b7c80ab488889a55e02cb38d90cc5373c6b31eec728735bf37d0a70"
+}

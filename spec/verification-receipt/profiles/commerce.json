@@ -1,0 +1,16 @@
+{
+  "id": "urn:aichain:profile:commerce",
+  "version": "0.4.0-alpha",
+  "subjectKinds": [
+    "core:agent",
+    "core:service"
+  ],
+  "requiredEvidence": [
+    "commerce:request",
+    "commerce:authority",
+    "commerce:result"
+  ],
+  "requireStream": false,
+  "requireObservation": false,
+  "specificationDigest": "0x1b658f5a8d6fb36095e57533326f71a1736fbed0aeedd5d658a5545296c6e1f9"
+}

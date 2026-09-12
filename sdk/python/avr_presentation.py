@@ -9,6 +9,7 @@ import re
 
 from authorised_receipt import derive_authorised_receipt
 from receipt import canonicalize, derive_receipt
+from verification_receipt import SCHEMA as GENERAL_SCHEMA, derive_verification_receipt
 
 DOMAIN = "aichain:avr-presentation:0.3.0-alpha:"
 BYTES32 = re.compile(r"^0x[0-9a-fA-F]{64}$")
@@ -25,6 +26,8 @@ def _derive_underlying_receipt(receipt: dict) -> dict:
         return derive_receipt(receipt)
     if receipt.get("schema") == "aichain.authorised-avr":
         return derive_authorised_receipt(receipt)
+    if receipt.get("schema") == GENERAL_SCHEMA:
+        return derive_verification_receipt(receipt)
     raise ValueError("Unsupported AVR receipt schema")
 
 
@@ -59,6 +62,8 @@ def _validate_assurance(assurance: dict, receipt: dict) -> None:
         raise ValueError("assurance contains unsupported fields")
     if assurance.get("level") not in ASSURANCE_LEVELS:
         raise ValueError("Unsupported assurance level")
+    if receipt.get('schema') == GENERAL_SCHEMA and assurance['level'] not in ('commitment-only', 'issuer-attested'):
+        raise ValueError('General receipts require a separately specified authority/proof adapter; current alpha supports commitment-only and issuer-attested')
     if assurance["level"] == "issuer-attested":
         attestation = assurance.get("attestation")
         if not _exact_keys(attestation, {"scheme", "signer", "signature"}) or attestation["scheme"] != "eip191-personal-sign" or not isinstance(attestation["signer"], str) or not ADDRESS.fullmatch(attestation["signer"]) or not isinstance(attestation["signature"], str) or not re.fullmatch(r"0x[0-9a-fA-F]{130}", attestation["signature"]):
@@ -84,6 +89,10 @@ def validate_presentation(presentation: dict) -> None:
     _validate_assurance(presentation["assurance"], presentation["receipt"])
     if presentation["anchor"] is not None:
         _validate_anchor(presentation["anchor"])
+        if presentation['receipt']['schema'] == GENERAL_SCHEMA:
+            anchor, context = presentation['anchor'], presentation['receipt']['context']
+            if type(anchor['chainId']) is not int or anchor['chainId'] > 2**53 - 1 or str(anchor['chainId']) != context['chainId'] or anchor['contract'].lower() != context['anchorContract']:
+                raise ValueError('Anchor location does not match signed receipt context')
 
 
 def create_presentation(receipt: dict, assurance: dict, anchor: dict | None = None) -> dict:
@@ -101,4 +110,7 @@ def derive_presentation(presentation: dict) -> dict:
 
 def assurance_summary(presentation: dict) -> dict:
     derived = derive_presentation(presentation)
-    return {"receiptId": derived["receiptId"], "presentationId": derived["presentationId"], "assuranceLevel": derived["assuranceLevel"], "anchored": presentation["anchor"] is not None, "anchorMode": presentation["anchor"]["mode"] if presentation["anchor"] else None, "proofSystem": presentation["assurance"].get("proof", {}).get("system"), "proofVerification": presentation["assurance"].get("proof", {}).get("verification"), "scope": "Evidence binds committed AVR data; it does not establish model-output truth."}
+    result = {"receiptId": derived["receiptId"], "presentationId": derived["presentationId"], "assuranceLevel": derived["assuranceLevel"], "anchored": presentation["anchor"] is not None, "anchorMode": presentation["anchor"]["mode"] if presentation["anchor"] else None, "proofSystem": presentation["assurance"].get("proof", {}).get("system"), "proofVerification": presentation["assurance"].get("proof", {}).get("verification"), "scope": "Evidence binds committed AVR data; it does not establish model-output truth."}
+    if presentation['receipt']['schema'] == GENERAL_SCHEMA:
+        result.update(profile=presentation['receipt']['profile'], profileValidation='not-checked', signatureVerification='not-checked', scope='Commits evidence and claimed event metadata; does not establish physical truth, safety, authority, or evidence availability.')
+    return result
