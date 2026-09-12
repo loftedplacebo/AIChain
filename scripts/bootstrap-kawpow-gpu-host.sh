@@ -21,7 +21,7 @@ missing=()
 for command_name in apt-get git cmake g++ make python3 nvidia-smi; do
   command -v "$command_name" >/dev/null 2>&1 || missing+=("$command_name")
 done
-if [[ ${#missing[@]:-0} -gt 0 ]]; then
+if (( ${#missing[@]} > 0 )); then
   if [[ "$(id -u)" != 0 ]]; then
     printf 'Missing prerequisites (run as root to install): %s\n' "${missing[*]}" >&2
     exit 2
