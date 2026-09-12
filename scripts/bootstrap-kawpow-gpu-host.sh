@@ -18,7 +18,7 @@ expected_miner_commit="632f6ea0a5cd09e2c6443374dbe6db0a767715ba"
 [[ "$compute" =~ ^[0-9]+$ ]] || { echo "AICHAIN_KAWPOW_COMPUTE must be numeric." >&2; exit 2; }
 
 missing=()
-for command_name in apt-get git cmake g++ make python3 nvidia-smi; do
+for command_name in apt-get git cmake g++ make python3 go nvidia-smi; do
   command -v "$command_name" >/dev/null 2>&1 || missing+=("$command_name")
 done
 if (( ${#missing[@]} > 0 )); then
@@ -37,9 +37,11 @@ if [[ ! -d "$project_root/.git" ]]; then
 fi
 git -C "$project_root" fetch --tags origin
 git -C "$project_root" checkout --detach "$repo_ref"
-git -C "$project_root" submodule update --init --recursive
-# cpp-kawpow is a nested submodule required by the Core-Geth KawPoW build.
-git -C "$project_root/node/core-geth" submodule update --init --recursive
+# The full Core-Geth test corpus is deliberately excluded: it is not a build
+# dependency and makes ephemeral-host onboarding unnecessarily slow. cpp-kawpow
+# is the only nested submodule required for the KawPoW development build.
+git -C "$project_root" submodule update --init node/core-geth
+git -C "$project_root/node/core-geth" submodule update --init consensus/kawpow/cpp-kawpow
 
 mkdir -p "$project_root/build"
 (cd "$project_root/node/core-geth" && go run build/ci.go install ./cmd/geth)
