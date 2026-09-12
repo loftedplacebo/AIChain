@@ -75,6 +75,10 @@ if [[ -n "$compat_cxx_flags" ]]; then
   cmake_args+=("-DCMAKE_CXX_FLAGS=$compat_cxx_flags")
 fi
 
+# Hunter builds parts of the dependency graph in separate CMake projects.  Pass
+# the compatibility flag through the compiler environment as well as the top
+# level CMake cache so it reaches Boost on newer GCC toolchains.
+export CXXFLAGS="${CXXFLAGS:-} ${compat_cxx_flags}"
 cmake "${cmake_args[@]}"
 cmake --build "$build_dir" --parallel "$(nproc)"
 
