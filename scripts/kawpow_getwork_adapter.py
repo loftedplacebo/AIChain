@@ -61,9 +61,11 @@ class NodeRPC:
 
 
 class Adapter:
-    def __init__(self, node: NodeRPC, audit_log: Path | None = None):
+    def __init__(self, node: NodeRPC, audit_log: Path | None = None,
+                 work_status_file: Path | None = None):
         self.node = node
         self.audit_log = audit_log
+        self.work_status_file = work_status_file
         self._work: OrderedDict[str, dict[str, Any]] = OrderedDict()
         self._lock = threading.Lock()
 
@@ -95,6 +97,7 @@ class Adapter:
             self._work.move_to_end(header_hash)
             while len(self._work) > MAX_TRACKED_WORK:
                 self._work.popitem(last=False)
+        self._write_work_status(work)
         return [header_hash, seed_hash, target, height]
 
     def submit_work(self, params: Any) -> bool:
@@ -107,6 +110,10 @@ class Adapter:
             work = self._work.get(header_hash)
         if work is None:
             self._audit(None, header_hash, nonce, mix_digest, {"accepted": False, "status": "unknown-adapter-work"})
+            return False
+        if _expired(work):
+            self._audit(work, header_hash, nonce, mix_digest,
+                        {"accepted": False, "status": "expired-adapter-work"})
             return False
         work_id = work["workId"]
         submission = {"version": WORK_VERSION, "workId": work_id, "nonce": nonce, "mixDigest": mix_digest}
@@ -129,6 +136,31 @@ class Adapter:
             self.audit_log.parent.mkdir(parents=True, exist_ok=True)
             with self.audit_log.open("a", encoding="utf-8") as output:
                 output.write(json.dumps(entry, separators=(",", ":")) + "\n")
+
+    def _write_work_status(self, work: dict[str, Any]) -> None:
+        """Publish non-secret current-work metadata for the local supervisor."""
+        if self.work_status_file is None:
+            return
+        expires_at = _quantity(work.get("expiresAt"), "expiresAt")
+        payload = {"workId": work["workId"], "headerHash": work["headerHash"],
+                   "expiresAt": expires_at, "updatedAt": int(time.time())}
+        self.work_status_file.parent.mkdir(parents=True, exist_ok=True)
+        temporary = self.work_status_file.with_suffix(self.work_status_file.suffix + ".tmp")
+        temporary.write_text(json.dumps(payload, separators=(",", ":")) + "\n", encoding="utf-8")
+        temporary.replace(self.work_status_file)
+
+
+def _quantity(value: Any, field: str) -> int:
+    if not isinstance(value, str) or not value.startswith("0x"):
+        raise ValueError(f"{field} must be an Ethereum quantity")
+    try:
+        return int(value, 16)
+    except ValueError as error:
+        raise ValueError(f"{field} must be an Ethereum quantity") from error
+
+
+def _expired(work: dict[str, Any]) -> bool:
+    return time.time() >= _quantity(work.get("expiresAt"), "expiresAt")
 
 
 def handler_for(adapter: Adapter):
@@ -172,10 +204,14 @@ def main() -> None:
     parser.add_argument("--listen", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=18545)
     parser.add_argument("--audit-log", type=Path)
+    parser.add_argument("--work-status-file", type=Path,
+                        help="absolute local status file consumed by the miner supervisor")
     args = parser.parse_args()
     if not _loopback_host(args.listen):
         parser.error("--listen must be a loopback address")
-    adapter = Adapter(NodeRPC(args.node_rpc), args.audit_log)
+    if args.work_status_file is not None and not args.work_status_file.is_absolute():
+        parser.error("--work-status-file must be absolute")
+    adapter = Adapter(NodeRPC(args.node_rpc), args.audit_log, args.work_status_file)
     server = ThreadingHTTPServer((args.listen, args.port), handler_for(adapter))
     print(f"AIChain KawPoW getwork adapter listening on http://{args.listen}:{args.port}", flush=True)
     server.serve_forever()

@@ -22,7 +22,7 @@ class FakeNode:
         if method == "aichain_getKawpowWork":
             return {"version": MODULE.WORK_VERSION, "workId": "0x" + "11" * 32,
                     "headerHash": "0x" + "22" * 32, "seedHash": "0x" + "00" * 32,
-                    "target": "0x" + "33" * 32, "height": "0x1", "expiresAt": "0x1"}
+                    "target": "0x" + "33" * 32, "height": "0x1", "expiresAt": "0x7fffffff"}
         return self.result
 
 
@@ -53,6 +53,30 @@ class AdapterTests(unittest.TestCase):
             adapter.get_work()
             adapter.submit_work(["0x" + "aa" * 8, "0x" + "22" * 32, "0x" + "bb" * 32])
             self.assertIn('"status":"accepted"', audit.read_text(encoding="utf-8"))
+
+    def test_expired_work_is_rejected_without_node_submission(self):
+        node = FakeNode()
+        class ExpiredNode(FakeNode):
+            def call(self, method, params):
+                value = super().call(method, params)
+                if method == "aichain_getKawpowWork":
+                    value["expiresAt"] = "0x1"
+                return value
+        expired = ExpiredNode()
+        adapter = MODULE.Adapter(expired)
+        adapter.get_work()
+        self.assertFalse(adapter.submit_work(["0x" + "aa" * 8, "0x" + "22" * 32,
+                                              "0x" + "bb" * 32]))
+        self.assertFalse(any(method == "aichain_submitKawpowWork" for method, _ in expired.calls))
+
+    def test_work_status_is_written_atomically(self):
+        with tempfile.TemporaryDirectory() as directory:
+            status = Path(directory) / "current-work.json"
+            adapter = MODULE.Adapter(FakeNode(), work_status_file=status)
+            adapter.get_work()
+            payload = __import__("json").loads(status.read_text(encoding="utf-8"))
+            self.assertEqual(payload["workId"], "0x" + "11" * 32)
+            self.assertEqual(payload["expiresAt"], 0x7fffffff)
 
     def test_loopback_policy(self):
         for host in ("127.0.0.1", "::1", "localhost"):

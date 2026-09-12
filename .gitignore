@@ -13,6 +13,7 @@ build/
 
 # Local network state and secrets
 /devnet/
+/tmp/
 .env
 .env.*
 config/closed-testnet.env
