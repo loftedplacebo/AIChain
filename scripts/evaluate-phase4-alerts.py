@@ -28,6 +28,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--policy", type=Path, required=True)
     parser.add_argument("--snapshot", type=Path, action="append", required=True)
+    parser.add_argument("--require-role", choices=("miner", "validator", "ingress", "indexer"), action="append", default=[])
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     if args.output.exists():
@@ -36,10 +37,19 @@ def main() -> None:
     if policy.get("schema") != "aichain.phase4-monitoring-alert-policy" or policy.get("schemaVersion") != "0.1.0-draft":
         raise SystemExit("unsupported alert policy")
     snapshots = [read_json(path) for path in args.snapshot]
-    if not all(row.get("schema") == "aichain.phase4-private-metrics-snapshot" for row in snapshots):
+    if not all(
+        row.get("schema") == "aichain.phase4-private-metrics-snapshot"
+        and row.get("schemaVersion") == "0.1.0-draft"
+        and row.get("rpcScope") == "loopback"
+        and row.get("role") in {"miner", "validator", "ingress", "indexer"}
+        for row in snapshots
+    ):
         raise SystemExit("unsupported snapshot schema")
 
     alerts: list[dict[str, str]] = []
+    observed_roles = {row["role"] for row in snapshots}
+    for role in sorted(set(args.require_role) - observed_roles):
+        alerts.append({"id": "block-or-peer-degradation", "severity": "warning", "detail": f"required role absent: {role}"})
     genesis = {row.get("genesisHash") for row in snapshots}
     builds = {row.get("buildId") for row in snapshots}
     if len(genesis) != 1 or len(builds) != 1:
@@ -50,7 +60,7 @@ def main() -> None:
         if isinstance(head.get("number"), int) and isinstance(head.get("hash"), str):
             heads.setdefault(head["number"], set()).add(head["hash"])
         if row.get("role") in {"miner", "validator"} and int(row.get("peerCount", 0)) < 1:
-            alerts.append({"id": "block-or-peer-degradation", "severity": "warning"})
+            alerts.append({"id": "block-or-peer-degradation", "severity": "warning", "detail": f"peer count below one: {row['role']}"})
     if any(len(hashes) > 1 for hashes in heads.values()):
         alerts.append({"id": "canonical-divergence-or-invalid-acceptance", "severity": "critical"})
     severity_rank = {"normal": 0, "warning": 1, "critical": 2}
@@ -61,7 +71,10 @@ def main() -> None:
         "status": status,
         "automatedControls": "none; evaluator does not connect to or control nodes",
         "policySha256": digest(args.policy),
-        "snapshotSha256": {path.name: digest(path) for path in args.snapshot},
+        "snapshots": [
+            {"fileName": path.name, "sha256": digest(path), "role": row["role"]}
+            for path, row in zip(args.snapshot, snapshots)
+        ],
         "alerts": alerts,
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)

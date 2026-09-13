@@ -1,6 +1,6 @@
 # Phase 4 — Private metrics and alert pipeline
 
-Version: 0.1.0-draft · Updated: 2026-09-08 · Status: disposable-node validated
+Version: 0.1.1-draft · Updated: 2026-09-13 · Status: foundation active
 
 ## Boundary
 
@@ -55,6 +55,7 @@ python3 scripts/evaluate-phase4-alerts.py \
   --policy config/phase4-monitoring-alert-policy-v0.1.0-draft.json \
   --snapshot evidence/private/miner-snapshot.json \
   --snapshot evidence/private/validator-snapshot.json \
+  --require-role miner --require-role validator \
   --output evidence/private/alert-evaluation.json
 ```
 
@@ -68,6 +69,15 @@ The monitoring policy also defines operational alerts for public-RPC exposure,
 block cadence, queue/indexer pressure and resource/proof budget breaches. Those
 are evaluated from the corresponding multi-sample and ingress/proof evidence,
 not falsely inferred from a single snapshot.
+
+The evaluator preserves one hash record per supplied snapshot, even if two
+operator-local files share a filename. `--require-role` makes missing roles a
+warning rather than silently treating a partial collection as healthy. Run the
+safe evaluator regression checks before relying on a new release image:
+
+```bash
+python3 scripts/test-phase4-monitoring.py
+```
 
 ## Evidence flow and review
 
