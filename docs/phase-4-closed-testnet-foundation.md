@@ -74,6 +74,24 @@ bash scripts/test-closed-testnet-plan.sh
 1. **Approve the manifest.** Record the reviewed Core-Geth commit, KawPoW
    source/adapter revision, genesis digest, contract artifacts, host inventory
    and the exact runbook version in a non-secret release record.
+
+   The release record is validated against the approved manifest before any
+   host action. It carries only opaque operator/region identifiers and hashes;
+   it rejects endpoints, credentials, allocations and private keys by schema:
+
+   ```bash
+   python3 scripts/validate-closed-testnet-release-record.py \
+     --manifest config/closed-testnet.env \
+     --record private/closed-testnet-release-record.json
+   ```
+
+   The validator checks manifest identity, genesis, source/build hashes,
+   artifact inventory, role separation, two-region coverage, runbook versions
+   and at least two distinct release approvals. Its safe regression suite is:
+
+   ```bash
+   python3 scripts/test-closed-testnet-release-record.py
+   ```
 2. **Build and verify artifacts.** Each operator builds from the tagged source,
    checks binary/artifact hashes and verifies the approved genesis digest before
    starting a node. A mismatch is a hard stop.
