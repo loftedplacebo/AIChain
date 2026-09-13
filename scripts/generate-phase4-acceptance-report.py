@@ -47,12 +47,20 @@ def resource_summary(path: Path) -> dict[str, Any]:
     records = data.get("records")
     if data.get("schema") != "aichain.kawpow-g3-resource-samples" or not isinstance(records, list):
         raise SystemExit(f"Unsupported resource sample schema: {path}")
+    ordered = [row for row in records if isinstance(row, dict) and isinstance(row.get("observedNs"), int)
+               and isinstance(row.get("dataDirBytes"), (int, float))]
+    state_growth_per_day = None
+    if len(ordered) >= 2:
+        elapsed_ns = ordered[-1]["observedNs"] - ordered[0]["observedNs"]
+        if elapsed_ns > 0:
+            state_growth_per_day = max(0.0, ordered[-1]["dataDirBytes"] - ordered[0]["dataDirBytes"]) * 86_400_000_000_000 / elapsed_ns
     return {
         "sourceSha256": digest(path),
         "sampleCount": len(records),
         "cpuPercentOneCore": numeric_summary([row.get("cpuPercentOneCore") for row in records if isinstance(row, dict)]),
         "rssBytes": numeric_summary([row.get("VmRSS") for row in records if isinstance(row, dict)]),
         "dataDirBytes": numeric_summary([row.get("dataDirBytes") for row in records if isinstance(row, dict)]),
+        "dataDirGrowthBytesPer24Hours": state_growth_per_day,
     }
 
 
@@ -88,10 +96,18 @@ def evaluate_policy(policy_path: Path, policy: dict[str, Any], result: dict[str,
               isinstance(block_timing.get("mean"), (int, float)) and policy_value(policy, "network", "minimumMeanBlockProductionMs") <= block_timing["mean"] <= policy_value(policy, "network", "maximumMeanBlockProductionMs"))
         check("network.p95-block-production-ms", block_timing.get("p95"), policy_value(policy, "network", "maximumP95BlockProductionMs"),
               isinstance(block_timing.get("p95"), (int, float)) and block_timing["p95"] <= policy_value(policy, "network", "maximumP95BlockProductionMs"))
+        check("network.p99-block-production-ms", block_timing.get("p99"), policy_value(policy, "network", "maximumP99BlockProductionMs"),
+              isinstance(block_timing.get("p99"), (int, float)) and block_timing["p99"] <= policy_value(policy, "network", "maximumP99BlockProductionMs"))
         check("network.p95-propagation-observation-ms", propagation.get("p95"), policy_value(policy, "network", "maximumP95PropagationObservationMs"),
               isinstance(propagation.get("p95"), (int, float)) and propagation["p95"] <= policy_value(policy, "network", "maximumP95PropagationObservationMs"))
         check("network.canonical-hash-agreement", network.get("canonicalHashAgreement"), policy_value(policy, "network", "requireCanonicalHashAgreement"),
               network.get("canonicalHashAgreement") is policy_value(policy, "network", "requireCanonicalHashAgreement"))
+        stale_rate = network.get("naturalStaleRate")
+        if not isinstance(stale_rate, (int, float)):
+            missing.append("network-natural-stale-rate")
+        else:
+            check("network.natural-stale-rate", stale_rate, policy_value(policy, "network", "maximumNaturalStaleRate"),
+                  0 <= stale_rate <= policy_value(policy, "network", "maximumNaturalStaleRate"))
 
     for role, policy_prefix in (("minerResources", "maximumMiner"), ("validatorResources", "maximumValidator")):
         resources = result["measurements"].get(role)
@@ -104,6 +120,12 @@ def evaluate_policy(policy_path: Path, policy: dict[str, Any], result: dict[str,
               isinstance(cpu, (int, float)) and cpu <= policy_value(policy, "resources", f"{policy_prefix}P95CpuPercentOneCore"))
         check(f"resources.{role}.max-rss", rss, policy_value(policy, "resources", f"{policy_prefix}RssBytes"),
               isinstance(rss, (int, float)) and rss <= policy_value(policy, "resources", f"{policy_prefix}RssBytes"))
+        growth = resources.get("dataDirGrowthBytesPer24Hours")
+        if not isinstance(growth, (int, float)):
+            missing.append(f"{role}-state-growth")
+        else:
+            check(f"resources.{role}.state-growth-per-24h", growth, policy_value(policy, "resources", "maximumDataGrowthBytesPer24Hours"),
+                  growth <= policy_value(policy, "resources", "maximumDataGrowthBytesPer24Hours"))
 
     by_kind = {row.get("kind"): row for row in experiments if isinstance(row, dict)}
     load = by_kind.get("load")
@@ -136,6 +158,20 @@ def evaluate_policy(policy_path: Path, policy: dict[str, Any], result: dict[str,
             check(identifier, actual, limit, isinstance(actual, (int, float)) and actual <= limit)
         check("proof.malformed-and-binding-rejection", metrics.get("malformedAndBindingRejected"), policy_value(policy, "proof", "requireMalformedAndBindingRejection"),
               metrics.get("malformedAndBindingRejected") is policy_value(policy, "proof", "requireMalformedAndBindingRejection"))
+
+    reorg = by_kind.get("reorg")
+    if not isinstance(reorg, dict) or not isinstance(reorg.get("metrics"), dict):
+        missing.append("reorg-metrics")
+    else:
+        recovery = reorg["metrics"].get("controlledReorgRecoverySeconds")
+        check("reorg.recovery-seconds", recovery, policy_value(policy, "network", "maximumControlledReorgRecoverySeconds"),
+              isinstance(recovery, (int, float)) and recovery <= policy_value(policy, "network", "maximumControlledReorgRecoverySeconds"))
+        verification_p95 = reorg["metrics"].get("validatorVerificationP95Ms")
+        verification_max = reorg["metrics"].get("validatorVerificationMaxMs")
+        check("verification.p95-ms", verification_p95, policy_value(policy, "network", "maximumValidatorVerificationP95Ms"),
+              isinstance(verification_p95, (int, float)) and verification_p95 <= policy_value(policy, "network", "maximumValidatorVerificationP95Ms"))
+        check("verification.max-ms", verification_max, policy_value(policy, "network", "maximumValidatorVerificationMs"),
+              isinstance(verification_max, (int, float)) and verification_max <= policy_value(policy, "network", "maximumValidatorVerificationMs"))
 
     if result["faultCoverage"]["missing"]:
         missing.append("fault-coverage")
@@ -188,14 +224,20 @@ def main() -> None:
     }
     if args.network_observation:
         observation = read_json(args.network_observation)
-        if observation.get("schema") != "aichain.kawpow-g3-network-observation":
+        blocks = observation.get("blocks")
+        expected_blocks = int(observation.get("endHeight", 0)) - int(observation.get("startHeight", 0))
+        if (observation.get("schema") != "aichain.kawpow-g3-network-observation"
+                or observation.get("schemaVersion") != "0.1.0-draft"
+                or not isinstance(blocks, list) or len(blocks) != expected_blocks):
             raise SystemExit("unsupported network observation schema")
         result["measurements"]["network"] = {
             "sourceSha256": digest(args.network_observation),
             "startHeight": observation.get("startHeight"), "endHeight": observation.get("endHeight"),
             "blockProductionMs": observation.get("blockProductionMs"),
             "propagationObservationMs": observation.get("propagationObservationMs"),
-            "canonicalHashAgreement": all(row.get("sameCanonicalHash") for row in observation.get("blocks", []) if isinstance(row, dict)),
+            "naturalStaleRate": observation.get("naturalStaleRate"),
+            "candidateBlockCount": observation.get("candidateBlockCount"),
+            "canonicalHashAgreement": bool(blocks) and all(row.get("sameCanonicalHash") for row in blocks if isinstance(row, dict)),
         }
     if args.miner_resources:
         result["measurements"]["minerResources"] = resource_summary(args.miner_resources)

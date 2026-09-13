@@ -1,6 +1,6 @@
 # Phase 4 — Measurement and fault-test harness
 
-Version: 0.1.0-draft · Updated: 2026-09-08 · Status: pre-provisioning
+Version: 0.1.1-draft · Updated: 2026-09-13 · Status: foundation active
 
 ## Purpose
 
@@ -73,6 +73,30 @@ Record these fields for every accepted exercise:
 - queue depth, rejection/deduplication counts, batch sizes, indexer lag and
   recovery/rebuild time; and
 - proof queue time, proof generation time, verification gas and rejection reason.
+
+For a policy-evaluable observation, provide the reviewed natural stale/orphan
+rate and candidate-block count to the observer. These are aggregates from the
+exercise record; the observer does not infer them from canonical blocks alone:
+
+```bash
+python3 scripts/observe-kawpow-g3-network.py \
+  --mining-rpc http://127.0.0.1:18545 \
+  --validator-rpc http://127.0.0.1:18546 \
+  --blocks 1000 --natural-stale-rate REPLACE_RATE \
+  --candidate-block-count REPLACE_CANDIDATE_COUNT \
+  --output evidence/network-observation.json
+```
+
+The report evaluates p99 block time, natural stale rate, controlled reorg
+recovery, CPU verification latency and projected 24-hour state growth in
+addition to the original ingress, proof and resource thresholds. It remains a
+review aid: those values must be independently reviewed before use.
+
+Run the safe regression checks before deploying a new harness image:
+
+```bash
+python3 scripts/test-phase4-acceptance.py
+```
 
 ## Fault results and acceptance draft
 

@@ -35,10 +35,20 @@ def main() -> None:
     parser.add_argument("--blocks", type=int, default=20)
     parser.add_argument("--timeout", type=float, default=300)
     parser.add_argument("--poll-ms", type=float, default=25)
+    parser.add_argument("--natural-stale-rate", type=float,
+                        help="Reviewed aggregate natural stale/orphan rate for this observation window (0..1).")
+    parser.add_argument("--candidate-block-count", type=int,
+                        help="Reviewed aggregate candidate-block count used to derive --natural-stale-rate.")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     if args.blocks <= 0 or args.timeout <= 0 or args.poll_ms <= 0:
         parser.error("blocks, timeout and poll-ms must be positive")
+    if (args.natural_stale_rate is None) != (args.candidate_block_count is None):
+        parser.error("--natural-stale-rate and --candidate-block-count must be supplied together")
+    if args.natural_stale_rate is not None and not 0 <= args.natural_stale_rate <= 1:
+        parser.error("--natural-stale-rate must be between 0 and 1")
+    if args.candidate_block_count is not None and args.candidate_block_count < args.blocks:
+        parser.error("--candidate-block-count must be at least --blocks")
     if args.output.exists():
         parser.error(f"refusing to overwrite {args.output}")
 
@@ -87,12 +97,16 @@ def main() -> None:
         "startedNs": started, "startHeight": start_height, "endHeight": target_height,
         "pollIntervalMs": args.poll_ms,
         "blockProductionMs": {"samples": production, "mean": statistics.mean(production) if production else None,
-                              "p50": percentile(production, .50), "p95": percentile(production, .95)},
+                              "p50": percentile(production, .50), "p95": percentile(production, .95),
+                              "p99": percentile(production, .99)},
         "propagationObservationMs": {"samples": propagation, "mean": statistics.mean(propagation),
                                      "p50": percentile(propagation, .50), "p95": percentile(propagation, .95),
                                      "measurementFloorMs": args.poll_ms},
         "blocks": rows,
     }
+    if args.natural_stale_rate is not None:
+        result["naturalStaleRate"] = args.natural_stale_rate
+        result["candidateBlockCount"] = args.candidate_block_count
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({"startHeight": start_height, "endHeight": target_height,
@@ -102,4 +116,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
