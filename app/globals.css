@@ -216,52 +216,61 @@ button:disabled{cursor:default;opacity:.45}
 @media(max-width:520px){.cinematic-layout{padding:35px 22px 40px}.cinematic-copy h1{font-size:51px;line-height:1.05;letter-spacing:-.045em}.cinematic-copy h1 em{font-size:.82em;white-space:normal}.cinematic-lede{font-size:17px}.cinematic-copy .actions{gap:20px}.hero-bottom-line{margin:0 22px;flex-direction:column;gap:10px}.layer-marker{right:0;padding:6px 9px;gap:7px;font-size:12px}.layer-marker span:first-child{font-size:10px}.living-caption{font-size:10px}.layer-explanation p{font-size:15px}.layer-explanation{min-height:195px}.guided-story{padding:25px 22px}.guided-topline{font-size:10px;gap:15px;align-items:start}.guided-topline a{font-size:13px}.guided-copy>p:not(.eyebrow){font-size:17px}.document-topline{padding:18px 22px;font-size:10px}.document-body{padding:28px 22px 20px}.document-body h3{font-size:29px}.document-body dl>div{gap:15px;font-size:14px}.document-footer{padding:18px 22px;gap:20px}.guided-controls{gap:10px}.guided-controls>button{padding:12px 14px;gap:10px;font-size:14px}.guided-controls>p{font-size:12px}.guided-chapters{gap:10px}.guided-chapters button{font-size:12px}.boundary-flow{flex-direction:column;align-items:flex-start;gap:12px;padding:24px}.boundary-flow span[aria-hidden]{transform:rotate(90deg)}}
 @media(prefers-reduced-motion:reduce){.living-image{animation:none!important;transform:none!important;will-change:auto}.guided-art{transform:none}.layer-marker{transition:none}}
 
-/* Whole transparent layers; one shared eight-second liquid-light sequence. */
+/* Whole transparent layers; one shared ten-second liquid-light sequence. */
 .living-scene{perspective:1100px}
-.receipt-stage{--liquid-cycle:8s;position:relative;aspect-ratio:3/2;transform:rotateX(var(--tilt-x,0deg)) rotateY(var(--tilt-y,0deg));transition:transform .35s ease-out;isolation:isolate}
+.receipt-stage{--liquid-cycle:10s;position:relative;aspect-ratio:3/2;transform:rotateX(var(--tilt-x,0deg)) rotateY(var(--tilt-y,0deg));transition:transform .35s ease-out;isolation:isolate}
 .receipt-slice{position:absolute;left:10%;width:74%;animation:glass-float var(--liquid-cycle) ease-in-out infinite;will-change:transform}
 .receipt-slice img{display:block;width:100%;height:auto;pointer-events:none}
 .slice-0{top:-12%;z-index:3;--lift:-18px;--drift:5px}
 .slice-1{top:10%;z-index:2;--lift:12px;--drift:-5px}
 .slice-2{top:32%;z-index:1;--lift:20px;--drift:4px}
 /* Hold the surfaces at their contact positions while the droplet crosses. */
-@keyframes glass-float{0%,25%,75%,100%{transform:translate3d(0,0,0)}12%,88%{transform:translate3d(var(--drift),var(--lift),0)}}
-.liquid-drop{position:absolute;z-index:4;left:47%;top:2%;width:clamp(9px,1.65vw,15px);aspect-ratio:1;border-radius:48% 48% 52% 52%;background:radial-gradient(circle at 34% 28%,#fffdf0 0 12%,#ffe4a1 24%,#ffb946 57%,#c77716 90%);box-shadow:0 0 12px #ffd18199,0 0 28px #ffb64b44;transform:translate(-50%,-100%);opacity:0;animation:liquid-descent var(--liquid-cycle) linear infinite;pointer-events:none}
+@keyframes glass-float{0%,24%,88%,100%{transform:translate3d(0,0,0)}12%,94%{transform:translate3d(var(--drift),var(--lift),0)}}
+.liquid-drop{position:absolute;z-index:4;left:47%;top:2%;width:clamp(23px,3vw,34px);aspect-ratio:1;border:1px solid #ffc56dcc;border-radius:44% 44% 52% 52%;background:radial-gradient(ellipse at 29% 20%,#fff9dfdd 0 5%,transparent 23%),radial-gradient(ellipse at 70% 76%,#ffb73ca6,transparent 40%),linear-gradient(145deg,#b7dbea99,#173e57aa 32%,#081a29ed 52%,#638a99bb 78%,#ffd991cc);box-shadow:inset 2px 2px 3px #e8f5ff99,inset -2px -3px 4px #ffb74c88,0 0 15px #ffc76e77,0 0 30px #ffb64b22;transform:translate(-50%,-100%);opacity:0;animation:liquid-descent var(--liquid-cycle) linear infinite;pointer-events:none}
 .liquid-drop i{position:absolute;bottom:65%;left:35%;width:30%;height:170%;background:linear-gradient(transparent,#ffcf7966);border-radius:100%;filter:blur(2px)}
 /* Contact centres: -12/10/32 + (74% x 45%) = 21.3/43.3/65.3%. */
 @keyframes liquid-descent{
 0%,8%{top:2%;opacity:0;transform:translate(-50%,-100%) scale(.6)}
 14%{top:3%;opacity:1;transform:translate(-50%,-100%) scale(.85,1.2)}
-29%{top:21.3%;opacity:1;transform:translate(-50%,-100%) scale(.75,1.4)}
-31%{top:21.3%;opacity:.65;transform:translate(-50%,-40%) scale(1.2,.55)}
-34%{top:24%;opacity:1;transform:translate(-50%,-100%) scale(.8,1.25)}
-44%{top:43.3%;opacity:1;transform:translate(-50%,-100%) scale(.75,1.4)}
-46%{top:43.3%;opacity:.65;transform:translate(-50%,-40%) scale(1.2,.55)}
-49%{top:47%;opacity:1;transform:translate(-50%,-100%) scale(.8,1.25)}
-59%{top:65.3%;opacity:1;transform:translate(-50%,-100%) scale(.85,1.3)}
-61%{top:65.3%;opacity:1;transform:translate(-50%,-35%) scale(1.45,.4)}
-64%{top:65.3%;opacity:0;transform:translate(-50%,0) scale(.15,.1)}
-100%{top:65.3%;opacity:0;transform:translate(-50%,0) scale(.15,.1)}
+26%{top:20.5%;opacity:1;transform:translate(-50%,-100%) scale(.8,1.25)}
+30%{top:21.3%;opacity:.9;transform:translate(-50%,-85%) scale(.98,1.05)}
+35%{top:22%;opacity:.8;transform:translate(-50%,-65%) scale(1.15,.8)}
+38%{top:26%;opacity:1;transform:translate(-50%,-100%) scale(.85,1.2)}
+45%{top:42.5%;opacity:1;transform:translate(-50%,-100%) scale(.8,1.25)}
+49%{top:43.3%;opacity:.9;transform:translate(-50%,-85%) scale(.98,1.05)}
+54%{top:44%;opacity:.8;transform:translate(-50%,-65%) scale(1.15,.8)}
+57%{top:48%;opacity:1;transform:translate(-50%,-100%) scale(.85,1.2)}
+65%{top:64.5%;opacity:1;transform:translate(-50%,-100%) scale(.85,1.2)}
+68%{top:65.3%;opacity:1;transform:translate(-50%,-80%) scale(1,1)}
+71%{top:65.3%;opacity:.9;transform:translate(-50%,-35%) scale(1.4,.45)}
+74%,100%{top:65.3%;opacity:0;transform:translate(-50%,0) scale(.15,.1)}
 }
 .surface-response,.absorption-surface{position:absolute;left:50%;top:45%;pointer-events:none}
 .surface-response{width:22%;height:6%;border-radius:50%;background:radial-gradient(ellipse,#fff3c999,#ffbb4d44 35%,transparent 70%);transform:translate(-50%,-50%) rotate(12deg);opacity:0}
 .response-0{animation:contact-authority var(--liquid-cycle) ease-out infinite}
 .response-1{animation:contact-evidence var(--liquid-cycle) ease-out infinite}
 .response-2{animation:contact-review var(--liquid-cycle) ease-out infinite}
-@keyframes contact-authority{0%,27%,40%,100%{opacity:0}31%{opacity:.9}}
-@keyframes contact-evidence{0%,42%,55%,100%{opacity:0}46%{opacity:.9}}
-@keyframes contact-review{0%,57%,77%,100%{opacity:0}62%{opacity:1}}
+@keyframes contact-authority{0%,25%,41%,100%{opacity:0}30%,35%{opacity:.85}}
+@keyframes contact-evidence{0%,44%,60%,100%{opacity:0}49%,54%{opacity:.85}}
+@keyframes contact-review{0%,64%,88%,100%{opacity:0}71%{opacity:1}}
 .absorption-surface{width:48%;height:15%;transform:translate(-50%,-50%) rotate(12deg)}
 .water-ring,.water-dimple{position:absolute;inset:0;border-radius:50%;opacity:0}
 .water-ring{border:1px solid #ffdb99;box-shadow:0 0 7px #ffc57255,inset 0 0 5px #ffc57233}
 .ring-one{animation:lake-ring-one var(--liquid-cycle) ease-out infinite}
 .ring-two{animation:lake-ring-two var(--liquid-cycle) ease-out infinite}
 .water-dimple{background:radial-gradient(ellipse, #071727aa 0 15%,#f5bd6455 22%,transparent 53%);animation:lake-dimple var(--liquid-cycle) ease-out infinite}
-@keyframes lake-dimple{0%,58%,76%,100%{opacity:0;transform:scale(.08)}62%{opacity:.9;transform:scale(.28)}67%{opacity:.35;transform:scale(.48)}}
-@keyframes lake-ring-one{0%,60%{opacity:0;transform:scale(.03)}63%{opacity:.85;transform:scale(.16)}79%{opacity:0;transform:scale(1)}100%{opacity:0;transform:scale(1)}}
-@keyframes lake-ring-two{0%,64%{opacity:0;transform:scale(.04)}67%{opacity:.55;transform:scale(.18)}85%{opacity:0;transform:scale(.92)}100%{opacity:0;transform:scale(.92)}}
+@keyframes lake-dimple{0%,67%,86%,100%{opacity:0;transform:scale(.08)}72%{opacity:.9;transform:scale(.28)}78%{opacity:.35;transform:scale(.48)}}
+@keyframes lake-ring-one{0%,70%{opacity:0;transform:scale(.03)}74%{opacity:.85;transform:scale(.16)}89%,100%{opacity:0;transform:scale(1)}}
+@keyframes lake-ring-two{0%,74%{opacity:0;transform:scale(.04)}78%{opacity:.55;transform:scale(.18)}94%,100%{opacity:0;transform:scale(.92)}}
 .living-receipt[data-motion="off"] .receipt-stage *{animation-play-state:paused!important;will-change:auto}
 .living-receipt[data-motion="off"] .receipt-stage{transform:none;transition:none}
 .living-caption button{display:block;min-height:44px}
 @media(max-width:850px){.slice-0{--lift:-12px}.slice-1{--lift:8px}.slice-2{--lift:14px}}
 @media(prefers-reduced-motion:reduce){.receipt-stage{transform:none!important;transition:none}.receipt-slice{animation:none!important;transform:none!important;will-change:auto}.liquid-drop,.surface-response,.absorption-surface{display:none}}
+
+
+/* Amber charge follows the original transparent silhouette and glass caustics. */
+.electric-charge{position:absolute;inset:0;pointer-events:none;opacity:0;mix-blend-mode:screen;animation:pane-charge var(--liquid-cycle) ease-out infinite}
+.electric-charge img{filter:sepia(1) saturate(4) hue-rotate(350deg) brightness(1.7) drop-shadow(0 0 5px #ffbe55)}
+@keyframes pane-charge{0%,68%{opacity:0;clip-path:circle(0% at 50% 45%)}72%{opacity:.95;clip-path:circle(12% at 50% 45%)}79%{opacity:.85;clip-path:circle(80% at 50% 45%)}84%{opacity:.55;clip-path:circle(80% at 50% 45%)}94%,100%{opacity:0;clip-path:circle(80% at 50% 45%)}}
+@media(prefers-reduced-motion:reduce){.electric-charge{display:none}}
