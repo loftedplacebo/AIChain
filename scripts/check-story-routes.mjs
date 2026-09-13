@@ -14,9 +14,9 @@ async function checkNativeLinks(directory) {
 await checkNativeLinks(new URL("../app/", import.meta.url));
 
 // Read-only smoke checks against the local development preview.
-const origin = "http://localhost:3000";
+const origin = process.argv[2] || "http://localhost:3000";
 const expectations = {
-  "/": ["Autonomous agents", 'href="/vision"'],
+  "/": ["Autonomous agents", 'href="/vision"', "THE LIVING RECEIPT", "Explore authority", "living-receipt-hero.png"],
   "/product": ["A focused review package", "The application enforces."],
   "/in-action": ["Path A / Accepted", "Path B / More evidence", "Path C / Rejected", "The evidence cannot be retrieved.", "Not granted by this review"],
   "/use-cases": ["Path C / Rejected", "product story, not a live customer result"],

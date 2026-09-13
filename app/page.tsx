@@ -1,4 +1,5 @@
 import { Footer, Nav } from "./components";
+import { LivingReceipt } from "./living-receipt";
 const pillars = [
   ["01","Know the authority","Connect a recorded action to the organisation and permissions behind it."],
   ["02","Keep the evidence","Bind a record to the evidence used, without publishing the private work itself."],
@@ -6,14 +7,8 @@ const pillars = [
 ];
 export default function Home() {
   return <main>
-    <section className="hero"><Nav dark/><div className="hero-copy" id="content">
-      <p className="eyebrow">The verification layer for autonomous work</p>
-      <h1>Autonomous agents.<br/><em>Human certainty.</em></h1>
-      <p className="lede">Orvessian is building a shared record of what AI agents were authorised to do, what happened, and what was checked—so people can review the decisions that matter.</p>
-      <div className="actions"><a className="button primary" href="/in-action">See it in action <span>→</span></a><a className="button text" href="/developers">Build with receipts <span>→</span></a></div>
-    </div><div className="hero-image" role="img" aria-label="Illustrative scene of people collaborating around a laptop"/>
-    <div className="trust-card"><strong>Built for accountable autonomy</strong><small>Receipt tooling in alpha · broader product in development</small></div></section>
-    <section className="intro"><p className="eyebrow">The work is autonomous. The accountability still matters.</p><h2>Delegating the work should not mean <em>losing the story.</em></h2><p className="section-copy">When an agent moves between tools and teams, someone still needs to explain the outcome. What was it allowed to do? Which evidence did it use? Who reviewed the exception? Those answers should not be scattered across a dozen systems.</p></section>
+    <section className="cinematic-hero"><Nav dark/><div className="cinematic-layout"><div className="cinematic-copy" id="content"><p className="eyebrow">The verification layer for autonomous work</p><h1>Autonomous <br/>agents.<br/><em>Human certainty.</em></h1><p className="cinematic-lede">Give autonomous work a record people can inspect. What was authorised. What happened. What was checked.</p><div className="actions"><a className="button primary" href="/in-action#walkthrough">See it in action <span>→</span></a><a className="button cinematic-secondary" href="/developers">Build with receipts <span>→</span></a></div><p className="hero-readiness">Receipt tooling in alpha. Broader product in development.</p></div><LivingReceipt/></div><div className="hero-bottom-line"><span>AUTONOMY WITH AN ACCOUNTABLE HISTORY</span><a href="#why-it-matters">The idea behind the record ↓</a></div></section>
+    <section className="intro" id="why-it-matters"><p className="eyebrow">The work is autonomous. The accountability still matters.</p><h2>Delegating the work should not mean <em>losing the story.</em></h2><p className="section-copy">When an agent moves between tools and teams, someone still needs to explain the outcome. What was it allowed to do? Which evidence did it use? Who reviewed the exception? Those answers should not be scattered across a dozen systems.</p></section>
     <section className="receipt-section"><div className="receipt-copy"><p className="eyebrow">A record people can inspect</p><h2>Give the work a <em>receipt.</em></h2><p>A verification receipt connects a recorded event to signed assertions and evidence. Private information stays with its custodian; authorised reviewers can inspect what they need.</p><a className="arrow-link" href="/product">Explore the product <span>→</span></a></div>
       <div className="receipt"><div className="receipt-head"><span>ORVESSIAN / WORK RECORD</span><span className="pill">ILLUSTRATIVE</span></div><div className="receipt-job"><span className="job-icon">◒</span><div><small>SUPPLIER ASSESSMENT</small><strong>A recommendation, with its history.</strong></div></div><div className="receipt-row"><span>Evidence</span><strong>Version recorded</strong></div><div className="receipt-row"><span>Exception</span><strong>Document expired</strong></div><div className="receipt-row"><span>Human decision</span><strong>Request an update</strong></div><div className="receipt-footer">A record of a decision—not a guarantee of correctness.</div></div>
     </section>
