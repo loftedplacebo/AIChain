@@ -1,4 +1,3 @@
-import Link from "next/link";
 
 export function EvidenceBoundary() {
   return <section className="foundation-content" id="evidence-boundary" aria-labelledby="boundary-title">
@@ -11,6 +10,6 @@ export function EvidenceBoundary() {
       <article><span className="stage-label">03 / Shared anchor</span><h3>A checkable reference</h3><ul><li>A receipt commitment or batch root</li><li>The transaction and inclusion reference</li><li>Public chain metadata, not the source documents</li></ul><p>A commitment binds to recorded data. It does not reveal or recover that data by itself.</p></article>
     </div>
     <p className="boundary-caveat">Privacy is not automatic: transaction metadata may be visible, and recipients can retain disclosed material. Evidence protection, careful commitments and retention policies still matter.</p>
-    <Link className="arrow-link" href="/technology">Understand the verification boundaries →</Link>
+    <a className="arrow-link" href="/technology">Understand the verification boundaries →</a>
   </section>;
 }

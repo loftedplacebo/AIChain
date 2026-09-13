@@ -1,4 +1,17 @@
 import assert from "node:assert/strict";
+import { readFile, readdir } from "node:fs/promises";
+
+// Marketing navigation must not depend on the failing client-side Link router.
+async function checkNativeLinks(directory) {
+  for (const entry of await readdir(directory, { withFileTypes: true })) {
+    const path = new URL(entry.name + (entry.isDirectory() ? "/" : ""), directory);
+    if (entry.isDirectory()) await checkNativeLinks(path);
+    else if (entry.name.endsWith(".tsx")) {
+      assert.doesNotMatch(await readFile(path, "utf8"), /["']next\/link["']/, `${path}: use native page links`);
+    }
+  }
+}
+await checkNativeLinks(new URL("../app/", import.meta.url));
 
 // Read-only smoke checks against the local development preview.
 const origin = "http://localhost:3000";
