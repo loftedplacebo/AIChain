@@ -13,10 +13,17 @@ async function checkNativeLinks(directory) {
 }
 await checkNativeLinks(new URL("../app/", import.meta.url));
 
+// Moving layers must be whole transparent assets, never cropped backdrop slices.
+const receiptSource = await readFile(new URL("../app/living-receipt.tsx", import.meta.url), "utf8");
+const styles = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+assert.ok(receiptSource.includes('/glass-wafer-alpha.png'));
+assert.ok(!receiptSource.includes('/living-receipt-hero.png'));
+assert.doesNotMatch(styles, /\.slice-[012]\s*\{[^}]*clip-path/s);
+
 // Read-only smoke checks against the local development preview.
 const origin = process.argv[2] || "http://localhost:3000";
 const expectations = {
-  "/": ["Autonomous agents", 'href="/vision"', "THE LIVING RECEIPT", "Explore authority", "living-receipt-hero.png"],
+  "/": ["Autonomous agents", 'href="/vision"', "THE LIVING RECEIPT", "Explore authority", "glass-wafer-alpha.png"],
   "/product": ["A focused review package", "The application enforces."],
   "/in-action": ["Path A / Accepted", "Path B / More evidence", "Path C / Rejected", "The evidence cannot be retrieved.", "Not granted by this review"],
   "/use-cases": ["Path C / Rejected", "product story, not a live customer result"],
