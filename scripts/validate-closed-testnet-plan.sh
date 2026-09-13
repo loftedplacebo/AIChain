@@ -44,8 +44,33 @@ done
 [[ "${values[AICHAIN_MONITORING]}" == required ]] || { echo "Closed testnet monitoring is required" >&2; exit 2; }
 
 count_csv() { awk -F, '{ print NF }' <<<"$1"; }
+contains_duplicate_csv() {
+  local value="$1" item
+  declare -A seen=()
+  IFS=',' read -r -a items <<<"$value"
+  for item in "${items[@]}"; do
+    [[ -n "$item" ]] || return 0
+    [[ -z "${seen[$item]+x}" ]] || return 0
+    seen[$item]=1
+  done
+  return 1
+}
+csv_overlaps() {
+  local left="$1" right="$2" item
+  declare -A left_items=()
+  IFS=',' read -r -a items <<<"$left"
+  for item in "${items[@]}"; do left_items[$item]=1; done
+  IFS=',' read -r -a items <<<"$right"
+  for item in "${items[@]}"; do [[ -z "${left_items[$item]+x}" ]] || return 0; done
+  return 1
+}
 (( $(count_csv "${values[AICHAIN_MINER_OPERATORS]}") >= 3 )) || { echo "At least three miner operators are required" >&2; exit 2; }
 (( $(count_csv "${values[AICHAIN_VALIDATOR_OPERATORS]}") >= 2 )) || { echo "At least two validator operators are required" >&2; exit 2; }
 (( $(count_csv "${values[AICHAIN_REGIONS]}") >= 2 )) || { echo "At least two regions are required" >&2; exit 2; }
+contains_duplicate_csv "${values[AICHAIN_MINER_OPERATORS]}" && { echo "Miner operator identifiers must be unique" >&2; exit 2; }
+contains_duplicate_csv "${values[AICHAIN_VALIDATOR_OPERATORS]}" && { echo "Validator operator identifiers must be unique" >&2; exit 2; }
+contains_duplicate_csv "${values[AICHAIN_REGIONS]}" && { echo "Region identifiers must be unique" >&2; exit 2; }
+csv_overlaps "${values[AICHAIN_MINER_OPERATORS]}" "${values[AICHAIN_VALIDATOR_OPERATORS]}" && { echo "Miner and validator operator identifiers must not overlap" >&2; exit 2; }
+[[ "${values[AICHAIN_GENESIS_SHA256]}" != 0x0000000000000000000000000000000000000000000000000000000000000000 ]] || { echo "Genesis digest must not be all zeroes" >&2; exit 2; }
 
 echo "Closed-testnet manifest passed pre-provisioning validation."

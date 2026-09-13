@@ -1,6 +1,6 @@
 # Phase 4 — Closed-testnet deployment foundation
 
-Version: 0.1.0-draft · Updated: 2026-09-08 · Status: pre-provisioning
+Version: 0.1.1-draft · Updated: 2026-09-13 · Status: foundation active
 
 ## Purpose and boundary
 
@@ -60,6 +60,14 @@ cloud token, IP address or genesis allocation. It rejects placeholders, public
 RPC, missing monitoring, fewer than three miner operators, fewer than two
 validators, or fewer than two regions. Passing it proves configuration
 completeness—not that a network is secure or launched.
+
+The gate also rejects duplicate role/region identifiers, overlapping miner and
+validator identities, and an all-zero genesis digest. Its safe regression
+fixture can be checked without provisioning infrastructure:
+
+```bash
+bash scripts/test-closed-testnet-plan.sh
+```
 
 ## Reproducible deployment sequence
 
