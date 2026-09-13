@@ -1,6 +1,6 @@
 import Link from "next/link";
 export function Mark() { return <span className="mark" aria-hidden="true">◒</span>; }
-const links = [["/product", "Product"], ["/in-action", "In action"], ["/technology", "Technology"], ["/developers", "Developers"], ["/#story", "Vision"]];
+const links = [["/product", "Product"], ["/in-action", "In action"], ["/technology", "Technology"], ["/developers", "Developers"], ["/vision", "Vision"]];
 export function Nav({ dark = false }: { dark?: boolean }) {
   return <><a className="skip-link" href="#content">Skip to content</a><nav className={`nav ${dark ? "nav-dark" : ""}`} aria-label="Main navigation">
     <Link className="brand" href="/"><Mark /> Orvessian</Link>
