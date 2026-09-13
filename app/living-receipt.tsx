@@ -31,9 +31,9 @@ export function LivingReceipt() {
     }} onPointerLeave={() => {
       stage.current?.style.setProperty("--tilt-x", "0deg");
       stage.current?.style.setProperty("--tilt-y", "0deg");
-    }}><div className="receipt-stage" ref={stage} role="img" aria-label="Three independently floating layers of smoky glass with an amber pulse connecting authority, evidence and review. Concept illustration.">
-      {[0,1,2].map(index => <div className={`receipt-slice slice-${index}`} key={index}><img src="/glass-wafer-alpha.png" width="1536" height="1024" fetchPriority={index === 0 ? "high" : "auto"} alt="" draggable={false}/></div>)}
-      <span className="receipt-pulse" aria-hidden="true"/>
+    }}><div className="receipt-stage" ref={stage} role="img" aria-label="An amber droplet passes through three floating glass layers, then dissolves into gentle ripples on the final surface. Concept illustration of authority, evidence and review.">
+      {[0,1,2].map(index => <div className={`receipt-slice slice-${index}`} key={index}><img src="/glass-wafer-alpha.png" width="1536" height="1024" fetchPriority={index === 0 ? "high" : "auto"} alt="" draggable={false}/><span className={`surface-response response-${index}`} aria-hidden="true"/>{index === 2 && <span className="absorption-surface" aria-hidden="true"><i className="water-dimple"/><i className="water-ring ring-one"/><i className="water-ring ring-two"/></span>}</div>)}
+      <span className="liquid-drop" aria-hidden="true"><i/></span>
     </div>
       <div className="layer-markers" aria-label="Explore the receipt layers">{layers.map((layer,index) => <button type="button" key={layer.name} className={`layer-marker marker-${index}`} disabled={!ready} aria-label={`Explore ${layer.name.toLowerCase()}`} aria-pressed={active === index} onClick={() => setActive(index)}><span>0{index+1}</span><span>{layer.name}</span></button>)}</div>
     </div>
