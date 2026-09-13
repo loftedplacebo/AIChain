@@ -4,7 +4,8 @@ Version: 0.1.0-alpha · Updated: 2026-09-08
 
 ## Scope and status
 
-The remaining release gates are tracked in [Phase 3 sign-off](./phase3-signoff-tracker.md).
+The Phase 3 release gates are recorded as signed off, with the documented
+limitations and Phase 4 entry requirements tracked in [Phase 3 sign-off](./phase3-signoff-tracker.md).
 
 The receipt-to-proof-to-lookup internal slice is implemented and has passed a
 complete fresh, bounded Linux reproduction, including the mixed workload.
@@ -163,12 +164,20 @@ The fresh durable-index rebuild took 16.75 seconds. This is a bounded,
 single-node measurement: it establishes the tested operating point and recovery
 path, not public-network or KawPoW capacity.
 
-Broader release gates still require delayed verifier-registry governance
-integration, installation without prebuilt prover/node prerequisites, and public
-API/security review. No production-ready or full-release-complete claim follows
-from this internal profile.
+Broader release gates still require installation without prebuilt prover/node
+prerequisites and public API/security review. No production-ready or
+full-release-complete claim follows from this internal profile.
+
+The delayed verifier-registry governance trial subsequently completed on the
+isolated VPS chain after the real 48-hour wall-clock interval. It passed the
+activation boundary, real proof, role, pause, duplicate, resource-limit,
+irreversible-retirement and historical-record checks. Phase 3 is therefore
+closed as an internal alpha; the broader release gates above remain Phase 4+
+work.
 
 ## Change log
 
 - 0.1.0-alpha: integrated internal profile, real proof/receipt evidence, bounded
   workload, reproducible runner and binding/recovery safeguards.
+- 0.1.1-alpha: signed off the real governance-delay trial and extended the
+  three-GPU disposable KawPoW interoperability rehearsal.

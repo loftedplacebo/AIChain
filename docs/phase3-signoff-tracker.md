@@ -1,14 +1,15 @@
 # Phase 3 sign-off tracker
 
-Updated: 2026-09-08. **Overall status: incomplete.** Commit/push requested only
-after the outstanding gates pass; do not represent pending gates as completed.
+Updated: 2026-09-13. **Overall status: Phase 3 signed off with documented
+limitations.** This closes the integrated-alpha gates; it does not claim a
+public or production-ready network.
 
 | Gate | Status | Evidence / next action |
 |---|---|---|
 | Sustained mixed workload | Passed, bounded profile | 300 s; 32,080 logical receipts, 320 batches, 80 individual anchors, 80 real-proof replays; 106.9 logical receipts/s; fresh index rebuild 16.75 s |
-| Multi-peer KawPoW integrated rerun | Passed, disposable network | RTX 3060 mining node and CPU-only VPS validator peered through authenticated SSH relays; 65+ accepted GPU solutions were recorded. A 12-block observer sample had matching canonical hashes at every height. |
+| Multi-peer KawPoW integrated rerun | Passed, disposable network | RTX 3060 mining nodes in three locations ran against a CPU-only VPS validator through authenticated SSH relays. The extended run recorded 134,152 Norway submissions: 14 canonical accepts, 134,126 duplicate rejections and 12 invalid/rejected cases. Both Norway and the VPS reached block 162 before clean shutdown. |
 | Governance boundary tests with a real proof | Passed | Anvil simulated time; 306,420 gas for `verifyAndRecord`; not a real elapsed-time result |
-| Real governance activation delay | Pending | Earliest wall-clock completion: 2026-09-09 05:53:57.989 UTC, plus chain activation condition |
+| Real governance activation delay | Passed | Real 48-hour wall-clock delay and chain activation completed. Registry `0x7D9EC0a9EbBd104706c75330d13e2e790fbC3CeB`; completion transaction `0x5284d243d0312beb148056fda82497a7405c2f30836620946e2e18f0d56fc08f`; 306,420 gas. Early activation/proof, boundary activation, real proof, resource limits, role controls, pause, duplicate rejection, irreversible retirement and historical retention all passed. |
 | KawPoW validator restart and catch-up | Passed, disposable network | Validator stopped cleanly at height 95, GPU miner advanced to 104, then validator restarted, re-peered and caught up to height 114. |
 | Phase 3 development-runner restart | Passed, replacement profile | Fresh custom-genesis CPU-Ethash runner kept its genesis across a clean restart and sealed a post-restart transaction. This runner is development-only, not an AIChain consensus selection. |
 | Replacement-profile complete proof workload | Passed, bounded profile | Fresh real RISC Zero proof (230,130 ms), pinned on-chain adapter verification (267,227 gas), 1,000-receipt load/replay, JavaScript/Python presentation checks and clean restart/recovery all passed. It is cold CPU-Ethash development evidence, not a comparable TPS or KawPoW result. |
@@ -69,6 +70,21 @@ it did not alter the VPS development chain or expose public JSON-RPC.
 
 This proves node-to-GPU-miner-to-independent-validator interoperability. It is
 not a public testnet, an ASIC-resistance result, or a production capacity claim.
+
+### Extended three-GPU rehearsal (2026-09-12/13)
+
+The follow-up disposable chain used the same custom genesis and network policy
+with three RTX 3060 mining hosts (two existing hosts plus a Norway host) and a
+CPU-only VPS validator. The Norway evidence log covered 10.43 hours, from
+2026-09-12 21:38:55 UTC through 2026-09-13 08:04:34 UTC, and contained 134,152
+submissions. Fourteen became canonical blocks; 134,126 were correctly rejected
+as duplicates and 12 were rejected as invalid. The Norway node and VPS both
+reported block 162 at collection time. The network was then shut down cleanly.
+
+The low canonical-win count is a competition result, not a miner failure:
+duplicate work is expected when multiple miners race on the same template. The
+run is evidence of interoperability and rejection behavior, not a production
+hash-rate or profitability benchmark.
 
 ## Historical restart limitation and replacement
 
