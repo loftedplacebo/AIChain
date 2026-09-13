@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const layers = [
   { name: "Authority", question: "Who was allowed to act?", description: "The brief, the responsible organisation and the limits of the job. Your application enforces those limits." },
@@ -13,6 +13,7 @@ export function LivingReceipt() {
   const [motion, setMotion] = useState(true);
   const [reduced, setReduced] = useState(false);
   const [ready, setReady] = useState(false);
+  const stage = useRef<HTMLDivElement>(null);
   useEffect(() => {
     setReady(true);
     const query = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -22,7 +23,18 @@ export function LivingReceipt() {
   }, []);
 
   return <div className="living-receipt" data-motion={motion && !reduced ? "on" : "off"}>
-    <div className="living-scene"><img className="living-image" src="/living-receipt-hero.png" width="1536" height="1024" fetchPriority="high" alt="Three floating layers of smoky glass edged in amber light: an abstract 3D illustration of a verification receipt."/>
+    <div className="living-scene" onPointerMove={event => {
+      if (!motion || reduced || event.pointerType !== "mouse") return;
+      const box = event.currentTarget.getBoundingClientRect();
+      stage.current?.style.setProperty("--tilt-x", `${((event.clientY - box.top) / box.height - .5) * -8}deg`);
+      stage.current?.style.setProperty("--tilt-y", `${((event.clientX - box.left) / box.width - .5) * 10}deg`);
+    }} onPointerLeave={() => {
+      stage.current?.style.setProperty("--tilt-x", "0deg");
+      stage.current?.style.setProperty("--tilt-y", "0deg");
+    }}><div className="receipt-stage" ref={stage} role="img" aria-label="Three independently floating layers of smoky glass with an amber pulse connecting authority, evidence and review. Concept illustration.">
+      {[0,1,2].map(index => <div className={`receipt-slice slice-${index}`} key={index}><img src="/living-receipt-hero.png" width="1536" height="1024" fetchPriority={index === 0 ? "high" : "auto"} alt="" draggable={false}/></div>)}
+      <span className="receipt-pulse" aria-hidden="true"/>
+    </div>
       <div className="layer-markers" aria-label="Explore the receipt layers">{layers.map((layer,index) => <button type="button" key={layer.name} className={`layer-marker marker-${index}`} disabled={!ready} aria-label={`Explore ${layer.name.toLowerCase()}`} aria-pressed={active === index} onClick={() => setActive(index)}><span>0{index+1}</span><span>{layer.name}</span></button>)}</div>
     </div>
     <div className="living-caption"><span>THE LIVING RECEIPT / CONCEPT ART</span><button type="button" disabled={!ready || reduced} onClick={() => setMotion(value=>!value)}>{reduced ? "Reduced motion" : motion ? "Pause motion" : "Enable motion"}</button></div>
