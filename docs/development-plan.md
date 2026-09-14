@@ -3,12 +3,12 @@
 | Field | Value |
 |---|---|
 | Status | Living delivery plan |
-| Document version | 0.18 |
-| Last updated | 2026-09-12 |
+| Document version | 0.19 |
+| Last updated | 2026-09-14 |
 | Architecture inputs | [Core L1 Architecture and Tooling](./core-l1-architecture-and-tooling.md); [AI Verification & ZK Architecture](./ai-verification-and-zk-architecture.md) |
 | Schedule | Dates, durations, staffing, and owners are **TBD** |
 | Decision state | This plan sequences open decisions; it does not settle them |
-| Delivery status | Phase 1 complete; Phase 2A NVIDIA and isolated ASERT validation complete; AMD/multi-miner work deferred to testnet; Phase 2C ZK-002–004 alpha scope complete; Phase 2D AVR Presentation `0.3.0-alpha` implemented; public-release ZK review/deployment gates remain open |
+| Delivery status | Phase 1 and Phase 3 integrated-alpha scope complete; Phase 2A NVIDIA and isolated ASERT validation complete; AMD/independent multi-miner work remains a Phase 4 gate; Phase 2C ZK-002–004 and Phase 2D alpha scope complete; Phase 4 closed-testnet foundation active |
 
 ## 1. Objective
 
@@ -185,9 +185,9 @@ Security, privacy, compatibility, documentation, and operations run across every
 ### Phase 3 — Integrated Alpha
 
 The implemented internal profile and measured results are tracked in
-[Phase 3 Integrated Alpha](./phase-3-integrated-alpha.md). This profile is not
-equivalent to closure of every broader release gate, particularly sustained
-capacity and the selected consensus-profile rerun.
+[Phase 3 Integrated Alpha](./phase-3-integrated-alpha.md). The integrated-alpha
+scope is signed off with documented limitations; sustained closed-testnet
+capacity, hardware diversity and production readiness remain Phase 4+ gates.
 
 **Goal:** Combine the L1, AVR, SDK, proof, and explorer work into one reproducible internal release.
 
@@ -214,8 +214,9 @@ capacity and the selected consensus-profile rerun.
 
 **Goal:** Exercise the integrated system under controlled, realistic, and adversarial conditions.
 
-**Foundation status (2026-09-08):** the pre-provisioning role model, private
-network policy, manifest gate and reset/upgrade discipline are defined in
+**Foundation status (2026-09-14):** Phase 3 is signed off. The pre-provisioning
+role model, private network policy, manifest/release-record gates, monitoring,
+acceptance tooling and reset/upgrade discipline are defined in
 [Phase 4 Closed-testnet deployment foundation](./phase-4-closed-testnet-foundation.md).
 This is not a testnet launch; the hardware-diversity, governance and release
 acceptance gates remain open.
@@ -392,5 +393,6 @@ This is a development-validation milestone, not a final AVR protocol release. **
 | 0.15 | 2026-09-06 | Recorded repeated benchmark evidence and accepted RISC Zero as the initial ZK-001 proof stack | [ADR-0006](./decisions/0006-risc-zero-initial-proof-stack-selection.md) |
 | 0.16 | 2026-09-06 | Defined alpha individual-proof batching and deferred recursive aggregation | [ADR-0007](./decisions/0007-zk-003-individual-proof-batches.md) |
 | 0.17 | 2026-09-06 | Defined alpha RISC Zero verifier lifecycle, limits, and governance controls | [ADR-0008](./decisions/0008-zk-004-verifier-governance-and-limits.md) |
+| 0.19 | 2026-09-14 | Reconciled the plan with completed Phase 3 sign-off and made Phase 4 closed-testnet hardening the active phase | [Phase 3 Sign-off Tracker](./phase3-signoff-tracker.md) |
 | 0.1 | 2026-08-18 | Initial phased development plan | Architecture documents v0.1 |
 | X.Y | YYYY-MM-DD | Describe the change | Decision ID or link |

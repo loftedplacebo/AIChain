@@ -25,7 +25,7 @@ closed-testnet gate. Those remain open.
 - Node RPC and AI mining RPC remain loopback-only. P2P is private and
   allow-listed/authenticated.
 - Validators do not run mining software or receive mining keys.
-- The existing Ethash devnet and the live governance-delay trial are not used.
+- The existing Ethash devnet and completed governance-delay evidence are not used.
 - The GPU SSH host identity has been verified against the provider’s displayed
   fingerprint before accepting a new host key. Do not use `accept-new` blindly.
 

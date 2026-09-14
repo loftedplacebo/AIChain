@@ -3,15 +3,20 @@
 | Field | Value |
 |---|---|
 | Status | Active delivery roadmap |
-| Document version | 0.8 |
-| Last updated | 2026-09-12 |
-| Starting point | Phase 2D AVR alpha complete; general Verification Receipt `0.4.0-alpha` implemented; Phase 3 integrated alpha active |
+| Document version | 1.3 |
+| Last updated | 2026-09-14 |
+| Starting point | Phase 3 integrated alpha signed off with documented limitations; Phase 4 closed-testnet foundation active |
 | Current constraint | No AMD GPU or additional independent GPU miners available |
 | Principle | Continue software/product work now; move hardware-diversity and multi-miner tests to the testnet gates |
 
 ## 1. Immediate Direction
 
-The active work is now **Phase 2D AVR product and scale foundation**. ZK-001, native SP1/RISC Zero proofs, security negatives, byte-identical public values, disposable EVM verifier trials, the repeated benchmark, alpha proof batching, and alpha verifier governance are complete. RISC Zero is selected under [ADR-0006](./decisions/0006-risc-zero-initial-proof-stack-selection.md), ZK-003 under [ADR-0007](./decisions/0007-zk-003-individual-proof-batches.md), and ZK-004 under [ADR-0008](./decisions/0008-zk-004-verifier-governance-and-limits.md).
+The active engineering work is now **Phase 4 closed-testnet hardening**. Phase
+2D and the Phase 3 integrated-alpha scope are signed off with documented
+limitations. ZK-001, native SP1/RISC Zero proofs, security negatives,
+byte-identical public values, disposable EVM verifier trials, the repeated
+benchmark, alpha proof batching, verifier governance and the real governance
+delay trial are complete. RISC Zero is selected under [ADR-0006](./decisions/0006-risc-zero-initial-proof-stack-selection.md), ZK-003 under [ADR-0007](./decisions/0007-zk-003-individual-proof-batches.md), and ZK-004 under [ADR-0008](./decisions/0008-zk-004-verifier-governance-and-limits.md).
 
 The Phase 2D receipt increment now includes the additive general [Verification
 Receipt `0.4.0-alpha`](./verification-receipt-developer-guide.md). It preserves
@@ -21,13 +26,11 @@ profile pinning, private evidence openings, signatures, receipt links, and
 robotics session/clock metadata. This is an alpha interface, not a stable
 protocol or a replacement for the existing authorised AVR/ZK-001 proof path.
 
-The receipt-specific work now moves through the same Phase 3 integrated-alpha
-gate as the rest of the product. The next gates are: an independent developer
-trial; durable evidence outbox, retention, backup and recovery; typed verifier
-results for profile, signature, authority and proof checks; stable SDK packaging
-and language conformance; and live general-format chain, reorganisation and
-machine-workload validation. These gates close product-readiness gaps; they do
-not advance the deferred consensus or hardware gates.
+The remaining receipt-specific items—an independent developer trial, durable
+evidence outbox and recovery, typed verifier results, stable SDK packaging and
+live general-format validation—are product/public-release work above the signed
+off Phase 3 scope. They may proceed alongside Phase 4 but do not reopen the
+historical Phase 3 gate.
 
 The following tasks are deferred—not waived—to the closed/public-testnet programme:
 
@@ -267,10 +270,11 @@ bounded measurements are recorded in [Scale and Operations Alpha](./phase-2d-sca
 The AVR explorer view is local/loopback-only and links to the existing private
 Blockscout spike without changing Blockscout or Core-Geth.
 
-**Phase 3 integrated alpha is active**: the internal receipt-to-proof-to-lookup
-slice has been exercised. See [the Phase 3 runbook](./phase-3-integrated-alpha.md)
-for reproducibility, measurements and remaining full-release gates. Sustained
-end-to-end capacity is not established by the Phase 2D local smoke measurements.
+**Phase 3 integrated alpha is signed off with documented limitations.** See
+[the Phase 3 runbook](./phase-3-integrated-alpha.md) and
+[sign-off tracker](./phase3-signoff-tracker.md) for reproducibility and measured
+evidence. Phase 4 must establish sustained closed-testnet capacity, hardware
+diversity and operational acceptance.
 
 The general receipt readiness review records the product-specific gates and
 their limitations in [Verification Receipt Readiness Review](./verification-receipt-readiness-review.md).
@@ -289,3 +293,4 @@ authority, proof, hardware, consensus, security, capacity or public-testnet gate
 | 1.0 | 2026-09-06 | Added persistent AVR event index, canonical checkpoint rollback, batch manifest/inclusion lookup, RPC bridge and disposable Core-Geth integration evidence |
 | 1.1 | 2026-09-06 | Completed Phase 2D alpha scale/operations policy, bounded ingress/micro-batching reference, local load measurement and explorer-safe lookup; Phase 3 is next |
 | 1.2 | 2026-09-12 | Added general Verification Receipt `0.4.0-alpha`, six use-case profiles, receipt-specific readiness gates, and aligned the next sequence with the active Phase 3 integrated-alpha roadmap |
+| 1.3 | 2026-09-14 | Reconciled the roadmap with completed Phase 3 sign-off and made Phase 4 closed-testnet hardening the active engineering phase |

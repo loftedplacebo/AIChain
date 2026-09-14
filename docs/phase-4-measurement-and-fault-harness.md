@@ -138,6 +138,6 @@ separately with access control and integrity hashes.
 
 This is the next implementation increment from the
 [closed-testnet deployment foundation](./phase-4-closed-testnet-foundation.md).
-It becomes operational only after the Phase 4 entry checklist is satisfied,
-including the remaining real Phase 3 governance-delay result and the required
-multi-operator hardware.
+It becomes operational only after the Phase 4 entry checklist is satisfied.
+The real Phase 3 governance-delay result has passed; the required
+multi-operator hardware and remaining Phase 4 approvals are still open.

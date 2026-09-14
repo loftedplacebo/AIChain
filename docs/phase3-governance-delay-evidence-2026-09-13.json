@@ -1,0 +1,34 @@
+{
+  "schema": "aichain.phase3-governance-delay-evidence",
+  "schemaVersion": "0.1.0",
+  "status": "passed",
+  "timeMode": "real 48-hour wall time and chain delay",
+  "registry": "0x7D9EC0a9EbBd104706c75330d13e2e790fbC3CeB",
+  "version": "0x486512b4e3448cec7fdb3192b9a323bc709d82e81b2ff00a888b7fd847c59cb8",
+  "transaction": "0x5284d243d0312beb148056fda82497a7405c2f30836620946e2e18f0d56fc08f",
+  "gasUsed": 306420,
+  "checks": [
+    "early-activation",
+    "early-proof",
+    "activation-boundary",
+    "real-proof",
+    "resource-limits",
+    "role-controls",
+    "pause",
+    "duplicate",
+    "irreversible-retirement",
+    "historical-record-retained"
+  ],
+  "sourceReportSha256": "eddce66bff446b1986d0354318cb757a5e2608d6ef4e5745fb9f18803d605a76",
+  "runtimeCleanup": {
+    "completedUtcDate": "2026-09-14",
+    "nodeStopped": true,
+    "disposableGuardianRecordRemoved": true,
+    "syntheticPrivateWitnessRemoved": true,
+    "publicCompletionReportRetained": true
+  },
+  "limitations": [
+    "This is Phase 3 governance integration evidence, not a production governance approval.",
+    "The isolated trial used synthetic accounts and no user funds."
+  ]
+}

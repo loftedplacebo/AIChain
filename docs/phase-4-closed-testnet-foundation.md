@@ -154,7 +154,7 @@ claiming an in-place upgrade is safe.
 
 ## Phase 4 entry checklist
 
-- [ ] Real Phase 3 delayed verifier-governance activation has passed and is recorded.
+- [x] Real Phase 3 delayed verifier-governance activation has passed and is recorded.
 - [ ] Closed-testnet release manifest passes validation.
 - [ ] Three independent GPU miners are available, with at least one AMD/OpenCL
   and one NVIDIA implementation.
