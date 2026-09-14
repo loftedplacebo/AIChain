@@ -1,6 +1,6 @@
 # KawPoW GPU Deployment Hardening
 
-Version: 0.1.0-draft · Updated: 2026-09-12 · Status: development-only
+Version: 0.1.0-draft · Updated: 2026-09-14 · Status: development-only
 
 ## Purpose
 
@@ -25,6 +25,26 @@ or production runbook.
   available, it enforces a 45-second maximum job duration as a safe fallback.
 - The supervisor pauses a GPU at 80°C by default. Set
   `AICHAIN_MAX_GPU_TEMP_C=0` only for an explicitly supervised diagnostic.
+- The supervisor records `head-stalled` and reconnects the miner if the
+  canonical head has not advanced for 120 seconds by default. This is a local
+  recovery attempt, not a node restart or a consensus intervention. Override
+  only with `AICHAIN_MAX_HEAD_STALL_SECONDS` for a measured diagnostic.
+- The adapter suppresses an exact repeat of a `(workId, nonce, mixDigest)`
+  submission locally. Repeated legacy-miner retries therefore cannot flood
+  the node with an already-submitted solution.
+- Treat `accepted: true` from `aichain_submitKawpowWork` as a reported node
+  acceptance, not proof of final canonical inclusion. Reconcile the audit log
+  after a run from the mining node's loopback RPC:
+
+```bash
+python3 scripts/reconcile-kawpow-submissions.py \
+  /absolute/run/kawpow-submissions.jsonl \
+  /absolute/evidence/submission-reconciliation.json \
+  --node-rpc http://127.0.0.1:8545
+```
+
+  The report labels each reported block `canonical`, `orphaned`, `not-found`,
+  or `unavailable` by comparing its hash to the canonical block at its height.
 
 ## Fleet preflight
 
@@ -51,6 +71,8 @@ separate explicitly approved action.
 | Bootstrap fetched excessive Core-Geth fixtures | Recursive test submodules were unnecessary | Bootstrap initializes only Core-Geth and cpp-kawpow build dependencies. |
 | Quotes/newlines broke ad-hoc relay authorization | Remote shell quoting and SSH key-file formatting | Treat relays as a dedicated, reviewed deployment step; do not hand-compose key entries during a run. |
 | Templates became stale while GPUs still hashed | Legacy pool miner retained a job after its expiry | Status-aware refresh plus bounded max-job restart. |
+| Identical shares were submitted repeatedly | Legacy miner retried a reported solution | Bounded adapter-side exact-submission deduplication. |
+| Node reported a solution accepted but chain stopped advancing | Acceptance did not itself establish canonical import or continued head progress | Canonical reconciliation plus a 120-second head-stall event and miner reconnect. |
 | One remote GPU reached 84°C | Provider hardware/power profile differed | Default thermal pause and host-specific temperature evidence. |
 
 ## Exit criteria for a usable soak run
@@ -60,6 +82,8 @@ separate explicitly approved action.
 - All miner and validator heads converge after each block and after a restart.
 - CPU validation, propagation, block intervals, stale rate, and GPU
   temperatures are captured in the evidence report.
+- Every reported accepted block has a reconciliation result; no unexplained
+  `not-found` result or sustained `head-stalled` event remains.
 - Temporary relay keys and tunnels are removed when the disposable network is
   shut down.
 

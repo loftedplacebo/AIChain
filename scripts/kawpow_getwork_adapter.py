@@ -17,6 +17,7 @@ from urllib.parse import urlparse
 
 MAX_REQUEST_BYTES = 4096
 MAX_TRACKED_WORK = 64
+MAX_TRACKED_SUBMISSIONS = 2048
 WORK_VERSION = "0.1.0-dev"
 
 
@@ -67,6 +68,10 @@ class Adapter:
         self.audit_log = audit_log
         self.work_status_file = work_status_file
         self._work: OrderedDict[str, dict[str, Any]] = OrderedDict()
+        # Legacy getwork miners may retry the exact same share aggressively.
+        # Keep a bounded local record so retries do not amplify node RPC load.
+        self._submissions: OrderedDict[str, dict[str, Any]] = OrderedDict()
+        self._inflight_submissions: set[str] = set()
         self._lock = threading.Lock()
 
     def dispatch(self, method: str, params: Any) -> Any:
@@ -116,10 +121,30 @@ class Adapter:
                         {"accepted": False, "status": "expired-adapter-work"})
             return False
         work_id = work["workId"]
+        submission_key = f"{work_id}:{nonce}:{mix_digest}"
+        duplicate = False
+        with self._lock:
+            if submission_key in self._submissions or submission_key in self._inflight_submissions:
+                duplicate = True
+            else:
+                self._inflight_submissions.add(submission_key)
+        if duplicate:
+            self._audit(work, header_hash, nonce, mix_digest,
+                        {"accepted": False, "status": "duplicate-adapter-submission"})
+            return False
         submission = {"version": WORK_VERSION, "workId": work_id, "nonce": nonce, "mixDigest": mix_digest}
-        result = self.node.call("aichain_submitKawpowWork", [submission])
-        if not isinstance(result, dict) or not isinstance(result.get("accepted"), bool):
-            raise ValueError("malformed node submission response")
+        try:
+            result = self.node.call("aichain_submitKawpowWork", [submission])
+            if not isinstance(result, dict) or not isinstance(result.get("accepted"), bool):
+                raise ValueError("malformed node submission response")
+        finally:
+            with self._lock:
+                self._inflight_submissions.discard(submission_key)
+        with self._lock:
+            self._submissions[submission_key] = result
+            self._submissions.move_to_end(submission_key)
+            while len(self._submissions) > MAX_TRACKED_SUBMISSIONS:
+                self._submissions.popitem(last=False)
         self._audit(work, header_hash, nonce, mix_digest, result)
         return result["accepted"]
 
@@ -127,9 +152,13 @@ class Adapter:
                result: dict[str, Any]) -> None:
         if self.audit_log is None:
             return
+        outcome = _submission_outcome(result)
         entry = {"timestamp": int(time.time()), "workId": work.get("workId") if work else None,
                  "headerHash": header_hash, "nonce": nonce,
-                 "mixDigest": mix_digest, **result}
+                 "mixDigest": mix_digest, "submissionOutcome": outcome, **result}
+        # Node acceptance is not a canonicality claim. The reconciliation tool
+        # later compares a reported block hash with the canonical head.
+        entry["canonicality"] = "unverified" if result.get("accepted") and result.get("blockHash") else "not-applicable"
         if work:
             entry.update({key: work.get(key) for key in ("parentHash", "height", "seedHash", "target", "expiresAt")})
         with self._lock:
@@ -143,6 +172,7 @@ class Adapter:
             return
         expires_at = _quantity(work.get("expiresAt"), "expiresAt")
         payload = {"workId": work["workId"], "headerHash": work["headerHash"],
+                   "parentHash": work.get("parentHash"), "height": work.get("height"),
                    "expiresAt": expires_at, "updatedAt": int(time.time())}
         self.work_status_file.parent.mkdir(parents=True, exist_ok=True)
         temporary = self.work_status_file.with_suffix(self.work_status_file.suffix + ".tmp")
@@ -161,6 +191,17 @@ def _quantity(value: Any, field: str) -> int:
 
 def _expired(work: dict[str, Any]) -> bool:
     return time.time() >= _quantity(work.get("expiresAt"), "expiresAt")
+
+
+def _submission_outcome(result: dict[str, Any]) -> str:
+    if result.get("accepted") is True:
+        return "accepted"
+    status = str(result.get("status", "")).lower()
+    if "duplicate" in status:
+        return "duplicate"
+    if "stale" in status or "expired" in status:
+        return "stale"
+    return "rejected"
 
 
 def handler_for(adapter: Adapter):

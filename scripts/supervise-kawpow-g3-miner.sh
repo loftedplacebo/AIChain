@@ -10,6 +10,7 @@ work_status_file="${AICHAIN_WORK_STATUS_FILE:-$output_dir/current-work.json}"
 work_refresh_margin="${AICHAIN_WORK_REFRESH_MARGIN_SECONDS:-5}"
 max_job_seconds="${AICHAIN_MAX_JOB_SECONDS:-45}"
 max_gpu_temp="${AICHAIN_MAX_GPU_TEMP_C:-80}"
+max_head_stall_seconds="${AICHAIN_MAX_HEAD_STALL_SECONDS:-120}"
 
 for path in "$miner" "$geth"; do
   [[ "$path" == /* && -x "$path" ]] || { echo "Executable must be an absolute path: $path" >&2; exit 2; }
@@ -20,8 +21,8 @@ done
   exit 2
 }
 [[ "$work_status_file" == /* ]] || { echo "AICHAIN_WORK_STATUS_FILE must be absolute." >&2; exit 2; }
-[[ "$work_refresh_margin" =~ ^[0-9]+$ && "$max_job_seconds" =~ ^[1-9][0-9]*$ && "$max_gpu_temp" =~ ^[0-9]+$ ]] || {
-  echo "Refresh margin and maximum GPU temperature must be non-negative integers." >&2; exit 2;
+[[ "$work_refresh_margin" =~ ^[0-9]+$ && "$max_job_seconds" =~ ^[1-9][0-9]*$ && "$max_gpu_temp" =~ ^[0-9]+$ && "$max_head_stall_seconds" =~ ^[1-9][0-9]*$ ]] || {
+  echo "Refresh, job, head-stall and GPU-temperature limits must be valid integers." >&2; exit 2;
 }
 
 mkdir -p "$output_dir"
@@ -47,6 +48,10 @@ trap 'exit 0' INT TERM
 
 height() {
   "$geth" attach --exec eth.blockNumber "$ipc" 2>/dev/null | tail -1
+}
+
+peer_count() {
+  "$geth" attach --exec net.peerCount "$ipc" 2>/dev/null | tail -1
 }
 
 start_miner() {
@@ -80,6 +85,7 @@ gpu_too_hot() {
 
 last_height="$(height)"
 [[ "$last_height" =~ ^[0-9]+$ ]] || { echo "Could not read canonical node height." >&2; exit 1; }
+last_head_progress_at="$(date +%s)"
 start_miner
 
 while sleep 0.25; do
@@ -90,6 +96,17 @@ while sleep 0.25; do
       "$(date +%s)" "$last_height" "$current_height" >>"$events"
     stop_miner
     last_height="$current_height"
+    last_head_progress_at="$(date +%s)"
+    start_miner
+  elif (( $(date +%s) - last_head_progress_at >= max_head_stall_seconds )); then
+    # This does not restart the node or modify consensus state. It makes a
+    # stalled head explicit and forces a fresh miner connection/template.
+    peers="$(peer_count)"
+    [[ "$peers" =~ ^[0-9]+$ ]] || peers=null
+    printf '{"timestamp":%s,"event":"head-stalled","height":%s,"maxHeadStallSeconds":%s,"peerCount":%s}\n' \
+      "$(date +%s)" "$current_height" "$max_head_stall_seconds" "$peers" >>"$events"
+    stop_miner
+    last_head_progress_at="$(date +%s)"
     start_miner
   elif work_expired_or_near_expiry; then
     printf '{"timestamp":%s,"event":"work-refresh","height":%s}\n' \

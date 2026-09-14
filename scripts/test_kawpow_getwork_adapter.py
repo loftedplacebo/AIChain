@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import importlib.util
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -52,7 +53,25 @@ class AdapterTests(unittest.TestCase):
             adapter = MODULE.Adapter(node, audit)
             adapter.get_work()
             adapter.submit_work(["0x" + "aa" * 8, "0x" + "22" * 32, "0x" + "bb" * 32])
-            self.assertIn('"status":"accepted"', audit.read_text(encoding="utf-8"))
+            entry = json.loads(audit.read_text(encoding="utf-8"))
+            self.assertEqual(entry["status"], "accepted")
+            self.assertEqual(entry["submissionOutcome"], "accepted")
+            self.assertEqual(entry["canonicality"], "unverified")
+
+    def test_duplicate_submission_is_not_forwarded_to_node(self):
+        node = FakeNode()
+        with tempfile.TemporaryDirectory() as directory:
+            audit = Path(directory) / "audit.jsonl"
+            adapter = MODULE.Adapter(node, audit)
+            solution = ["0x" + "aa" * 8, "0x" + "22" * 32, "0x" + "bb" * 32]
+            adapter.get_work()
+            self.assertTrue(adapter.submit_work(solution))
+            self.assertFalse(adapter.submit_work(solution))
+            submissions = [call for call in node.calls if call[0] == "aichain_submitKawpowWork"]
+            self.assertEqual(len(submissions), 1)
+            entries = [json.loads(line) for line in audit.read_text(encoding="utf-8").splitlines()]
+            self.assertEqual(entries[-1]["status"], "duplicate-adapter-submission")
+            self.assertEqual(entries[-1]["submissionOutcome"], "duplicate")
 
     def test_expired_work_is_rejected_without_node_submission(self):
         node = FakeNode()
@@ -77,6 +96,7 @@ class AdapterTests(unittest.TestCase):
             payload = __import__("json").loads(status.read_text(encoding="utf-8"))
             self.assertEqual(payload["workId"], "0x" + "11" * 32)
             self.assertEqual(payload["expiresAt"], 0x7fffffff)
+            self.assertEqual(payload["height"], "0x1")
 
     def test_loopback_policy(self):
         for host in ("127.0.0.1", "::1", "localhost"):
