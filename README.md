@@ -1,5 +1,12 @@
 # New Dag
 
+## Commercial product strategy review
+
+The proposed SDK/API, evidence-platform and business roadmap is linked from the
+[commercialisation review handoff](./docs/commercialisation-review-handoff.md).
+It supplements the existing engineering gates and preserves current protocol
+interfaces; roadmap review remains pending before large-scale implementation.
+
 New Dag is an independent EVM-compatible Proof-of-Work L1 whose core product is the AI Verification Receipt layer. The product direction is a neutral verification and audit layer for autonomous AI, with a long-term ambition to serve as a trust layer for autonomous machines.
 
 ## Verification receipt developers
