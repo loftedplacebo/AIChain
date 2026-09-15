@@ -93,7 +93,8 @@ separate explicitly approved action.
   node/API and loopback adapter path now exist, but the pinned legacy external
   miner only implements `eth_getWork`, so its bounded supervisor fallback
   remains necessary.
-- Add a dedicated, audited relay orchestration command so manual SSH key file
-  editing is no longer needed for multi-region trials.
+- Use the reviewed [private relay orchestration renderer](./kawpow-private-relay-orchestration.md)
+  for multi-region trials; an eventual host-changing key-install/teardown
+  runner remains subject to separate operational approval.
 - Validate the same guardrails with AMD/OpenCL hardware before closed-testnet
   sign-off.

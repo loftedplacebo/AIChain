@@ -1,0 +1,23 @@
+{
+  "schema": "aichain.kawpow-relay-plan",
+  "scope": "disposable development network only",
+  "relay": {
+    "id": "validator-relay",
+    "address": "203.0.113.100",
+    "port": 22,
+    "user": "relay",
+    "hostKey": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEJhdGNoUmVwbGFjZVN0cmluZ0ZvclRlc3Rz relay-host"
+  },
+  "miners": [
+    {
+      "id": "miner-nvidia-a", "region": "region-one", "address": "203.0.113.10", "port": 22, "user": "root",
+      "p2pPort": 30303, "relayPort": 31001, "relayIdentityPath": "/root/.ssh/aichain-relay-miner-a",
+      "relayPublicKey": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE1pbmVyQVB1YmxpY0tleUZvclRlc3Rz miner-a"
+    },
+    {
+      "id": "miner-nvidia-b", "region": "region-two", "address": "203.0.113.20", "port": 22, "user": "root",
+      "p2pPort": 30303, "relayPort": 31002, "relayIdentityPath": "/root/.ssh/aichain-relay-miner-b",
+      "relayPublicKey": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE1pbmVyQlB1YmxpY0tleUZvclRlc3Rz miner-b"
+    }
+  ]
+}
