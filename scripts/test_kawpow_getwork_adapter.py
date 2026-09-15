@@ -18,12 +18,14 @@ class FakeNode:
         self.calls = []
         self.result = {"accepted": True, "status": "accepted", "blockHash": "0x" + "44" * 32}
 
-    def call(self, method, params):
+    def call(self, method, params, timeout=None):
         self.calls.append((method, params))
         if method == "aichain_getKawpowWork":
             return {"version": MODULE.WORK_VERSION, "workId": "0x" + "11" * 32,
                     "headerHash": "0x" + "22" * 32, "seedHash": "0x" + "00" * 32,
                     "target": "0x" + "33" * 32, "height": "0x1", "expiresAt": "0x7fffffff"}
+        if method == "aichain_waitForKawpowWork":
+            return {"changed": True, "work": self.call("aichain_getKawpowWork", [])}
         return self.result
 
 
@@ -73,11 +75,23 @@ class AdapterTests(unittest.TestCase):
             self.assertEqual(entries[-1]["status"], "duplicate-adapter-submission")
             self.assertEqual(entries[-1]["submissionOutcome"], "duplicate")
 
+    def test_native_work_watch_is_loopback_adapter_only(self):
+        node = FakeNode()
+        adapter = MODULE.Adapter(node)
+        result = adapter.dispatch("aichain_waitForKawpowWork", [{
+            "workId": "0x" + "11" * 32, "expiresAt": "0x7fffffff", "timeoutSeconds": 1,
+        }])
+        self.assertTrue(result["changed"])
+        self.assertEqual(result["work"]["workId"], "0x" + "11" * 32)
+        self.assertIn("0x" + "22" * 32, adapter._work)
+        with self.assertRaises(ValueError):
+            adapter.dispatch("aichain_waitForKawpowWork", [])
+
     def test_expired_work_is_rejected_without_node_submission(self):
         node = FakeNode()
         class ExpiredNode(FakeNode):
-            def call(self, method, params):
-                value = super().call(method, params)
+            def call(self, method, params, timeout=None):
+                value = super().call(method, params, timeout)
                 if method == "aichain_getKawpowWork":
                     value["expiresAt"] = "0x1"
                 return value

@@ -3,8 +3,8 @@
 | Field | Value |
 |---|---|
 | Status | G2 implementation and disposable node/GPU interoperability test complete |
-| Version | 0.4 |
-| Last updated | 2026-08-24 |
+| Version | 0.5 |
+| Last updated | 2026-09-14 |
 | Governing decision | [ADR-0004](./decisions/0004-kawpow-phase-2a-development-selection.md) |
 | Production status | **TBD — this is not a public mining API or launch protocol** |
 
@@ -82,6 +82,29 @@ For a rejected submission, `accepted` is `false`, `blockHash` is omitted, and
 `invalid-seal`. Detailed internal verification errors must stay in local node
 logs rather than becoming a remote oracle.
 
+### `aichain_waitForKawpowWork`
+
+This additive, development-only method gives an AIChain-aware miner a bounded
+long-poll path. It does not alter standard Ethereum JSON-RPC or make an
+existing `eth_getWork` miner long-poll capable.
+
+Parameters: one cursor object containing the complete prior work identity.
+
+```json
+{
+  "workId": "0x<32 bytes>",
+  "expiresAt": "0x66c9f900",
+  "timeoutSeconds": 25
+}
+```
+
+`timeoutSeconds` defaults to 25 and is capped at 30. The node returns as soon
+as the node-issued `(workId, expiresAt)` cursor changes, or returns the current
+work with `changed: false` when the deadline or caller context ends.
+
+The cursor is only a scheduling handle. It never permits the caller to select
+a parent, header, target, difficulty, transaction set, or expiry.
+
 ## Canonical Encoding
 
 | Field | Encoding |
@@ -122,6 +145,9 @@ not a consensus field and miners must not derive meaning from it.
   seconds.
 - Per-client submission limit: 20 per second with a burst of 40.
 - `getKawpowWork` limit: 2 per second with a burst of 4.
+- `waitForKawpowWork` uses the same bounded get-work client limiter and a
+  30-second maximum server wait. It must not create an unbounded watcher or
+  verification worker per client.
 - Reject unknown object fields and all non-canonical encodings.
 - Never perform unbounded allocation or launch concurrent verification without
   a fixed worker limit.
@@ -193,6 +219,11 @@ The RTX 3060 interoperability run accepted block 1 and rejected malformed,
 invalid-seal, stale/unknown, and duplicate submissions. The shared Ethash
 devnet was not modified. See [G2 Node-to-GPU KawPoW Interoperability](phase-2a-g2-node-gpu-interoperability.md).
 
+The current Phase 4 hardening increment adds a bounded, loopback-only
+`aichain_waitForKawpowWork` cursor method and local adapter pass-through. It is
+an additive path for a future AIChain-aware miner; the legacy external miner
+still uses `eth_getWork` and its supervisor safeguards.
+
 ## Change Log
 
 | Version | Date | Change |
@@ -201,3 +232,4 @@ devnet was not modified. See [G2 Node-to-GPU KawPoW Interoperability](phase-2a-g
 | 0.2 | 2026-08-23 | Recorded the tested bounded work-registry implementation |
 | 0.3 | 2026-08-23 | Recorded strict wire decoding and the tested but unregistered RPC service |
 | 0.4 | 2026-08-24 | Recorded opt-in local-only integration, finalized templates, transactional import, bounded verification, and passing RTX 3060 G2 run |
+| 0.5 | 2026-09-14 | Added bounded native work-cursor long polling for future AIChain-aware miners; legacy compatibility remains unchanged |

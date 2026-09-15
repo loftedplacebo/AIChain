@@ -89,8 +89,10 @@ separate explicitly approved action.
 
 ## Open work
 
-- Make template expiry part of the native mining protocol/long-poll response,
-  rather than a legacy-miner supervisor fallback.
+- Integrate `aichain_waitForKawpowWork` into an AIChain-aware miner. The
+  node/API and loopback adapter path now exist, but the pinned legacy external
+  miner only implements `eth_getWork`, so its bounded supervisor fallback
+  remains necessary.
 - Add a dedicated, audited relay orchestration command so manual SSH key file
   editing is no longer needed for multi-region trials.
 - Validate the same guardrails with AMD/OpenCL hardware before closed-testnet

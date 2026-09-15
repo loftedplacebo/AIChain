@@ -48,13 +48,13 @@ class NodeRPC:
         self._request_id = 0
         self._lock = threading.Lock()
 
-    def call(self, method: str, params: list[Any]) -> Any:
+    def call(self, method: str, params: list[Any], timeout: float | None = None) -> Any:
         with self._lock:
             self._request_id += 1
             request_id = self._request_id
         body = json.dumps({"jsonrpc": "2.0", "id": request_id, "method": method, "params": params}).encode()
         request = urllib.request.Request(self.url, data=body, headers={"Content-Type": "application/json"})
-        with urllib.request.urlopen(request, timeout=self.timeout) as response:
+        with urllib.request.urlopen(request, timeout=self.timeout if timeout is None else timeout) as response:
             decoded = json.load(response)
         if decoded.get("error") is not None:
             raise RuntimeError(decoded["error"].get("message", "node RPC error"))
@@ -79,6 +79,8 @@ class Adapter:
             if params not in ([], None):
                 raise ValueError("eth_getWork takes no parameters")
             return self.get_work()
+        if method == "aichain_waitForKawpowWork":
+            return self.wait_for_work(params)
         if method == "eth_submitWork":
             return self.submit_work(params)
         if method == "eth_submitHashrate":
@@ -87,6 +89,25 @@ class Adapter:
 
     def get_work(self) -> list[str]:
         work = self.node.call("aichain_getKawpowWork", [])
+        self._record_work(work)
+        return [work["headerHash"], work["seedHash"], work["target"], work["height"]]
+
+    def wait_for_work(self, params: Any) -> dict[str, Any]:
+        """Expose the bounded native cursor through the same loopback adapter.
+
+        This is for an AIChain-aware miner. Legacy eth_getWork clients retain
+        their existing behaviour and never receive this non-Ethereum method.
+        """
+        if not isinstance(params, list) or len(params) != 1 or not isinstance(params[0], dict):
+            raise ValueError("aichain_waitForKawpowWork requires one cursor object")
+        cursor = params[0]
+        result = self.node.call("aichain_waitForKawpowWork", [cursor], timeout=35.0)
+        if not isinstance(result, dict) or not isinstance(result.get("changed"), bool) or not isinstance(result.get("work"), dict):
+            raise ValueError("malformed node work-watch response")
+        self._record_work(result["work"])
+        return result
+
+    def _record_work(self, work: Any) -> None:
         if not isinstance(work, dict) or work.get("version") != WORK_VERSION:
             raise ValueError("unsupported or malformed node work response")
         work_id = _fixed_hex(work.get("workId"), 32, "workId")
@@ -103,7 +124,6 @@ class Adapter:
             while len(self._work) > MAX_TRACKED_WORK:
                 self._work.popitem(last=False)
         self._write_work_status(work)
-        return [header_hash, seed_hash, target, height]
 
     def submit_work(self, params: Any) -> bool:
         if not isinstance(params, list) or len(params) != 3:
