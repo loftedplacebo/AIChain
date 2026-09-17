@@ -180,6 +180,16 @@ It produces useful synchronization, recovery, AVR/proof and monitoring evidence
 without misrepresenting the result as closure of the full hardware-diversity
 gate.
 
+## Miner packaging increment
+
+The miner packaging/licensing boundary is defined in
+[AIChain KawPoW miner packaging and licensing](aichain-kawpow-miner-packaging.md).
+The selected implementation path is a separate GPLv3-compatible miner fork;
+until that fork is released, use the pinned upstream miner with the AIChain
+adapter and launcher. This allows node-only, miner-only and combined operator
+packages without coupling GPL source into Core-Geth. It does not authorize a
+public miner release or imply finalized rewards.
+
 ## Next implementation increment
 
 The measurement and fault-test harness is now drafted in

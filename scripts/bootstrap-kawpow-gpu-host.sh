@@ -8,14 +8,22 @@ project_root="${AICHAIN_BOOTSTRAP_ROOT:-/workspace/aichain}"
 repo_url="${AICHAIN_REPOSITORY_URL:-https://github.com/loftedplacebo/AIChain.git}"
 repo_ref="${AICHAIN_REPOSITORY_REF:-main}"
 miner_root="${AICHAIN_MINER_ROOT:-/workspace/kawpowminer}"
-build_dir="${AICHAIN_MINER_BUILD_DIR:-$miner_root/build-aichain-cuda86}"
+miner_repo_url="${AICHAIN_MINER_REPOSITORY_URL:-https://github.com/RavenCommunity/kawpowminer.git}"
+backend="${AICHAIN_MINER_BACKEND:-cuda}"
+build_dir="${AICHAIN_MINER_BUILD_DIR:-$miner_root/build-aichain-${backend}86}"
 compute="${AICHAIN_KAWPOW_COMPUTE:-86}"
-expected_miner_commit="632f6ea0a5cd09e2c6443374dbe6db0a767715ba"
+expected_miner_commit="${AICHAIN_MINER_COMMIT:-632f6ea0a5cd09e2c6443374dbe6db0a767715ba}"
 
 [[ "$project_root" == /* && "$miner_root" == /* && "$build_dir" == /* ]] || {
   echo "Bootstrap paths must be absolute." >&2; exit 2;
 }
 [[ "$compute" =~ ^[0-9]+$ ]] || { echo "AICHAIN_KAWPOW_COMPUTE must be numeric." >&2; exit 2; }
+[[ "$backend" == "cuda" || "$backend" == "opencl" ]] || {
+  echo "AICHAIN_MINER_BACKEND must be cuda or opencl." >&2; exit 2;
+}
+[[ "$expected_miner_commit" =~ ^[0-9a-fA-F]{40}$ ]] || {
+  echo "AICHAIN_MINER_COMMIT must be a 40-character immutable Git commit." >&2; exit 2;
+}
 
 missing=()
 for command_name in apt-get git cmake g++ make python3 go nvidia-smi; do
@@ -50,7 +58,7 @@ mkdir -p "$project_root/build"
 install -m 755 "$project_root/node/core-geth/build/bin/geth" "$project_root/build/core-geth-asert"
 
 if [[ ! -d "$miner_root/.git" ]]; then
-  git clone --recurse-submodules https://github.com/RavenCommunity/kawpowminer.git "$miner_root"
+  git clone --recurse-submodules "$miner_repo_url" "$miner_root"
 fi
 git -C "$miner_root" fetch origin "$expected_miner_commit"
 git -C "$miner_root" checkout --detach "$expected_miner_commit"
@@ -62,9 +70,10 @@ git -C "$miner_root" apply "$project_root/patches/kawpowminer/0001-gcc13-cstdint
 # its nested Boost build, not only the parent CMake configuration.
 export HUNTER_ROOT="${AICHAIN_HUNTER_ROOT:-/workspace/.hunter-aichain}"
 export AICHAIN_KAWPOW_COMPUTE="$compute"
+export AICHAIN_MINER_COMMIT="$expected_miner_commit"
 export AICHAIN_KAWPOW_CXX_FLAGS="-DPTHREAD_STACK_MIN=16384"
 export CXXFLAGS="${CXXFLAGS:-} -DPTHREAD_STACK_MIN=16384"
-bash "$project_root/scripts/build-kawpow-gpu-control.sh" "$miner_root" "$build_dir" cuda
+bash "$project_root/scripts/build-kawpow-gpu-control.sh" "$miner_root" "$build_dir" "$backend"
 
 miner_binary="$(find "$build_dir" -type f -name kawpowminer -perm -111 -print -quit)"
 [[ -n "$miner_binary" ]] || { echo "KawPoW miner build did not produce a binary." >&2; exit 1; }

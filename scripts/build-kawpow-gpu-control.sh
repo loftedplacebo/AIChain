@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-expected_commit="632f6ea0a5cd09e2c6443374dbe6db0a767715ba"
+expected_commit="${AICHAIN_MINER_COMMIT:-632f6ea0a5cd09e2c6443374dbe6db0a767715ba}"
 
 if [[ $# -lt 1 || $# -gt 3 ]]; then
   echo "Usage: $0 /absolute/path/to/kawpowminer-source [absolute-build-dir] [cuda|opencl]" >&2
@@ -16,6 +16,10 @@ compat_cxx_flags="${AICHAIN_KAWPOW_CXX_FLAGS:-}"
 
 if [[ "$source_dir" != /* || "$build_dir" != /* ]]; then
   echo "Source and build paths must be absolute." >&2
+  exit 2
+fi
+if [[ ! "$expected_commit" =~ ^[0-9a-fA-F]{40}$ ]]; then
+  echo "AICHAIN_MINER_COMMIT must be a 40-character immutable Git commit." >&2
   exit 2
 fi
 if [[ ! -d "$source_dir/.git" ]]; then

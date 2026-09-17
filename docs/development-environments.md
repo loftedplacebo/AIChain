@@ -284,7 +284,7 @@ cd /opt/aichain
 sudo ./scripts/provision-vps.sh
 ```
 
-The script supports apt-based Linux systems, initializes the pinned Core-Geth source (without its optional nested test-fixture repositories), installs the project-pinned Go `1.21.13` toolchain after checksum verification, builds the node, and does not alter SSH, firewall, or RPC exposure. Do not copy Windows `core-geth.exe` to Linux.
+The script supports apt-based Linux systems, initializes the pinned Core-Geth source (including the recursive `consensus/kawpow/cpp-kawpow` native verifier submodule, without optional test-fixture repositories), installs the project-pinned Go `1.21.13` toolchain after checksum verification, builds with CGO enabled, and does not alter SSH, firewall, or RPC exposure. Do not copy Windows `core-geth.exe` to Linux. If building manually, use `scripts/build-core-geth-linux.sh`; it performs the same nested-submodule and CGO checks.
 
 Create the mining account interactively on the VPS so its password is never placed in a command, repository, or chat:
 

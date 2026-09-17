@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | NVIDIA G1, G2, and G3 complete; AMD/OpenCL repeat and production gates pending |
-| Version | 0.7 |
+| Version | 0.8 |
 | Last updated | 2026-08-25 |
 | Governing decision | [ADR-0004](./decisions/0004-kawpow-phase-2a-development-selection.md) |
 
@@ -85,7 +85,10 @@ bash ./scripts/run-kawpow-gpu-control.sh \
 The inspected miner revision is
 `RavenCommunity/kawpowminer@632f6ea0a5cd09e2c6443374dbe6db0a767715ba`.
 Its GPL-3.0 source remains an external measurement tool and must not become a
-Core-Geth dependency.
+Core-Geth dependency. The packaging and modification boundary is recorded in
+[AIChain KawPoW miner packaging and licensing](aichain-kawpow-miner-packaging.md).
+Option B—a separate GPLv3-compatible AIChain miner fork—is the selected path;
+the fork is not yet a production release and does not define mining rewards.
 
 The first NVIDIA control result is recorded in
 [KawPoW G1 RTX 3060 Result](../benchmarks/pow/kawpow-g1-rtx3060-2026-08-23.md).
@@ -167,3 +170,4 @@ NVIDIA procedure is reproducible.
 | 0.5 | 2026-08-23 | Recorded the completed RTX 3060 control and reproducible modern-toolchain compatibility settings |
 | 0.6 | 2026-08-24 | Recorded G2 pass: real node work, RTX 3060 solution, CPU verification, canonical import, and negative rejection matrix |
 | 0.7 | 2026-08-25 | Recorded NVIDIA G3 pass: separate CPU validator, sync/restart, invalid-input suite, controlled reorg, AVR batching, resources, and soak |
+| 0.8 | 2026-09-15 | Recorded the separate GPLv3-compatible AIChain miner-fork packaging decision and kept economics/reward gates open |

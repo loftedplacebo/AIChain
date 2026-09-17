@@ -40,6 +40,13 @@ The following tasks are deferred—not waived—to the closed/public-testnet pro
 - heterogeneous NVIDIA/AMD fork and recovery tests; and
 - production hash-rate bootstrap and launch-difficulty validation.
 
+The GPU packaging decision is now recorded in
+[AIChain KawPoW miner packaging and licensing](aichain-kawpow-miner-packaging.md).
+The selected path is a separate GPLv3-compatible AIChain miner fork (or the
+pinned upstream miner plus AIChain launcher until the fork is justified). This
+does not change Core-Geth licensing, does not make the miner a node dependency,
+and does not settle rewards or issuance.
+
 Until those tests pass, KawPoW plus 10-second/30-minute ASERT remains the **development baseline**, not a final mainnet selection.
 
 ## 2. Phase 2B — Define the First ZK Claim
