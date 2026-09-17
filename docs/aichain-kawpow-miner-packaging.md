@@ -71,7 +71,7 @@ The existing bootstrap remains pinned by default to the measured upstream
 commit. A separately hosted fork can be selected without changing Core-Geth:
 
 ```bash
-AICHAIN_MINER_REPOSITORY_URL=https://github.com/loftedplacebo/aichain-kawpowminer.git \
+AICHAIN_MINER_REPOSITORY_URL=https://github.com/loftedplacebo/AIChain-kawpowminer.git \
 AICHAIN_MINER_COMMIT=<40-character-reviewed-commit> \
 AICHAIN_MINER_BACKEND=cuda \
   bash scripts/bootstrap-kawpow-gpu-host.sh

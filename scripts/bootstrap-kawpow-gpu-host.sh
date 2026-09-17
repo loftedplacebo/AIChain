@@ -8,11 +8,11 @@ project_root="${AICHAIN_BOOTSTRAP_ROOT:-/workspace/aichain}"
 repo_url="${AICHAIN_REPOSITORY_URL:-https://github.com/loftedplacebo/AIChain.git}"
 repo_ref="${AICHAIN_REPOSITORY_REF:-main}"
 miner_root="${AICHAIN_MINER_ROOT:-/workspace/kawpowminer}"
-miner_repo_url="${AICHAIN_MINER_REPOSITORY_URL:-https://github.com/RavenCommunity/kawpowminer.git}"
+miner_repo_url="${AICHAIN_MINER_REPOSITORY_URL:-https://github.com/loftedplacebo/AIChain-kawpowminer.git}"
 backend="${AICHAIN_MINER_BACKEND:-cuda}"
 build_dir="${AICHAIN_MINER_BUILD_DIR:-$miner_root/build-aichain-${backend}86}"
 compute="${AICHAIN_KAWPOW_COMPUTE:-86}"
-expected_miner_commit="${AICHAIN_MINER_COMMIT:-632f6ea0a5cd09e2c6443374dbe6db0a767715ba}"
+expected_miner_commit="${AICHAIN_MINER_COMMIT:-e04c574a417fd663d96d6f4606116e48126793e5}"
 
 [[ "$project_root" == /* && "$miner_root" == /* && "$build_dir" == /* ]] || {
   echo "Bootstrap paths must be absolute." >&2; exit 2;

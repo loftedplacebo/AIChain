@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-expected_commit="${AICHAIN_MINER_COMMIT:-632f6ea0a5cd09e2c6443374dbe6db0a767715ba}"
+expected_commit="${AICHAIN_MINER_COMMIT:-e04c574a417fd663d96d6f4606116e48126793e5}"
 
 if [[ $# -lt 1 || $# -gt 3 ]]; then
   echo "Usage: $0 /absolute/path/to/kawpowminer-source [absolute-build-dir] [cuda|opencl]" >&2
