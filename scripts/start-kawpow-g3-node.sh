@@ -35,7 +35,6 @@ exec "$geth_binary" \
   --datadir "$data_dir" \
   --aichain.kawpowdev \
   --networkid 20260825 \
-  --syncmode full \
   --nodiscover --maxpeers 4 --nat none --port "$p2p_port" \
   --http --http.addr 127.0.0.1 --http.port "$rpc_port" \
   --http.api "$http_apis" --http.vhosts localhost \
