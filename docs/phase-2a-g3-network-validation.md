@@ -132,4 +132,5 @@ state, passwords, and keystores are intentionally not committed.
 
 | Version | Date | Change |
 |---|---|---|
+| 0.2 | 2026-09-18 | Regression-tested the current loopback GPU-miner profile on a fresh RTX 3060 host after removing the incompatible forced full-sync launcher option: 10 GPU-mined blocks were independently accepted by a separate CPU-only validator on a disposable chain. |
 | 0.1 | 2026-08-25 | Recorded two-node propagation, sync/restart, rejection, reorg, AVR, resource, and soak results |
