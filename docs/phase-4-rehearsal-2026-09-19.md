@@ -72,10 +72,10 @@ the miner/VPS snapshots. Genesis matches; the real binary hashes differ as
 recorded above. This was a build-identity failure, not a consensus split. The
 binary correction does not retroactively change the historical alert.
 
-Still required: post-recovery health evaluation, VPS long downtime recovery,
-live node-outage indexer/queue recovery and lag measurements, sustained capacity, continuous alert
-coverage, and the wider multi-miner/AMD/competition/reorg/24-hour gates specified
-by the Phase 4 policy. Do not infer those results from this rehearsal.
+Still required: live node-outage indexer/queue recovery and lag measurements,
+sustained capacity, continuous alert coverage, and the wider
+multi-miner/AMD/competition/reorg/24-hour gates specified by the Phase 4 policy.
+Do not infer those results from this rehearsal.
 
 Raw operational evidence stays under ignored `devnet/phase4-laptop-20260919`.
 Never publish encrypted wallets, passwords, relay private keys or raw SSH config.
@@ -110,10 +110,21 @@ exist; this change is not a claim that every miner failure is fixed.
 Validation: five indexer unit tests, one supervisor regression, JavaScript syntax,
 shell syntax, and the live indexer recovery integration passed.
 
-The VPS validator was intentionally stopped at 4811 for the next bounded test.
-The controller waits for a 100-block gap (target at least 4911), then restarts the
-same datadir and checks its recovered hash against the miner. A 40-minute gap
-deadline triggers a restart attempt even if the gap is not reached. At this
-checkpoint the test is **running**, not passed. The laptop temporarily loses its
-upstream peer too because its private P2P route goes through this VPS validator.
+## Follow-up: VPS recovery and standardized health
+
+The VPS validator recovery passed. It was stopped at 4811, held offline while
+the miner advanced by 100 blocks, then restarted against the same datadir. The
+restart target was 4911; the validator reached it in 22.32 seconds of catch-up
+and 33.78 seconds from restart request to recovery. The recovered target hash
+was `0x63df66173cc185f929e63084daa3646ff97d4ad7a0612ea5105b1ee65835860c`,
+matching the miner's canonical chain. The laptop reconnected through the VPS
+relay and all three nodes later agreed at block 5183.
+
+Fresh post-recovery snapshots from miner, VPS validator and laptop validator all
+reported the standardized binary SHA-256
+`d2071e4de187e81e91333bdb54a59aed7ff8b268ad014761f0df0e5f5e4da2ad`.
+The checked-in alert evaluator returned `normal` with zero alerts. This clears
+the earlier temporary build-identity mismatch for the current run; it does not
+turn this single-GPU rehearsal into a complete Phase 4 acceptance result.
+
 No rented instance was stopped or deleted.
