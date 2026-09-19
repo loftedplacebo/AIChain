@@ -128,3 +128,32 @@ the earlier temporary build-identity mismatch for the current run; it does not
 turn this single-GPU rehearsal into a complete Phase 4 acceptance result.
 
 No rented instance was stopped or deleted.
+
+## Follow-up: live ingress and indexer recovery
+
+A bounded live recovery exercise submitted 100 synthetic, public-safe AVR
+presentations to a durable queue snapshot with a reduced test limit of 100 and
+four batches of 25. It rejected a duplicate and the 101st receipt, then handed
+the queue to a fresh consumer process. The restarted consumer anchored all four
+batches at blocks 5305–5308. Batch inclusion times were 5210 ms, 6208 ms, 34550
+ms and 10283 ms; p95 was 34550 ms. This is below the 60-second alpha inclusion
+budget for this small run, but is not a throughput result.
+
+The indexer was intentionally stopped while the batches anchored. Its saved
+cursor was six blocks behind at restart, then caught up six blocks in 286 ms;
+post-recovery lag was zero. Batch inclusion lookups passed for every restarted
+consumer batch. The queue's exact 10,000-record retention/backpressure boundary
+is separately covered by a local regression test; this live test uses 100 to
+bound cost and chain traffic.
+
+The intentional six-block indexer outage exceeds the policy's continuous
+two-block lag threshold. Treat it as an expected controlled-fault alert and
+recovery measurement, **not** a passing continuous-lag result. It demonstrates
+that recovery is fast after the consumer/indexer returns; it does not demonstrate
+a real external API outage, proof-queue operation, sustained load, or public TPS.
+
+Evidence run ID: `phase4-live-ingress:1789843415661`. Confirmed batch
+transactions: `0x978599d0eccfd1515f27eddd407ca89c631ff1ac3a1548f918d880b9d36a93b9`,
+`0xb827dacad08c5e6bd0f48407e3e8ccfc9a3e9247ce45d7bcb6077fab31e57e9a`,
+`0x93c55bfd86b772fb15fd521c32c93cc1fa7fe7cd6f8fd13a1491abad02e8c3f6`, and
+`0x719b3551369bfc97f9b92d8b132763e57d2298c56e219447fe05399dc8a65618`.

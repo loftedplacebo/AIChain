@@ -27,3 +27,17 @@ test("recovery callbacks are idempotent, stale results ignored, retained state b
   assert.equal(queue.get(p.receiptId).status,'failed'); assert.equal(queue.drain(2,true),null);
   assert.equal(queue.submit(presentation(8)).accepted,false);
 });
+test("snapshot restores pending work and refuses malformed queue state", () => {
+  const queue = new AvrIngressQueue({maxBatchReceipts:2}); const first=presentation(9); const second=presentation(10);
+  queue.submit(first,1); queue.submit(second,2);
+  const restored=AvrIngressQueue.fromSnapshot(queue.snapshot());
+  assert.deepEqual(restored.drain(3,true).receiptIds,[first.receiptId.toLowerCase(),second.receiptId.toLowerCase()]);
+  const malformed=queue.snapshot(); malformed.pendingReceiptIds.push(malformed.pendingReceiptIds[0]);
+  assert.throws(()=>AvrIngressQueue.fromSnapshot(malformed),/pending receipt IDs/);
+});
+test("retains the configured 10,000 receipt boundary before applying backpressure", () => {
+  const queue=new AvrIngressQueue();
+  for(let index=0; index<10_000; index++) assert.equal(queue.submit(presentation(10_000+index),index).accepted,true);
+  assert.equal(queue.records.size,10_000);
+  assert.equal(queue.submit(presentation(20_001),10_001).status,'rejected-queue-full');
+});

@@ -14,7 +14,7 @@
 | Acceptance state | Immediate local validation | Gives agents an explicit provisional response before chain inclusion |
 | Micro-batch window | 250 ms | Limits latency while allowing short bursts to coalesce |
 | Maximum batch | 1,000 receipt IDs | Matches the largest controlled G3 batch measurement; not a final protocol maximum |
-| Maximum in-memory queue | 10,000 receipts | Bounded backpressure; callers receive `rejected-queue-full` rather than unbounded memory use |
+| Maximum retained queue | 10,000 receipts | Bounded backpressure; callers receive `rejected-queue-full` rather than unbounded memory use |
 | Duplicate key | Canonical receipt ID | Repeated submissions return the existing state without another queue entry |
 | Retry budget | 3 attempts | Retryable submission failures and detected reorgs re-enter the queue only inside this budget |
 | Initial confirmation display | `provisionally-included` | One block is not finality; risk-specific confirmation policy remains TBD |
@@ -22,6 +22,14 @@
 The reference queue never handles raw AI data, keys, signatures, proof bytes or
 transactions. It creates opaque batch manifests; a separate signing/submission
 worker must use standard Ethereum transaction flow and record the result.
+
+The reference queue now exposes an explicit, versioned snapshot/restore shape
+for a caller that supplies its own atomic durable store. It preserves pending
+work, deduplication records, retry state and the selected anchor context across
+a consumer restart. It is not itself a database, daemon, crash-safe write-ahead
+log, multi-process coordinator or production delivery guarantee. The caller must
+write a snapshot atomically before hand-off and reconcile with canonical chain
+events after restart.
 
 ## Fee and confirmation posture
 
@@ -65,7 +73,7 @@ bounded ingress policy, measured local acceptance, and explorer-safe lookup are
 implemented.
 
 Before public use, the following remain mandatory: a real persistent queue and
-database, signer/submission worker, long-duration multi-host load and recovery
+database with crash/concurrency semantics, signer/submission worker, long-duration multi-host load and recovery
 tests, measured RPC/indexer p50/p95 latency, resource and state-growth metrics,
 rate limiting/authentication, data-availability policy, Blockscout deployment
 integration, and independent security review.

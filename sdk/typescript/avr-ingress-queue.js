@@ -4,6 +4,8 @@ const { validatePresentation } = require("./avr-presentation");
 const { SCHEMA: GENERAL_SCHEMA } = require('./verification-receipt');
 
 const DEFAULT_POLICY = Object.freeze({ microBatchMs: 250, maxQueueReceipts: 10_000, maxBatchReceipts: 1_000, maxAttempts: 3, maxPresentationBytes: 16384 });
+const SNAPSHOT_SCHEMA = "aichain.avr-ingress-queue";
+const SNAPSHOT_VERSION = "0.1.0-draft";
 
 class AvrIngressQueue {
   constructor(policy = {}) {
@@ -53,5 +55,41 @@ class AvrIngressQueue {
     }
   }
   get(receiptId) { return this.records.get(receiptId.toLowerCase()) ?? null; }
+  snapshot() {
+    return {
+      schema: SNAPSHOT_SCHEMA, schemaVersion: SNAPSHOT_VERSION,
+      policy: { ...this.policy }, sequence: this.sequence,
+      anchorContext: this.anchorContext ? { ...this.anchorContext } : null,
+      records: [...this.records.values()].map((entry) => structuredClone(entry)),
+      pendingReceiptIds: this.pending.map((entry) => entry.receiptId)
+    };
+  }
+  static fromSnapshot(snapshot) {
+    if (!snapshot || snapshot.schema !== SNAPSHOT_SCHEMA || snapshot.schemaVersion !== SNAPSHOT_VERSION ||
+      !snapshot.policy || !Number.isInteger(snapshot.sequence) || snapshot.sequence < 0 ||
+      !Array.isArray(snapshot.records) || !Array.isArray(snapshot.pendingReceiptIds)) throw new Error("Unsupported or malformed AVR ingress snapshot");
+    const queue = new AvrIngressQueue(snapshot.policy);
+    queue.sequence = snapshot.sequence;
+    if (snapshot.anchorContext !== null && (!snapshot.anchorContext || !Number.isInteger(snapshot.anchorContext.chainId) || typeof snapshot.anchorContext.anchorContract !== "string")) {
+      throw new Error("Malformed AVR ingress anchor context");
+    }
+    queue.anchorContext = snapshot.anchorContext ? { ...snapshot.anchorContext } : null;
+    for (const rawEntry of snapshot.records) {
+      if (!rawEntry || typeof rawEntry.receiptId !== "string" || !rawEntry.presentation ||
+        !Number.isInteger(rawEntry.acceptedAt) || !Number.isInteger(rawEntry.attempts) ||
+        typeof rawEntry.status !== "string" || queue.records.has(rawEntry.receiptId.toLowerCase())) throw new Error("Malformed AVR ingress entry");
+      validatePresentation(rawEntry.presentation);
+      if (rawEntry.presentation.receiptId.toLowerCase() !== rawEntry.receiptId.toLowerCase()) throw new Error("AVR ingress receipt ID does not match presentation");
+      queue.records.set(rawEntry.receiptId.toLowerCase(), structuredClone(rawEntry));
+    }
+    const pending = new Set();
+    for (const receiptId of snapshot.pendingReceiptIds) {
+      if (typeof receiptId !== "string" || pending.has(receiptId.toLowerCase())) throw new Error("Malformed AVR ingress pending receipt IDs");
+      const entry = queue.records.get(receiptId.toLowerCase());
+      if (!entry || entry.status !== "accepted") throw new Error("Pending AVR ingress entry is unavailable");
+      pending.add(receiptId.toLowerCase()); queue.pending.push(entry);
+    }
+    return queue;
+  }
 }
-module.exports = { DEFAULT_POLICY, AvrIngressQueue };
+module.exports = { DEFAULT_POLICY, SNAPSHOT_SCHEMA, SNAPSHOT_VERSION, AvrIngressQueue };
