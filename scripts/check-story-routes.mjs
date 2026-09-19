@@ -31,6 +31,7 @@ const expectations = {
   "/technology": ["Six checks"],
   "/technical": ["Six checks"],
   "/developers": ["0.4.0-alpha", "Commit the bytes", "No hidden trust leap."],
+  "/film": ["One action. Different views. One trusted record.", "A customer needs help.", "Illustrative product story."],
   "/safety": ["Keep the controls around AI work clear.", "Prevent and contain", "Planned testnet work, not a live safety service."],
   "/whitepaper": ["working edition", "A record, not a verdict", "0.4.0-alpha"],
   "/status": ["Project status", "source snapshot", "GPU-miner development profile"],
