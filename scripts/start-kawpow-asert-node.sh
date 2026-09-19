@@ -35,7 +35,6 @@ exec "$geth_binary" \
   --aichain.kawpowdev \
   --aichain.kawpowdev.asert-target "$target" \
   --networkid "$network_id" \
-  --syncmode full \
   --nodiscover --maxpeers 8 --nat none --port "$p2p_port" \
   --http --http.addr 127.0.0.1 --http.port "$rpc_port" \
   --http.api "$http_apis" --http.vhosts localhost \
