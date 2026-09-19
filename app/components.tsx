@@ -1,5 +1,5 @@
 export function Mark() { return <span className="mark" aria-hidden="true">◒</span>; }
-const links = [["/product", "Product"], ["/in-action", "In action"], ["/technology", "Technology"], ["/developers", "Developers"], ["/vision", "Vision"]];
+const links = [["/product", "Product"], ["/safety", "Safety"], ["/in-action", "In action"], ["/technology", "Technology"], ["/developers", "Developers"], ["/vision", "Vision"]];
 export function Nav({ dark = false }: { dark?: boolean }) {
   return <><a className="skip-link" href="#content">Skip to content</a><nav className={`nav ${dark ? "nav-dark" : ""}`} aria-label="Main navigation">
     <a className="brand" href="/"><Mark /> Orvessian</a>
@@ -9,7 +9,7 @@ export function Nav({ dark = false }: { dark?: boolean }) {
   </nav></>;
 }
 export function Footer() {
-  return <footer><a className="brand" href="/"><Mark /> Orvessian</a><p>Autonomous agents. Human certainty.</p><div><a href="/developers">Developers</a><a href="/whitepaper">Whitepaper</a><a href="/status">Project status</a></div></footer>;
+  return <footer><a className="brand" href="/"><Mark /> Orvessian</a><p>Autonomous agents. Human certainty.</p><div><a href="/safety">Safety</a><a href="/developers">Developers</a><a href="/whitepaper">Whitepaper</a><a href="/status">Project status</a></div></footer>;
 }
 export function PageHeader({ label, title, children }: { label: string; title: string; children: React.ReactNode }) {
   return <section className="subhero tech-hero foundation-header"><Nav dark/><div className="subhero-copy" id="content"><p className="eyebrow">{label}</p><h1>{title}</h1><div className="header-description">{children}</div></div></section>;
