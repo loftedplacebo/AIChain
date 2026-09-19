@@ -44,8 +44,9 @@ One NVIDIA GPU miner ── private P2P ── VPS CPU-only validator
 It validates independent CPU acceptance, synchronization, recovery, AVR/proof
 traffic and the new monitoring pipeline across three roles. It cannot test
 miner competition, natural multi-miner stale rate, adversarial greater-work
-reorganisation, AMD/OpenCL compatibility, or the full three-miner/two-region
-closed-testnet gate. Those remain open.
+reorganisation, or the full three-miner/two-region closed-testnet gate. Those
+remain open. AMD/OpenCL compatibility is separately deferred to the
+post-mainnet miner-compatibility milestone.
 
 ## Safe entry conditions
 
@@ -114,8 +115,9 @@ The report should state all of the following explicitly:
 - AVR/proof/batch and indexer metrics;
 - validator restart/catch-up result;
 - all alerts, including resolved warnings; and
-- deferred gates: AMD, at least two further independent miners, two-region
-  competition, natural stale rate, greater-work reorg and 24-hour soak.
+- deferred Phase 4 gates: at least two further independent NVIDIA/CUDA miners,
+  two-region competition, natural stale rate, greater-work reorg and 24-hour
+  soak; AMD/OpenCL compatibility is deferred separately to post-mainnet work.
 
 No result from this rehearsal is a closed-testnet exit, a public testnet claim,
 an ASIC-resistance claim, quantum-resistance proof or mainnet launch approval.

@@ -1,6 +1,6 @@
 # Phase 4 — Closed-testnet deployment foundation
 
-Version: 0.1.1-draft · Updated: 2026-09-13 · Status: foundation active
+Version: 0.1.2-draft · Updated: 2026-09-19 · Status: foundation active
 
 ## Purpose and boundary
 
@@ -19,8 +19,8 @@ require explicit release approval.
 
 ```text
         Miner A (NVIDIA) ─┐
-        Miner B (AMD) ────┼── authenticated P2P overlay ── Validator A
-        Miner C (independent) ─┘                            Validator B
+        Miner B (NVIDIA) ─┼── authenticated P2P overlay ── Validator A
+        Miner C (NVIDIA) ─┘                                 Validator B
                                       │                         │
                                       ├── restricted telemetry ──┤
                                       │
@@ -35,7 +35,7 @@ Roles are separated deliberately:
 
 | Role | Minimum | May mine? | RPC exposure | Primary responsibility |
 |---|---:|---:|---|---|
-| GPU miners | 3 independent operators, including NVIDIA and AMD | Yes | Loopback/private only | Block production and competing-work evidence |
+| GPU miners | 3 independent NVIDIA/CUDA operators | Yes | Loopback/private only | Block production and competing-work evidence |
 | Validators | 2 operators | No | Loopback/private only | Independent block validation, sync and reorg evidence |
 | Ingress/indexer | 1+ | No | Private gateway only | AVR batching, durable indexing and explorer references |
 | Monitoring | 1+ independent collector | No | Private telemetry only | Metrics, alerts and evidence retention |
@@ -156,8 +156,9 @@ claiming an in-place upgrade is safe.
 
 - [x] Real Phase 3 delayed verifier-governance activation has passed and is recorded.
 - [ ] Closed-testnet release manifest passes validation.
-- [ ] Three independent GPU miners are available, with at least one AMD/OpenCL
-  and one NVIDIA implementation.
+- [ ] Three independent NVIDIA/CUDA GPU miners are available across the
+  approved operator and regional split. AMD/OpenCL is explicitly deferred to
+  post-mainnet compatibility work.
 - [ ] Two non-mining validator operators are available across two regions.
 - [ ] Genesis, source/artifact hashes and contract release record are approved.
 - [ ] Private P2P/RPC/telemetry connectivity has been reviewed.
@@ -171,10 +172,13 @@ claiming an in-place upgrade is safe.
 - Stablecoin, canonical bridge or any value-bearing bridge.
 - Claims of ASIC resistance, quantum resistance, production TPS or finality.
 - Production security approval; independent review remains required.
+- AMD/OpenCL mining support and heterogeneous miner-operation claims. These are
+  post-mainnet compatibility work; initial supported miner operations are
+  NVIDIA/CUDA only.
 
 ## Interim single-GPU rehearsal
 
-While the required AMD and additional independent miners are unavailable, run
+While the additional independent NVIDIA/CUDA miners are unavailable, run
 the scoped [single-GPU / dual-validator rehearsal](./phase-4-single-gpu-rehearsal.md).
 It produces useful synchronization, recovery, AVR/proof and monitoring evidence
 without misrepresenting the result as closure of the full hardware-diversity

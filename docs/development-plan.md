@@ -8,7 +8,7 @@
 | Architecture inputs | [Core L1 Architecture and Tooling](./core-l1-architecture-and-tooling.md); [AI Verification & ZK Architecture](./ai-verification-and-zk-architecture.md) |
 | Schedule | Dates, durations, staffing, and owners are **TBD** |
 | Decision state | This plan sequences open decisions; it does not settle them |
-| Delivery status | Phase 1 and Phase 3 integrated-alpha scope complete; Phase 2A NVIDIA and isolated ASERT validation complete; AMD/independent multi-miner work remains a Phase 4 gate; Phase 2C ZK-002–004 and Phase 2D alpha scope complete; Phase 4 closed-testnet foundation active |
+| Delivery status | Phase 1 and Phase 3 integrated-alpha scope complete; Phase 2A NVIDIA and isolated ASERT validation complete; independent NVIDIA multi-miner work remains a Phase 4 gate while AMD/OpenCL compatibility is deferred post-mainnet; Phase 2C ZK-002–004 and Phase 2D alpha scope complete; Phase 4 closed-testnet foundation active |
 
 ## 1. Objective
 
@@ -137,7 +137,7 @@ Security, privacy, compatibility, documentation, and operations run across every
 
 **Current status:** KawPoW is selected only for Phase 2A development evaluation. NVIDIA G1, G2, G3, and the isolated ASERT live-validation milestone are complete. RTX-mined 5/10/15-second ASERT profiles propagated to CPU-only validators on two independent machines; the 10-second profile passed overnight operation, a 3,585-block catch-up, clean restarts, a controlled greater-work reorganisation, rejection tests, and individual/batched AVR traffic. The existing Ethash devnet remains unchanged.
 
-**Next active work:** use the completed [ASERT live validation](./phase-2a-asert-live-validation.md) as the development PoW baseline. AMD/OpenCL interoperability, independently operated multi-miner geography, heterogeneous fork tests, and launch hash-rate calibration are deferred to the closed/public-testnet gates because the required hardware is not currently available. Phase 2B now becomes the active phase: specify the ZK statement and benchmark candidate proof stacks without changing consensus. Production difficulty, block interval, economics, and final **L1-001/L1-003** approval remain **TBD**.
+**Next active work:** use the completed [ASERT live validation](./phase-2a-asert-live-validation.md) as the development PoW baseline. Independently operated NVIDIA/CUDA multi-miner geography, competing-branch tests, and launch hash-rate calibration remain closed/public-testnet gates. AMD/OpenCL interoperability is a separately funded post-mainnet compatibility milestone because suitable capacity is not currently available. Phase 2B now becomes the active phase: specify the ZK statement and benchmark candidate proof stacks without changing consensus. Production difficulty, block interval, economics, and final **L1-001/L1-003** approval remain **TBD**.
 
 **Primary outputs**
 
@@ -230,7 +230,7 @@ not set production parameters.
 The [private metrics pipeline](./phase-4-private-metrics-pipeline.md) collects
 loopback-only role snapshots and evaluates identity, canonical-head and peer
 alerts without unattended node-control authority.
-Before AMD and multi-miner capacity is available, the
+Before additional independent NVIDIA/CUDA multi-miner capacity is available, the
 [single-GPU / dual-validator rehearsal](./phase-4-single-gpu-rehearsal.md)
 provides the bounded interim test sequence and preserves the full closed-testnet
 hardware gates.
@@ -245,8 +245,8 @@ hardware gates.
 - Monitoring, incident response, backup/recovery, and key-handling runbooks.
 - External security-review scope and release acceptance targets.
 - Sustained-load and burst-load exercises for receipt ingestion, batch construction, proof queues, P2P propagation, block/state growth, reorganization recovery, and explorer/indexer lag.
-- AMD/OpenCL mining interoperability and recovery tests.
-- At least three independently operated GPU miners across at least two regions, including heterogeneous NVIDIA/AMD fork, propagation, stale/orphan, and hash-rate shock measurements.
+- At least three independently operated NVIDIA/CUDA GPU miners across at least two regions, including propagation, stale/orphan, competing-branch, and hash-rate shock measurements.
+- Post-mainnet AMD/OpenCL mining interoperability, recovery, and heterogeneous-miner compatibility tests before AMD support is claimed.
 - Launch-difficulty calibration from representative aggregate testnet hash rate.
 
 **Exit gate**
@@ -344,7 +344,7 @@ The active increment is now defined in [Next Development Phases](./next-developm
 4. Select and deploy one disposable alpha verifier.
 5. Consolidate AVR assurance levels, SDK parity, proof-aware batching, explorer indexing, and organisation disclosure.
 6. Produce the integrated alpha while retaining the completed KawPoW/ASERT development profile.
-7. Acquire/rent AMD and independently operated GPU capacity when preparing the closed testnet, then close the deferred mining gates there.
+7. Acquire/rent independently operated NVIDIA/CUDA GPU capacity when preparing the closed testnet, then close the deferred multi-miner gates there. Plan AMD/OpenCL compatibility as a post-mainnet milestone.
 
 ## 8.1 Completed Phase 1B Development Validation (2026-08-22)
 
@@ -391,6 +391,7 @@ This is a development-validation milestone, not a final AVR protocol release. **
 | 0.12 | 2026-08-28 | Deferred AMD/OpenCL and geographically distributed multi-miner tests to the testnet gates; made ZK-001 the active task and mapped the alpha/testnet/asset sequence | [Next Development Phases](./next-development-phases.md) |
 | 0.14 | 2026-08-29 | Recorded SP1/RISC Zero native security and EVM verifier interoperability, while leaving repeated benchmarks and ZK-002–004 open | [Phase 2C EVM Verifier Evidence](./phase-2c-evm-verifier-evidence.md) |
 | 0.15 | 2026-09-06 | Recorded repeated benchmark evidence and accepted RISC Zero as the initial ZK-001 proof stack | [ADR-0006](./decisions/0006-risc-zero-initial-proof-stack-selection.md) |
+| 0.20 | 2026-09-19 | Retained independent NVIDIA/CUDA multi-miner testing as a Phase 4 gate and deferred AMD/OpenCL compatibility to a separately funded post-mainnet milestone | [Next Development Phases](./next-development-phases.md) |
 | 0.16 | 2026-09-06 | Defined alpha individual-proof batching and deferred recursive aggregation | [ADR-0007](./decisions/0007-zk-003-individual-proof-batches.md) |
 | 0.17 | 2026-09-06 | Defined alpha RISC Zero verifier lifecycle, limits, and governance controls | [ADR-0008](./decisions/0008-zk-004-verifier-governance-and-limits.md) |
 | 0.19 | 2026-09-14 | Reconciled the plan with completed Phase 3 sign-off and made Phase 4 closed-testnet hardening the active phase | [Phase 3 Sign-off Tracker](./phase3-signoff-tracker.md) |

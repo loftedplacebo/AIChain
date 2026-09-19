@@ -73,9 +73,10 @@ recorded above. This was a build-identity failure, not a consensus split. The
 binary correction does not retroactively change the historical alert.
 
 Still required: live node-outage indexer/queue recovery and lag measurements,
-sustained capacity, continuous alert coverage, and the wider
-multi-miner/AMD/competition/reorg/24-hour gates specified by the Phase 4 policy.
-Do not infer those results from this rehearsal.
+sustained capacity, continuous alert coverage, and the wider independent
+NVIDIA/CUDA multi-miner/competition/reorg/24-hour gates specified by the Phase
+4 policy. AMD/OpenCL compatibility is separately deferred to a post-mainnet
+milestone. Do not infer those results from this rehearsal.
 
 Raw operational evidence stays under ignored `devnet/phase4-laptop-20260919`.
 Never publish encrypted wallets, passwords, relay private keys or raw SSH config.

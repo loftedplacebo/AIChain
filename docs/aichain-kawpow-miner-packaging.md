@@ -121,6 +121,9 @@ from the PoW miner and must not be treated as consensus issuance.
 ## Relationship to the roadmap
 
 This closes the packaging/licensing decision needed for Phase 4 preparation.
-It does not close the deferred AMD/OpenCL, three-independent-miner,
-multi-region, public-testnet or production-economics gates. Those remain Phase 4
-and later work in [Next Development Phases](next-development-phases.md).
+It does not close the three-independent-NVIDIA/CUDA-miner, multi-region,
+public-testnet or production-economics gates. Those remain Phase 4 and later
+work in [Next Development Phases](next-development-phases.md). AMD/OpenCL
+interoperability is deliberately deferred to a separately funded post-mainnet
+compatibility milestone; no AMD/OpenCL support claim is made before that work
+is complete.

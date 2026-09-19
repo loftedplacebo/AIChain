@@ -3,11 +3,11 @@
 | Field | Value |
 |---|---|
 | Status | Active delivery roadmap |
-| Document version | 1.3 |
-| Last updated | 2026-09-14 |
+| Document version | 1.4 |
+| Last updated | 2026-09-19 |
 | Starting point | Phase 3 integrated alpha signed off with documented limitations; Phase 4 closed-testnet foundation active |
-| Current constraint | No AMD GPU or additional independent GPU miners available |
-| Principle | Continue software/product work now; move hardware-diversity and multi-miner tests to the testnet gates |
+| Current constraint | No additional independent GPU miners are currently available; AMD/OpenCL miner compatibility is unvalidated |
+| Principle | Keep independent NVIDIA/CUDA multi-miner validation as a testnet gate; defer AMD/OpenCL compatibility to a separately funded post-mainnet milestone |
 
 ## 1. Immediate Direction
 
@@ -34,11 +34,17 @@ historical Phase 3 gate.
 
 The following tasks are deferred—not waived—to the closed/public-testnet programme:
 
-- AMD/OpenCL miner interoperability;
-- three or more independently operated GPU miners;
+- three or more independently operated NVIDIA/CUDA GPU miners;
 - geographic propagation, stale/orphan, and pool-distribution measurements;
-- heterogeneous NVIDIA/AMD fork and recovery tests; and
+- competing-branch, greater-work reorganisation, and recovery tests; and
 - production hash-rate bootstrap and launch-difficulty validation.
+
+AMD/OpenCL build, mining and interoperability are a **post-mainnet
+compatibility milestone**, not an initial closed- or public-testnet gate. The
+initial supported miner scope is NVIDIA/CUDA only. This is a deployment and
+support boundary, not a consensus exclusion: nodes must continue to validate
+correctly formed KawPoW blocks regardless of the miner implementation that
+found them.
 
 The GPU packaging decision is now recorded in
 [AIChain KawPoW miner packaging and licensing](aichain-kawpow-miner-packaging.md).
@@ -191,14 +197,21 @@ Batch/individual anchor -> AIChain L1
 
 ### Deferred mining tests required here
 
-- AMD/OpenCL build, mine, verify, and recovery test.
-- At least three independently operated GPU miners.
+- At least three independently operated NVIDIA/CUDA GPU miners.
 - At least two geographic regions and heterogeneous network latency.
-- NVIDIA/AMD competing branches and greater-work reorganization.
+- Competing branches, greater-work reorganization, and recovery.
 - Stale/orphan rate, propagation, confirmation, and pool concentration measurements.
 - Hash-rate entry/exit shocks and launch-difficulty calibration.
 - Extended partition, restart, catch-up, and soak tests.
 - Quantum-threat assessment and upgrade/migration posture.
+
+### Post-mainnet miner-compatibility milestone
+
+- AMD/OpenCL build, mine, CPU-verify, restart/recovery, and operator-runbook tests.
+- Heterogeneous NVIDIA/AMD fork, propagation, stale/orphan, and greater-work
+  reorganisation measurements.
+- Supported-device policy, reproducible builds, and maintenance ownership
+  before AMD/OpenCL is described as supported.
 
 ### Wider closed-testnet work
 
@@ -253,8 +266,9 @@ Bridge confirmation rules must be materially stricter than ordinary AVR confirma
    restart/reorg/indexer recovery.
 3. Measure sustained individual-versus-batched receipt/proof load, confirmation
    latency, state/index growth, queue backpressure and verifier cost.
-4. Prepare the closed testnet and acquire/rent the AMD plus independent GPU
-   capacity required to close the deferred mining gates.
+4. Prepare the closed testnet and acquire/rent independent NVIDIA/CUDA GPU
+   capacity required to close the deferred multi-miner gates. Schedule
+   AMD/OpenCL compatibility separately as post-mainnet work.
 5. Run public testnet only after closed-testnet security, performance, SDK,
    receipt, proof and operational acceptance.
 6. Evaluate any stablecoin/bridge only through the separately gated asset track.
