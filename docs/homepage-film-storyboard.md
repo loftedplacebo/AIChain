@@ -6,6 +6,8 @@
 
 A short, human-first film about an AI customer-service assistant handling a missing-delivery refund. The story explains Orvessian through people who need the result: the customer, the support lead and the later reviewer.
 
+The current web animatic uses six clear steps: missing delivery, permitted checks, approval boundary, daytime human review, customer resolution and the shared record. The first and resolution scenes deliberately show an empty entryway: the issue is a delivery that has not arrived.
+
 ## Recommended format
 
 - **Homepage loop:** 12–15 seconds, silent, designed to loop after the hero copy.
