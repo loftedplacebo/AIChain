@@ -23,15 +23,15 @@ assert.doesNotMatch(styles, /\.slice-[012]\s*\{[^}]*clip-path/s);
 // Read-only smoke checks against the local development preview.
 const origin = process.argv[2] || "http://localhost:3000";
 const expectations = {
-  "/": ["Autonomous agents", 'href="/vision"', "THE LIVING RECEIPT", "Explore authority", "glass-wafer-alpha.png"],
-  "/product": ["A focused review package", "The application enforces."],
+  "/": ["Autonomy needs", "Trust infrastructure for autonomous systems", "Govern", "Purchasing agent", "glass-wafer-alpha.png"],
+  "/product": ["The trust layer", "Start with a clear mandate.", "More than an activity log."],
   "/in-action": ["Path A / Accepted", "Path B / More evidence", "Path C / Rejected", "The evidence cannot be retrieved.", "Not granted by this review"],
-  "/use-cases": ["Path C / Rejected", "product story, not a live customer result"],
+  "/use-cases": ["Path C / Rejected", "illustrative example, not a live customer result"],
   "/vision": ["More freedom to act.", "First focus", "Longer-term ambition", "emergency stops"],
   "/technology": ["Six checks"],
   "/technical": ["Six checks"],
   "/developers": ["0.4.0-alpha", "Commit the bytes", "No hidden trust leap."],
-  "/safety": ["When AI acts, keep the controls around it checkable.", "Prevent and contain", "Planned testnet work, not a live safety service."],
+  "/safety": ["Keep the controls around AI work clear.", "Prevent and contain", "Planned testnet work, not a live safety service."],
   "/whitepaper": ["working edition", "A record, not a verdict", "0.4.0-alpha"],
   "/status": ["Project status", "source snapshot", "GPU-miner development profile"],
 };
