@@ -25,6 +25,7 @@ const origin = process.argv[2] || "http://localhost:3000";
 const expectations = {
   "/": ["Autonomy needs", "Trust infrastructure for autonomous systems", "Govern", "Purchasing agent", "glass-wafer-alpha.png"],
   "/product": ["The trust layer", "Start with a clear mandate.", "More than an activity log."],
+  "/products": ["Products / indicative planning", "Design partner pilot", "No public sale. No token pricing. No current production offer."],
   "/in-action": ["Path A / Accepted", "Path B / More evidence", "Path C / Rejected", "The evidence cannot be retrieved.", "Not granted by this review"],
   "/use-cases": ["Path C / Rejected", "illustrative example, not a live customer result"],
   "/vision": ["More freedom to act.", "First focus", "Longer-term ambition", "emergency stops"],
