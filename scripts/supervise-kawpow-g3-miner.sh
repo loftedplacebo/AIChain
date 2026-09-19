@@ -89,7 +89,12 @@ last_head_progress_at="$(date +%s)"
 start_miner
 
 while sleep 0.25; do
-  current_height="$(height)"
+  # A rolling node restart temporarily removes IPC. Do not let errexit kill
+  # the supervisor (and its GPU child) while the node is coming back.
+  if ! current_height="$(height)"; then
+    sleep 1
+    continue
+  fi
   [[ "$current_height" =~ ^[0-9]+$ ]] || continue
   if (( current_height > last_height )); then
     printf '{"timestamp":%s,"event":"height-advanced","from":%s,"to":%s}\n' \
@@ -101,7 +106,7 @@ while sleep 0.25; do
   elif (( $(date +%s) - last_head_progress_at >= max_head_stall_seconds )); then
     # This does not restart the node or modify consensus state. It makes a
     # stalled head explicit and forces a fresh miner connection/template.
-    peers="$(peer_count)"
+    peers="$(peer_count)" || peers=null
     [[ "$peers" =~ ^[0-9]+$ ]] || peers=null
     printf '{"timestamp":%s,"event":"head-stalled","height":%s,"maxHeadStallSeconds":%s,"peerCount":%s}\n' \
       "$(date +%s)" "$current_height" "$max_head_stall_seconds" "$peers" >>"$events"
