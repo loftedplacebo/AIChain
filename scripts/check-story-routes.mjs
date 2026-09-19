@@ -30,9 +30,9 @@ const expectations = {
   "/vision": ["More freedom to act.", "First focus", "Longer-term ambition", "emergency stops"],
   "/technology": ["Six checks"],
   "/technical": ["Six checks"],
-  "/developers": ["0.4.0-alpha"],
-  "/whitepaper": ["full whitepaper is being developed"],
-  "/status": ["Project status"],
+  "/developers": ["0.4.0-alpha", "Commit the bytes", "No hidden trust leap."],
+  "/whitepaper": ["working edition", "A record, not a verdict", "0.4.0-alpha"],
+  "/status": ["Project status", "source snapshot", "GPU-miner development profile"],
 };
 
 for (const [route, phrases] of Object.entries(expectations)) {
