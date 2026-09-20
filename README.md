@@ -1,13 +1,19 @@
-# New Dag
+# Orvessian / AIChain verification engineering
+
+## Current launch direction — Base
+
+On 20 September 2026 the founder accepted launching the verification product on Base, with larger/hierarchical receipt batching evaluated before further own-consensus work. Read [ADR-0009](./docs/decisions/0009-base-launch-settlement.md) and the [Base transition audit and B0–B6 roadmap](./docs/base-transition-audit-and-roadmap.md) first.
+
+Reuse the contracts, SDKs, profiles, audit tools and selected proof path here. The own-PoW node/miner material below is historical research and development evidence, not the launch critical path. The separately versioned website stays in place. No Base production deployment is implied.
 
 ## Commercial product strategy review
 
 The proposed SDK/API, evidence-platform and business roadmap is linked from the
 [commercialisation review handoff](./docs/commercialisation-review-handoff.md).
-It supplements the existing engineering gates and preserves current protocol
-interfaces; roadmap review remains pending before large-scale implementation.
+It provides the business context. ADR-0009 and the Base transition roadmap now
+own launch sequencing; historical receipt semantics and experiment records remain preserved.
 
-New Dag is an independent EVM-compatible Proof-of-Work L1 whose core product is the AI Verification Receipt layer. The product direction is a neutral verification and audit layer for autonomous AI, with a long-term ambition to serve as a trust layer for autonomous machines.
+The project originated as an independent EVM-compatible Proof-of-Work L1. Its current product is a verification and audit layer for selected AI activity, with Base as the accepted launch settlement destination.
 
 ## Verification receipt developers
 

@@ -1,5 +1,11 @@
 # Development Plan
 
+## Current launch plan — 20 September 2026
+
+[ADR-0009](decisions/0009-base-launch-settlement.md) accepts Base as the product launch destination. The [Base transition audit and B0–B6 roadmap](base-transition-audit-and-roadmap.md) supersedes the own-L1 launch objective and forward delivery dependencies below. Larger flat batches are evaluated before hierarchy; new mining development is off the launch critical path. Wallet setup follows the audit, and the existing website remains in place.
+
+The original phases, acceptance criteria and evidence below are retained as the historical own-chain programme. They are not proof of Base readiness and are not required to launch the Base verification product. No historical gate has been relabelled as passed.
+
 | Field | Value |
 |---|---|
 | Status | Living delivery plan |
@@ -392,6 +398,7 @@ This is a development-validation milestone, not a final AVR protocol release. **
 | 0.14 | 2026-08-29 | Recorded SP1/RISC Zero native security and EVM verifier interoperability, while leaving repeated benchmarks and ZK-002–004 open | [Phase 2C EVM Verifier Evidence](./phase-2c-evm-verifier-evidence.md) |
 | 0.15 | 2026-09-06 | Recorded repeated benchmark evidence and accepted RISC Zero as the initial ZK-001 proof stack | [ADR-0006](./decisions/0006-risc-zero-initial-proof-stack-selection.md) |
 | 0.20 | 2026-09-19 | Retained independent NVIDIA/CUDA multi-miner testing as a Phase 4 gate and deferred AMD/OpenCL compatibility to a separately funded post-mainnet milestone | [Next Development Phases](./next-development-phases.md) |
+| 0.21 | 2026-09-20 | Completed a bounded three-NVIDIA-miner / one-CPU-validator private-relay rehearsal; recorded installer, independent-validation and initial-difficulty limitations without closing Phase 4 | [Cross-region three-miner rehearsal](./phase-4-cross-region-three-miner-rehearsal.md) |
 | 0.16 | 2026-09-06 | Defined alpha individual-proof batching and deferred recursive aggregation | [ADR-0007](./decisions/0007-zk-003-individual-proof-batches.md) |
 | 0.17 | 2026-09-06 | Defined alpha RISC Zero verifier lifecycle, limits, and governance controls | [ADR-0008](./decisions/0008-zk-004-verifier-governance-and-limits.md) |
 | 0.19 | 2026-09-14 | Reconciled the plan with completed Phase 3 sign-off and made Phase 4 closed-testnet hardening the active phase | [Phase 3 Sign-off Tracker](./phase3-signoff-tracker.md) |

@@ -184,6 +184,14 @@ It produces useful synchronization, recovery, AVR/proof and monitoring evidence
 without misrepresenting the result as closure of the full hardware-diversity
 gate.
 
+## Cross-region three-miner rehearsal
+
+The subsequent bounded three-NVIDIA-miner / one-CPU-validator rehearsal is
+recorded in [Cross-region three-miner rehearsal](phase-4-cross-region-three-miner-rehearsal.md).
+It establishes pinned installer interoperability and private relay operation;
+it does not satisfy the independent-operator, two-validator, sustained-capacity
+or final difficulty-calibration gates in this document.
+
 ## Miner packaging increment
 
 The miner packaging/licensing boundary is defined in
