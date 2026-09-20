@@ -20,6 +20,18 @@ if [[ ! -d "$data_dir/geth/chaindata" ]]; then
   "$geth_binary" --datadir "$data_dir" init "$genesis"
 fi
 
+# Core-Geth configures the P2P bind host through the Node.P2P TOML section
+# (rather than a --listenaddr CLI flag).  Keep disposable-node P2P private:
+# remote peers must arrive through an explicitly configured loopback relay.
+p2p_config="$data_dir/aichain-private-p2p.toml"
+cat > "$p2p_config" <<EOF
+[Node.P2P]
+ListenAddr = "127.0.0.1:$p2p_port"
+NoDiscovery = true
+MaxPeers = 8
+EOF
+chmod 600 "$p2p_config"
+
 http_apis="eth,net,web3"
 declare -a role_args=()
 if [[ "$role" == mining ]]; then
@@ -31,11 +43,12 @@ fi
 network_id=$((2026082700 + target))
 echo "Starting isolated AIChain ASERT-v1 ${target}s $role node: RPC 127.0.0.1:$rpc_port, P2P 127.0.0.1:$p2p_port"
 exec "$geth_binary" \
+  --config "$p2p_config" \
   --datadir "$data_dir" \
   --aichain.kawpowdev \
   --aichain.kawpowdev.asert-target "$target" \
   --networkid "$network_id" \
-  --nodiscover --maxpeers 8 --nat none --port "$p2p_port" \
+  --nodiscover --maxpeers 8 --nat none \
   --http --http.addr 127.0.0.1 --http.port "$rpc_port" \
   --http.api "$http_apis" --http.vhosts localhost \
   --authrpc.addr 127.0.0.1 --authrpc.port "$((rpc_port + 1000))" \
