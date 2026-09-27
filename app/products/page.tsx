@@ -1,19 +1,24 @@
-import { Footer, PageHeader } from "../components";
+import { Footer, PageHeader } from '../components';
+import PricingPreview from './governance-preview/pricing-preview';
 
-const offers = [
-  { name: "Evaluate", price: "Pricing under development", timing: "Proposed · development workspace", summary: "Validate governance reporting for one AI workflow with structured events and a clear capture boundary.", details: ["Structured event API", "Model and outcome reports", "Portable governance records"] },
-  { name: "Operate", price: "Monthly or annual concept", timing: "Proposed · allowance plus consumption", summary: "Give a team one place to understand model changes, review policy results and investigate exceptions.", details: ["Projects and deployment comparisons", "Incident records and governance trends", "Usage budgets and reporting"] },
-  { name: "Enterprise", price: "Scope and price to be agreed", timing: "Proposed · organisation requirements", summary: "Coordinate governance across a wider estate of agents, models and machines.", details: ["Organisation access and integrations", "Domain-specific governance profiles", "Agreed data residency and support"] },
-];
-
-export const metadata = { title: "Products | Orvessian", description: "Indicative product planning for Orvessian trust infrastructure.", openGraph: { images: [] }, twitter: { images: [] } };
+export const metadata = {
+  title: 'Plans | Orvessian',
+  description: 'Compare Evaluate, Operate and Enterprise: a synthetic demo today and proposed governance workspace plans.',
+  openGraph: { images: [] }, twitter: { images: [] },
+};
 
 export default function Products() {
-  return <main><PageHeader label="Products / indicative planning" title="Trust products for AI that acts."><p>Orvessian is being designed for organisations that need AI to move forward without losing sight of what happened. The workspace has a synthetic testnet implementation. The plans below are packaging concepts, not a current paid offer.</p></PageHeader>
-    <section className="commercial-intro"><div><p className="eyebrow">Proposed commercial model</p><h2>A governance workspace.<br /><em>Measurable consumption.</em></h2></div><div><p>The current proposal combines a monthly or annual workspace subscription with an included event allowance and transparent additional usage. Prices and allowances will follow measured costs and customer requirements.</p><p>The testnet relayer already sponsors batch submissions. The commercial design keeps gas within the managed service: customers do not need a wallet, ETH or a platform token.</p><a className="button primary" href="/portal">Explore the governance preview →</a><p><a className="arrow-link" href="/products/governance-preview">Compare the proposed plans →</a></p></div></section>
-    <section className="product-offers" aria-labelledby="offers-heading"><div className="offer-heading"><p className="eyebrow">The planned offers</p><h2 id="offers-heading">Start with the work that matters.</h2><p>Each offer is designed around a different point of entry. Availability, scope and price will be confirmed only after the relevant testnet gates are met.</p></div><div className="offer-grid">{offers.map((offer, index) => <article key={offer.name}><p className="offer-number">0{index + 1}</p><h3>{offer.name}</h3><p className="offer-price">{offer.price}</p><p className="offer-timing">{offer.timing}</p><p className="offer-summary">{offer.summary}</p><ul>{offer.details.map(detail => <li key={detail}>{detail}</li>)}</ul></article>)}</div></section>
-    <section className="commercial-boundary"><div><p className="eyebrow">Commercial planning</p><h2>Commercial clarity before commercial access.</h2></div><div className="commercial-boundary-list"><article><h3>Proposed usage measure</h3><p>One durably accepted governance event. A model run can generate several records. Identical retries should not increase accepted-event usage.</p></article><article><h3>Customer-held source content</h3><p>Only bounded structured governance records are submitted. Conversations, documents and raw sensor data remain with the customer.</p></article><article><h3>Preview status</h3><p>No checkout, active subscription or production offer. Allowances, overage policy and service levels remain undecided.</p></article></div></section>
-    <section className="pricing-gates"><div><p className="eyebrow">Before commercial release</p><h2>What we still need to prove.</h2><p>Prices and allowances are undecided. They must reflect customer value and measured service costs.</p></div><ol><li><span>01</span><div><h3>Real cost per record</h3><p>Measure batching, durable evidence, indexing and support—not just a single transaction.</p></div></li><li><span>02</span><div><h3>Useful service levels</h3><p>Set honest limits for confirmation, recovery and review based on multi-host testnet evidence.</p></div></li><li><span>03</span><div><h3>Customer value</h3><p>Validate that the record reduces review effort and makes exceptions easier to explain.</p></div></li><li><span>04</span><div><h3>Managed access policy</h3><p>Validate quotas, retry accounting, abuse controls and public onboarding before paid access.</p></div></li></ol></section>
-    <section className="products-next"><p className="eyebrow">The underlying product</p><h2>A product layer around an independent record.</h2><p>The commercial offers sit above the trust layer. They do not replace an organisation’s agent runtime, real-time controls or human judgement.</p><a className="arrow-link" href="/product">Understand the trust layer <span>→</span></a></section><Footer />
+  return <main>
+    <PageHeader label="Plans · preview" title="Governance that grows with your team.">
+      <p>Understand agent activity, review outcomes and investigate decisions with independently checkable evidence. Start with the synthetic demo and explore the proposed plans.</p>
+    </PageHeader>
+    <PricingPreview />
+    <section className="products-next">
+      <p className="eyebrow">The underlying product</p>
+      <h2>A shared account of your AI operations.</h2>
+      <p>The workspace brings selected structured decisions and outcomes into a review workflow. Agent execution and real-time controls stay with your existing systems.</p>
+      <a className="arrow-link" href="/product">Explore the platform <span aria-hidden="true">→</span></a>
+    </section>
+    <Footer />
   </main>;
 }

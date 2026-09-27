@@ -45,11 +45,17 @@ test("rejects malformed transaction hashes before contacting the RPC", async () 
   assert.match((await response.json()).error, /valid 32-byte transaction hash/);
 });
 
-test("governance portal renders labelled demo controls and product preview discloses undecided pricing", async () => {
+test("governance portal renders labelled demo controls and plans disclose indicative pricing", async () => {
   const portal=await request('/portal');assert.equal(portal.status,200);const html=await portal.text();
   assert.match(html,/Interactive product preview/);assert.match(html,/All activity is synthetic/);assert.match(html,/Model deployment/);assert.match(html,/Reports/);
   const pricing=await request('/products/governance-preview');assert.equal(pricing.status,200);const offer=await pricing.text();
-  assert.match(offer,/Pricing to be determined/);assert.match(offer,/Monthly/);assert.match(offer,/Annual/);assert.match(offer,/No token purchase or wallet/);
+  assert.match(offer,/Indicative launch pricing/);assert.match(offer,/£99 \/ month/);assert.match(offer,/£990 billed annually/);assert.match(offer,/From £999 \/ month/);assert.match(offer,/No token purchase or wallet/);
+  assert.match(offer,/Paid plans, public API onboarding and production service are not available yet/);
+  assert.match(offer,/Compare scope and availability/);
+  assert.match(offer,/href="\/portal"/);assert.match(offer,/href="\/product"/);assert.match(offer,/href="\/status"/);
+  const products=await request('/products');assert.equal(products.status,200);const plans=await products.text();
+  for(const tier of ['Evaluate','Operate','Enterprise']) assert.ok(plans.includes(tier));
+  assert.match(plans,/Indicative launch pricing/);assert.match(plans,/100,000 events per month/);assert.match(plans,/£10 per additional 10,000 events/);
 });
 
 test('demo exports are labelled synthetic, downloadable and use the selected cohort',async()=>{
