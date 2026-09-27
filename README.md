@@ -1,3 +1,15 @@
+# Orvessian website and governance platform
+
+Current review: 27 September 2026. Read [platform baseline](../docs/platform-architecture.md) for implemented, testnet and planned capabilities. `/portal` is a generated synthetic demo; `/workspace` is authenticated and currently connects the local website through SSH to the VPS API; `/explorer` inspects public anchors. `/products/governance-preview` is proposed packaging, not a paid offer.
+
+The local tunnel is 8794 → VPS loopback 8795. API credentials stay server-side; synthetic login details are in the ignored engineering build directory. Public production hosting, SSO, customer onboarding and pricing remain gated. Source edits do not publish the website.
+
+## Documentation
+
+[Seven active guides](../docs/README.md) own current strategy, delivery and operations. See [website messaging](../docs/website-messaging.md), [commercial model](../docs/commercial-model.md) and [historical website planning](docs/archive/README.md).
+
+## Existing development and component notes
+
 # vinext-starter
 
 A clean full-stack starter running on
@@ -26,6 +38,35 @@ This starter does not use `wrangler.jsonc`.
 - `db/schema.ts` starts intentionally empty
 - `examples/d1/` contains an optional D1 example surface
 - `drizzle.config.ts` supports local migration generation when needed
+
+## Orvessian Base Sepolia explorer alpha
+
+The `/explorer` route is a read-only product preview. It reads chain 84532
+through `/api/explorer`, which only permits recent anchor-event scans and
+transaction-hash verification against the deployed `ReceiptBatchAnchor`
+contract. The default RPC is `https://sepolia.base.org`; deployments may set
+`BASE_SEPOLIA_RPC_URL` and `BASE_SEPOLIA_RPC_FALLBACK_URL` to HTTPS Base
+Sepolia endpoints. The route tries the configured endpoints sequentially with
+a bounded timeout and verifies chain ID 84532 before trusting the response.
+The default secondary endpoint is `https://base-sepolia-rpc.publicnode.com`.
+These shared public RPC endpoints are rate limited and intended for testing;
+use a dedicated provider for production workloads. Keep this testnet-only
+route bound to Base Sepolia RPC URLs; it rejects a wrong chain ID.
+
+The public RPC limits `eth_getLogs` to a 1,000-block range, so the current
+activity table is intentionally short. Transaction-hash verification can read
+an older event directly. Receipt-level Merkle membership still requires the
+off-chain batch manifest, which the browser accepts for local verification;
+the explorer does not show private evidence.
+
+After verifying an anchor transaction, the page also lets a user select its
+AVR batch manifest JSON and check one receipt ID locally. The browser caps the
+file at 2 MB and manifests at 10,000 receipt IDs, recomputes the Ethereum
+Keccak Merkle root and membership proof, then compares batch ID, root,
+publisher, leaf count and schema version with the verified Base Sepolia event.
+The manifest is read in the browser and is not uploaded to `/api/explorer`.
+This alpha check proves identifier membership only; it does not validate the
+receipt body, evidence provenance, model behavior or safety.
 
 ## Workspace Auth Headers
 

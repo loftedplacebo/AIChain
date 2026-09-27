@@ -1,16 +1,18 @@
 # Orvessian brand platform
 
+> Historical archive — 27 September 2026. Retained for its original scope, not current launch guidance. See the [active documentation](C:/AIChain/docs/README.md).
+
 ## The category
 
-Orvessian is independent trust infrastructure for autonomous systems.
+Orvessian is an AI governance workspace backed by independently checkable evidence.
 
-It is not an agent runtime, a real-time safety controller, or a promise that an AI outcome is correct. It provides a durable, impartial record around consequential autonomous work: the authority to act, the controls that observed it, and the decisions that followed.
+It is not an agent runtime, a real-time safety controller, or a promise that an AI outcome is correct. It provides a reviewable record of selected consequential autonomous work: the authority to act, the controls that observed it, and the decisions that followed.
 
 ## The core message
 
 **Autonomy needs a trusted record.**
 
-When AI takes action, organisations need to know what it was allowed to do, what happened, and what people did when something changed. Orvessian creates an independent history of authority, action and intervention.
+When AI takes action, organisations need to know what it was allowed to do, what happened, and what people did when something changed. Orvessian connects submitted context, actions and interventions to signed records and a shared Base anchor; it does not establish complete or truthful source capture.
 
 ## The product story
 
@@ -30,7 +32,7 @@ These are illustrative product scenarios. They do not claim that Orvessian is cu
 
 ## Language guide
 
-Lead with **trusted record**, **authority**, **controls**, **intervention**, **review** and **accountability**.
+Lead with **governance workspace**, **decisions**, **outcomes**, **review** and **accountability**. Explain reporting and investigation before cryptographic details. Label planned rules, alerting and live inventory as future capabilities.
 
 Use **verification receipts**, **commitments**, **signatures**, **profiles** and **anchoring** on technical and developer pages, with their stated limits.
 

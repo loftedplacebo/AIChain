@@ -1,5 +1,7 @@
 # Homepage film storyboard
 
+> Historical archive — 27 September 2026. Retained for its original scope, not current launch guidance. See the [active documentation](C:/AIChain/docs/README.md).
+
 ## Concept
 
 **One action. Different views. One trusted record.**

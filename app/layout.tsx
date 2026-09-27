@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-export const metadata: Metadata = { metadataBase: new URL("https://orvessian.mjgrant.chatgpt.site"), title: "Orvessian | Trust infrastructure for autonomous systems.", description: "An independent record of authority, control events and decisions around autonomous work.", openGraph: { title: "Orvessian | Trust infrastructure for autonomous systems.", description: "An independent record of authority, control events and decisions around autonomous work.", images: [{ url: "/og.png", width: 1728, height: 941, alt: "Orvessian — Trust infrastructure for autonomous systems." }] }, twitter: { card: "summary_large_image", images: ["/og.png"] } };
+import "./platform-marketing.css";
+export const metadata: Metadata = { metadataBase: new URL("https://orvessian.mjgrant.chatgpt.site"), title: "Orvessian | AI governance and verification", description: "A governance workspace for AI activity, outcomes and independently checkable evidence.", openGraph: { title: "Orvessian | AI governance and verification", description: "A governance workspace for AI activity, outcomes and independently checkable evidence.", images: [] }, twitter: { card: "summary", images: [] } };
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) { return <html lang="en"><body>{children}</body></html>; }
