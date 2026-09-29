@@ -1,0 +1,14 @@
+/* Scoped to customer Settings and API keys; survive the site's base form reset. */
+.gp-customer-controls form{max-width:720px;margin:24px 0;padding:22px;background:#f7faf9;border:1px solid #d8e2e2;border-radius:10px}
+.gp-customer-controls h3{font-size:17px;font-weight:600;margin:22px 0 12px}
+.gp-customer-controls form h3{margin-top:0}
+.gp-customer-controls fieldset{display:grid;gap:16px;border:0;padding:0;margin:0;min-width:0}
+.gp-customer-controls label{display:grid;gap:8px;font-size:13px;line-height:1.5;color:#294857;min-width:0}
+.gp-customer-controls input,.gp-customer-controls select{display:block;width:100%;min-width:0;min-height:44px;padding:10px 12px;background:#fff;color:#183345;border:1px solid #b8c9d0;border-radius:6px}
+.gp-customer-controls input[readonly]{font-family:monospace;font-size:12px}
+.gp-customer-controls fieldset button{width:fit-content;max-width:100%;min-height:44px;white-space:normal}
+.gp-customer-controls fieldset:disabled{opacity:.65}
+.gp-customer-controls fieldset:disabled button{cursor:wait}
+.gp-customer-controls .gp-key-filter{max-width:320px;margin:20px 0}
+.gp-key-pagination{margin:18px 0}.gp-key-pagination button{min-height:44px}
+@media(max-width:600px){.gp-customer-controls form{padding:16px}.gp-customer-controls fieldset button{width:100%}}

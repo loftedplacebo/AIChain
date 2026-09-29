@@ -1,0 +1,57 @@
+'use client';
+import {useEffect,useRef,useState} from 'react';
+import {readWorkspaceResponse,mutationErrorMessage} from '../../lib/workspace-response.js';
+import {customerActionNotice} from '../../lib/customer-action-notice.js';
+export type CustomerProject={id:string;name:string;workspaceId?:string;role?:string;canManageMembers?:boolean};
+type Member={id:string;email:string;role:string};
+type Invitation={id:string;email:string;role:string;expiresAt:number;revokedAt:number|null;acceptedBy:string|null};
+type Props={projects:CustomerProject[];selected:string;revision:number;onChanged:(projectId?:string)=>Promise<void>;onReauthenticationRequired?:()=>void};
+export default function CustomerSettings({projects,selected,revision,onChanged,onReauthenticationRequired}:Props){
+ const project=projects.find(p=>p.id===selected),organization=project?.workspaceId||'',admin=!!project?.canManageMembers,owner=project?.role==='owner';
+ const [members,setMembers]=useState<Member[]|null>(null),[invitations,setInvitations]=useState<Invitation[]|null>(null),[error,setError]=useState(''),[notice,setNotice]=useState(''),[busy,setBusy]=useState(false),[secret,setSecret]=useState(''),[edit,setEdit]=useState<Member|null>(null);
+ const alive=useRef(true),pending=useRef(false),controller=useRef<AbortController|null>(null),attempt=useRef<{signature:string;id:string}|null>(null);
+ const [invitationState,setInvitationState]=useState('pending'),[invitationOffset,setInvitationOffset]=useState(0),[invitationTotal,setInvitationTotal]=useState(0),[invitationNext,setInvitationNext]=useState<number|null>(null);
+ useEffect(()=>{alive.current=true;return()=>{alive.current=false;controller.current?.abort();};},[]);
+ useEffect(()=>{if(!secret)return;const timer=setTimeout(()=>setSecret(''),300000),hidden=()=>{if(document.visibilityState==='hidden')setSecret('');};document.addEventListener('visibilitychange',hidden);return()=>{clearTimeout(timer);document.removeEventListener('visibilitychange',hidden);};},[secret]);
+ async function request(action:string,input?:Record<string,unknown>,signal?:AbortSignal){
+  const response=await fetch('/api/workspace?'+new URLSearchParams({action,organization,...(action==='invitations'?{state:invitationState,offset:String(invitationOffset),limit:'50'}:{})}),{cache:'no-store',signal,...(input?{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(input)}:{})});
+  return readWorkspaceResponse(response,{signal,onReauthenticationRequired:()=>{if(alive.current){setSecret('');onReauthenticationRequired?.();}}});
+ }
+ async function reload(signal?:AbortSignal){if(!admin||!organization)return;const [m,i]=await Promise.allSettled([request('members',undefined,signal),request('invitations',undefined,signal)]);if(!alive.current||signal?.aborted)return;
+  if(m.status==='fulfilled')setMembers(m.value.members);
+  if(i.status==='fulfilled'){setInvitations(i.value.invitations);setInvitationTotal(i.value.total);setInvitationNext(i.value.nextOffset);}
+  if(m.status==='rejected')throw m.reason;if(i.status==='rejected')throw i.reason;
+ }
+ useEffect(()=>{setSecret('');setEdit(null);setNotice('');},[organization,admin]);
+ useEffect(()=>{setMembers(null);setInvitations(null);setError('');const abort=new AbortController();reload(abort.signal).catch(e=>{if(!abort.signal.aborted)setError(e.message);});return()=>abort.abort();},[organization,admin,revision,invitationState,invitationOffset]);
+ async function save(action:string,input:Record<string,unknown>,form?:HTMLFormElement){
+  if(pending.current)return;pending.current=true;setBusy(true);setError('');setNotice('');setSecret('');
+  const signature=JSON.stringify({action,organization,input});if(attempt.current?.signature!==signature)attempt.current={signature,id:crypto.randomUUID()};
+  const abort=new AbortController();controller.current=abort;
+  try{
+   const result=await request(action,{...input,actionId:attempt.current.id},abort.signal);if(!alive.current)return;
+   attempt.current=null;form?.reset();setEdit(null);
+   if(result.secret)setSecret(result.secret);
+   setNotice(customerActionNotice(action,result));
+   try{await onChanged(result.projectId);if(alive.current)await reload(abort.signal);}catch{if(alive.current&&!abort.signal.aborted)setError('Change saved, but settings could not refresh. Use Refresh before making another change.');}
+  }catch(e){if(alive.current&&!abort.signal.aborted)setError(mutationErrorMessage(e,' Retry the same form to check the original operation.'));}
+  finally{pending.current=false;if(alive.current)setBusy(false);}
+ }
+ function submit(action:string,fields:string[]){return (event:React.FormEvent<HTMLFormElement>)=>{event.preventDefault();const form=event.currentTarget,data=new FormData(form),input:Record<string,unknown>={};for(const field of fields)input[field]=String(data.get(field)||'');void save(action,input,form);};}
+ return <section className="gp-panel gp-customer-controls"><h2>Workspace settings</h2><p>Workspaces group projects and members. Each project has separate API keys and governance records. Members currently have access to all projects in their workspace.</p>
+ {error&&<p role="alert" className="gp-alert">{error}</p>}{notice&&<p role="status">{notice}</p>}
+ {!projects.length&&<section><h3>Welcome to Orvessian</h3><p>Create your first workspace and project, generate an API key, then connect your agent or application. Your source conversations and documents stay in your systems.</p></section>}
+ <form onSubmit={submit('workspace-create',['name','projectName'])}><h3>Create a workspace</h3><fieldset disabled={busy}><label>Workspace name<input name="name" required maxLength={100}/></label><label>First project name<input name="projectName" required maxLength={100}/></label><button className="gp-primary">Create workspace and project</button></fieldset></form>
+ <form onSubmit={submit('invitation-accept',['secret'])}><h3>Join an existing workspace</h3><p>Paste the invitation token shared by its administrator. You must sign in with the verified email address they invited.</p><fieldset disabled={busy}><label>Invitation token<input name="secret" type="password" required maxLength={68} autoComplete="off" spellCheck={false}/></label><button>Accept invitation</button></fieldset></form>
+ {project&&<section><h3>Current project</h3><p>{project.name}</p><dl><dt>Workspace reference</dt><dd>{organization}</dd><dt>Project reference</dt><dd>{project.id}</dd><dt>Your role</dt><dd>{project.role}</dd></dl><p>Use these references in SDK submissions. After creating a key, follow the <a href="/developers">integration guide</a> and inspect your first record under Decisions.</p></section>}
+ {project&&!admin&&<p>An owner or workspace administrator manages projects and invitations. Only an owner changes existing member roles.</p>}
+ {admin&&<>
+ <form onSubmit={submit('project-create',['name'])}><h3>Add a project</h3><fieldset disabled={busy}><label>Project name<input name="name" required maxLength={100}/></label><button>Create project</button></fieldset></form>
+ <h3>Members</h3>{!members?error?<p>Member list unavailable. Use Refresh to try again.</p>:<p role="status">Loading members…</p>:<div className="gp-table-wrap"><table><thead><tr><th>Member</th><th>Role</th><th>Actions</th></tr></thead><tbody>{members.map(m=><tr key={m.id}><td>{m.email}</td><td>{m.role}</td><td>{owner?<button disabled={busy} onClick={()=>setEdit(m)}>Change access</button>:'Owner manages access'}</td></tr>)}</tbody></table></div>}
+ {owner&&edit&&<form key={edit.id} onSubmit={event=>{event.preventDefault();const role=String(new FormData(event.currentTarget).get('role'));void save('member-change',{userId:edit.id,role:role==='remove'?null:role});}}><h4>Change access for {edit.email}</h4><p>Changes apply to every project in this workspace on the next request. A workspace must keep at least one owner.</p><fieldset disabled={busy}><label>Role<select name="role" defaultValue={edit.role}>{['owner','workspace-admin','governance-admin','reviewer','reader'].map(role=><option key={role} value={role}>{role}</option>)}<option value="remove">Remove from workspace</option></select></label><button>Confirm access change</button><button type="button" onClick={()=>setEdit(null)}>Cancel</button></fieldset></form>}
+ <form onSubmit={submit('invitation-create',['email','role'])}><h3>Invite a member</h3><p>Invitations expire after seven days. This creates a token for you to share; it does not send an email. Owner grants require an existing owner's explicit role change.</p><fieldset disabled={busy}><label>Email<input name="email" type="email" maxLength={254} required/></label><label>Role<select name="role" defaultValue="reader"><option value="reader">Read-only</option><option value="reviewer">Reviewer</option><option value="governance-admin">Governance administrator</option>{owner&&<option value="workspace-admin">Workspace administrator</option>}</select></label><button>Create invitation</button></fieldset></form>
+ {secret&&<section className="gp-alert"><h3>Copy the invitation token now</h3><p>It is shown once and hidden when you leave, hide this page or after five minutes. Share it only with the invited person through a secure channel.</p><label>Invitation token<input value={secret} readOnly autoComplete="off" spellCheck={false}/></label><button onClick={async()=>{try{await navigator.clipboard.writeText(secret);if(alive.current)setNotice('Invitation token copied.');}catch{if(alive.current)setError('Copy unavailable. Select the token and copy it manually.');}}}>Copy invitation token</button> <button onClick={()=>setSecret('')}>Hide token</button></section>}
+ <h3>Invitations</h3><label>Invitation status<select value={invitationState} disabled={busy} onChange={event=>{setInvitationState(event.target.value);setInvitationOffset(0);}}><option value="pending">Pending</option><option value="all">All history</option><option value="accepted">Accepted</option><option value="expired">Expired</option><option value="revoked">Revoked</option></select></label>{!invitations?error?<p>Invitation list unavailable. Use Refresh to try again.</p>:<p role="status">Loading invitations…</p>:!invitations.length?<p>No invitations match this filter.</p>:<div className="gp-table-wrap"><table><thead><tr><th>Email</th><th>Role</th><th>Status</th><th>Action</th></tr></thead><tbody>{invitations.map(i=><tr key={i.id}><td>{i.email}</td><td>{i.role}</td><td>{i.revokedAt!==null?'Revoked':i.acceptedBy?'Accepted':i.expiresAt<=Date.now()?'Expired':'Pending'}<small>Expires {new Date(i.expiresAt).toISOString()}</small></td><td>{!i.acceptedBy&&i.revokedAt===null&&i.expiresAt>Date.now()&&(owner||i.role!=='workspace-admin')&&<button disabled={busy} onClick={()=>void save('invitation-revoke',{invitationId:i.id})}>Revoke invitation now</button>}</td></tr>)}</tbody></table><p>Revoking an accepted invitation does not remove membership; use Change access.</p></div>}{invitations&&<div className="gp-key-pagination"><p>{invitations.length?invitationOffset+1:0}–{invitations.length?invitationOffset+invitations.length:0} of {invitationTotal} matching invitations · Newest first · Lists may change as invitations expire or are managed.</p><button disabled={busy||invitationOffset===0} onClick={()=>setInvitationOffset(Math.max(0,invitationOffset-50))}>Previous invitations</button> <button disabled={busy||invitationNext===null} onClick={()=>invitationNext!==null&&setInvitationOffset(invitationNext)}>Next invitations</button></div>}
+ </>}
+ </section>;
+}

@@ -1,0 +1,43 @@
+'use client';
+import {useEffect,useRef,useState} from 'react';
+import {readWorkspaceResponse,mutationErrorMessage} from '../../lib/workspace-response.js';
+import FirstSubmission from './first-submission';
+type KeyInfo={id:string;label:string;scopes:string[];createdAt:string;expiresAt:string;revokedAt:string|null;lastUsedAt:string|null;status:'active'|'expired'|'revoked'};
+export default function KeysPanel({workspace,tenantRef,revision,canManage,onReauthenticationRequired}:{workspace:string;tenantRef?:string;revision:number;canManage:boolean;onReauthenticationRequired?:()=>void}){
+ const [keys,setKeys]=useState<KeyInfo[]|null>(null),[error,setError]=useState(''),[notice,setNotice]=useState(''),[busy,setBusy]=useState(false),[secret,setSecret]=useState(''),[selected,setSelected]=useState<KeyInfo|null>(null),[operation,setOperation]=useState<'create'|'rotate'|'revoke'>('create');
+ const [state,setState]=useState('active'),[offset,setOffset]=useState(0),[total,setTotal]=useState(0),[nextOffset,setNextOffset]=useState<number|null>(null),[refreshTick,setRefreshTick]=useState(0);
+ const alive=useRef(true),active=useRef<AbortController|null>(null),inFlight=useRef(false),action=useRef<{signature:string;id:string}|null>(null);
+ async function request(name:string,body?:unknown,id?:string,signal?:AbortSignal){
+  const response=await fetch('/api/workspace?'+new URLSearchParams({action:name,workspace,...(id?{id}:{}),...(name==='keys'?{state,offset:String(offset),limit:'50'}:{})}),{method:body?'POST':'GET',headers:body?{'content-type':'application/json'}:undefined,body:body?JSON.stringify(body):undefined,cache:'no-store',signal});
+  return readWorkspaceResponse(response,{signal,onReauthenticationRequired:()=>{if(alive.current){setSecret('');onReauthenticationRequired?.();}}});
+ }
+ useEffect(()=>{alive.current=true;return()=>{alive.current=false;active.current?.abort();};},[]);
+ useEffect(()=>{if(!canManage)return;const controller=new AbortController();setKeys(null);setError('');request('keys',undefined,undefined,controller.signal).then(result=>{if(!controller.signal.aborted){setKeys(result.keys);setTotal(result.total);setNextOffset(result.nextOffset);}}).catch(e=>{if(!controller.signal.aborted)setError(e.message);});return()=>controller.abort();},[workspace,revision,canManage,state,offset,refreshTick]);
+ useEffect(()=>{if(!secret)return;const hide=()=>{if(document.visibilityState==='hidden')setSecret('');};const timer=setTimeout(()=>setSecret(''),300000);document.addEventListener('visibilitychange',hide);return()=>{clearTimeout(timer);document.removeEventListener('visibilitychange',hide);};},[secret]);
+ function choose(key:KeyInfo|null,next:'create'|'rotate'|'revoke'){setSecret('');setSelected(key);setOperation(next);setError('');setNotice('');action.current=null;}
+ async function submit(event:React.FormEvent<HTMLFormElement>){
+  event.preventDefault();if(inFlight.current)return;inFlight.current=true;setBusy(true);setError('');setNotice('');setSecret('');
+  const fields=new FormData(event.currentTarget),payload=operation==='revoke'?{}:{label:String(fields.get('label')||''),scopes:fields.get('access')==='read'?['read']:fields.get('access')==='write'?['write']:['read','write'],expiresInDays:Number(fields.get('days')),...(operation==='rotate'?{graceSeconds:Number(fields.get('grace'))}:{})};
+  const signature=JSON.stringify([workspace,operation,selected?.id,payload]);if(action.current?.signature!==signature)action.current={signature,id:crypto.randomUUID()};
+  const controller=new AbortController();active.current=controller;
+  try{
+   const result=await request('key-'+operation,{...payload,actionId:action.current.id},selected?.id,controller.signal);
+   if(!alive.current)return;action.current=null;
+   if(result.secret){setSecret(result.secret);setNotice('Save this key in your application’s secret manager. You can’t retrieve it again.');}
+   else if(result.secretAvailable===false)setNotice('This request already created key '+result.key.id+'. Its secret cannot be recovered. Revoke it and create another key if you did not save it.');
+   else setNotice('Key revoked. New requests using it will be denied.');
+   setSelected(null);setOperation('create');
+   setOffset(0);setRefreshTick(n=>n+1);
+  }catch(e){if(alive.current&&!controller.signal.aborted)setError(mutationErrorMessage(e,' If the response was lost, retry the same operation; do not assume it failed.'));}
+  finally{inFlight.current=false;if(alive.current)setBusy(false);}
+ }
+ if(!canManage)return <section className="gp-panel"><h2>API keys</h2><p>A workspace administrator manages project credentials.</p></section>;
+ return <section className="gp-panel gp-customer-controls"><h2>Project API keys</h2><p>Credentials belong to the selected workspace’s project. Use a separate key for each application and grant only the access it needs.</p>{error&&<p role="alert">{error}</p>}{notice&&<p role="status">{notice}</p>}
+ {tenantRef&&<FirstSubmission key={workspace} tenantRef={tenantRef} projectRef={workspace}/>}
+ {secret&&<section aria-label="New API key"><label>New key — shown once<input aria-label="New API key secret" value={secret} readOnly autoComplete="off" spellCheck={false}/></label><p>It will be hidden after five minutes, when this page leaves view, or when you dismiss it.</p><button onClick={async()=>{try{await navigator.clipboard.writeText(secret);if(alive.current)setNotice('Key copied. Store it securely.');}catch{if(alive.current)setError('Copy unavailable. Select the key and copy it manually.');}}}>Copy key</button> <button onClick={()=>setSecret('')}>Hide key</button></section>}
+ <label className="gp-key-filter">Key status<select value={state} disabled={busy} onChange={event=>{choose(null,'create');setState(event.target.value);setOffset(0);}}><option value="active">Active</option><option value="all">All history</option><option value="expired">Expired</option><option value="revoked">Revoked</option></select></label>
+ {!keys?error?<p>Key list unavailable. Use Refresh to try again.</p>:<p role="status">Loading API keys…</p>:!keys.length?<p>No keys match this filter. Choose another status or create a key below.</p>:<div className="gp-table-wrap"><table><thead><tr><th>Key</th><th>Access</th><th>Status / expiry</th><th>Last authenticated use</th><th>Actions</th></tr></thead><tbody>{keys.map(key=><tr key={key.id}><td>{key.label}<small>{key.id}</small></td><td>{key.scopes.join(', ')}</td><td>{key.status}<small>{key.expiresAt}</small>{key.status==='active'&&key.revokedAt&&<small>Stops working {key.revokedAt}</small>}</td><td>{key.lastUsedAt||'Not used'}</td><td>{key.status==='active'&&<><button disabled={busy||!!key.revokedAt} onClick={()=>choose(key,'rotate')}>Rotate</button> <button disabled={busy} onClick={()=>choose(key,'revoke')}>Revoke</button></>}</td></tr>)}</tbody></table></div>}
+ {keys&&<div className="gp-key-pagination"><p>{keys.length?offset+1:0}–{keys.length?offset+keys.length:0} of {total} matching keys · Newest first · Lists may change as keys expire or are managed.</p><button disabled={busy||offset===0} onClick={()=>setOffset(Math.max(0,offset-50))}>Previous keys</button> <button disabled={busy||nextOffset===null} onClick={()=>nextOffset!==null&&setOffset(nextOffset)}>Next keys</button></div>}
+ <form key={operation+'-'+(selected?.id||'new')} onSubmit={submit}><h3>{operation==='create'?'Create a key':operation==='rotate'?'Rotate '+selected?.label:'Revoke '+selected?.label}</h3><fieldset disabled={busy}>{operation==='revoke'?<p>This stops new requests using this key immediately. Update applications that still depend on it.</p>:<><label>Label<input name="label" required maxLength={80} defaultValue={selected?.label||''}/></label><label>Access<select name="access" defaultValue={selected?.scopes.length===2?'both':selected?.scopes[0]||'write'}><option value="write">Submit events and register agents</option><option value="read">Read records and evidence</option><option value="both">Read and submit</option></select></label><label>Expires in days<input name="days" type="number" min={1} max={365} defaultValue={90} required/></label>{operation==='rotate'&&<label>Overlap with old key<select name="grace" defaultValue="0"><option value="0">None — revoke old key immediately</option><option value="3600">One hour to update applications</option><option value="86400">24 hours to update applications</option></select></label>}</>}
+ <button className="gp-primary" type="submit">{busy?'Saving…':operation==='create'?'Create API key':operation==='rotate'?'Create replacement key':'Revoke key now'}</button>{selected&&<button type="button" onClick={()=>choose(null,'create')}>Cancel</button>}</fieldset></form></section>;
+}
