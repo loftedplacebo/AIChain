@@ -4,7 +4,7 @@
 
 The SDK/integration pass is complete at local alpha scope; see [the audited SDK plan](sdk-integration-plan.md). The production-foundations/onboarding goal remains **active and incomplete**. Local implementation and synthetic/native validation do not establish hosted readiness. Staging and production startup remain hard-gated. Billing/checkout follows this package; website pricing is indicative.
 
-For first-partner outreach, use the [design-partner pilot brief template](examples/design-partner-pilot-brief-template.md) to scope one workflow, synthetic records, named contacts and measurable acceptance. The owner-only marketing Site was refreshed to version 25 on 29 September. Its server gateways now reject incomplete or malformed hosted portal/API origins before forwarding a session, but the hosted customer workspace still has no API connection. Do not issue partner credentials until the hosted synthetic-data acceptance gate in the brief is met.
+For first-partner outreach, use the [design-partner pilot brief template](examples/design-partner-pilot-brief-template.md) to scope one workflow, synthetic records, named contacts and measurable acceptance. The owner-only marketing Site was refreshed to version 26 on 29 September. Its server gateways now reject incomplete or malformed hosted portal/API origins, including IP literals and local-only names, before forwarding a session. The hosted customer workspace still has no API connection. Do not issue partner credentials until the hosted synthetic-data acceptance gate in the brief is met.
 
 | Requirement | Implemented and evidenced | Required before completion |
 | --- | --- | --- |

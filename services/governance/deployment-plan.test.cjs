@@ -25,6 +25,21 @@ test('portal, API, callback and webhook origins form one exact isolated route pl
  const shared=fixture();shared.environments[3].portal.apiOrigin=shared.environments[2].portal.apiOrigin;assert.equal(validatePlan(shared).valid,false);
  const old=fixture();old.schemaVersion=1;assert.equal(validatePlan(old).valid,false);
 });
+test('an HTTPS synthetic test pilot has hosted isolation and public DNS requirements',()=>{
+ const hosted=fixture(),pilot=hosted.environments[1];
+ pilot.portal={origin:'https://pilot.example.test',apiOrigin:'https://api.pilot.example.test'};
+ pilot.identity.callbackUrl=pilot.portal.origin+'/api/auth/callback';
+ pilot.identity.webhookUrl=pilot.portal.apiOrigin+'/v1/auth/workos-webhook';
+ pilot.database.tls='verify-full';pilot.backup.custody='independent-storage';
+ assert.equal(validatePlan(hosted).valid,true);
+ for(const mutate of [
+  e=>e.portal.apiOrigin='https://127.0.0.2',
+  e=>e.portal.apiOrigin='https://[::1]',
+  e=>e.portal.apiOrigin='https://api.localhost',
+  e=>e.database.tls='local',
+  e=>e.backup.custody='local-synthetic'
+ ]){const plan=structuredClone(hosted);mutate(plan.environments[1]);assert.equal(validatePlan(plan).valid,false);}
+});
 test('unknown fields and inline credential objects are rejected without reflecting values',()=>{
  const plan=fixture();plan.environments[2].secrets.workosApi={value:'private-secret-value'};plan.environments[3].database.password='private-secret-value';const result=validatePlan(plan);assert.equal(result.valid,false);assert.ok(!JSON.stringify(result).includes('private-secret-value'));
  const unknown=fixture();unknown.approved=true;assert.equal(validatePlan(unknown).valid,false);

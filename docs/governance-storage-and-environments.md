@@ -216,8 +216,10 @@ configuration or database changes. A valid result always has `releaseReady:false
 The schema requires dev, test, staging and prod, each with a distinct database,
 provider environment/client, callback/webhook URL, credential references, recording/
 relayer addresses, worker journal and backup destination. API, worker and migration
-roles must differ within a database. Hosted profiles require verified PostgreSQL
-TLS, HTTPS identity endpoints and independent backup storage. Every profile declares
+roles must differ within a database. Staging and production, plus a `test`
+profile using HTTPS portal/API origins for a hosted synthetic pilot, require
+verified PostgreSQL TLS, HTTPS identity endpoints with public DNS names and
+independent backup storage. Every profile declares
 retention and RPO/RTO targets. These are declared constraints: different references
 can still resolve to the same secret, hosts can be aliases, and separate backup
 prefixes may share a failure domain. Independent provisioning review must check
@@ -228,7 +230,7 @@ Schema version 2 adds exact portal and API origins for each environment. The
 callback must be the portal origin plus `/api/auth/callback`; the signed WorkOS
 webhook must be the API origin plus `/v1/auth/workos-webhook`. Origins must be
 distinct across these routes and environments; hosted origins require HTTPS and
-non-loopback hosts. This catches a common Sites-to-VPS miswire before provider
+public DNS names rather than IP literals or local-only names. This catches a common Sites-to-VPS miswire before provider
 registration. Version 1 private plan copies must be updated to version 2 with
 these fields. The check compares declared strings only: it does not prove DNS,
 TLS, reverse-proxy routing, Sites runtime settings or provider registration.
