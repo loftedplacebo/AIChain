@@ -3,15 +3,15 @@ const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),{ran
 const run=require('node:util').promisify(require('node:child_process').execFile);
 const sqlite=require('./recovery.cjs'),files=sqlite.recoveryFiles,pg=require('./postgres-recovery.cjs'),{verify}=require('./postgres-migrate.cjs');
 const {assertOfflineAdministrator}=require('./postgres-offline-administrator.cjs');
+const {databaseOptions,nativeEnv}=require('./postgres-backup-connection.cjs');
 const roles=['worker','rules','indexer','relayer'],ref=v=>typeof v==='string'&&/^[a-z][a-z0-9_]{0,62}$/.test(v);
 function configuration(environment,connection,binaries){
  if(!['dev','test'].includes(environment))throw Error('PostgreSQL backup tooling is limited to dev/test');
- if(!connection||Object.keys(connection).some(k=>!['host','port','database','user','password'].includes(k))||!['127.0.0.1','localhost'].includes(connection.host)||!Number.isInteger(connection.port)||connection.port<1||connection.port>65535||!ref(connection.database)||!ref(connection.user)||typeof connection.password!=='string'||!connection.password)throw Error('Explicit local database connection required');
+ databaseOptions(connection);
  if(typeof binaries!=='string'||!path.isAbsolute(binaries))throw Error('Explicit absolute PostgreSQL binary directory required');
  for(const binary of ['pg_dump','pg_restore'])files.regular(path.join(binaries,binary+(process.platform==='win32'?'.exe':'')));
 }
 function binary(binaries,name){return path.join(binaries,name+(process.platform==='win32'?'.exe':''));}
-function nativeEnv(c){const env={...process.env};for(const name of Object.keys(env))if(name.startsWith('PG'))delete env[name];return {...env,PGHOST:c.host,PGPORT:String(c.port),PGUSER:c.user,PGPASSWORD:c.password,PGDATABASE:c.database,PGCONNECT_TIMEOUT:'5',PGOPTIONS:'-c statement_timeout=120000'};}
 async function native(exe,args,connection){try{await run(exe,args,{env:nativeEnv(connection),windowsHide:true,timeout:120000,maxBuffer:65536});}catch{throw Error('Native PostgreSQL backup/restore failed; destination remains offline');}}
 function marker(directory,name){const file=path.join(directory,name);files.regular(file);if(fs.statSync(file).size>65536)throw Error('Recovery marker too large');return JSON.parse(fs.readFileSync(file,'utf8'));}
 async function sourceCheck(pool,environment){
@@ -24,7 +24,7 @@ async function createBackup({environment,connection,binaries,journals=[],outputR
  configuration(environment,connection,binaries);files.keyCheck(key);
  if(consistency!=='quiesced')throw Error('Stop every API/worker/delivery writer and acknowledge quiesced capture');
  if(!Array.isArray(journals)||journals.some(j=>!roles.includes(j.role))||new Set(journals.map(j=>j.role)).size!==journals.length)throw Error('Only unique explicit worker/rules/indexer/relayer journal roles are allowed');
- const pool=new Pool({...connection,max:2,connectionTimeoutMillis:5000}),destination=files.freshDirectory(outputRoot,'pg-backup-'),scratch=files.freshDirectory(os.tmpdir(),'ov-pg-backup-');let success=false,locker;
+ const pool=new Pool(databaseOptions(connection)),destination=files.freshDirectory(outputRoot,'pg-backup-'),scratch=files.freshDirectory(os.tmpdir(),'ov-pg-backup-');let success=false,locker;
  try{
   await sourceCheck(pool,environment);locker=await pool.connect();await locker.query('BEGIN');await locker.query("SET LOCAL lock_timeout='5000'");
   const tables=(await locker.query("SELECT tablename FROM pg_tables WHERE schemaname='public' ORDER BY tablename")).rows.map(r=>r.tablename);
@@ -83,15 +83,15 @@ async function inspectBackup({environment,directory,key,maxAgeHours=24}){
 }
 async function restoreBackup({environment,connection,binaries,directory,outputRoot,key,targetDatabase,approvedMigrations=[]}){
  configuration(environment,connection,binaries);files.keyCheck(key);
- if(connection.database!=='postgres')throw Error('Restore operator must connect to the maintenance database');
+ if(!['postgres','defaultdb'].includes(connection.database))throw Error('Restore operator must connect to an approved maintenance database');
  const scratch=files.freshDirectory(os.tmpdir(),'ov-pg-restore-'),destination=files.freshDirectory(outputRoot,'pg-restore-');let success=false,targetPool,handle;
- const admin=new Pool({...connection,max:2,connectionTimeoutMillis:5000});
+ const admin=new Pool(databaseOptions(connection));
  try{
   const {header,manifest,dump,journalRestore}=await readArchive({environment,directory,key,scratchDirectory:scratch.directory,journalOutputRoot:destination.directory});
   // Decrypt/validate every part before any destination database is created.
   // An authenticated archive remains usable after loss of the source database.
   // Absence never permits reuse of an existing target or matching source name.
-  handle=await pg.createRestoreTarget(admin,{sourceDatabase:manifest.database,targetDatabase,environment,sourceMayBeAbsent:true});targetPool=new Pool({...connection,database:targetDatabase,max:2,connectionTimeoutMillis:5000});
+  handle=await pg.createRestoreTarget(admin,{sourceDatabase:manifest.database,targetDatabase,environment,sourceMayBeAbsent:true});targetPool=new Pool(databaseOptions({...connection,database:targetDatabase}));
   await native(binary(binaries,'pg_restore'),['--exit-on-error','--single-transaction','--no-owner','--no-acl','--dbname',targetDatabase,dump],connection);
   const invalidated=await pg.invalidateRestore(targetPool,handle,{approvedMigrations});await pg.reviewRestore(targetPool,{environment,restoreId:invalidated.restoreId});
   const result={version:1,kind:'postgres-coordinated',backupId:header.id,environment,targetDatabase,restoreId:invalidated.restoreId,journalsDirectory:journalRestore?path.basename(journalRestore.directory):null,journalRoles:journalRestore?.files||[],activation:'review-required',access:'revoked-and-disabled',appliedMigrations:invalidated.appliedMigrations};
@@ -107,6 +107,6 @@ async function reviewRestore({environment,connection,binaries,directory}){
  const expected=['recovery.json'];if(result.journalsDirectory){if(typeof result.journalsDirectory!=='string'||!/^restore-[A-Za-z0-9]+$/.test(result.journalsDirectory))throw Error('Invalid journal restore directory');expected.push(result.journalsDirectory);const journal=sqlite.reviewRestore({environment,directory:path.join(directory,result.journalsDirectory)});if(JSON.stringify(journal.files.map(f=>f.role))!==JSON.stringify(result.journalRoles))throw Error('Journal recovery roles mismatch');}
  else if(result.journalRoles.length)throw Error('Missing restored journals');
  if(JSON.stringify(fs.readdirSync(directory).sort())!==JSON.stringify(expected.sort()))throw Error('Unexpected recovery files');
- const pool=new Pool({...connection,max:2,connectionTimeoutMillis:5000});try{return {directory,...await pg.reviewRestore(pool,{environment,restoreId:result.restoreId}),journalRoles:result.journalRoles};}finally{await pool.end();}
+ const pool=new Pool(databaseOptions(connection));try{return {directory,...await pg.reviewRestore(pool,{environment,restoreId:result.restoreId}),journalRoles:result.journalRoles};}finally{await pool.end();}
 }
 module.exports={createBackup,restoreBackup,reviewRestore,inspectBackup};

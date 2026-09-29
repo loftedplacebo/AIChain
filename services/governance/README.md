@@ -806,8 +806,11 @@ worker/rules/indexer/relayer journals use the existing encrypted SQLite snapshot
 format; their encrypted files and markers are hashed into the coordinated manifest.
 Customer event/control SQLite files are not accepted as journal roles in this mode.
 
-Capture requires an explicitly quiesced dev/test deployment, loopback connection,
-offline database administrator and official binary directory. It holds SHARE locks
+Capture requires an explicitly quiesced dev/test deployment, an offline database
+administrator and official binary directory. A remote database connection requires
+`sslmode: "verify-full"` and an absolute CA certificate path in the private
+connection JSON; both the Node client and native `pg_dump`/`pg_restore` verify
+TLS identity. The local loopback profile remains available. It holds SHARE locks
 on public tables during the PostgreSQL dump and journal capture. Stop APIs,
 publishers, delivery workers and migrations first; this is not an online backup
 promise. Each dump/journal is bounded at 512 MiB; native commands time out at two
@@ -816,6 +819,21 @@ are cleaned on success and failure. Persisted bundles contain encrypted dump and
 manifest, encrypted journal bundle and a non-secret completion marker. PostgreSQL
 connection passwords are passed through a private child environment, not arguments
 or output; inherited PG connection/service variables are removed.
+
+Example private remote connection file (replace every value and protect the file):
+
+```json
+{"host":"db.example.test","port":25060,"database":"governance_test","user":"offline_admin","password":"REPLACE","sslmode":"verify-full","caFile":"C:/PRIVATE_OPERATOR_DIRECTORY/database-ca.pem"}
+```
+
+The restore command's connection file uses the same host, user, TLS mode and CA
+file, with `database` set to an approved maintenance database: `postgres` for
+the local cluster or `defaultdb` for a DigitalOcean cluster. DigitalOcean
+documents `defaultdb` as its built-in administrative database.
+[Provider connection guide](https://docs.digitalocean.com/products/databases/postgresql/how-to/connect/).
+Confirm `CREATEDB` access before relying on this procedure. A locally passing
+transport check does not prove that the chosen managed provider allows the
+complete restore and release flow.
 
 Restore decrypts and validates the complete manifest, dump and journals before
 creating a database. Wrong keys, changed ciphertext, hashes, roles or unexpected

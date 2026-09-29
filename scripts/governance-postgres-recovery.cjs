@@ -15,7 +15,7 @@ async function main(){
   const raw=privateFile(config.keyFile,128).trim();if(!/^[a-f0-9]{64}$/.test(raw))throw Error('Separate 32-byte backup key required');const key=Buffer.from(raw,'hex');
   try{const result=await (operation==='monitor'?require('../services/governance/backup-monitor.cjs').checkBackupSet:recovery.inspectBackup)({...config,key});console.log(JSON.stringify({operation,...result},null,2));if(result.freshness==='stale'||result.status==='not-ready')process.exitCode=2;}finally{key.fill(0);}return;
  }
- const connection=parseStrictJson(privateFile(config.connectionFile,4096));if(!connection||typeof connection!=='object'||Array.isArray(connection)||Object.keys(connection).some(k=>!['host','port','database','user','password'].includes(k)))throw Error('Invalid private database configuration');
+ const connection=parseStrictJson(privateFile(config.connectionFile,4096));if(!connection||typeof connection!=='object'||Array.isArray(connection)||Object.keys(connection).some(k=>!['host','port','database','user','password','sslmode','caFile'].includes(k)))throw Error('Invalid private database configuration');
  if(operation==='review'){console.log(JSON.stringify({operation,...await recovery.reviewRestore({...config,connection})},null,2));return;}
  const raw=privateFile(config.keyFile,128).trim();if(!/^[a-f0-9]{64}$/.test(raw))throw Error('Separate 32-byte backup key required');const key=Buffer.from(raw,'hex');
  try{console.log(JSON.stringify({operation,...await (operation==='backup'?recovery.createBackup:recovery.restoreBackup)({...config,connection,key})},null,2));}finally{key.fill(0);}

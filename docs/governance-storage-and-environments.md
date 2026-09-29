@@ -124,15 +124,17 @@ with `BYPASSRLS` and effective ownership of the selected database; creating
 a fresh restore target additionally requires `CREATEDB`. A local native test
 using those role attributes passed migrations, encrypted capture, fresh-target
 restore and access invalidation; ordinary runtime roles were rejected. This
-does **not** establish managed-provider compatibility. The backup runner still
-requires a local `127.0.0.1`/`localhost` database connection and native
-dump/restore binaries, and the remaining review/activation/release commands
-have not been exercised with a real managed-provider account. Add verified
-remote TLS backup connections, then prove the entire capture, fresh-target
+does **not** establish managed-provider compatibility. The backup runner now
+accepts either the existing loopback connection or a remote hostname with
+`sslmode: "verify-full"` and an absolute trusted CA file. It applies the same
+verified TLS policy to its Node connection and native dump/restore processes;
+native PostgreSQL binaries are still required on the operator machine. The
+review/activation/release commands have not been exercised with a real
+managed-provider account. Prove the entire capture, fresh-target
 restore, access invalidation and controlled release path on a disposable
 managed cluster before adopting this provider. Passing API startup or
-migrations alone is insufficient. Restrict
-database trusted sources to the VPS/operator paths and verify the server
+migrations alone is insufficient. Restrict database trusted sources to the
+VPS/operator paths and verify the server
 certificate and hostname; DigitalOcean's default `sslmode=require` does not
 verify identity. Its managed point-in-time recovery covers only the last seven
 days and restores to a new node, so it does not replace independent backup
