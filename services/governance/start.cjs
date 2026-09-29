@@ -51,7 +51,7 @@ async function start(env=process.env){
   services={...services,ruleEngine:new (require('./governance-rules.cjs').RuleEngine)(ruleJournal),notificationDestinations};
  }
  const readiness=require('./readiness.cjs').createReadiness({environment:stage,pool:store.pool,runtimeProfile:store.runtimeProfile||'pilot',sqlite:[store.db,sessionDb,ruleJournal?.db]});
- const server=createServer(store,credentials,users,sessionDb,evidenceOptions,{...services,workosConfig,readiness});
+ const server=createServer(store,credentials,users,sessionDb,evidenceOptions,{...services,workosConfig,readiness,environment:stage});
  const ruleProcessor=processingEnabled?new (require('./rule-processing.cjs').RuleProcessor)({engine:services.ruleEngine,store,projects:ruleProjects,intervalMs:ruleInterval}):null;
  server.listen(config.port,'127.0.0.1',()=>console.log(`Governance ${stage} service ready (${driver}); loopback only`));
  ruleProcessor?.start();

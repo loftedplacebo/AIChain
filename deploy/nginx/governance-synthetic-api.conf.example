@@ -1,0 +1,54 @@
+# Install inside nginx's http context only after replacing the .invalid name,
+# issuing its certificate and reviewing the actual VPS firewall and rate policy.
+# The governance process itself must remain bound to 127.0.0.1:8796.
+limit_req_zone $binary_remote_addr zone=orvessian_pilot_api:10m rate=10r/s;
+limit_req_zone $binary_remote_addr zone=orvessian_pilot_auth:10m rate=5r/m;
+limit_conn_zone $binary_remote_addr zone=orvessian_pilot_connections:10m;
+
+server {
+    listen 443 ssl;
+    server_name api.pilot.example.invalid;
+    server_tokens off;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_certificate /etc/letsencrypt/live/api.pilot.example.invalid/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/api.pilot.example.invalid/privkey.pem;
+
+    client_max_body_size 1m;
+    client_body_timeout 15s;
+    limit_req_status 429;
+    limit_conn_status 429;
+
+    # WorkOS start requests need an additional per-source admission budget.
+    location = /v1/auth/start {
+        limit_req zone=orvessian_pilot_auth burst=3 nodelay;
+        limit_conn orvessian_pilot_connections 20;
+        proxy_pass http://127.0.0.1:8796;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header Connection "";
+        proxy_connect_timeout 2s;
+        proxy_read_timeout 30s;
+        proxy_send_timeout 30s;
+        proxy_redirect off;
+    }
+
+    location /v1/ {
+        limit_req zone=orvessian_pilot_api burst=30 nodelay;
+        limit_conn orvessian_pilot_connections 20;
+        proxy_pass http://127.0.0.1:8796;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header Connection "";
+        proxy_connect_timeout 2s;
+        proxy_read_timeout 30s;
+        proxy_send_timeout 30s;
+        proxy_redirect off;
+    }
+
+    # Internal readiness stays on the loopback listener.
+    location / { return 404; }
+}

@@ -126,6 +126,18 @@ drill, HTTPS reverse-proxy rules, WorkOS URLs and isolated secrets are reviewed.
 The service listens on loopback only; its existence does not connect Sites or
 open partner access.
 
+The [Nginx pilot example](../deploy/nginx/governance-synthetic-api.conf.example)
+exposes only `/v1/` over HTTPS, keeps `/health` and `/ready` on loopback, and
+sets separate per-source sign-in and general API limits plus connection and
+body limits. Replace the `.invalid` hostname with the approved API domain,
+issue a matching certificate, keep the governance port closed at the VPS
+firewall, then run `nginx -t` before any reload. Review limits using the
+expected Sites outbound traffic and direct SDK workload: an edge source IP
+may represent several customers. The signed WorkOS webhook path is included
+under `/v1/`; register that exact HTTPS URL and test delivery. This example
+has not been syntax-checked on the target VPS or enabled. It does not prove
+per-person abuse protection, provider registration or public reachability.
+
 ### Provisional provider shortlist — 29 September
 
 For a small synthetic-data pilot, the simplest candidate is a DigitalOcean

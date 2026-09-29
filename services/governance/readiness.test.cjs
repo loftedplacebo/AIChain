@@ -32,12 +32,12 @@ test('draining immediately invalidates cached readiness and hides dependency err
  const {GovernanceStore}=require('./store'),{createServer}=require('./server.cjs');
  const store=new GovernanceStore(':memory:');store.db.exec("CREATE TABLE governance_environment(name TEXT); INSERT INTO governance_environment VALUES('test')");
  const readiness=createReadiness({environment:'test',sqlite:[store.db]});
- const server=createServer(store,[],[],store.db,{}, {readiness});await new Promise(r=>server.listen(0,'127.0.0.1',r));
+ const server=createServer(store,[],[],store.db,{}, {readiness,environment:'test'});await new Promise(r=>server.listen(0,'127.0.0.1',r));
  try{
   const url='http://127.0.0.1:'+server.address().port;
   const ready=await fetch(url+'/ready');assert.equal(ready.status,200);assert.deepEqual(await ready.json(),{status:'ready'});assert.equal(ready.headers.get('cache-control'),'no-store');
   readiness.drain();const stopped=await fetch(url+'/ready');assert.equal(stopped.status,503);assert.deepEqual(await stopped.json(),{status:'not-ready'});
-  assert.equal((await fetch(url+'/health')).status,200);
+  const health=await fetch(url+'/health');assert.equal(health.status,200);assert.equal((await health.json()).mode,'synthetic-test');
  }finally{await new Promise(r=>server.close(r));store.close();}
 });
 test('PostgreSQL probe uses readonly transaction, verifies migrations and destroys failed clients',async()=>{

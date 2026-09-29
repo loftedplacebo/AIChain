@@ -34,7 +34,7 @@ function createServer(store, credentials, users=[], sessionDb=store.db, evidence
     const send=(status,body)=>{if(res.destroyed||res.writableEnded)return;res.writeHead(status,{'content-type':'application/json','cache-control':'no-store','x-content-type-options':'nosniff',...(!req.complete&&(Number(req.headers['content-length']||0)>0||req.headers['transfer-encoding'])?{connection:'close'}:{})});res.end(JSON.stringify(body));};
     try {
       const url=new URL(req.url,'http://localhost');
-      if(req.method==='GET' && url.pathname==='/health') return send(200,{status:'ok',mode:'local-development',sourceContent:'not-supported'});
+      if(req.method==='GET' && url.pathname==='/health') return send(200,{status:'ok',mode:services.environment==='test'?'synthetic-test':'local-development',sourceContent:'not-supported'});
       if(req.method==='GET' && url.pathname==='/ready') {
         let result;try{result=await services.readiness?.check();}catch{}
         const ready=result?.status==='ready';
