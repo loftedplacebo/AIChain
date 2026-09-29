@@ -1,18 +1,19 @@
-# Local toolchains and Go caches
+# Local tools and generated state
 .toolchains/
 .gocache/
 .gomodcache/
 .npm-cache/
 __pycache__/
-
-# Build outputs
 bin/
 build/
-
-# Local network state and secrets
 /devnet/
 *.key
 *.keystore
-
-# Editor settings
+.env
+.env.*
 .vscode/
+
+# Packaged site exports and document render pages
+/orvessian-*.tar.gz
+/orvesian_*.png
+/orvessian_*.png

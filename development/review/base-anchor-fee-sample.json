@@ -1,0 +1,24 @@
+{
+  "sampledAt": "2026-09-20T17:19:41.931Z",
+  "endpoint": "https://mainnet.base.org",
+  "chainId": 8453,
+  "blockNumber": 51567717,
+  "blockTimestamp": 1789924781,
+  "gasPriceWei": "6000000",
+  "historicalExecutionGas": 92831,
+  "calldataBytes": 164,
+  "unsignedTransactionBytes": 208,
+  "l1EstimatedWei": "1063911842",
+  "l1UpperBoundWei": "2632891724",
+  "sampleEstimate": {
+    "perAnchorETH": "0.000000558049911842",
+    "perDayETH": "0.0558049911842",
+    "per30DaysETH": "1.674149735526"
+  },
+  "usingL1UpperBound": {
+    "perAnchorETH": "0.000000559618891724",
+    "perDayETH": "0.0559618891724",
+    "per30DaysETH": "1.678856675172"
+  },
+  "caveat": "Synthetic unsigned transaction and historical execution gas. No deployed Base anchor, live execution estimate, sustained fee observation or production benchmark. L1 upper bound is current-state only, not a future fee cap."
+}

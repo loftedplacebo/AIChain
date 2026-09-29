@@ -1,0 +1,150 @@
+{
+  "asOf": "2026-09-20",
+  "warning": "Illustrative fluid arrivals, not measured throughput, fee quotes, PoW attack costs, or a production SLA. Bursts and finite-window rounding are excluded.",
+  "assumptions": {
+    "maxBatch": 1000,
+    "maxWaitSeconds": 10,
+    "monthDays": 30,
+    "hypotheticalUSDPerAnchor": [
+      0.001,
+      0.01,
+      0.1
+    ],
+    "evidenceBytesPerEvent": 2000
+  },
+  "scenarios": [
+    {
+      "label": "50,000 events/week; shared queue",
+      "eventsPerDay": 7142.857142857143,
+      "independentQueues": 1,
+      "eventTPS": 0.08267195767195767,
+      "approximateEventsPerBatch": 1.8267195767195767,
+      "approximateAnchorsPerDay": 3910.2099927588706,
+      "approximateAnchorTPS": 0.04525706010137582,
+      "fullBatchOnlyAnchorsPerDay": 7.142857142857143,
+      "fullBatchFirstEventWaitSeconds": 12083.904,
+      "approximateMonthlyAnchorCostUSD": {
+        "0.001": 117.30629978276612,
+        "0.01": 1173.062997827661,
+        "0.1": 11730.629978276613
+      },
+      "rawEvidenceGBPerDayAt2KB": 0.014285714285714285
+    },
+    {
+      "label": "1 million/day; shared queue",
+      "eventsPerDay": 1000000,
+      "independentQueues": 1,
+      "eventTPS": 11.574074074074074,
+      "approximateEventsPerBatch": 116.74074074074075,
+      "approximateAnchorsPerDay": 8565.989847715735,
+      "approximateAnchorTPS": 0.09914340101522841,
+      "fullBatchOnlyAnchorsPerDay": 1000,
+      "fullBatchFirstEventWaitSeconds": 86.3136,
+      "approximateMonthlyAnchorCostUSD": {
+        "0.001": 256.97969543147207,
+        "0.01": 2569.7969543147206,
+        "0.1": 25697.969543147206
+      },
+      "rawEvidenceGBPerDayAt2KB": 2
+    },
+    {
+      "label": "10 million/day; shared queue",
+      "eventsPerDay": 10000000,
+      "independentQueues": 1,
+      "eventTPS": 115.74074074074075,
+      "approximateEventsPerBatch": 1000,
+      "approximateAnchorsPerDay": 10000,
+      "approximateAnchorTPS": 0.11574074074074074,
+      "fullBatchOnlyAnchorsPerDay": 10000,
+      "fullBatchFirstEventWaitSeconds": 8.631359999999999,
+      "approximateMonthlyAnchorCostUSD": {
+        "0.001": 300,
+        "0.01": 3000,
+        "0.1": 30000
+      },
+      "rawEvidenceGBPerDayAt2KB": 20
+    },
+    {
+      "label": "100 million/day; shared queue",
+      "eventsPerDay": 100000000,
+      "independentQueues": 1,
+      "eventTPS": 1157.4074074074074,
+      "approximateEventsPerBatch": 1000,
+      "approximateAnchorsPerDay": 100000,
+      "approximateAnchorTPS": 1.1574074074074074,
+      "fullBatchOnlyAnchorsPerDay": 100000,
+      "fullBatchFirstEventWaitSeconds": 0.863136,
+      "approximateMonthlyAnchorCostUSD": {
+        "0.001": 3000,
+        "0.01": 30000,
+        "0.1": 300000
+      },
+      "rawEvidenceGBPerDayAt2KB": 200
+    },
+    {
+      "label": "1 million/day; 1,000 separate tenant queues",
+      "eventsPerDay": 1000000,
+      "independentQueues": 1000,
+      "eventTPS": 11.574074074074074,
+      "approximateEventsPerBatch": 1.1157407407407407,
+      "approximateAnchorsPerDay": 896265.5601659751,
+      "approximateAnchorTPS": 10.37344398340249,
+      "fullBatchOnlyAnchorsPerDay": 1000,
+      "fullBatchFirstEventWaitSeconds": 86313.59999999999,
+      "approximateMonthlyAnchorCostUSD": {
+        "0.001": 26887.966804979253,
+        "0.01": 268879.6680497925,
+        "0.1": 2688796.6804979257
+      },
+      "rawEvidenceGBPerDayAt2KB": 2
+    }
+  ],
+  "judgmentWeightsPercent": {
+    "securityFit": 25,
+    "delivery": 25,
+    "operations": 20,
+    "reuse": 15,
+    "capacity": 10,
+    "sovereignty": 5
+  },
+  "subjectiveRatings": {
+    "ownPoW": [
+      2,
+      2,
+      1,
+      5,
+      3,
+      5
+    ],
+    "ownPermissionlessPoS": [
+      2,
+      1,
+      2,
+      4,
+      4,
+      5
+    ],
+    "ownPermissionedBFT": [
+      2,
+      3,
+      3,
+      4,
+      5,
+      4
+    ],
+    "existingEVMPublicNetwork": [
+      4,
+      5,
+      4,
+      4,
+      4,
+      2
+    ]
+  },
+  "subjectiveScoresOutOf5": {
+    "ownPoW": 2.5,
+    "ownPermissionlessPoS": 2.4,
+    "ownPermissionedBFT": 3.15,
+    "existingEVMPublicNetwork": 4.15
+  }
+}
