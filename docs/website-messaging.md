@@ -61,6 +61,16 @@ customer API connection, public signup or paid service. The website build and
 failed after the source push; a separately prepared archive passed the Sites
 build checks and produced the successful deployment.
 
+Owner-only refresh on 29 September 2026: website commit
+`354b164f00eef7053b5f712b9f57211d9b95af89` was pushed to both the Sites
+source branch and GitHub backup, then saved and deployed as Sites version 24.
+When the hosted sign-in status endpoint is unavailable, `/workspace` now shows a
+clear availability message instead of an inactive password form. The legacy
+password form remains available in local configurations whose API explicitly
+reports hosted sign-in disabled. The build and all 40 website tests passed; the
+Site reports a successful owner-only deployment. This does not connect a hosted
+API or establish a real customer sign-in path.
+
 Current source: C:/AIChain/website. [Platform baseline](platform-architecture.md) and [review record](archive/2026-09-27/superseded-plans/documentation-review-2026-09-27.md) take precedence over earlier site phase plans.
 
 ## Positioning research — 27 September 2026
