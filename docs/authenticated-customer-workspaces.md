@@ -104,6 +104,34 @@ Exit code 0 means `observed-fresh`, 2 means a valid non-fresh observation, and 1
 
 Validation: 34 WorkOS tests pass, including state classification, malformed/future-state rejection, client-scoped read-only monitoring and the actual SQLite CLI with unchanged source bytes. Native session run `s997166a2a0e8` passes 24 groups, adding shared-PG status without stored-state changes, restored-gate denial and an actual child-process CLI against the strict API role without credential output. Temporary synthetic connection files were removed. The earlier migration/recovery/role checks remain valid; no schema or grants changed for monitoring.
 
+### One-step operator revocation replay
+
+`npm run governance:identity-replay -- --apply-revocations C:\absolute\private-replay.json`
+performs **one** bounded, coordinated WorkOS Events API replay step. It can revoke
+app sessions and stored renewal credentials, so the explicit flag and a private
+configuration file are required. The file names `environment` (`dev`/`test`),
+`storage` (`sqlite`/`postgres`), `clientId`, a canonical UTC `startAt` baseline
+and an absolute `apiKeyFile` containing the WorkOS server key. SQLite mode needs
+an existing absolute `sessionDatabase`; PostgreSQL mode needs an absolute
+`databaseUrlFile` containing the strict API-role connection URI and may include
+`caFile`. Keep keys and database URIs out of the JSON file, Git and command line.
+
+The command checks the environment marker, recovery gate and existing SQLite
+session/replay schema, or the PostgreSQL API profile, forced RLS, migrations and
+session repositories, before replay. It fetches at most ten pages/1,000 events
+in one selected window, validates the complete provider response before writes,
+applies matching revocations idempotently and advances coverage only after a
+successful window. Output contains aggregate counts and timestamps, without
+subjects, session tokens, key values or raw events. Exit code 0 means advanced
+or not due, 2 means another step holds the lease, and 1 means failure; a failed
+step does not claim coverage. Keep the original baseline on retries.
+
+One synthetic CLI test exercises a real SQLite customer session and event:
+the matching session is removed, an unrelated session survives, the checkpoint
+advances, and wrong-environment/restored-gate runs are refused. This does not
+establish real WorkOS event delivery, PostgreSQL live replay, historical coverage,
+an installed schedule or alert ownership. Those remain hosted release gates.
+
 ### Live read-only Events API checkpoint
 
 `node --env-file=build/governance/dev/workos.env scripts/check-workos-revocation-feed.cjs --live-read-only` checks one past hour using the existing local key; append `--hours=24` for a bounded 24-hour window. It sends only authenticated fixed-origin GET requests, runs the replay parser with a nonpersistent no-op repository, and prints aggregate observations. It never opens a customer database, writes a revocation tombstone, revokes a provider session, publishes a transaction or installs a schedule. The explicit live flag is required; key values and raw event payloads are not printed or saved.

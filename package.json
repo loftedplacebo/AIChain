@@ -73,8 +73,9 @@
     "test:governance-recovery-worker": "node --test services/governance/recovery-worker-spend.test.cjs services/governance/recovery-worker-nonces.test.cjs services/governance/recovery-worker-evidence.test.cjs services/governance/recovery-worker-review.test.cjs services/governance/worker.test.cjs services/governance/worker-launch-binding.test.cjs services/governance/publisher-review-rpc.test.cjs",
     "test:governance-recovery-index": "node --test services/governance/recovery-index-review.test.cjs sdk/typescript/avr-event-indexer.test.js scripts/base-sepolia-avr-indexer.test.cjs",
     "test:governance-recovery-delivery": "node --test services/governance/recovery-rule-evidence.test.cjs services/governance/recovery-rule-links.test.cjs services/governance/recovery-delivery-review.test.cjs services/governance/governance-rules.test.cjs services/governance/webhook-delivery.test.cjs services/governance/webhook-signatures.test.cjs",
-    "test:governance-workos": "node --test services/governance/account-sessions.test.cjs services/governance/workos-revocation-status.test.cjs services/governance/workos-revocation-step.test.cjs services/governance/workos-revocation-replay.test.cjs services/governance/workos-webhook.test.cjs services/governance/workos-auth.test.cjs",
-    "governance:identity-status": "node scripts/governance-identity-status.cjs"
+    "test:governance-workos": "node --test services/governance/account-sessions.test.cjs services/governance/workos-replay-cli.test.cjs services/governance/workos-revocation-status.test.cjs services/governance/workos-revocation-step.test.cjs services/governance/workos-revocation-replay.test.cjs services/governance/workos-webhook.test.cjs services/governance/workos-auth.test.cjs",
+    "governance:identity-status": "node scripts/governance-identity-status.cjs",
+    "governance:identity-replay": "node scripts/governance-identity-replay.cjs"
   },
   "dependencies": {
     "ethers": "^6.16.0",

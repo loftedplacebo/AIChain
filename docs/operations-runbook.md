@@ -34,6 +34,7 @@ do not point synthetic stress traffic at a live customer workspace.
 | Operate earlier synthetic ingress | [VPS synthetic ingress](vps-base-sepolia-synthetic-ingress.md) |
 | Plan PostgreSQL migration and permissions | [Storage and environments](governance-storage-and-environments.md) |
 | Review native database recovery evidence | [PostgreSQL validation](governance-postgres-native-validation.md) |
+| Run one bounded provider session-revocation replay step | [Operator replay command](authenticated-customer-workspaces.md#one-step-operator-revocation-replay) |
 
 ## Managed identity acceptance before hosted customer access
 
