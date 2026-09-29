@@ -95,6 +95,37 @@ audience remains owner-only until the synthetic hosted gate passes and named pil
 users can be granted access. Required MFA policy is a separate pending decision.
 None of these controls is established by this topology record.
 
+#### Hosted synthetic API entry point
+
+`scripts/governance-hosted-synthetic-api.cjs` and
+`deploy/systemd/aichain-governance-synthetic-api.service` are a separate,
+uninstalled entry point for the first named synthetic-data design partner. They
+do not replace the running SQLite VPS demo service. The launcher accepts only
+an explicit `test` environment with PostgreSQL events, keys and customer
+control; a remote restricted database login using `sslmode=verify-full` and an
+absolute trusted CA file; WorkOS with an HTTPS portal callback, exact named
+email admission list and webhook signing secret; and an explicit loopback port.
+It refuses seeded users, static project credentials, SQLite state and rule
+processing. The underlying store still verifies its strict API grants and
+database environment marker before listening. Staging and production startup
+remain separately gated.
+
+For a reviewed deployment, install an appropriately versioned Node runtime and
+the new unit on a separate pilot VPS, with a dedicated service account. Put
+provider and database credentials in a root-managed
+`/etc/aichain-governance-synthetic-api.env`; give that account read access only
+to the managed database CA file. Set `GOVERNANCE_ENV=test`, all three storage
+selectors to `postgres`, `GOVERNANCE_DATABASE_URL` for the restricted API role,
+`GOVERNANCE_DATABASE_CA_FILE`, `PORT`, `GOVERNANCE_IDENTITY_PROVIDER=workos`,
+`WORKOS_API_KEY`, `WORKOS_CLIENT_ID`, `WORKOS_REDIRECT_URI`,
+`WORKOS_PILOT_ALLOWED_EMAILS`, `WORKOS_WEBHOOK_SECRET` and
+`GOVERNANCE_IDENTITY_SEAL_KEY`. Keep migration credentials, worker signing keys
+and backup keys out of this service. The unit's Node path and working directory
+must match the actual installation. Do not enable it until the managed database
+drill, HTTPS reverse-proxy rules, WorkOS URLs and isolated secrets are reviewed.
+The service listens on loopback only; its existence does not connect Sites or
+open partner access.
+
 ### Provisional provider shortlist — 29 September
 
 For a small synthetic-data pilot, the simplest candidate is a DigitalOcean

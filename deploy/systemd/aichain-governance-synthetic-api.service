@@ -1,0 +1,27 @@
+[Unit]
+Description=Orvessian hosted synthetic governance API (loopback only)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=aichain-governance-api
+Group=aichain-governance-api
+WorkingDirectory=/opt/aichain/governance-worker
+EnvironmentFile=/etc/aichain-governance-synthetic-api.env
+ExecStart=/opt/aichain/.toolchains/node-v24.21.0-linux-x64/bin/node scripts/governance-hosted-synthetic-api.cjs
+Restart=on-failure
+RestartSec=5
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ReadOnlyPaths=/etc/aichain-governance-synthetic-api.env
+MemoryMax=512M
+CPUQuota=100%
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target
