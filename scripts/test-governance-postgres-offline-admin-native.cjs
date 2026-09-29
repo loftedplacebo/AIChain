@@ -14,6 +14,10 @@ async function main(){
  await admin.query(`CREATE ROLE ${runtime} LOGIN PASSWORD '${runtimePassword}' NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT NOBYPASSRLS`);
  await admin.query(`CREATE DATABASE ${source} OWNER ${role}`);
  const owner=pool(source,role,password);await migrate(owner,{environment:'test'});
+ await owner.query(require('../services/governance/postgres-runtime-profile.cjs').grantSql('api',runtime));
+ const apiPool=pool(source,runtime,runtimePassword),api=new (require('../services/governance/postgres-store.cjs').PostgresGovernanceStore)(apiPool,{runtimeProfile:'api'});
+ await api.ready('test');const event=require('../fixtures/governance/paired-model-comparison-v0.1.0-draft.json').events[0];
+ assert.equal((await api.ingest(event,{tenant:event.tenantRef,project:event.projectRef})).status,'accepted');
  assert.deepEqual(await assertOfflineAdministrator(owner),{superuser:false,managedAdministrator:true});
  const ordinary=pool(source,runtime,runtimePassword);await assert.rejects(assertOfflineAdministrator(ordinary),/offline database administrator/);
  const maintenance=pool('postgres',role,password),handle=await createRestoreTarget(maintenance,{sourceDatabase:source,targetDatabase:target,environment:'test'});
@@ -25,8 +29,16 @@ async function main(){
  const recovery=await backup.restoreBackup({environment:'test',directory:archive.directory,key,connection:{...connection,database:'postgres'},binaries,targetDatabase:'gov_restore_archive_'+id,outputRoot:path.join(directory,'restores')});
  assert.equal(recovery.activation,'review-required');assert.equal(recovery.access,'revoked-and-disabled');
  assert.equal((await backup.reviewRestore({environment:'test',connection:{...connection,database:recovery.targetDatabase},binaries,directory:recovery.directory})).review,'passed');
+ const recovered=pool(recovery.targetDatabase,role,password),recoveryOptions={environment:'test',restoreId:recovery.restoreId};
+ const evidence=await require('../services/governance/recovery-evidence-review.cjs').reviewEvidence(recovered,{...recoveryOptions,trustedSigners:['0x'+'11'.repeat(20)]});
+ assert.equal(evidence.reviewed,1);assert.equal(evidence.counts['unsigned-pending'],1);assert.equal(evidence.offlineIntegrity,'incomplete');
+ const access=await require('../services/governance/postgres-recovery.cjs').prepareAccessReview(recovered,recoveryOptions);
+ assert.equal(access.snapshot.identities.length,0);assert.equal(access.snapshot.restoreId,recovery.restoreId);
+ await recovered.query('GRANT CONNECT ON DATABASE '+recovery.targetDatabase+' TO '+runtime);
+ await assert.rejects(require('../services/governance/postgres-recovery.cjs').prepareAccessReview(pool(recovery.targetDatabase,runtime,runtimePassword),recoveryOptions),/offline database administrator/);
+ assert.equal((await recovered.query('SELECT state FROM governance_recovery_gate')).rows[0].state,'review-required');
  key.fill(0);
- console.log('PASS managed-like non-superuser captures encrypted PostgreSQL and restores to a fresh revoked target');
+ console.log('PASS managed-like non-superuser captures a runtime-submitted record, restores to a revoked target and reviews pending evidence without activation');
  console.log('Synthetic databases retained: '+source+', '+target+', '+recovery.targetDatabase);
 }
 main().catch(()=>{console.error('Managed-like offline administrator native acceptance failed');process.exitCode=1;}).finally(async()=>{await Promise.all(pools.map(p=>p.end()));await admin.end();});

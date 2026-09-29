@@ -122,8 +122,10 @@ has `BYPASSRLS`, so it must never be an API or worker login. The offline
 backup and recovery commands now also accept a non-superuser administrator
 with `BYPASSRLS` and effective ownership of the selected database; creating
 a fresh restore target additionally requires `CREATEDB`. A local native test
-using those role attributes passed migrations, encrypted capture, fresh-target
-restore and access invalidation; ordinary runtime roles were rejected. This
+using those role attributes passed migrations, one restricted-role synthetic
+submission, encrypted capture, fresh-target restore, access invalidation,
+full pending-evidence review and private access inventory. The runtime role
+could not perform that review and the restored gate remained closed. This
 does **not** establish managed-provider compatibility. The backup runner now
 accepts either the existing loopback connection or a remote hostname with
 `sslmode: "verify-full"` and an absolute trusted CA file. It applies the same
