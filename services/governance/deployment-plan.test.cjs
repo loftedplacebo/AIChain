@@ -36,6 +36,7 @@ test('an HTTPS synthetic test pilot has hosted isolation and public DNS requirem
   e=>e.portal.apiOrigin='https://127.0.0.2',
   e=>e.portal.apiOrigin='https://[::1]',
   e=>e.portal.apiOrigin='https://api.localhost',
+  e=>e.database.host='127.0.0.2',
   e=>e.database.tls='local',
   e=>e.backup.custody='local-synthetic'
  ]){const plan=structuredClone(hosted);mutate(plan.environments[1]);assert.equal(validatePlan(plan).valid,false);}

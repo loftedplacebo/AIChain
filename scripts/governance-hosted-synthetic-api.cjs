@@ -25,5 +25,21 @@ async function start(env=process.env){
  validate(env);
  return require('../services/governance/start.cjs').start(env);
 }
-module.exports={validate,start};
-if(require.main===module)start().catch(()=>{console.error('Hosted synthetic API failed to start; review private configuration and database readiness.');process.exitCode=1;});
+async function preflight(env=process.env){
+ validate(env);
+ const {Pool}=require('pg');
+ const pool=new Pool({...connectionOptions(env.GOVERNANCE_DATABASE_URL,{caFile:env.GOVERNANCE_DATABASE_CA_FILE}),statement_timeout:10000,query_timeout:12000});
+ try{
+  await new (require('../services/governance/postgres-store.cjs').PostgresGovernanceStore)(pool,{runtimeProfile:'api'}).ready('test');
+  const directory=new (require('../services/governance/postgres-customer-directory.cjs').PostgresCustomerDirectory)(pool);
+  await new (require('../services/governance/postgres-provider-sessions.cjs').PostgresProviderSessions)(pool,directory).ready('test');
+  await new (require('../services/governance/postgres-project-keys.cjs').PostgresProjectKeys)(pool).ready('test');
+  return {status:'ready',stage:'test',database:'verified',runtimeProfile:'api',identity:'configured',scope:'Read-only configuration and database checks; no WorkOS policy, HTTPS edge, offsite backup or release proof'};
+ }finally{await pool.end();}
+}
+module.exports={validate,start,preflight};
+if(require.main===module){
+ const check=process.argv.length===3&&process.argv[2]==='--preflight';
+ if(process.argv.length>2&&!check){console.error('Usage: governance-hosted-synthetic-api.cjs [--preflight]');process.exitCode=2;}
+ else (check?preflight().then(result=>console.log(JSON.stringify(result))):start()).catch(()=>{console.error(check?'Hosted synthetic API preflight failed; review private configuration and database readiness.':'Hosted synthetic API failed to start; review private configuration and database readiness.');process.exitCode=1;});
+}

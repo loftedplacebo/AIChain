@@ -4,6 +4,7 @@ const stages=['dev','test','staging','prod'];
 const secretFields=['apiDatabase','workerDatabase','workosApi','sessionEncryption','webhookSigning','recordingSigner','relayer','backupEncryption'];
 const scalar=(value)=>typeof value==='string'&&/^[A-Za-z0-9][A-Za-z0-9_.:/-]{0,199}$/.test(value);
 const loopback=host=>['localhost','127.0.0.1','[::1]'].includes(host);
+const localDatabase=host=>{const name=host.toLowerCase().replace(/\.$/,'');return loopback(name)||name==='0.0.0.0'||name.startsWith('127.')||name.endsWith('.localhost')||name==='localhost.localdomain';};
 const publicHost=host=>{const name=host.toLowerCase().replace(/\.$/,'');return !loopback(name)&&!name.startsWith('[')&&!/^[0-9.]+$/.test(name)&&!['.localhost','.local','.internal'].some(suffix=>name.endsWith(suffix))&&name!=='localhost.localdomain';};
 function exact(value,fields,location,errors){
  if(!value||typeof value!=='object'||Array.isArray(value)){errors.push(location+': object required');return false;}
@@ -31,7 +32,7 @@ function validatePlan(plan){
   }
   if(exact(env.database,['host','port','name','apiRole','workerRole','migrationRole','tls'],'database',errors)){
    const db=env.database;
-   if(typeof db.host!=='string'||!/^[a-z0-9.-]+$/.test(db.host)||!Number.isInteger(db.port)||db.port<1||db.port>65535||![db.name,db.apiRole,db.workerRole,db.migrationRole].every(v=>typeof v==='string'&&/^[a-z][a-z0-9_]{0,62}$/.test(v)))errors.push(stage+': invalid database endpoint or role');
+   if(typeof db.host!=='string'||!/^[a-z0-9.-]+$/.test(db.host)||hosted&&localDatabase(db.host)||!Number.isInteger(db.port)||db.port<1||db.port>65535||![db.name,db.apiRole,db.workerRole,db.migrationRole].every(v=>typeof v==='string'&&/^[a-z][a-z0-9_]{0,62}$/.test(v)))errors.push(stage+': invalid database endpoint or role');
    else unique('database',db.host+':'+db.port+'/'+db.name,stage);
    if(new Set([db.apiRole,db.workerRole,db.migrationRole]).size!==3)errors.push(stage+': API, worker and migration roles must differ');
    if(!['local','verify-full'].includes(db.tls)||hosted&&db.tls!=='verify-full')errors.push(stage+': hosted PostgreSQL requires verified TLS');

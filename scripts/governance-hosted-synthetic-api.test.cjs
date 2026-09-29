@@ -4,7 +4,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const os=require('node:os');
 const path=require('node:path');
-const {validate}=require('./governance-hosted-synthetic-api.cjs');
+const {validate,preflight}=require('./governance-hosted-synthetic-api.cjs');
 
 test('hosted synthetic launcher requires the restricted remote shared-PostgreSQL path',t=>{
  const directory=fs.mkdtempSync(path.join(os.tmpdir(),'governance-hosted-config-'));
@@ -35,4 +35,8 @@ test('hosted synthetic launcher requires the restricted remote shared-PostgreSQL
   [{PORT:undefined},/explicit loopback service port/]
  ];
  for(const [change,message] of rejects)assert.throws(()=>validate({...env,...change}),message);
+});
+
+test('preflight rejects an unreviewed stage before opening a database connection',async()=>{
+ await assert.rejects(preflight({GOVERNANCE_ENV:'prod'}),/test-stage/);
 });

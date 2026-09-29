@@ -126,6 +126,15 @@ drill, HTTPS reverse-proxy rules, WorkOS URLs and isolated secrets are reviewed.
 The service listens on loopback only; its existence does not connect Sites or
 open partner access.
 
+Before enabling the service, run
+`node scripts/governance-hosted-synthetic-api.cjs --preflight` under its exact
+private environment. It makes read-only queries through the restricted API
+login to check migrations, environment/recovery gate, role grants, forced RLS,
+customer sessions, revocation state and project keys, then closes its pool
+without binding a listener. A passing result is scoped to those checks. It does
+not contact WorkOS, validate the HTTPS proxy, prove a backup or release a
+publisher; run their separate acceptance steps.
+
 The [Nginx pilot example](../deploy/nginx/governance-synthetic-api.conf.example)
 exposes only `/v1/` over HTTPS, keeps `/health` and `/ready` on loopback, and
 sets separate per-source sign-in and general API limits plus connection and
