@@ -10,7 +10,7 @@ The website should introduce the governance platform through customer questions:
 | /product | Explain platform workflow and record detail | Planned rules/alerts separate from submitted incidents |
 | /products and /products/governance-preview | Indicative launch pricing and plan comparison | Label provisional GBP prices and allowances; no checkout or production SLA |
 | /portal | Public synthetic demonstration | Never imply private customer data or a live model benchmark |
-| /workspace | Provisioned authenticated pilot | Private VPS API; local website requires SSH tunnel |
+| /workspace | Provisioned authenticated pilot | Hosted website has no customer API connection; the earlier private VPS pilot uses a local SSH tunnel |
 | /explorer | Public anchor checks | No private event reconstruction without authorized records |
 | /technology and /technical | Base application architecture and assurance | No own L1/L2 launch, universal correctness or Ethereum-finality claim |
 | /developers | Runnable local receipt example plus pilot context | Public managed API onboarding still gated |
@@ -50,6 +50,16 @@ were deployed as Sites version 22 from website commit
 Existing owner-only access was preserved. This publishes the marketing preview;
 it does not activate paid plans, public access, customer onboarding or the private
 development workspace backend. Build, 20 tests and targeted lint passed.
+
+Source refresh on 29 September 2026: website commit
+`2a03ac6838a86b9a25cb81b1613de6be8b0fa9c8` was saved and deployed as Sites
+version 23 at the same URL. The deployment completed successfully and the Site
+still has custom access restricted to its owner. The updated source includes the
+local customer workspace and onboarding controls, but the hosted Site has no
+customer API connection, public signup or paid service. The website build and
+40 route/component tests passed before publication. A Windows packaging helper
+failed after the source push; a separately prepared archive passed the Sites
+build checks and produced the successful deployment.
 
 Current source: C:/AIChain/website. [Platform baseline](platform-architecture.md) and [review record](archive/2026-09-27/superseded-plans/documentation-review-2026-09-27.md) take precedence over earlier site phase plans.
 
