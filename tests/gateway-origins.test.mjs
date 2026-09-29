@@ -11,11 +11,16 @@ test('hosted gateways refuse incomplete or unsafe origins before contacting the 
   {origin},
   {origin,api:origin},
   {origin,api:'http://127.0.0.1:8790'},
+  {origin,api:'https://127.0.0.2:8790'},
+  {origin,api:'https://[::1]:8790'},
+  {origin,api:'https://api.localhost'},
+  {origin,api:'https://api.internal'},
   {origin,api:'https://name:secret@api.example.test'},
   {origin,api:api+'/extra'},
   {origin,api:api+'?key=secret'},
   {origin,api:api+'#fragment'},
   {origin:origin+'/extra',api},
+  {origin:'https://portal.localhost',api},
   {origin:origin+'?key=secret',api},
  ];
  let calls=0;
