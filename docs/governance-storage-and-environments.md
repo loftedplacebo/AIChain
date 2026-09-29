@@ -14,6 +14,17 @@ After provisioning, `node scripts/governance-shared-dev.cjs` starts the loopback
 
 29 September acceptance: strict API/worker profile checks pass; actual API requests return 200 for `/health` and `/ready` and 401 for unauthenticated `/v1/session`. Aggregate secret-free evidence is in `build/governance/dev/postgres/startup-validation.json` and `provisioned.json`. API and cluster were stopped after validation. Real customer sign-in, renewal, key lifecycle, membership and receipt/worker/Base acceptance on this fresh database remain next steps. No worker is started by these commands. Stop the API with Ctrl+C, then run `node scripts/governance-postgres-dev.cjs stop` after use. Hosted release gates remain enforced.
 
+Later current-state inspection on 29 September confirmed the earlier customer
+sign-in and one-record checkpoint still persists in `governance_dev`. An initial
+unscoped owner-role count showed zero because customer/event tables use forced
+row security; it was not an empty-database result. A privileged read-only count
+found one identity, stored app-session row, workspace, project, membership, revoked key,
+accepted event and pending outbox row. The strict API role independently read one
+pending record in the selected project. No evidence bundle or publisher release
+exists yet, so the [roadmap](roadmap-and-decisions.md) still treats worker/Base
+receipt acceptance as open. No publisher permission or Base transaction followed
+this inspection.
+
 The generic governance service launcher accepts `dev` and `test` for serving.
 It recognises `staging` and `prod` but refuses startup while managed identity and
 operational release evidence are incomplete. There is no flag to bypass that gate.
