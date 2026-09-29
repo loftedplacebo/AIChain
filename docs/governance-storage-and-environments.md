@@ -106,6 +106,15 @@ prefixes may share a failure domain. Independent provisioning review must check
 actual resources, access policies, key material and restore results. The validator
 does not prove any of those properties. No existing secret files are imported.
 
+Schema version 2 adds exact portal and API origins for each environment. The
+callback must be the portal origin plus `/api/auth/callback`; the signed WorkOS
+webhook must be the API origin plus `/v1/auth/workos-webhook`. Origins must be
+distinct across these routes and environments; hosted origins require HTTPS and
+non-loopback hosts. This catches a common Sites-to-VPS miswire before provider
+registration. Version 1 private plan copies must be updated to version 2 with
+these fields. The check compares declared strings only: it does not prove DNS,
+TLS, reverse-proxy routing, Sites runtime settings or provider registration.
+
 Recommended release sequence:
 
 1. Select the database/backup hosting layout and agree recovery objectives. Record

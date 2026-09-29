@@ -1,8 +1,9 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "environments": [
     {
       "stage": "dev",
+      "portal": {"origin": "http://127.0.0.1:3002", "apiOrigin": "http://127.0.0.1:8790"},
       "database": {
         "host": "dev.db.example.test",
         "port": 5432,
@@ -44,6 +45,7 @@
     },
     {
       "stage": "test",
+      "portal": {"origin": "http://127.0.0.1:3003", "apiOrigin": "http://127.0.0.1:8791"},
       "database": {
         "host": "test.db.example.test",
         "port": 5432,
@@ -85,6 +87,7 @@
     },
     {
       "stage": "staging",
+      "portal": {"origin": "https://staging.example.test", "apiOrigin": "https://api.staging.example.test"},
       "database": {
         "host": "staging.db.example.test",
         "port": 5432,
@@ -98,7 +101,7 @@
         "environmentId": "replace_staging_environment",
         "clientId": "replace_staging_client",
         "callbackUrl": "https://staging.example.test/api/auth/callback",
-        "webhookUrl": "https://staging.example.test/v1/auth/workos-webhook"
+        "webhookUrl": "https://api.staging.example.test/v1/auth/workos-webhook"
       },
       "secrets": {
         "apiDatabase": "replace/staging/apiDatabase",
@@ -126,6 +129,7 @@
     },
     {
       "stage": "prod",
+      "portal": {"origin": "https://prod.example.test", "apiOrigin": "https://api.prod.example.test"},
       "database": {
         "host": "prod.db.example.test",
         "port": 5432,
@@ -139,7 +143,7 @@
         "environmentId": "replace_prod_environment",
         "clientId": "replace_prod_client",
         "callbackUrl": "https://prod.example.test/api/auth/callback",
-        "webhookUrl": "https://prod.example.test/v1/auth/workos-webhook"
+        "webhookUrl": "https://api.prod.example.test/v1/auth/workos-webhook"
       },
       "secrets": {
         "apiDatabase": "replace/prod/apiDatabase",
