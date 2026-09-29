@@ -1,0 +1,4 @@
+{
+  "environment": "dev",
+  "directory": "build/governance/dev/recovery-drills/restore-REPLACE_WITH_NEW_RESTORE_DIRECTORY"
+}

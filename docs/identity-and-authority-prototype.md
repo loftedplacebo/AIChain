@@ -7,7 +7,7 @@
 | Last updated | 2026-08-19 |
 | Contract | `AuthorityRegistry` |
 | Protocol status | Non-final; does not resolve identity or authorization decisions |
-| Companion documents | [Autonomous Machines Product Vision](./autonomous-machines-product-vision.md); [AI Verification & ZK Architecture](./ai-verification-and-zk-architecture.md) |
+| Companion documents | [Autonomous Machines Product Vision](archive/2026-09-27/superseded-plans/autonomous-machines-product-vision.md); [AI Verification & ZK Architecture](./ai-verification-and-zk-architecture.md) |
 
 ## 1. Purpose and Boundary
 

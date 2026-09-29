@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AIChain — Base Sepolia deployment</title>
+<style>
+  body { max-width: 760px; margin: 48px auto; padding: 0 20px; font: 16px/1.5 system-ui, sans-serif; color: #17212b; }
+  h1 { margin-bottom: 0; } .muted { color: #5f6b76; } code { overflow-wrap: anywhere; }
+  .card { margin: 24px 0; padding: 20px; border: 1px solid #cad3dc; border-radius: 10px; background: #f8fafc; }
+  button { padding: 11px 16px; border: 0; border-radius: 7px; background: #134e8a; color: white; font-weight: 650; cursor: pointer; }
+  button[disabled] { background: #82909d; cursor: not-allowed; } #status { white-space: pre-wrap; }
+</style>
+<h1>Base Sepolia anchor deployment</h1>
+<p class="muted">This page runs locally. It cannot access your private key. MetaMask shows and signs any transaction.</p>
+<div class="card">
+  <p><strong>Network:</strong> <span id="network">Loading…</span></p>
+  <p><strong>Required account:</strong> <code id="signer"></code></p>
+  <p><strong>Contract:</strong> <span id="contract"></span></p>
+  <p><strong>Creation data hash:</strong> <code id="hash"></code></p>
+  <button id="connect">1. Connect Fluxora MetaMask</button>
+  <button id="deploy" disabled>2. Review and deploy to Base Sepolia</button>
+</div>
+<div class="card"><strong>Status</strong><div id="status">Loading deployment manifest…</div></div>
+<script>
+  const expectedChainId = '0x14a34'; // 84532
+  let manifest, account;
+  const status = message => document.querySelector('#status').textContent = message;
+  (async () => {
+    manifest = await fetch('/build/base-sepolia/deployment-manifest.json', { cache: 'no-store' }).then(r => r.json());
+    document.querySelector('#network').textContent = `${manifest.network.name} (chain ${manifest.network.chainId})`;
+    document.querySelector('#signer').textContent = manifest.signer;
+    document.querySelector('#contract').textContent = manifest.contract.name;
+    document.querySelector('#hash').textContent = manifest.creation.dataKeccak256;
+    status('Ready. Connect MetaMask to continue.');
+  })().catch(error => status(`Could not load local deployment manifest: ${error.message}`));
+
+  document.querySelector('#connect').onclick = async () => {
+    try {
+      if (!window.ethereum) throw new Error('MetaMask was not detected in this browser profile.');
+      const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+      const chainId = await ethereum.request({ method: 'eth_chainId' });
+      if (chainId !== expectedChainId) throw new Error('Select Base Sepolia in MetaMask, then try again.');
+      account = accounts.find(value => value.toLowerCase() === manifest.signer.toLowerCase());
+      if (!account) throw new Error(`Select the Fluxora account ${manifest.signer} in MetaMask, then try again.`);
+      document.querySelector('#deploy').disabled = false;
+      status(`Connected to Fluxora on Base Sepolia: ${account}`);
+    } catch (error) { status(`Connection not completed: ${error.message}`); }
+  };
+
+  document.querySelector('#deploy').onclick = async () => {
+    try {
+      status('MetaMask will now show the contract-creation transaction. Review it before confirming.');
+      const transactionHash = await ethereum.request({ method: 'eth_sendTransaction', params: [{ from: account, to: undefined, value: '0x0', data: manifest.creation.data }] });
+      status(`Submitted to Base Sepolia. Transaction hash:\n${transactionHash}\n\nSend this hash back to Codex for independent verification.`);
+      document.querySelector('#deploy').disabled = true;
+    } catch (error) { status(`Deployment was not completed: ${error.message}`); }
+  };
+</script>
+</html>

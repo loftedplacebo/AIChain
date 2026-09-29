@@ -1,0 +1,14 @@
+{
+  "start": 1790515771.8086588,
+  "next": 100,
+  "accepted": 100,
+  "duplicates": 0,
+  "errors": 0,
+  "maxLatencyMs": 116,
+  "status": "running",
+  "updatedAt": 1790515783.839347,
+  "workerStates": {
+    "confirmed": 4
+  },
+  "checkedAt": 1790515873.9952397
+}

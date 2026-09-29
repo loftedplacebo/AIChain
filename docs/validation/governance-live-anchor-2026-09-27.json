@@ -1,0 +1,28 @@
+{
+  "state": "confirmed",
+  "checkedAt": "2026-09-27T12:46:47.985Z",
+  "signature": "valid",
+  "sourceSignature": "not-verified",
+  "recordCommitment": true,
+  "batchMembership": true,
+  "chainId": 84532,
+  "contract": "0x5781540e4682a9d35011c94a25f615e438e8e7af",
+  "finality": "Not an Ethereum finality or AI correctness claim",
+  "signer": "0xb4ab030ba5c5db6442c946d02439d77a7067908f",
+  "receiptId": "0x2d35e8ea431044c6bcf1427b976577910f4bb1ce62dae0a3ecc0384207596cec",
+  "trustedSigner": true,
+  "batch": {
+    "id": "0xbc5067a65adbff919b9f506709c2fd6731e085268f38b0f677eeaeac1eb707eb",
+    "root": "0x3f5bb56ee16b835cff3dd933eac398154b6d606bbe4c7f68b1a639fd8d621fa2",
+    "leafCount": 182,
+    "publisher": "0xec502b5f4d1925138a7409d9a7b55fba20e13cc3"
+  },
+  "transactionHash": "0x128e3141042cfe0b4d3dbf6fe6015b2491fd9dc78bedc31281ce7fdcca8753a8",
+  "explorerUrl": "https://sepolia.basescan.org/tx/0x128e3141042cfe0b4d3dbf6fe6015b2491fd9dc78bedc31281ce7fdcca8753a8",
+  "confirmations": 32,
+  "minimumConfirmations": 12,
+  "blockNumber": 47372429,
+  "blockHash": "0x912a642795aa183c86c16cd9204291eaf0d8a038bad891fe88fbeefff11978cb",
+  "reason": "Canonical Base Sepolia inclusion checked at the displayed time; later reorganisations remain possible",
+  "linkedRecords": 182
+}

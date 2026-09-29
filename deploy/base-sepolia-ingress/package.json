@@ -1,0 +1,11 @@
+{
+  "name": "aichain-base-sepolia-synthetic-ingress",
+  "private": true,
+  "version": "0.1.0-alpha",
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "ethers": "6.16.0"
+  }
+}

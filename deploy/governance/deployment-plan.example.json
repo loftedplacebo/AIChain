@@ -1,0 +1,169 @@
+{
+  "schemaVersion": 1,
+  "environments": [
+    {
+      "stage": "dev",
+      "database": {
+        "host": "dev.db.example.test",
+        "port": 5432,
+        "name": "governance_dev",
+        "apiRole": "governance_api",
+        "workerRole": "governance_evidence_worker",
+        "migrationRole": "governance_migrations",
+        "tls": "local"
+      },
+      "identity": {
+        "environmentId": "replace_dev_environment",
+        "clientId": "replace_dev_client",
+        "callbackUrl": "http://127.0.0.1:3002/api/auth/callback",
+        "webhookUrl": "http://127.0.0.1:8790/v1/auth/workos-webhook"
+      },
+      "secrets": {
+        "apiDatabase": "replace/dev/apiDatabase",
+        "workerDatabase": "replace/dev/workerDatabase",
+        "workosApi": "replace/dev/workosApi",
+        "sessionEncryption": "replace/dev/sessionEncryption",
+        "webhookSigning": "replace/dev/webhookSigning",
+        "recordingSigner": "replace/dev/recordingSigner",
+        "relayer": "replace/dev/relayer",
+        "backupEncryption": "replace/dev/backupEncryption"
+      },
+      "evidence": {
+        "chainId": 84532,
+        "recordingAddress": "0x0000000000000000000000000000000000000001",
+        "relayerAddress": "0x0000000000000000000000000000000000000002",
+        "workerJournal": "replace/dev/worker-journal"
+      },
+      "backup": {
+        "destination": "replace/dev/backups",
+        "custody": "local-synthetic",
+        "retentionDays": 7,
+        "rpoMinutes": 1440,
+        "rtoMinutes": 240
+      }
+    },
+    {
+      "stage": "test",
+      "database": {
+        "host": "test.db.example.test",
+        "port": 5432,
+        "name": "governance_test",
+        "apiRole": "governance_api",
+        "workerRole": "governance_evidence_worker",
+        "migrationRole": "governance_migrations",
+        "tls": "local"
+      },
+      "identity": {
+        "environmentId": "replace_test_environment",
+        "clientId": "replace_test_client",
+        "callbackUrl": "http://127.0.0.1:3003/api/auth/callback",
+        "webhookUrl": "http://127.0.0.1:8791/v1/auth/workos-webhook"
+      },
+      "secrets": {
+        "apiDatabase": "replace/test/apiDatabase",
+        "workerDatabase": "replace/test/workerDatabase",
+        "workosApi": "replace/test/workosApi",
+        "sessionEncryption": "replace/test/sessionEncryption",
+        "webhookSigning": "replace/test/webhookSigning",
+        "recordingSigner": "replace/test/recordingSigner",
+        "relayer": "replace/test/relayer",
+        "backupEncryption": "replace/test/backupEncryption"
+      },
+      "evidence": {
+        "chainId": 84532,
+        "recordingAddress": "0x0000000000000000000000000000000000000003",
+        "relayerAddress": "0x0000000000000000000000000000000000000004",
+        "workerJournal": "replace/test/worker-journal"
+      },
+      "backup": {
+        "destination": "replace/test/backups",
+        "custody": "local-synthetic",
+        "retentionDays": 7,
+        "rpoMinutes": 1440,
+        "rtoMinutes": 240
+      }
+    },
+    {
+      "stage": "staging",
+      "database": {
+        "host": "staging.db.example.test",
+        "port": 5432,
+        "name": "governance_staging",
+        "apiRole": "governance_api",
+        "workerRole": "governance_evidence_worker",
+        "migrationRole": "governance_migrations",
+        "tls": "verify-full"
+      },
+      "identity": {
+        "environmentId": "replace_staging_environment",
+        "clientId": "replace_staging_client",
+        "callbackUrl": "https://staging.example.test/api/auth/callback",
+        "webhookUrl": "https://staging.example.test/v1/auth/workos-webhook"
+      },
+      "secrets": {
+        "apiDatabase": "replace/staging/apiDatabase",
+        "workerDatabase": "replace/staging/workerDatabase",
+        "workosApi": "replace/staging/workosApi",
+        "sessionEncryption": "replace/staging/sessionEncryption",
+        "webhookSigning": "replace/staging/webhookSigning",
+        "recordingSigner": "replace/staging/recordingSigner",
+        "relayer": "replace/staging/relayer",
+        "backupEncryption": "replace/staging/backupEncryption"
+      },
+      "evidence": {
+        "chainId": 84532,
+        "recordingAddress": "0x0000000000000000000000000000000000000005",
+        "relayerAddress": "0x0000000000000000000000000000000000000006",
+        "workerJournal": "replace/staging/worker-journal"
+      },
+      "backup": {
+        "destination": "replace/staging/backups",
+        "custody": "independent-storage",
+        "retentionDays": 7,
+        "rpoMinutes": 1440,
+        "rtoMinutes": 240
+      }
+    },
+    {
+      "stage": "prod",
+      "database": {
+        "host": "prod.db.example.test",
+        "port": 5432,
+        "name": "governance_prod",
+        "apiRole": "governance_api",
+        "workerRole": "governance_evidence_worker",
+        "migrationRole": "governance_migrations",
+        "tls": "verify-full"
+      },
+      "identity": {
+        "environmentId": "replace_prod_environment",
+        "clientId": "replace_prod_client",
+        "callbackUrl": "https://prod.example.test/api/auth/callback",
+        "webhookUrl": "https://prod.example.test/v1/auth/workos-webhook"
+      },
+      "secrets": {
+        "apiDatabase": "replace/prod/apiDatabase",
+        "workerDatabase": "replace/prod/workerDatabase",
+        "workosApi": "replace/prod/workosApi",
+        "sessionEncryption": "replace/prod/sessionEncryption",
+        "webhookSigning": "replace/prod/webhookSigning",
+        "recordingSigner": "replace/prod/recordingSigner",
+        "relayer": "replace/prod/relayer",
+        "backupEncryption": "replace/prod/backupEncryption"
+      },
+      "evidence": {
+        "chainId": 84532,
+        "recordingAddress": "0x0000000000000000000000000000000000000007",
+        "relayerAddress": "0x0000000000000000000000000000000000000008",
+        "workerJournal": "replace/prod/worker-journal"
+      },
+      "backup": {
+        "destination": "replace/prod/backups",
+        "custody": "independent-storage",
+        "retentionDays": 7,
+        "rpoMinutes": 1440,
+        "rtoMinutes": 240
+      }
+    }
+  ]
+}

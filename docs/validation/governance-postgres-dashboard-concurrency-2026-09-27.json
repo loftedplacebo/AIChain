@@ -1,0 +1,137 @@
+{
+  "runId": "g0c8a431e0848",
+  "startedAt": "2026-09-27T18:52:02.138Z",
+  "engine": "standalone PostgreSQL over TCP",
+  "synthetic": true,
+  "checks": [
+    {
+      "name": "concurrent migrations and restricted runtime startup",
+      "status": "passed"
+    },
+    {
+      "name": "fixture reconstructed through real PostgreSQL",
+      "status": "passed",
+      "events": 182,
+      "accuracy": [
+        0.7,
+        0.9
+      ]
+    },
+    {
+      "name": "signed receipt and batch evidence persist in scoped PostgreSQL transactions",
+      "status": "passed"
+    },
+    {
+      "name": "40 simultaneous retries create one event and one outbox entry",
+      "status": "passed"
+    },
+    {
+      "name": "600 unique submissions with 24 concurrent workers",
+      "status": "passed",
+      "events": 600,
+      "elapsedMs": 2330,
+      "eventsPerSecond": 257.6,
+      "p50Ms": 86,
+      "p95Ms": 134,
+      "note": "Local short-run storage baseline, not sustained capacity or an SLA"
+    },
+    {
+      "name": "pooled concurrent reads do not leak tenant or project context",
+      "status": "passed"
+    },
+    {
+      "name": "concurrent quota enforcement accepts exactly 10 of 40 new events",
+      "status": "passed"
+    },
+    {
+      "name": "event, outbox and metering counts reconcile",
+      "status": "passed",
+      "counts": {
+        "events": "793",
+        "outbox": "793",
+        "metered": "793"
+      }
+    },
+    {
+      "name": "authenticated website gateway reads and exports from native PostgreSQL with workspace isolation",
+      "status": "passed"
+    },
+    {
+      "name": "dashboard reads overlap HTTP submissions above 10000 records",
+      "status": "passed",
+      "seedCount": 10020,
+      "writeCount": 600,
+      "targetSubmissionsPerSecond": 40,
+      "submissionConcurrency": 12,
+      "dashboardReaders": 4,
+      "elapsedMs": 17052,
+      "overlappingReads": 273,
+      "observedRunRange": [
+        10020,
+        10583
+      ],
+      "metrics": {
+        "submissions": {
+          "requests": 600,
+          "p50Ms": 11,
+          "p95Ms": 110,
+          "p99Ms": 281
+        },
+        "report": {
+          "requests": 12,
+          "p50Ms": 1102,
+          "p95Ms": 2645,
+          "p99Ms": 2645
+        },
+        "reviews": {
+          "requests": 49,
+          "p50Ms": 197,
+          "p95Ms": 351,
+          "p99Ms": 425
+        },
+        "events": {
+          "requests": 115,
+          "p50Ms": 13,
+          "p95Ms": 22,
+          "p99Ms": 110
+        },
+        "foreignReport": {
+          "requests": 101,
+          "p50Ms": 40,
+          "p95Ms": 68,
+          "p99Ms": 136
+        }
+      },
+      "counts": {
+        "events": "10620",
+        "outbox": "10620",
+        "metered": "10620"
+      },
+      "errors": 0,
+      "note": "Native PostgreSQL; real ingestion HTTP and authenticated portal gateway data requests. No browser rendering, model calls, receipt worker or Base broadcasts. Short paced functional concurrency test, not maximum capacity."
+    },
+    {
+      "name": "native pg_dump/pg_restore preserves events, outbox, counters, migrations and reports",
+      "status": "passed",
+      "snapshot": {
+        "counts": {
+          "governance_events": 11433,
+          "governance_outbox": 11433,
+          "governance_usage": 6,
+          "governance_evidence": 182,
+          "migrations": 5,
+          "environment": 1
+        },
+        "sha256": "938df6c50d3e78c2cbc7c9a2e34d02d763d51325a4d1d87a8bf932a76a71fe17"
+      },
+      "backupBytes": 889947,
+      "dumpMs": 712,
+      "restoreMs": 2708,
+      "restoredIsolation": true,
+      "duplicateReplayPreserved": true
+    }
+  ],
+  "serverVersion": "17.11",
+  "completedAt": "2026-09-27T18:53:55.785Z",
+  "status": "passed"
+}

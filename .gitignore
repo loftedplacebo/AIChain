@@ -10,6 +10,8 @@ __pycache__/
 bin/
 build/
 /artifacts/zk/
+/orvessian-*.tar.gz
+/website/
 
 # Local network state and secrets
 /devnet/
@@ -22,3 +24,7 @@ config/closed-testnet.env
 
 # Editor settings
 .vscode/
+
+# Local Python distribution build products
+/sdk/python/build/
+/sdk/python/*.egg-info/

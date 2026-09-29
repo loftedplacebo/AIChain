@@ -1,0 +1,7 @@
+{
+  "environment": "test",
+  "directory": "C:/AIChain/build/private-backups/old-key-generation/pg-backup-REPLACE",
+  "outputRoot": "C:/AIChain/build/private-backups/new-key-generation",
+  "keyFile": "C:/AIChain/build/private-keys/old-backup-key.txt",
+  "newKeyFile": "C:/AIChain/build/private-keys/new-backup-key.txt"
+}

@@ -1,21 +1,27 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-/// @notice Phase 1B prototype anchor for Merkle batches of AVR receipt identifiers.
-/// @dev Batch roots use sorted Keccak-256 pair hashing; receipt identifiers remain opaque bytes32 values.
+/// @notice Public anchor for Merkle batches of AVR receipt identifiers.
+/// @dev A batch is identified by its publisher and root. Receipt identifiers remain opaque bytes32 values.
 contract ReceiptBatchAnchor {
     struct Batch {
-        address issuer;
+        address publisher;
         uint64 includedAt;
         uint64 leafCount;
         string schemaVersion;
     }
 
-    mapping(bytes32 batchRoot => Batch batch) private batches;
+    // A root alone is not a globally-owned namespace: two independent publishers
+    // can legitimately derive the same root. The scoped identity prevents a
+    // mempool observer from reserving another publisher's root first.
+    mapping(bytes32 batchId => Batch batch) private batches;
 
-    event ReceiptBatchAnchored(
+    /// @notice Versioned event for publisher-scoped batches.
+    /// @dev The original ReceiptBatchAnchored event belongs to historical deployments.
+    event ReceiptBatchAnchoredV2(
+        bytes32 indexed batchId,
         bytes32 indexed batchRoot,
-        address indexed issuer,
+        address indexed publisher,
         uint64 leafCount,
         string schemaVersion,
         uint64 includedAt
@@ -24,28 +30,37 @@ contract ReceiptBatchAnchor {
     error EmptyBatchRoot();
     error EmptySchemaVersion();
     error EmptyBatch();
-    error BatchAlreadyAnchored(bytes32 batchRoot);
-    error UnknownBatch(bytes32 batchRoot);
+    error BatchAlreadyAnchored(bytes32 batchId);
+    error UnknownBatch(bytes32 batchId);
+
+    /// @notice Computes the immutable identity of a batch anchored by `publisher`.
+    /// @dev Includes the contract address and chain ID to prevent cross-deployment replay.
+    function batchId(address publisher, bytes32 batchRoot) public view returns (bytes32) {
+        return keccak256(abi.encode(block.chainid, address(this), publisher, batchRoot));
+    }
 
     function anchorBatch(bytes32 batchRoot, uint64 leafCount, string calldata schemaVersion) external {
         if (batchRoot == bytes32(0)) revert EmptyBatchRoot();
         if (leafCount == 0) revert EmptyBatch();
         if (bytes(schemaVersion).length == 0) revert EmptySchemaVersion();
-        if (batches[batchRoot].issuer != address(0)) revert BatchAlreadyAnchored(batchRoot);
+
+        bytes32 id = batchId(msg.sender, batchRoot);
+        if (batches[id].publisher != address(0)) revert BatchAlreadyAnchored(id);
 
         uint64 includedAt = uint64(block.timestamp);
-        batches[batchRoot] = Batch({
-            issuer: msg.sender,
+        batches[id] = Batch({
+            publisher: msg.sender,
             includedAt: includedAt,
             leafCount: leafCount,
             schemaVersion: schemaVersion
         });
-        emit ReceiptBatchAnchored(batchRoot, msg.sender, leafCount, schemaVersion, includedAt);
+        emit ReceiptBatchAnchoredV2(id, batchRoot, msg.sender, leafCount, schemaVersion, includedAt);
     }
 
-    function getBatch(bytes32 batchRoot) external view returns (Batch memory) {
-        Batch memory batch = batches[batchRoot];
-        if (batch.issuer == address(0)) revert UnknownBatch(batchRoot);
+    function getBatch(address publisher, bytes32 batchRoot) external view returns (Batch memory) {
+        bytes32 id = batchId(publisher, batchRoot);
+        Batch memory batch = batches[id];
+        if (batch.publisher == address(0)) revert UnknownBatch(id);
         return batch;
     }
 

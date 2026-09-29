@@ -27,7 +27,7 @@ measured EVM verification gas in the prior interoperability trial.
 1. **RISC Zero is selected for the initial AIChain AVR ZK proof path.**
 2. The initial selected versions are `risc0-zkvm 3.0.3`, the versioned ZK-001
    statement, and the pinned RISC Zero EVM verifier source/encoder documented
-   in [Phase 2C EVM Verifier Evidence](../phase-2c-evm-verifier-evidence.md).
+   in [Phase 2C EVM Verifier Evidence](../archive/2026-09-27/completed-stages/phase-2c-evm-verifier-evidence.md).
 3. Proof generation remains off-chain. Only the proof and defined public
    inputs/commitments are verified on-chain; private witness data is not
    submitted to the L1.
@@ -77,8 +77,8 @@ Before a public or production network relies on this path:
 
 ## References
 
-- [Repeated benchmark results](../phase-2c-repeated-benchmark-results.md)
-- [Phase 2C EVM verifier evidence](../phase-2c-evm-verifier-evidence.md)
+- [Repeated benchmark results](../archive/2026-09-27/completed-stages/phase-2c-repeated-benchmark-results.md)
+- [Phase 2C EVM verifier evidence](../archive/2026-09-27/completed-stages/phase-2c-evm-verifier-evidence.md)
 - [ZK-001 policy-evaluation statement](../zk-001-policy-evaluation-statement.md)
 - [ZK-001 threat model](../zk-001-threat-model.md)
 - [ADR-0005: ZK-001 policy-evaluation statement](./0005-zk-001-policy-evaluation-statement.md)

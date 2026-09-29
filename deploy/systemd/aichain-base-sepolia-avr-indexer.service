@@ -1,0 +1,33 @@
+[Unit]
+Description=AIChain Base Sepolia AVR event indexer (read-only)
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=aichain-indexer
+Group=aichain-indexer
+WorkingDirectory=/opt/aichain/base-sepolia-indexer
+Environment=NODE_ENV=production
+Environment=AICHAIN_ENABLE_AVR_INDEXER=1
+ExecStart=/opt/aichain/.toolchains/node-v24.21.0-linux-x64/bin/node /opt/aichain/base-sepolia-indexer/scripts/base-sepolia-avr-indexer.cjs --state /var/lib/aichain-base-sepolia-indexer/avr-event-index.json --watch-seconds 15
+Restart=on-failure
+RestartSec=5
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+ReadWritePaths=/var/lib/aichain-base-sepolia-indexer
+MemoryMax=512M
+CPUQuota=100%
+TasksMax=64
+LimitNOFILE=4096
+
+[Install]
+WantedBy=multi-user.target

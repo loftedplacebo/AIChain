@@ -9,7 +9,7 @@ For each candidate run:
 3. Store only non-secret inputs and outputs. Never place private keys, RPC credentials, or `.env` values here.
 4. Link the manifest, raw measurements, code revision, and any Core-Geth patch in the comparison report.
 
-The initial benchmark protocol is in [the Phase 2A shortlist](../../docs/phase-2a-pow-candidate-shortlist.md).
+The initial benchmark protocol is in [the Phase 2A shortlist](../../docs/archive/2026-09-27/own-chain/phase-2a-pow-candidate-shortlist.md).
 
 ## Difficulty simulation
 

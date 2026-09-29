@@ -1,13 +1,15 @@
 # Verification receipt readiness review — 2026-09-12
 
+> Current baseline — 27 September 2026: [Platform current state](platform-architecture.md) supersedes dated implementation and launch-status statements below. The governance workspace uses the private VPS API, sponsored Base Sepolia batches and live evidence verification. The 24-hour reliability run is in progress. Production identity, operations, automatic alerting and commercial release remain gated. Historical measurements and protocol semantics retain their original scope.
+
 **Verdict:** the L1 anchoring primitive is flexible; the original developer-facing
 receipt format was too AI-specific to be the general product promised by the
 vision. This increment closes the most immediate format and integration gaps.
 It does not justify calling the chain or receipt product production-ready.
 
 The assessment uses the original recorded use cases in
-[Autonomous Machines Product Vision](./autonomous-machines-product-vision.md)
-and [Organisational Verification Architecture](./future-proof-organisational-verification-architecture.md).
+[Autonomous Machines Product Vision](archive/2026-09-27/superseded-plans/autonomous-machines-product-vision.md)
+and [Organisational Verification Architecture](archive/2026-09-27/superseded-plans/future-proof-organisational-verification-architecture.md).
 The active source is `C:\AIChain`; the older project directory contains an
 incomplete prior checkout and was not used for implementation.
 

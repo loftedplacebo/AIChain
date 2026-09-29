@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=84", "wheel>=0.48"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "orvessian-ingestion"
+version = "0.1.0a1"
+description = "Bounded structured governance ingestion and optional framework adapters"
+readme = "README-ingestion.md"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.optional-dependencies]
+langchain = ["langchain-core==1.6.5", "langgraph==1.2.12"]
+openai = ["langchain-core==1.6.5", "langgraph==1.2.12", "langchain-openai==1.6.6", "openai==3.19.2"]
+otel = ["opentelemetry-sdk==1.45.0"]
+mcp = ["mcp==2.2.0", "langchain-core==1.6.5"]
+
+[tool.setuptools]
+py-modules = ["orvessian_ingest", "orvessian_delivery", "orvessian_langchain", "orvessian_openai", "orvessian_otel", "orvessian_mcp"]

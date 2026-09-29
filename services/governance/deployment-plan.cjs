@@ -1,0 +1,49 @@
+'use strict';
+// Non-secret topology review only. Does not resolve credentials or approve release.
+const stages=['dev','test','staging','prod'];
+const secretFields=['apiDatabase','workerDatabase','workosApi','sessionEncryption','webhookSigning','recordingSigner','relayer','backupEncryption'];
+const scalar=(value)=>typeof value==='string'&&/^[A-Za-z0-9][A-Za-z0-9_.:/-]{0,199}$/.test(value);
+function exact(value,fields,location,errors){
+ if(!value||typeof value!=='object'||Array.isArray(value)){errors.push(location+': object required');return false;}
+ if(Object.keys(value).some(key=>!fields.includes(key))||fields.some(key=>!Object.hasOwn(value,key))){errors.push(location+': fields do not match schema');return false;}return true;
+}
+function validatePlan(plan){
+ const errors=[],resources=new Map();
+ const unique=(kind,value,stage)=>{const key=kind+':'+value;if(resources.has(key))errors.push(stage+': '+kind+' must be separate from '+resources.get(key));else resources.set(key,stage);};
+ if(!exact(plan,['schemaVersion','environments'],'plan',errors)||plan.schemaVersion!==1){return {valid:false,releaseReady:false,errors:errors.length?errors:['plan: unsupported schema']};}
+ if(!Array.isArray(plan.environments)||plan.environments.length!==4)return {valid:false,releaseReady:false,errors:['plan: exactly dev, test, staging and prod required']};
+ const seen=new Set();
+ for(const env of plan.environments){
+  if(!exact(env,['stage','database','identity','secrets','evidence','backup'],'environment',errors))continue;
+  const stage=env.stage;if(!stages.includes(stage)||seen.has(stage)){errors.push('environment: invalid or repeated stage');continue;}seen.add(stage);
+  if(exact(env.database,['host','port','name','apiRole','workerRole','migrationRole','tls'],'database',errors)){
+   const db=env.database;
+   if(typeof db.host!=='string'||!/^[a-z0-9.-]+$/.test(db.host)||!Number.isInteger(db.port)||db.port<1||db.port>65535||![db.name,db.apiRole,db.workerRole,db.migrationRole].every(v=>typeof v==='string'&&/^[a-z][a-z0-9_]{0,62}$/.test(v)))errors.push(stage+': invalid database endpoint or role');
+   else unique('database',db.host+':'+db.port+'/'+db.name,stage);
+   if(new Set([db.apiRole,db.workerRole,db.migrationRole]).size!==3)errors.push(stage+': API, worker and migration roles must differ');
+   if(!['local','verify-full'].includes(db.tls)||['staging','prod'].includes(stage)&&db.tls!=='verify-full')errors.push(stage+': hosted PostgreSQL requires verified TLS');
+  }
+  if(exact(env.identity,['environmentId','clientId','callbackUrl','webhookUrl'],'identity',errors)){
+   if(!scalar(env.identity.environmentId)||!scalar(env.identity.clientId))errors.push(stage+': invalid provider identifiers');
+   else{unique('provider environment',env.identity.environmentId,stage);unique('provider client',env.identity.clientId,stage);}
+   for(const field of ['callbackUrl','webhookUrl']){
+    try{const url=new URL(env.identity[field]);if(url.username||url.password||url.search||url.hash||!['http:','https:'].includes(url.protocol)||url.protocol==='http:'&&!['127.0.0.1','localhost','[::1]'].includes(url.hostname)||['staging','prod'].includes(stage)&&(url.protocol!=='https:'||['127.0.0.1','localhost','[::1]'].includes(url.hostname)))throw Error();unique(field,url.href,stage);}catch{errors.push(stage+': invalid '+field);}
+   }
+  }
+  if(exact(env.secrets,secretFields,'secrets',errors)){
+   for(const field of secretFields)if(!scalar(env.secrets[field]))errors.push(stage+': invalid secret reference');else unique('secret reference',env.secrets[field],stage);
+  }
+  if(exact(env.evidence,['chainId','recordingAddress','relayerAddress','workerJournal'],'evidence',errors)){
+   if(![84532,8453].includes(env.evidence.chainId)||stage!=='prod'&&env.evidence.chainId!==84532)errors.push(stage+': invalid Base chain selection');
+   for(const field of ['recordingAddress','relayerAddress'])if(typeof env.evidence[field]!=='string'||!/^0x[0-9a-fA-F]{40}$/.test(env.evidence[field])||/^0x0{40}$/i.test(env.evidence[field]))errors.push(stage+': invalid evidence address');else unique('signing address',env.evidence[field].toLowerCase(),stage);
+   if(!scalar(env.evidence.workerJournal))errors.push(stage+': invalid worker journal reference');else unique('worker journal',env.evidence.workerJournal,stage);
+  }
+  if(exact(env.backup,['destination','custody','retentionDays','rpoMinutes','rtoMinutes'],'backup',errors)){
+   if(!scalar(env.backup.destination))errors.push(stage+': invalid backup destination');else unique('backup destination',env.backup.destination,stage);
+   if(!['local-synthetic','independent-storage'].includes(env.backup.custody)||['staging','prod'].includes(stage)&&env.backup.custody!=='independent-storage')errors.push(stage+': hosted backup requires independent storage');
+   for(const field of ['retentionDays','rpoMinutes','rtoMinutes'])if(!Number.isSafeInteger(env.backup[field])||env.backup[field]<1||env.backup[field]>525600)errors.push(stage+': invalid backup objective');
+  }
+ }
+ return {valid:errors.length===0&&seen.size===4,releaseReady:false,errors};
+}
+module.exports={validatePlan};

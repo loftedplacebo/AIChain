@@ -1,0 +1,5 @@
+# Real exporter acceptance matrix; no automatic provider instrumentation.
+opentelemetry-api==1.45.0
+opentelemetry-sdk==1.45.0
+opentelemetry-semantic-conventions==0.66b0
+typing-extensions==4.16.0

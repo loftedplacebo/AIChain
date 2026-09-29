@@ -1,0 +1,3 @@
+# Exact versions exercised by the optional framework acceptance suite.
+langchain-core==1.6.5
+langgraph==1.2.12

@@ -1,0 +1,9 @@
+{
+  "name": "aichain-base-sepolia-indexer",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Read-only Base Sepolia AVR anchor event indexer",
+  "dependencies": {
+    "ethers": "6.16.0"
+  }
+}

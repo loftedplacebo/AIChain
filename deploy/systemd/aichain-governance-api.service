@@ -1,0 +1,23 @@
+[Unit]
+Description=AIChain synthetic governance workspace API (loopback only)
+After=network-online.target
+[Service]
+Type=simple
+User=aichain-governance
+Group=aichain-governance
+WorkingDirectory=/opt/aichain/governance-worker
+ExecStart=/opt/aichain/.toolchains/node-v24.21.0-linux-x64/bin/node scripts/governance-vps-api.cjs
+Restart=on-failure
+RestartSec=5
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/aichain-governance-worker
+MemoryMax=512M
+CPUQuota=100%
+TimeoutStopSec=30
+[Install]
+WantedBy=multi-user.target

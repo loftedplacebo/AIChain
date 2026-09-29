@@ -6,7 +6,7 @@
 | Document version | 0.5 |
 | Last updated | 2026-08-20 |
 | Protocol status | Non-final; does not select the production rollup or batching design |
-| Companion documents | [Development Plan](./development-plan.md); [AI Verification & ZK Architecture](./ai-verification-and-zk-architecture.md) |
+| Companion documents | [Development Plan](archive/2026-09-27/superseded-plans/development-plan.md); [AI Verification & ZK Architecture](./ai-verification-and-zk-architecture.md) |
 
 ## 1. Objective
 

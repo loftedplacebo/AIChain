@@ -8,7 +8,8 @@ const BYTES32 = /^0x[0-9a-fA-F]{64}$/;
 const AVR_EVENTS = new Interface([
   "event ReceiptAnchored(bytes32 indexed receiptId, bytes32 indexed commitmentsRoot, address indexed issuer, string schemaVersion, uint64 includedAt)",
   "event AuthorisedReceiptAnchored(bytes32 indexed receiptId, bytes32 indexed organizationId, bytes32 indexed authorityCommitment, address issuer, bytes32 commitmentsRoot, string schemaVersion, uint64 includedAt)",
-  "event ReceiptBatchAnchored(bytes32 indexed batchRoot, address indexed issuer, uint64 leafCount, string schemaVersion, uint64 includedAt)"
+  "event ReceiptBatchAnchored(bytes32 indexed batchRoot, address indexed issuer, uint64 leafCount, string schemaVersion, uint64 includedAt)",
+  "event ReceiptBatchAnchoredV2(bytes32 indexed batchId, bytes32 indexed batchRoot, address indexed publisher, uint64 leafCount, string schemaVersion, uint64 includedAt)"
 ]);
 
 function normalise(value) { return typeof value === "string" ? value.toLowerCase() : value; }
@@ -93,9 +94,12 @@ async function verifyPresentationAnchor(presentation, provider, { minimumConfirm
   if (!BYTES32.test(evidence.batchRoot) || !Array.isArray(evidence.siblings) || !Number.isInteger(evidence.leafCount) || evidence.leafCount < 1 || typeof evidence.schemaVersion !== "string" || !evidence.schemaVersion) {
     return invalid("Batch inclusion evidence is malformed", { confirmations });
   }
-  const event = events.find((item) => item.name === "ReceiptBatchAnchored" && sameHex(item.args[0], evidence.batchRoot));
+  const event = events.find((item) => (item.name === "ReceiptBatchAnchored" && sameHex(item.args[0], evidence.batchRoot))
+    || (item.name === "ReceiptBatchAnchoredV2" && sameHex(item.args[1], evidence.batchRoot)));
   if (!event) return invalid("Expected receipt batch anchor event was not found", { confirmations });
-  if (Number(event.args[2]) !== evidence.leafCount || event.args[3] !== evidence.schemaVersion) {
+  const leafCount = event.name === "ReceiptBatchAnchoredV2" ? event.args[3] : event.args[2];
+  const schemaVersion = event.name === "ReceiptBatchAnchoredV2" ? event.args[4] : event.args[3];
+  if (Number(leafCount) !== evidence.leafCount || schemaVersion !== evidence.schemaVersion) {
     return invalid("Batch anchor event does not match supplied batch metadata", { confirmations });
   }
   if (!verifyBatchMembership(presentation.receiptId, evidence.siblings, evidence.batchRoot)) {

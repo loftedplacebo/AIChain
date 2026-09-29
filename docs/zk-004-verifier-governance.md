@@ -40,5 +40,5 @@ receipt binding. This is a deliberate safe boundary, not a missing proof.
 The disposable Foundry suite has five passing tests covering lifecycle,
 resource limits, duplicate/tamper rejection, guardian controls, role/delay
 constraints, and RISC image/journal pinning. Real verifier gas is measured in
-[Phase 2C EVM Verifier Evidence](./phase-2c-evm-verifier-evidence.md); mock
+[Phase 2C EVM Verifier Evidence](archive/2026-09-27/completed-stages/phase-2c-evm-verifier-evidence.md); mock
 registry gas is not a production cost estimate.

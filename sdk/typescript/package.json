@@ -1,8 +1,26 @@
 {
-  "name": "@aichain/avr-sdk-prototype",
-  "private": true,
-  "version": "0.1.0-draft",
-  "scripts": {
-    "test": "node --test"
+  "name": "@orvessian/ingestion",
+  "version": "0.1.0-alpha.1",
+  "description": "Bounded governance ingestion; Node.js local alpha",
+  "main": "orvessian-ingest.js",
+  "types": "orvessian-ingest.d.ts",
+  "files": [
+    "orvessian-ingest.js",
+    "orvessian-ingest.d.ts",
+    "governance-event.js",
+    "README-ingestion.md",
+    "README-langfuse.md",
+    "orvessian-mappings.js",
+    "orvessian-mappings.d.ts",
+    "orvessian-queue.js",
+    "orvessian-queue.d.ts",
+    "orvessian-langfuse.js",
+    "orvessian-langfuse.d.ts"
+  ],
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "publishConfig": {
+    "access": "restricted"
   }
 }

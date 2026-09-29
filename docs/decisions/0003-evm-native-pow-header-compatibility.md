@@ -91,7 +91,7 @@ algorithm undecided.
 
 ## References
 
-- [PoW Header and Target Mapping Contract](../phase-2a-pow-header-target-mapping-contract.md)
-- [C2 FiroPoW Header-Mapping Review](../phase-2a-c2-firopow-header-mapping-review.md)
-- [C1 Source Audit](../phase-2a-c1-source-audit.md)
-- [Phase 2A Consensus Recommendation](../phase-2a-consensus-recommendation.md)
+- [PoW Header and Target Mapping Contract](../archive/2026-09-27/own-chain/phase-2a-pow-header-target-mapping-contract.md)
+- [C2 FiroPoW Header-Mapping Review](../archive/2026-09-27/own-chain/phase-2a-c2-firopow-header-mapping-review.md)
+- [C1 Source Audit](../archive/2026-09-27/own-chain/phase-2a-c1-source-audit.md)
+- [Phase 2A Consensus Recommendation](../archive/2026-09-27/own-chain/phase-2a-consensus-recommendation.md)

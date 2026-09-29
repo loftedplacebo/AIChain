@@ -79,3 +79,18 @@ test("requires an anchored batch event and a valid receipt inclusion proof", asy
   delete withoutProof.anchor.batch;
   assert.equal((await verifyPresentationAnchor(withoutProof, providerFor([log]))).reason, "Batch anchor requires batch root and receipt inclusion proof");
 });
+
+test("accepts a publisher-scoped V2 batch anchor event", async () => {
+  const other = `0x${"22".repeat(32)}`;
+  const ids = [receipt.expected.receiptId, other];
+  const { batchRoot, siblings } = rootAndProof(ids, 0);
+  const batchId = `0x${"33".repeat(32)}`;
+  const presentation = createPresentation(receipt, { level: "commitment-only" }, {
+    mode: "batch", chainId: 20260822, contract, transactionHash: txHash,
+    batch: { batchRoot, leafCount: 2, schemaVersion: "0.1.0-draft", siblings }
+  });
+  const log = eventLog("ReceiptBatchAnchoredV2", [batchId, batchRoot, receipt.issuer.toLowerCase(), 2, "0.1.0-draft", 42]);
+  const result = await verifyPresentationAnchor(presentation, providerFor([log]));
+  assert.equal(result.valid, true);
+  assert.equal(result.event, "ReceiptBatchAnchoredV2");
+});

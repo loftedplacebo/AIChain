@@ -1,0 +1,86 @@
+// Dedicated synthetic loopback cluster only. Creates isolated databases/roles;
+// never overwrites or drops a database. Credentials remain inside this process.
+const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+const {randomBytes}=require('node:crypto'),{Pool}=require('pg');
+const {migrate}=require('../services/governance/postgres-migrate.cjs');
+const {PostgresProjectKeys}=require('../services/governance/postgres-project-keys.cjs');
+const base=path.resolve(__dirname,'../build/postgres-native');
+const config=JSON.parse(fs.readFileSync(path.join(base,'cluster-access.json'),'utf8'));
+if(config.host!=='127.0.0.1'||config.port!==55439||config.user!=='governance_test_admin'||!fs.existsSync(path.join(base,'LOCAL-SYNTHETIC-ONLY')))throw Error('Only the dedicated local test cluster is allowed');
+const id='k'+randomBytes(6).toString('hex'),database='gov_keys_'+id,owner='gov_owner_'+id,app='gov_app_'+id;
+const ownerPassword=randomBytes(24).toString('hex'),appPassword=randomBytes(24).toString('hex');
+const directory=path.join(base,id);fs.mkdirSync(directory,{recursive:true});
+const admin=new Pool({...config,database:'postgres',max:2}),pools=[],results={runId:id,synthetic:true,engine:'native PostgreSQL over TCP',checks:[]};let service;
+const connect=(user,password)=>({host:config.host,port:config.port,database,user,password,max:10,connectionTimeoutMillis:5000});
+const poolFor=(user,password)=>{const pool=new Pool(connect(user,password));pools.push(pool);return pool;};
+const passed=(name)=>{results.checks.push({name,status:'passed'});console.log('PASS '+name);};
+const p={tenant:'synthetic-customer',project:'keys',actorId:'owner'},input={actionId:'create',label:'Synthetic recorder',scopes:['read','write']};
+async function main(){
+ results.serverVersion=(await admin.query('SHOW server_version')).rows[0].server_version;
+ await admin.query(`CREATE ROLE ${owner} LOGIN PASSWORD '${ownerPassword}' NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT NOBYPASSRLS`);
+ await admin.query(`CREATE ROLE ${app} LOGIN PASSWORD '${appPassword}' NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT NOBYPASSRLS`);
+ await admin.query(`CREATE DATABASE ${database} OWNER ${owner}`);
+ const migrationPool=poolFor(owner,ownerPassword);await migrate(migrationPool);
+ await migrationPool.query(`GRANT USAGE ON SCHEMA public TO ${app}; GRANT SELECT ON governance_migrations,governance_environment TO ${app}; GRANT SELECT,INSERT,UPDATE ON governance_key_scopes,governance_project_keys,governance_key_actions TO ${app}; GRANT SELECT,INSERT ON governance_events TO ${app}; GRANT SELECT,INSERT,UPDATE ON governance_outbox,governance_usage,governance_evidence,governance_agents TO ${app};`);
+ const poolA=poolFor(app,appPassword),poolB=poolFor(app,appPassword),a=new PostgresProjectKeys(poolA),b=new PostgresProjectKeys(poolB);
+ await a.ready('test');await b.ready('test');
+ await admin.query(`GRANT ${owner} TO ${app}`);await assert.rejects(a.ready('test'),/privileges/);await admin.query(`REVOKE ${owner} FROM ${app}`);await a.ready('test');
+ passed('restricted runtime accepts separate pools and rejects owner membership even with NOINHERIT');
+ const retries=await Promise.all(Array.from({length:24},(_,i)=>(i%2?a:b).create(p,input)));
+ assert.equal(retries.filter(r=>r.status==='created').length,1);assert.equal(retries.filter(r=>r.secret!==null).length,1);
+ const original=retries.find(r=>r.secret);assert.equal((await b.resolve(original.secret)).keyId,original.key.id);
+ passed('24 concurrent identical retries commit one key and expose its secret once');
+ const rotations=await Promise.all(Array.from({length:24},(_,i)=>(i%2?a:b).create(p,{...input,actionId:'rotate-'+i,graceSeconds:0},{rotateId:original.key.id}).catch(e=>({error:e.status}))));
+ assert.equal(rotations.filter(r=>r.status==='created').length,1);assert.equal(rotations.filter(r=>r.error===409).length,23);
+ const replacement=rotations.find(r=>r.secret);assert.equal(await a.resolve(original.secret),null);assert.ok(await b.resolve(replacement.secret));
+ await a.revoke(p,replacement.key.id,{actionId:'revoke'});assert.equal(await b.resolve(replacement.secret),null);
+ passed('competing rotations produce one replacement and revocation immediately reaches the other pool');
+ const race=await a.create(p,{...input,actionId:'blocked-resolve'}),locker=await poolB.connect();let resolving;
+ try{
+  await locker.query('BEGIN');await locker.query("SELECT set_config('governance.tenant',$1,true),set_config('governance.project',$2,true)",[p.tenant,p.project]);
+  await locker.query('SELECT id FROM governance_project_keys WHERE id=$1 FOR UPDATE',[race.key.id]);
+  resolving=a.resolve(race.secret);
+  let waiting=false;for(let i=0;i<100;i++){
+   waiting=(await admin.query("SELECT count(*) n FROM pg_stat_activity WHERE usename=$1 AND wait_event_type='Lock'",[app])).rows[0].n!=='0';
+   if(waiting)break;await new Promise(r=>setTimeout(r,10));
+  }
+  assert.ok(waiting,'resolver must be waiting on the key row');await new Promise(r=>setTimeout(r,10));
+  await locker.query('UPDATE governance_project_keys SET revoked_at=$2 WHERE id=$1',[race.key.id,Date.now()]);await locker.query('COMMIT');
+  assert.equal(await resolving,null);
+ }finally{await locker.query('ROLLBACK');locker.release();await resolving?.catch(()=>{});}
+ passed('authentication waiting on a row lock rechecks revocation against the time after the wait');
+ const limit={...p,project:'quota'};
+ for(let i=0;i<99;i++)await a.create(limit,{...input,actionId:'seed-'+i});
+ const burst=await Promise.all(Array.from({length:24},(_,i)=>(i%2?a:b).create(limit,{...input,actionId:'burst-'+i}).catch(e=>({error:e.status}))));
+ assert.equal(burst.filter(r=>r.status==='created').length,1);assert.equal(burst.filter(r=>r.error===429).length,23);assert.equal((await a.list(limit)).length,100);
+ passed('concurrent creations cannot exceed the 100-active-key project limit');
+ let listClock=Date.now();const paginated=new PostgresProjectKeys(poolB,{now:()=>listClock});
+ await require('../services/governance/key-pagination-checks.cjs')(paginated,ms=>listClock+=ms);
+ passed('filtered pagination retains older active keys across 107 historical entries and prevents tenant leakage');
+ await migrationPool.query(`REVOKE INSERT ON governance_key_actions FROM ${app}`);
+ await assert.rejects(a.create({...p,project:'rollback'},input),/permission denied/);
+ await migrationPool.query(`GRANT INSERT ON governance_key_actions TO ${app}`);
+ assert.equal((await a.list({...p,project:'rollback'})).length,0);
+ assert.equal((await migrationPool.query("SELECT count(*) n FROM governance_key_scopes WHERE project='rollback'")).rows[0].n,'0');
+ passed('failed audit write rolls back the key and its project lock row');
+ for(const table of ['governance_project_keys','governance_key_actions','governance_key_scopes'])assert.equal((await poolA.query('SELECT * FROM '+table)).rows.length,0);
+ await assert.rejects(a.transaction({...p,tenant:'foreign'},c=>c.query("INSERT INTO governance_key_scopes VALUES('synthetic-customer','forged')")),/row-level security/);
+ const reads=await Promise.all(Array.from({length:30},(_,i)=>(i%2?a:b).list(i%3?limit:{...limit,tenant:'foreign'})));
+ assert.ok(reads.every((rows,i)=>i%3?rows.length===100:rows.length===0));
+ assert.equal((await poolB.query('SELECT * FROM governance_project_keys')).rows.length,0);
+ passed('pooled project contexts do not leak and raw unscoped queries are denied');
+ await poolA.end();const reopened=new PostgresProjectKeys(poolFor(app,appPassword));await reopened.ready('test');assert.equal((await reopened.list(limit)).length,100);
+ passed('key metadata and idempotency history survive closing and reopening a service pool');
+ const url=new URL('postgresql://localhost');url.hostname=config.host;url.port=String(config.port);url.pathname='/'+database;url.username=app;url.password=appPassword;
+ const users=[{id:'owner',email:'owner@example.test',passwordHash:require('../services/governance/auth.cjs').passwordHash('synthetic-password'),workspaces:[{id:'workspace',name:'Synthetic workspace',tenant:p.tenant,project:p.project,role:'workspace-admin'}]}];
+ service=await require('../services/governance/start.cjs').start({GOVERNANCE_ENV:'test',GOVERNANCE_STORAGE:'postgres',GOVERNANCE_KEY_STORAGE:'postgres',GOVERNANCE_DATABASE_URL:url.href,GOVERNANCE_SESSION_DB:path.join(directory,'sessions.sqlite'),GOVERNANCE_USERS:JSON.stringify(users),PORT:'0'});
+ if(!service.server.listening)await new Promise(r=>service.server.once('listening',r));
+ const api=`http://127.0.0.1:${service.server.address().port}`;
+ const session=await (await fetch(api+'/v1/session',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email:users[0].email,password:'synthetic-password'})})).json();assert.ok(session.token);
+ const createdResponse=await fetch(api+'/v1/keys',{method:'POST',headers:{'content-type':'application/json','x-workspace-session':session.token,'x-workspace-id':'workspace'},body:JSON.stringify({...input,actionId:'http'})});assert.equal(createdResponse.status,201);const httpKey=await createdResponse.json();assert.ok(await b.resolve(httpKey.secret));
+ await b.revoke(p,httpKey.key.id,{actionId:'external-revoke'});
+ assert.equal((await fetch(api+'/v1/events',{headers:{authorization:'Bearer '+httpKey.secret}})).status,401);
+ await service.stop();service=null;passed('generic launcher creates shared keys through authenticated HTTP and observes another pool revoking them');
+ results.completedAt=new Date().toISOString();fs.writeFileSync(path.join(directory,'results.json'),JSON.stringify(results,null,2));console.log('Evidence: '+path.join(directory,'results.json'));
+}
+main().catch(()=>{console.error('Native shared-key acceptance failed; no credentials are printed');process.exitCode=1;}).finally(async()=>{await service?.stop();await Promise.all(pools.map(pool=>pool.ended?Promise.resolve():pool.end()));await admin.end();});

@@ -49,7 +49,7 @@ retirement, role separation, and the RISC adapter's image-ID/seal/journal pin.
 
 The registry overhead tests use a mock cryptographic verifier. They do not
 replace the real RISC Zero Groth16 gas evidence in
-[Phase 2C EVM Verifier Evidence](../phase-2c-evm-verifier-evidence.md).
+[Phase 2C EVM Verifier Evidence](../archive/2026-09-27/completed-stages/phase-2c-evm-verifier-evidence.md).
 
 ## Public-release gates
 

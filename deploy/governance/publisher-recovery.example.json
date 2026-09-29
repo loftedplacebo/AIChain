@@ -1,0 +1,26 @@
+{
+  "environment": "test",
+  "connectionFile": "C:/PRIVATE_OPERATOR_DIRECTORY/admin-connection.json",
+  "runtimeConnectionFile": "C:/PRIVATE_OPERATOR_DIRECTORY/worker-connection.json",
+  "rpcFile": "C:/PRIVATE_OPERATOR_DIRECTORY/review-rpc.json",
+  "journal": "C:/PRIVATE_RESTORE_DIRECTORY/worker.sqlite",
+  "restoreId": "REPLACE_WITH_REVIEWED_RESTORE_ID",
+  "expected": {
+    "tenant": "REPLACE_WITH_REVIEWED_TENANT",
+    "project": "REPLACE_WITH_REVIEWED_PROJECT",
+    "publisher": "REPLACE_WITH_REVIEWED_PUBLISHER_ADDRESS",
+    "recorder": "REPLACE_WITH_REVIEWED_RECORDER_ADDRESS"
+  },
+  "policy": {
+    "batchSize": 1000,
+    "maxTransactionsPerHour": 10,
+    "maxGasPriceWei": "100000000",
+    "dailyReservationWei": "1000000000000000",
+    "l1AllowanceWei": "10000000000000"
+  },
+  "codeHash": "REPLACE_WITH_REVIEWED_CONTRACT_CODE_HASH",
+  "maxJobs": 1000,
+  "maxRecords": 1000,
+  "minimumConfirmations": 12,
+  "outputRoot": "C:/PRIVATE_OPERATOR_DIRECTORY/release-plans"
+}

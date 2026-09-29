@@ -1,0 +1,77 @@
+{
+  "runId": "g25c59e62488a",
+  "startedAt": "2026-09-27T19:02:36.426Z",
+  "engine": "standalone PostgreSQL over TCP",
+  "synthetic": true,
+  "checks": [
+    {
+      "name": "concurrent migrations and restricted runtime startup",
+      "status": "passed"
+    },
+    {
+      "name": "fixture reconstructed through real PostgreSQL",
+      "status": "passed",
+      "events": 182,
+      "accuracy": [
+        0.7,
+        0.9
+      ]
+    },
+    {
+      "name": "signed receipt and batch evidence persist in scoped PostgreSQL transactions",
+      "status": "passed"
+    },
+    {
+      "name": "40 simultaneous retries create one event and one outbox entry",
+      "status": "passed"
+    },
+    {
+      "name": "600 unique submissions with 24 concurrent workers",
+      "status": "passed",
+      "events": 600,
+      "elapsedMs": 655,
+      "eventsPerSecond": 915.9,
+      "p50Ms": 26,
+      "p95Ms": 31,
+      "note": "Local short-run storage baseline, not sustained capacity or an SLA"
+    },
+    {
+      "name": "pooled concurrent reads do not leak tenant or project context",
+      "status": "passed"
+    },
+    {
+      "name": "concurrent quota enforcement accepts exactly 10 of 40 new events",
+      "status": "passed"
+    },
+    {
+      "name": "event, outbox and metering counts reconcile",
+      "status": "passed",
+      "counts": {
+        "events": "793",
+        "outbox": "793",
+        "metered": "793"
+      }
+    },
+    {
+      "name": "authenticated website gateway reads and exports from native PostgreSQL with workspace isolation",
+      "status": "passed"
+    }
+  ],
+  "serverVersion": "17.11",
+  "status": "failed",
+  "failure": {
+    "message": "Resource or pending-record safety limit reached"
+  },
+  "lastResourceSample": {
+    "elapsedMs": 202,
+    "completed": 8,
+    "nodeRssBytes": 207859712,
+    "hostFreeBytes": 217042944,
+    "nodeCpuMs": 78,
+    "databaseBytes": 38549171,
+    "pending": 10020,
+    "connections": 11,
+    "poolWaiting": 0
+  },
+  "validationScope": "Stopped during startup; five-minute mixed workload not completed"
+}

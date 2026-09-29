@@ -41,3 +41,9 @@ test("retains the configured 10,000 receipt boundary before applying backpressur
   assert.equal(queue.records.size,10_000);
   assert.equal(queue.submit(presentation(20_001),10_001).status,'rejected-queue-full');
 });
+test("supports an explicit 5,000-receipt capacity-test policy without widening the default", () => {
+  const queue = new AvrIngressQueue({ maxBatchReceipts: 5_000, maxQueueReceipts: 6_000 });
+  assert.equal(queue.policy.maxBatchReceipts, 5_000);
+  assert.equal(queue.snapshot().policy.maxQueueReceipts, 6_000);
+  assert.equal(new AvrIngressQueue({ maxBatchReceipts: 5_001, maxQueueReceipts: 5_000 }).policy.maxBatchReceipts, 5_001);
+});

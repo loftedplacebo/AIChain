@@ -1,5 +1,12 @@
 # AI Verification & ZK Architecture
 
+Current product implementation: [governance portal delivery status](archive/2026-09-27/superseded-plans/governance-development-status.md).
+Base is the launch settlement direction under ADR-0009. Customer APIs accept
+bounded structured governance records; source prompts, transcripts, documents
+and raw sensor content remain in customer systems and are never hosted by AIChain.
+Historical own-L1 language below describes earlier design work and must be
+read with [ADR-0009](./decisions/0009-base-launch-settlement.md).
+
 | Field | Value |
 |---|---|
 | Status | Living design document |
@@ -7,7 +14,7 @@
 | Last updated | 2026-09-12 |
 | Protocol/schema version | **TBD** |
 | Decision state | Product direction agreed; unresolved items are marked **TBD** |
-| Companion document | [Core L1 Architecture and Tooling](./core-l1-architecture-and-tooling.md) |
+| Companion document | [Core L1 Architecture and Tooling](archive/2026-09-27/own-chain/core-l1-architecture-and-tooling.md) |
 
 ## 1. Purpose
 
@@ -194,7 +201,7 @@ A batch or rollup may improve efficiency, but it must not overstate assurance: a
 
 ## 9. Receipt Profiles and Use Cases
 
-The initial AVR targets off-chain AI activity. The receipt architecture is also intended to support versioned profiles for enterprise agents, agent-to-agent interactions, AI-generated-content provenance, AI supply chains, robotics, vehicles, drones, and other autonomous machines. See [Autonomous Machines Product Vision](./autonomous-machines-product-vision.md).
+The initial AVR targets off-chain AI activity. The receipt architecture is also intended to support versioned profiles for enterprise agents, agent-to-agent interactions, AI-generated-content provenance, AI supply chains, robotics, vehicles, drones, and other autonomous machines. See [Autonomous Machines Product Vision](archive/2026-09-27/superseded-plans/autonomous-machines-product-vision.md).
 
 Each profile must define its own evidence boundary, identity/authority semantics, threat model, and assurance language. For example, a content receipt can establish provenance, not factual correctness; a vehicle receipt can bind disclosed incident evidence to a historical anchor, not prove safety or assign liability by itself.
 

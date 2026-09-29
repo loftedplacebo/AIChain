@@ -6,7 +6,7 @@
 | Date | 2026-08-22 |
 | Decision owners | AIChain project |
 | Related decisions | ARCH-002, AVR-008, AVR-009, PRIV-002, SCALE-003, CRYPTO-001 |
-| Related research | [Future-Proof Organisational Verification Architecture](../future-proof-organisational-verification-architecture.md) |
+| Related research | [Future-Proof Organisational Verification Architecture](../archive/2026-09-27/superseded-plans/future-proof-organisational-verification-architecture.md) |
 
 ## Context
 

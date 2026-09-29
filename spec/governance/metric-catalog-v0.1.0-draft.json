@@ -1,0 +1,56 @@
+{
+  "schema": "aichain.governance-metric-catalog",
+  "schemaVersion": "0.1.0-draft",
+  "defaults": {
+    "minimumSampleSize": 30,
+    "insufficientSampleBehavior": "show-count-and-suppress-rate",
+    "compareOnlyCompatibleProfileAndMetricVersions": true
+  },
+  "metrics": [
+    {
+      "id": "governance.policy-denial-rate",
+      "version": "1.0.0",
+      "title": "Policy denial rate",
+      "unit": "ratio",
+      "numerator": "ai.policy.evaluated events where policy.decision == deny",
+      "denominator": "all eligible ai.policy.evaluated events with a known policy version",
+      "groupBy": ["model.deploymentRef", "policy.policyRef", "policy.version", "activity.taskClass", "environment"],
+      "requiredSources": ["customer-sdk", "customer-gateway", "independent-monitor"],
+      "limitations": ["Measures recorded evaluations only; does not prove every action was evaluated."]
+    },
+    {
+      "id": "quality.adjudicated-label-accuracy",
+      "version": "1.0.0",
+      "title": "Accuracy against adjudicated labels",
+      "unit": "ratio",
+      "numerator": "eligible ai.run.completed events whose result.predictedLabel equals a linked ai.outcome.adjudicated label",
+      "denominator": "eligible run events with exactly one compatible human-adjudication or calibrated-measurement label",
+      "groupBy": ["model.deploymentRef", "activity.taskClass", "environment"],
+      "requiredSources": ["customer-sdk", "customer-gateway", "human-reviewer", "downstream-system"],
+      "labelSourcesAccepted": ["human-adjudication", "calibrated-measurement"],
+      "limitations": ["A label is only as reliable as its rubric and adjudicator.", "Unlabelled and pending cases are excluded and counted separately.", "Comparisons require matched or appropriately adjusted cohorts."]
+    },
+    {
+      "id": "safety.configuration-mismatch-rate",
+      "version": "1.0.0",
+      "title": "Observed configuration mismatch rate",
+      "unit": "ratio",
+      "numerator": "ai.runtime.config-observed events where model.approvedConfigDigest differs from model.observedConfigDigest",
+      "denominator": "ai.runtime.config-observed events with both approved and observed digests",
+      "groupBy": ["agentRef", "model.deploymentRef", "environment"],
+      "requiredSources": ["independent-monitor", "customer-gateway", "provider-attestation"],
+      "limitations": ["Strength depends on observation source; agent self-report is not independent runtime evidence.", "A recorded match does not prove the monitor observed the complete runtime."]
+    },
+    {
+      "id": "operations.monitor-coverage",
+      "version": "1.0.0",
+      "title": "Monitor heartbeat coverage",
+      "unit": "ratio",
+      "numerator": "expected monitor heartbeat intervals with a signed observation received within the configured grace period",
+      "denominator": "expected intervals from the tenant's registered monitor inventory",
+      "groupBy": ["agentRef", "environment", "monitorRef"],
+      "requiredSources": ["independent-monitor"],
+      "limitations": ["Requires a separately maintained expected-source inventory; absence of an event alone cannot establish a monitor is installed."]
+    }
+  ]
+}

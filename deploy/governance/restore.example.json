@@ -1,0 +1,6 @@
+{
+  "environment": "dev",
+  "directory": "build/governance/dev/encrypted-backups/REPLACE_WITH_COMPLETED_BACKUP_DIRECTORY",
+  "outputRoot": "build/governance/dev/recovery-drills",
+  "keyFile": "build/governance/dev/backup.key"
+}

@@ -24,10 +24,11 @@
 - Accepted work and proof material must survive process failure; exports must support independent verification without our API.
 - Base inclusion, data finality and any stronger proof/settlement check must be separately stated. Block-count thresholds from the PoW prototype do not establish Base finality.
 - Public anchor semantics, destination binding, Base deployment compatibility, retention, operational recovery and independent security review remain open launch gates.
+- The launch batch anchor uses a publisher-scoped batch identity, so an observer cannot globally reserve another publisher's batch root. Receipt authorship remains an off-chain signed-evidence property; a publisher is a transaction sender, not a claim about who created every receipt.
 - RISC Zero ZK-001 remains a narrow policy-evaluation proof under ADR-0006–0008. General receipt anchoring does not imply model execution proof or automatically extend the old proof statement to all general profiles.
 
 ## Consequences
 
 The primary engineering effort moves to the verification service, reliable submission, batching, finality observation and auditor exports. Existing node/miner work becomes a preserved research track. New own-chain work requires a separately justified decision rather than automatic continuation after the Base launch.
 
-The implementation sequence and evidence are recorded in [the Base transition audit and roadmap](../base-transition-audit-and-roadmap.md). This decision approves the architectural pivot, not a production deployment, cloud resource deletion, public release, final pricing or token issuance.
+The implementation sequence and evidence are recorded in [the Base transition audit and roadmap](../archive/2026-09-27/superseded-plans/base-transition-audit-and-roadmap.md). This decision approves the architectural pivot, not a production deployment, cloud resource deletion, public release, final pricing or token issuance.

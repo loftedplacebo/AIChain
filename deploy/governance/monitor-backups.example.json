@@ -1,0 +1,8 @@
+{
+  "environment": "dev",
+  "root": "C:/AIChain/build/governance/dev/encrypted-postgres-backups",
+  "keyFile": "C:/AIChain/build/governance/dev/backup.key",
+  "maxAgeHours": 24,
+  "requiredJournalRoles": ["worker"],
+  "maxArchives": 32
+}

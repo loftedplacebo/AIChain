@@ -1,0 +1,35 @@
+[Unit]
+Description=AIChain Base Sepolia synthetic receipt ingress (loopback only)
+After=network.target
+
+[Service]
+Type=simple
+User=aichain-ingress
+Group=aichain-ingress
+WorkingDirectory=/opt/aichain/base-sepolia-ingress
+EnvironmentFile=/etc/aichain-base-sepolia-synthetic-ingress.env
+Environment=NODE_ENV=production
+Environment=AICHAIN_SYNTHETIC_INGRESS_PORT=8787
+Environment=AICHAIN_SYNTHETIC_MAX_BATCH_RECEIPTS=10000
+Environment=AICHAIN_SYNTHETIC_MAX_QUEUE_RECEIPTS=20000
+ExecStart=/opt/aichain/.toolchains/node-v24.21.0-linux-x64/bin/node /opt/aichain/base-sepolia-ingress/services/ingress/synthetic-ingress-http.js
+Restart=on-failure
+RestartSec=3
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+ReadWritePaths=/var/lib/aichain-base-sepolia-ingress
+MemoryMax=512M
+CPUQuota=200%
+TasksMax=128
+LimitNOFILE=4096
+
+[Install]
+WantedBy=multi-user.target

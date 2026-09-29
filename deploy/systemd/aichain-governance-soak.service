@@ -1,0 +1,21 @@
+[Unit]
+Description=Bounded 24-hour synthetic governance API soak
+After=aichain-governance-api.service aichain-governance-worker.service
+Requires=aichain-governance-api.service
+[Service]
+Type=simple
+User=aichain-governance
+Group=aichain-governance
+WorkingDirectory=/opt/aichain/governance-worker
+ExecStart=/usr/bin/python3 scripts/governance_soak.py
+Restart=on-failure
+RestartSec=15
+RuntimeMaxSec=87000
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/aichain-governance-worker
+MemoryMax=128M
+CPUQuota=25%

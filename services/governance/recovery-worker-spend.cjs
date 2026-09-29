@@ -1,0 +1,19 @@
+'use strict';
+const {createHash}=require('node:crypto'),{Transaction}=require('ethers'),{readWorkerSnapshot,inspectJob}=require('./recovery-worker-review.cjs'),{BATCH_ABI}=require('../../sdk/typescript/base-sepolia-batch-adapter');
+const wei=v=>typeof v==='string'&&/^[1-9][0-9]{0,77}$/.test(v),clock=v=>Number.isSafeInteger(v)&&v>=0&&v<=8640000000000000;
+function reviewWorkerSpend(options){
+ const {policy,now=Date.now()}=options;if(!policy||Object.keys(policy).sort().join(',')!=='batchSize,dailyReservationWei,l1AllowanceWei,maxGasPriceWei,maxTransactionsPerHour'||!clock(now)||!Number.isInteger(policy.batchSize)||policy.batchSize<1||policy.batchSize>1000||!Number.isInteger(policy.maxTransactionsPerHour)||policy.maxTransactionsPerHour<1||policy.maxTransactionsPerHour>10000||!['dailyReservationWei','l1AllowanceWei','maxGasPriceWei'].every(k=>wei(policy[k])))throw Error('Explicit bounded worker spend policy and observation clock required');
+ const snapshot=readWorkerSnapshot(options);if(snapshot.report.journalIntegrity!=='passed')throw Error('Worker journal integrity must pass before spend review');
+ const counts={signed:0,unsigned:snapshot.report.counts.unsigned,externalReferences:snapshot.report.counts.externalReference,invalidReservation:0,invalidSigningTime:0,belowCurrentReserve:0,aboveCurrentFee:0,aboveCurrentBatchSize:0,recentHour:0,recentDay:0};let recentReserved=0n,recentRequired=0n,totalExecutionCeiling=0n;const deadline=Date.now()+30000;
+ for(const row of snapshot.rows){if(Date.now()>deadline)throw Error('Spend review exceeded bounded duration');if(inspectJob(row,options.expected).kind!=='signed')continue;counts.signed++;const job=JSON.parse(row.body),tx=Transaction.from(job.raw),decoded=BATCH_ABI.parseTransaction({data:tx.data}),execution=tx.gasLimit*tx.maxFeePerGas,required=execution+BigInt(policy.l1AllowanceWei);totalExecutionCeiling+=execution;
+  if(tx.maxFeePerGas>BigInt(policy.maxGasPriceWei))counts.aboveCurrentFee++;if(Number(decoded.args[1])>policy.batchSize)counts.aboveCurrentBatchSize++;
+  if(!wei(job.reserve))counts.invalidReservation++;else if(BigInt(job.reserve)<required)counts.belowCurrentReserve++;
+  if(!clock(job.signedAt)||job.signedAt>now){counts.invalidSigningTime++;continue;}
+  if(job.signedAt>now-3600000)counts.recentHour++;
+  if(job.signedAt>now-86400000){counts.recentDay++;recentRequired+=required;if(wei(job.reserve))recentReserved+=BigInt(job.reserve);}
+ }
+ const hourExceeded=counts.recentHour>policy.maxTransactionsPerHour,dayExceeded=recentReserved>BigInt(policy.dailyReservationWei)||recentRequired>BigInt(policy.dailyReservationWei),incompatible=counts.invalidReservation+counts.invalidSigningTime+counts.belowCurrentReserve+counts.aboveCurrentFee+counts.aboveCurrentBatchSize;
+ const observation={now,counts,recentReservedWei:recentReserved.toString(),recentRequiredWei:recentRequired.toString(),totalExecutionCeilingWei:totalExecutionCeiling.toString(),hourExceeded,dayExceeded};
+ return {environment:options.environment,reviewedJobs:snapshot.rows.length,...observation,spendReview:incompatible||hourExceeded||dayExceeded?'requires-reconciliation':'compatible-with-recorded-state',snapshotDigest:snapshot.report.snapshotDigest,observationDigest:createHash('sha256').update(JSON.stringify({snapshotDigest:snapshot.report.snapshotDigest,policy,observation})).digest('hex'),signingTimeAuthenticity:'not-proven',actualFees:'not-reconciled',postBackupActivity:'not-enumerated',activation:'review-required',interpretation:'Saved reservation and current-policy arithmetic only. L1 allowance is not a protocol fee cap; historical timestamps, actual receipts, external activity and uncertain transactions need independent review. Never reset reservations, replace bytes or infer permission to broadcast'};
+}
+module.exports={reviewWorkerSpend};

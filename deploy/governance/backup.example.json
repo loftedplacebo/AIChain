@@ -1,0 +1,9 @@
+{
+  "environment": "dev",
+  "consistency": "quiesced",
+  "files": [
+    {"role": "events", "path": "build/governance/workos-dev/events.sqlite"}
+  ],
+  "outputRoot": "build/governance/dev/encrypted-backups",
+  "keyFile": "build/governance/dev/backup.key"
+}

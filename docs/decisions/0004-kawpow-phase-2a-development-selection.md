@@ -106,7 +106,7 @@ assuming KawPoW will stay GPU-favourable indefinitely.
 ## References
 
 - [ADR-0003: EVM-Native PoW Header Compatibility](./0003-evm-native-pow-header-compatibility.md)
-- [C1 source audit](../phase-2a-c1-source-audit.md)
-- [C1 integration spike](../phase-2a-core-geth-integration-spike.md)
-- [Phase 2A source screen](../phase-2a-gpu-pow-source-screen.md)
-- [KawPoW conformance boundary assessment](../phase-2a-c4-quai-kawpow-conformance-provenance-assessment.md)
+- [C1 source audit](../archive/2026-09-27/own-chain/phase-2a-c1-source-audit.md)
+- [C1 integration spike](../archive/2026-09-27/own-chain/phase-2a-core-geth-integration-spike.md)
+- [Phase 2A source screen](../archive/2026-09-27/own-chain/phase-2a-gpu-pow-source-screen.md)
+- [KawPoW conformance boundary assessment](../archive/2026-09-27/own-chain/phase-2a-c4-quai-kawpow-conformance-provenance-assessment.md)

@@ -1,0 +1,28 @@
+{
+  "scope": "Read-only HTTP Events API checks using the existing local WorkOS configuration; no customer database or provider mutation",
+  "observations": [
+    {
+      "observedAt": "2026-09-29T11:19:27.462Z",
+      "rangeStart": "2026-09-29T10:19:22.162Z",
+      "rangeEnd": "2026-09-29T11:19:22.162Z",
+      "pages": 1,
+      "events": 0,
+      "matchedRevocationsValidated": 0,
+      "sessionRevocationAcceptance": "no-matching-event-observed"
+    },
+    {
+      "observedAt": "2026-09-29T11:19:57.249Z",
+      "rangeStart": "2026-09-28T11:19:52.060Z",
+      "rangeEnd": "2026-09-29T11:19:52.060Z",
+      "pages": 1,
+      "events": 0,
+      "matchedRevocationsValidated": 0,
+      "sessionRevocationAcceptance": "no-matching-event-observed"
+    }
+  ],
+  "verified": ["authenticated Events API access", "empty list/page metadata accepted by the replay parser"],
+  "notVerified": ["live nonempty revocation envelope", "live multi-page traversal", "real session invalidation", "webhook delivery", "retention coverage", "scheduled replay"],
+  "customerStateChanged": false,
+  "providerStateChanged": false,
+  "historicalCoverage": "not-proven"
+}

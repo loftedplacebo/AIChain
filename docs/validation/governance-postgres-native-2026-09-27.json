@@ -1,0 +1,83 @@
+{
+  "runId": "gd4fc649ee059",
+  "startedAt": "2026-09-27T10:46:39.608Z",
+  "engine": "standalone PostgreSQL over TCP",
+  "synthetic": true,
+  "checks": [
+    {
+      "name": "concurrent migrations and restricted runtime startup",
+      "status": "passed"
+    },
+    {
+      "name": "fixture reconstructed through real PostgreSQL",
+      "status": "passed",
+      "events": 182,
+      "accuracy": [
+        0.7,
+        0.9
+      ]
+    },
+    {
+      "name": "40 simultaneous retries create one event and one outbox entry",
+      "status": "passed"
+    },
+    {
+      "name": "600 unique submissions with 24 concurrent workers",
+      "status": "passed",
+      "events": 600,
+      "elapsedMs": 882,
+      "eventsPerSecond": 679.9,
+      "p50Ms": 34,
+      "p95Ms": 40,
+      "note": "Local short-run storage baseline, not sustained capacity or an SLA"
+    },
+    {
+      "name": "pooled concurrent reads do not leak tenant or project context",
+      "status": "passed"
+    },
+    {
+      "name": "concurrent quota enforcement accepts exactly 10 of 40 new events",
+      "status": "passed"
+    },
+    {
+      "name": "event, outbox and metering counts reconcile",
+      "status": "passed",
+      "counts": {
+        "events": "793",
+        "outbox": "793",
+        "metered": "793"
+      }
+    },
+    {
+      "name": "authenticated website gateway reads and exports from native PostgreSQL with workspace isolation",
+      "status": "passed"
+    },
+    {
+      "name": "native pg_dump/pg_restore preserves events, outbox, counters, migrations and reports",
+      "status": "passed",
+      "snapshot": {
+        "counts": {
+          "governance_events": 793,
+          "governance_outbox": 793,
+          "governance_usage": 4,
+          "migrations": 1,
+          "environment": 1
+        },
+        "sha256": "52b200ab3e57d42c6b2c30ee938665b6cde48ed21e14e6e01544e74012946a8d"
+      },
+      "backupBytes": 72502,
+      "dumpMs": 267,
+      "restoreMs": 173,
+      "restoredIsolation": true,
+      "duplicateReplayPreserved": true
+    },
+    {
+      "name": "source and restored database preserve full snapshot and isolated reads after clean server restart",
+      "status": "passed",
+      "verifiedAt": "2026-09-27T10:48:29.781Z"
+    }
+  ],
+  "serverVersion": "17.11",
+  "completedAt": "2026-09-27T10:46:47.820Z",
+  "status": "passed"
+}

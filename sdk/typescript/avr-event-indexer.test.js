@@ -22,7 +22,10 @@ function mockProvider(chain) {
     getNetwork: async () => ({ chainId: 424242n }),
     getBlockNumber: async () => Math.max(...Object.keys(chain.blocks).map(Number)),
     getBlock: async (number) => chain.blocks[number] ?? null,
-    getLogs: async ({ address, fromBlock }) => (chain.logs[fromBlock] ?? []).filter((entry) => entry.address.toLowerCase() === address.toLowerCase())
+    getLogs: async ({ address, fromBlock, toBlock }) => Object.entries(chain.logs)
+      .filter(([number]) => Number(number) >= fromBlock && Number(number) <= toBlock)
+      .flatMap(([, entries]) => entries)
+      .filter((entry) => entry.address.toLowerCase() === address.toLowerCase())
   };
 }
 function tempState() { return path.join(fs.mkdtempSync(path.join(os.tmpdir(), "aichain-index-")), "state.json"); }
@@ -59,6 +62,24 @@ test("rolls back orphaned events when a stored block hash is replaced", async ()
   assert.equal(lookupReceipt(result.state, receiptB).anchor.blockHash, root("2"));
 });
 
+test("scans in bounded ranges, commits progress per range, and detects a reorg from range-end checkpoints", async () => {
+  const chain = {
+    blocks: Object.fromEntries(Array.from({ length: 8 }, (_, number) => [number, { hash: root(String(number % 10)) }])),
+    logs: { 2: [log("ReceiptAnchored", [receiptA, root("a"), issuer, "0.1.0-draft", 10], individualContract, 2, root("2"), root("d"))] }
+  };
+  const statePath = tempState();
+  const first = await syncIndex({ provider: mockProvider(chain), contracts, statePath, maxRange: 3 });
+  assert.equal(first.indexedBlocks, 8);
+  assert.deepEqual(first.state.checkpoints.map(({ fromBlock, toBlock }) => [fromBlock, toBlock]), [[0, 2], [3, 5], [6, 7]]);
+  assert.equal(first.state.nextBlock, 8);
+
+  chain.blocks[7] = { hash: root("9") };
+  const recovered = await syncIndex({ provider: mockProvider(chain), contracts, statePath, maxRange: 3 });
+  assert.equal(recovered.reorged, true);
+  assert.equal(lookupReceipt(recovered.state, receiptA).anchor.blockHash, root("2"));
+  assert.equal(recovered.state.checkpoints.at(-1).hash, root("9"));
+});
+
 test("attaches a validated batch manifest and produces receipt inclusion retrieval", async () => {
   const manifest = createManifest([receiptA, receiptB, receiptC], "0.1.0-draft");
   const chain = {
@@ -74,6 +95,24 @@ test("attaches a validated batch manifest and produces receipt inclusion retriev
   assert.equal(indexed.mode, "batch");
   assert.equal(indexed.inclusion.batchRoot, manifest.batchRoot);
   assert.equal(indexed.inclusion.siblings.length, 2);
+});
+
+test("indexes publisher-scoped V2 batches without conflating identical roots", async () => {
+  const firstId = root("7"), secondId = root("8");
+  const first = createManifest([receiptA], "0.4.0-alpha", { batchId: firstId, publisher: issuer });
+  const secondPublisher = "0x4000000000000000000000000000000000000004";
+  const second = createManifest([receiptA], "0.4.0-alpha", { batchId: secondId, publisher: secondPublisher });
+  const chain = { blocks: { 0: { hash: root("0") }, 1: { hash: root("1") } }, logs: { 0: [], 1: [
+    log("ReceiptBatchAnchoredV2", [firstId, first.batchRoot, issuer, 1, "0.4.0-alpha", 12], batchContract, 1, root("1"), root("7"), 0),
+    log("ReceiptBatchAnchoredV2", [secondId, second.batchRoot, secondPublisher, 1, "0.4.0-alpha", 13], batchContract, 1, root("1"), root("8"), 1)
+  ] } };
+  const statePath = tempState(); const directory = path.dirname(statePath);
+  fs.writeFileSync(path.join(directory, "first.json"), JSON.stringify(first));
+  fs.writeFileSync(path.join(directory, "second.json"), JSON.stringify(second));
+  const result = await syncIndex({ provider: mockProvider(chain), contracts, statePath, manifestsDirectory: directory });
+  assert.equal(result.manifestsAttached, 2);
+  assert.equal(Object.keys(result.state.batches).length, 2);
+  assert.equal(lookupReceipt(result.state, receiptA).inclusion.batchId, firstId);
 });
 
 test("rejects a manifest whose contents do not resolve to the advertised root", async () => {

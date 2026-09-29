@@ -1,0 +1,804 @@
+{
+  "runId": "g1ae3d35e1e61",
+  "startedAt": "2026-09-27T19:10:37.997Z",
+  "engine": "standalone PostgreSQL over TCP",
+  "synthetic": true,
+  "checks": [
+    {
+      "name": "concurrent migrations and restricted runtime startup",
+      "status": "passed"
+    },
+    {
+      "name": "fixture reconstructed through real PostgreSQL",
+      "status": "passed",
+      "events": 182,
+      "accuracy": [
+        0.7,
+        0.9
+      ]
+    },
+    {
+      "name": "signed receipt and batch evidence persist in scoped PostgreSQL transactions",
+      "status": "passed"
+    },
+    {
+      "name": "40 simultaneous retries create one event and one outbox entry",
+      "status": "passed"
+    },
+    {
+      "name": "600 unique submissions with 24 concurrent workers",
+      "status": "passed",
+      "events": 600,
+      "elapsedMs": 722,
+      "eventsPerSecond": 831.5,
+      "p50Ms": 28,
+      "p95Ms": 35,
+      "note": "Local short-run storage baseline, not sustained capacity or an SLA"
+    },
+    {
+      "name": "pooled concurrent reads do not leak tenant or project context",
+      "status": "passed"
+    },
+    {
+      "name": "concurrent quota enforcement accepts exactly 10 of 40 new events",
+      "status": "passed"
+    },
+    {
+      "name": "event, outbox and metering counts reconcile",
+      "status": "passed",
+      "counts": {
+        "events": "793",
+        "outbox": "793",
+        "metered": "793"
+      }
+    },
+    {
+      "name": "authenticated website gateway reads and exports from native PostgreSQL with workspace isolation",
+      "status": "passed"
+    },
+    {
+      "name": "dashboard reads overlap HTTP submissions above 10000 records",
+      "status": "passed",
+      "mode": "five-minute-mixed-labelled",
+      "resources": [
+        {
+          "elapsedMs": 169,
+          "completed": 7,
+          "nodeRssBytes": 140517376,
+          "hostFreeBytes": 1264898048,
+          "nodeCpuMs": 63,
+          "databaseBytes": 38672051,
+          "pending": 10020,
+          "connections": 11,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 5271,
+          "completed": 211,
+          "nodeRssBytes": 152711168,
+          "hostFreeBytes": 1161383936,
+          "nodeCpuMs": 1109,
+          "databaseBytes": 39155379,
+          "pending": 10227,
+          "connections": 11,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 10365,
+          "completed": 415,
+          "nodeRssBytes": 154365952,
+          "hostFreeBytes": 1174347776,
+          "nodeCpuMs": 2266,
+          "databaseBytes": 39687859,
+          "pending": 10431,
+          "connections": 5,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 15466,
+          "completed": 619,
+          "nodeRssBytes": 154746880,
+          "hostFreeBytes": 1155416064,
+          "nodeCpuMs": 3422,
+          "databaseBytes": 40122035,
+          "pending": 10634,
+          "connections": 7,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 20556,
+          "completed": 822,
+          "nodeRssBytes": 154099712,
+          "hostFreeBytes": 1165914112,
+          "nodeCpuMs": 4359,
+          "databaseBytes": 40629939,
+          "pending": 10839,
+          "connections": 6,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 25635,
+          "completed": 1025,
+          "nodeRssBytes": 159244288,
+          "hostFreeBytes": 1149292544,
+          "nodeCpuMs": 5359,
+          "databaseBytes": 41088691,
+          "pending": 11043,
+          "connections": 5,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 30789,
+          "completed": 1231,
+          "nodeRssBytes": 161247232,
+          "hostFreeBytes": 1158696960,
+          "nodeCpuMs": 6282,
+          "databaseBytes": 41825971,
+          "pending": 11245,
+          "connections": 6,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 35893,
+          "completed": 1436,
+          "nodeRssBytes": 159711232,
+          "hostFreeBytes": 1159884800,
+          "nodeCpuMs": 7235,
+          "databaseBytes": 42358451,
+          "pending": 11452,
+          "connections": 6,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 40981,
+          "completed": 1639,
+          "nodeRssBytes": 157569024,
+          "hostFreeBytes": 1167740928,
+          "nodeCpuMs": 8329,
+          "databaseBytes": 42915507,
+          "pending": 11656,
+          "connections": 6,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 46239,
+          "completed": 1850,
+          "nodeRssBytes": 162750464,
+          "hostFreeBytes": 1175261184,
+          "nodeCpuMs": 9282,
+          "databaseBytes": 43382451,
+          "pending": 11859,
+          "connections": 6,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 51785,
+          "completed": 2071,
+          "nodeRssBytes": 163868672,
+          "hostFreeBytes": 1194807296,
+          "nodeCpuMs": 10281,
+          "databaseBytes": 43865779,
+          "pending": 12069,
+          "connections": 5,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 56892,
+          "completed": 2276,
+          "nodeRssBytes": 169111552,
+          "hostFreeBytes": 1181958144,
+          "nodeCpuMs": 11125,
+          "databaseBytes": 44349107,
+          "pending": 12291,
+          "connections": 5,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 62020,
+          "completed": 2481,
+          "nodeRssBytes": 164241408,
+          "hostFreeBytes": 1188163584,
+          "nodeCpuMs": 12141,
+          "databaseBytes": 44832435,
+          "pending": 12496,
+          "connections": 5,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 67095,
+          "completed": 2684,
+          "nodeRssBytes": 169758720,
+          "hostFreeBytes": 1169367040,
+          "nodeCpuMs": 12953,
+          "databaseBytes": 45373107,
+          "pending": 12701,
+          "connections": 5,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 72189,
+          "completed": 2888,
+          "nodeRssBytes": 165728256,
+          "hostFreeBytes": 1165107200,
+          "nodeCpuMs": 13954,
+          "databaseBytes": 45823667,
+          "pending": 12904,
+          "connections": 5,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 77324,
+          "completed": 3092,
+          "nodeRssBytes": 171261952,
+          "hostFreeBytes": 1141547008,
+          "nodeCpuMs": 15063,
+          "databaseBytes": 46298803,
+          "pending": 13107,
+          "connections": 8,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 82450,
+          "completed": 3298,
+          "nodeRssBytes": 171589632,
+          "hostFreeBytes": 1162772480,
+          "nodeCpuMs": 16016,
+          "databaseBytes": 46896819,
+          "pending": 13313,
+          "connections": 7,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 87555,
+          "completed": 3502,
+          "nodeRssBytes": 167829504,
+          "hostFreeBytes": 1154031616,
+          "nodeCpuMs": 17032,
+          "databaseBytes": 47642291,
+          "pending": 13518,
+          "connections": 5,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 92651,
+          "completed": 3706,
+          "nodeRssBytes": 172732416,
+          "hostFreeBytes": 1138929664,
+          "nodeCpuMs": 17938,
+          "databaseBytes": 48191155,
+          "pending": 13722,
+          "connections": 5,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 97731,
+          "completed": 3910,
+          "nodeRssBytes": 174260224,
+          "hostFreeBytes": 1149558784,
+          "nodeCpuMs": 18797,
+          "databaseBytes": 48641715,
+          "pending": 13926,
+          "connections": 5,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 102827,
+          "completed": 4113,
+          "nodeRssBytes": 174084096,
+          "hostFreeBytes": 1094963200,
+          "nodeCpuMs": 19563,
+          "databaseBytes": 49149619,
+          "pending": 14129,
+          "connections": 5,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 107947,
+          "completed": 4318,
+          "nodeRssBytes": 170897408,
+          "hostFreeBytes": 1126989824,
+          "nodeCpuMs": 20469,
+          "databaseBytes": 49608371,
+          "pending": 14333,
+          "connections": 5,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 113039,
+          "completed": 4522,
+          "nodeRssBytes": 168263680,
+          "hostFreeBytes": 1152847872,
+          "nodeCpuMs": 21579,
+          "databaseBytes": 50083507,
+          "pending": 14538,
+          "connections": 5,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 118165,
+          "completed": 4727,
+          "nodeRssBytes": 171859968,
+          "hostFreeBytes": 1161519104,
+          "nodeCpuMs": 22485,
+          "databaseBytes": 50550451,
+          "pending": 14742,
+          "connections": 5,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 123263,
+          "completed": 4931,
+          "nodeRssBytes": 169107456,
+          "hostFreeBytes": 1168416768,
+          "nodeCpuMs": 23376,
+          "databaseBytes": 51132083,
+          "pending": 14947,
+          "connections": 5,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 128372,
+          "completed": 5135,
+          "nodeRssBytes": 174657536,
+          "hostFreeBytes": 1160773632,
+          "nodeCpuMs": 24328,
+          "databaseBytes": 51615411,
+          "pending": 15151,
+          "connections": 5,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 133464,
+          "completed": 5339,
+          "nodeRssBytes": 168046592,
+          "hostFreeBytes": 1175121920,
+          "nodeCpuMs": 25282,
+          "databaseBytes": 52082355,
+          "pending": 15355,
+          "connections": 5,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 138558,
+          "completed": 5543,
+          "nodeRssBytes": 169000960,
+          "hostFreeBytes": 1139224576,
+          "nodeCpuMs": 26062,
+          "databaseBytes": 52606643,
+          "pending": 15558,
+          "connections": 6,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 143764,
+          "completed": 5750,
+          "nodeRssBytes": 175255552,
+          "hostFreeBytes": 1117769728,
+          "nodeCpuMs": 27094,
+          "databaseBytes": 53368499,
+          "pending": 15763,
+          "connections": 6,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 148970,
+          "completed": 5958,
+          "nodeRssBytes": 172204032,
+          "hostFreeBytes": 1082195968,
+          "nodeCpuMs": 28375,
+          "databaseBytes": 53966515,
+          "pending": 15971,
+          "connections": 7,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 154146,
+          "completed": 6166,
+          "nodeRssBytes": 172081152,
+          "hostFreeBytes": 1050918912,
+          "nodeCpuMs": 29548,
+          "databaseBytes": 54498995,
+          "pending": 16179,
+          "connections": 6,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 159325,
+          "completed": 6373,
+          "nodeRssBytes": 175837184,
+          "hostFreeBytes": 1054801920,
+          "nodeCpuMs": 30703,
+          "databaseBytes": 54998707,
+          "pending": 16386,
+          "connections": 6,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 164513,
+          "completed": 6581,
+          "nodeRssBytes": 177446912,
+          "hostFreeBytes": 1036763136,
+          "nodeCpuMs": 31735,
+          "databaseBytes": 55457459,
+          "pending": 16593,
+          "connections": 5,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 169635,
+          "completed": 6786,
+          "nodeRssBytes": 177524736,
+          "hostFreeBytes": 1026555904,
+          "nodeCpuMs": 32751,
+          "databaseBytes": 55965363,
+          "pending": 16801,
+          "connections": 6,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 174844,
+          "completed": 6994,
+          "nodeRssBytes": 178761728,
+          "hostFreeBytes": 1057087488,
+          "nodeCpuMs": 33829,
+          "databaseBytes": 56440499,
+          "pending": 17006,
+          "connections": 5,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 180023,
+          "completed": 7201,
+          "nodeRssBytes": 174415872,
+          "hostFreeBytes": 1067028480,
+          "nodeCpuMs": 34813,
+          "databaseBytes": 56915635,
+          "pending": 17214,
+          "connections": 5,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 185177,
+          "completed": 7407,
+          "nodeRssBytes": 175394816,
+          "hostFreeBytes": 1043435520,
+          "nodeCpuMs": 36016,
+          "databaseBytes": 57374387,
+          "pending": 17421,
+          "connections": 5,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 190333,
+          "completed": 7613,
+          "nodeRssBytes": 175935488,
+          "hostFreeBytes": 1043173376,
+          "nodeCpuMs": 37328,
+          "databaseBytes": 57882291,
+          "pending": 17627,
+          "connections": 5,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 195502,
+          "completed": 7820,
+          "nodeRssBytes": 180592640,
+          "hostFreeBytes": 1048948736,
+          "nodeCpuMs": 38532,
+          "databaseBytes": 58652339,
+          "pending": 17833,
+          "connections": 5,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 200669,
+          "completed": 8027,
+          "nodeRssBytes": 178700288,
+          "hostFreeBytes": 1020071936,
+          "nodeCpuMs": 39485,
+          "databaseBytes": 59266739,
+          "pending": 18040,
+          "connections": 5,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 205874,
+          "completed": 8235,
+          "nodeRssBytes": 180469760,
+          "hostFreeBytes": 1076948992,
+          "nodeCpuMs": 40500,
+          "databaseBytes": 59741875,
+          "pending": 18247,
+          "connections": 5,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 211006,
+          "completed": 8440,
+          "nodeRssBytes": 182575104,
+          "hostFreeBytes": 1023320064,
+          "nodeCpuMs": 41547,
+          "databaseBytes": 60266163,
+          "pending": 18455,
+          "connections": 5,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 216106,
+          "completed": 8645,
+          "nodeRssBytes": 174170112,
+          "hostFreeBytes": 1033035776,
+          "nodeCpuMs": 42704,
+          "databaseBytes": 60716723,
+          "pending": 18660,
+          "connections": 6,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 221207,
+          "completed": 8849,
+          "nodeRssBytes": 182509568,
+          "hostFreeBytes": 1027280896,
+          "nodeCpuMs": 43595,
+          "databaseBytes": 61200051,
+          "pending": 18865,
+          "connections": 6,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 226348,
+          "completed": 9054,
+          "nodeRssBytes": 176226304,
+          "hostFreeBytes": 1040732160,
+          "nodeCpuMs": 44734,
+          "databaseBytes": 61650611,
+          "pending": 19069,
+          "connections": 5,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 231484,
+          "completed": 9259,
+          "nodeRssBytes": 180858880,
+          "hostFreeBytes": 1028874240,
+          "nodeCpuMs": 45469,
+          "databaseBytes": 62191283,
+          "pending": 19274,
+          "connections": 5,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 236638,
+          "completed": 9466,
+          "nodeRssBytes": 182562816,
+          "hostFreeBytes": 1064669184,
+          "nodeCpuMs": 46157,
+          "databaseBytes": 62699187,
+          "pending": 19480,
+          "connections": 5,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 241733,
+          "completed": 9670,
+          "nodeRssBytes": 174333952,
+          "hostFreeBytes": 1072627712,
+          "nodeCpuMs": 46969,
+          "databaseBytes": 63141555,
+          "pending": 19686,
+          "connections": 6,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 246890,
+          "completed": 9875,
+          "nodeRssBytes": 181489664,
+          "hostFreeBytes": 1069563904,
+          "nodeCpuMs": 48016,
+          "databaseBytes": 63649459,
+          "pending": 19889,
+          "connections": 6,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 252013,
+          "completed": 10080,
+          "nodeRssBytes": 176611328,
+          "hostFreeBytes": 1047728128,
+          "nodeCpuMs": 48954,
+          "databaseBytes": 64403123,
+          "pending": 20096,
+          "connections": 6,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 257170,
+          "completed": 10287,
+          "nodeRssBytes": 180981760,
+          "hostFreeBytes": 1221181440,
+          "nodeCpuMs": 50235,
+          "databaseBytes": 64927411,
+          "pending": 20301,
+          "connections": 6,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 262450,
+          "completed": 10498,
+          "nodeRssBytes": 181473280,
+          "hostFreeBytes": 1042833408,
+          "nodeCpuMs": 51297,
+          "databaseBytes": 65459891,
+          "pending": 20507,
+          "connections": 6,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 267647,
+          "completed": 10706,
+          "nodeRssBytes": 178675712,
+          "hostFreeBytes": 1104347136,
+          "nodeCpuMs": 52657,
+          "databaseBytes": 65935027,
+          "pending": 20718,
+          "connections": 5,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 272872,
+          "completed": 10915,
+          "nodeRssBytes": 179224576,
+          "hostFreeBytes": 1133715456,
+          "nodeCpuMs": 54172,
+          "databaseBytes": 66459315,
+          "pending": 20926,
+          "connections": 5,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 278173,
+          "completed": 11127,
+          "nodeRssBytes": 178941952,
+          "hostFreeBytes": 1023098880,
+          "nodeCpuMs": 55751,
+          "databaseBytes": 66950835,
+          "pending": 21134,
+          "connections": 7,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 283505,
+          "completed": 11340,
+          "nodeRssBytes": 182099968,
+          "hostFreeBytes": 1033428992,
+          "nodeCpuMs": 57563,
+          "databaseBytes": 67458739,
+          "pending": 21347,
+          "connections": 7,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 288952,
+          "completed": 11558,
+          "nodeRssBytes": 182439936,
+          "hostFreeBytes": 1046589440,
+          "nodeCpuMs": 59531,
+          "databaseBytes": 67966643,
+          "pending": 21565,
+          "connections": 6,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 294296,
+          "completed": 11772,
+          "nodeRssBytes": 179097600,
+          "hostFreeBytes": 1052966912,
+          "nodeCpuMs": 61657,
+          "databaseBytes": 68458163,
+          "pending": 21778,
+          "connections": 6,
+          "poolWaiting": 0
+        },
+        {
+          "elapsedMs": 299457,
+          "completed": 11978,
+          "nodeRssBytes": 176861184,
+          "hostFreeBytes": 837922816,
+          "nodeCpuMs": 63360,
+          "databaseBytes": 68990643,
+          "pending": 21992,
+          "connections": 10,
+          "poolWaiting": 0
+        }
+      ],
+      "resourceLimits": {
+        "nodeRssBytes": 1073741824,
+        "minHostFreeBytes": 536870912,
+        "databaseBytes": 536870912,
+        "pending": 30000
+      },
+      "finalKpis": {
+        "agentsReporting": 20,
+        "runs": 19620,
+        "modelDeployments": 3,
+        "policyEvaluations": 0,
+        "denied": 0,
+        "reviewedLabels": 1440,
+        "openAlerts": 0
+      },
+      "seedCount": 10020,
+      "writeCount": 12000,
+      "targetSubmissionsPerSecond": 40,
+      "submissionConcurrency": 12,
+      "dashboardReaders": 4,
+      "elapsedMs": 304459,
+      "overlappingReads": 7369,
+      "observedRunRange": [
+        10020,
+        19605
+      ],
+      "metrics": {
+        "submissions": {
+          "requests": 12000,
+          "p50Ms": 5,
+          "p95Ms": 13,
+          "p99Ms": 20
+        },
+        "report": {
+          "requests": 702,
+          "p50Ms": 205,
+          "p95Ms": 675,
+          "p99Ms": 1649
+        },
+        "reviews": {
+          "requests": 1558,
+          "p50Ms": 38,
+          "p95Ms": 252,
+          "p99Ms": 523
+        },
+        "events": {
+          "requests": 2670,
+          "p50Ms": 7,
+          "p95Ms": 16,
+          "p99Ms": 23
+        },
+        "foreignReport": {
+          "requests": 2443,
+          "p50Ms": 16,
+          "p95Ms": 38,
+          "p99Ms": 53
+        }
+      },
+      "counts": {
+        "events": "22020",
+        "outbox": "22020",
+        "metered": "22020"
+      },
+      "errors": 0,
+      "note": "Native PostgreSQL; real ingestion HTTP and authenticated portal gateway data requests. No browser rendering, model calls, receipt worker or Base broadcasts. Bounded paced functional concurrency test, not maximum capacity. Resource samples cover Node RSS/CPU, host free RAM, database size, connections and pending records; not PostgreSQL process RSS/CPU or disk free space."
+    },
+    {
+      "name": "native pg_dump/pg_restore preserves events, outbox, counters, migrations and reports",
+      "status": "passed",
+      "snapshot": {
+        "counts": {
+          "governance_events": 22833,
+          "governance_outbox": 22833,
+          "governance_usage": 6,
+          "governance_evidence": 182,
+          "migrations": 5,
+          "environment": 1
+        },
+        "sha256": "965a078b726ebbd7c344fe6bc773da8f7b66fd18388f965043179f4909041cb4"
+      },
+      "backupBytes": 1825679,
+      "dumpMs": 602,
+      "restoreMs": 2350,
+      "restoredIsolation": true,
+      "duplicateReplayPreserved": true
+    }
+  ],
+  "serverVersion": "17.11",
+  "completedAt": "2026-09-27T19:16:32.638Z",
+  "status": "passed"
+}
