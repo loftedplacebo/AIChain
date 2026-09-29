@@ -67,4 +67,4 @@ async function downloadBackupSet({environment,bucket,keyPrefix,outputRoot,key,cl
   success=true;return {environment,directory:destination.directory,id:verified.id,createdAt:verified.createdAt,journalRoles:verified.journalRoles,integrity:'verified',remoteRestore:'not-tested'};
  }finally{if(!success)files.clean(destination);}
 }
-module.exports={createStorageClient,uploadBackupSet,downloadBackupSet};
+module.exports={createStorageClient,uploadBackupSet,downloadBackupSet,validateTransferPolicy:transferPolicy};

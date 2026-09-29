@@ -37,10 +37,14 @@ async function main(){
  }};
  const remote=require('../services/governance/backup-object-storage.cjs'),uploaded=await remote.uploadBackupSet({environment:'test',directory:archive.directory,bucket:'synthetic-backups',prefix:'pilot',key,client:objectClient});
  assert.equal(uploads.at(-1),uploaded.keyPrefix+'/complete.json');
+ const remotePolicy={environment:'test',bucket:'synthetic-backups',keyPrefix:uploaded.keyPrefix,key,client:objectClient},monitor=require('../services/governance/backup-object-monitor.cjs').checkRemoteBackup;
+ assert.equal((await monitor(remotePolicy)).status,'ready');
+ assert.equal((await monitor({...remotePolicy,requiredJournalRoles:['worker']})).reason,'missing-journals');
  const downloadRoot=path.join(directory,'downloaded');fs.mkdirSync(downloadRoot);const downloaded=await remote.downloadBackupSet({environment:'test',bucket:'synthetic-backups',keyPrefix:uploaded.keyPrefix,outputRoot:downloadRoot,key,client:objectClient});
  assert.equal(downloaded.id,archive.id);assert.equal(downloaded.integrity,'verified');
  const corrupted=uploaded.keyPrefix+'/postgres.gcm',originalObject=objects.get(corrupted);objects.set(corrupted,Buffer.from(originalObject));objects.get(corrupted)[20]^=1;
  await assert.rejects(remote.downloadBackupSet({environment:'test',bucket:'synthetic-backups',keyPrefix:uploaded.keyPrefix,outputRoot:downloadRoot,key,client:objectClient}),/digest mismatch/);objects.set(corrupted,originalObject);
+ objects.set(corrupted,Buffer.from(originalObject));objects.get(corrupted)[20]^=1;assert.equal((await monitor(remotePolicy)).status,'not-ready');objects.set(corrupted,originalObject);
  const recovery=await backup.restoreBackup({environment:'test',directory:copied.directory,key,connection:{...connection,database:'postgres'},binaries,targetDatabase:'gov_restore_archive_'+id,outputRoot:path.join(directory,'restores')});
  assert.equal(recovery.activation,'review-required');assert.equal(recovery.access,'revoked-and-disabled');
  assert.equal((await backup.reviewRestore({environment:'test',connection:{...connection,database:recovery.targetDatabase},binaries,directory:recovery.directory})).review,'passed');

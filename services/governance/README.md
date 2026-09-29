@@ -886,6 +886,11 @@ S3-compatible bucket. `download` requires the returned exact `keyPrefix` and
 an existing absolute `outputRoot`. It downloads into a fresh private directory,
 checks each object's bounded size and SHA-256 against the transferred index,
 then authenticates/decrypts the archive with the separately held 32-byte key.
+`monitor` uses the same exact `keyPrefix` to download and authenticate the set
+in temporary private storage, then reports freshness and missing required
+journal roles. It exits 0 when ready, 2 when not ready, and 1 on invalid
+configuration. The monitor needs `maxAgeHours` (1–720) and optional
+`requiredJournalRoles`; it does not list a bucket or select a newer set.
 An upload writes the completion marker last; partial uploads remain incomplete
 and are not deleted automatically. Neither command creates buckets, sets Object
 Lock, deletes objects, schedules jobs, starts services or releases publishers.
@@ -906,7 +911,7 @@ path-style addressing and no implicit upload retry. It never prints the credenti
 decryption key. The upload result means only that the remote completion marker
 was written; independently download and restore the exact set before claiming
 recovery readiness. A local synthetic S3 client test exercises marker ordering,
-download hash denial and restore from the downloaded archive. A real bucket,
+download hash denial, ready/not-ready monitoring and restore from the downloaded archive. A real bucket,
 residency/retention policy, least-privilege application keys, monitoring and a
 provider-backed restore drill remain open.
 
