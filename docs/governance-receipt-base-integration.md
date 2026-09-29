@@ -92,8 +92,14 @@ node scripts/governance-evidence.cjs verify <downloaded-evidence.json>
 
 `prepare` produces reviewable calldata and stores the batch; it never broadcasts.
 Save its output. `attach` records a candidate hash, not a confirmation. `verify`
-recomputes checks rather than trusting the exported verification summary. Inspect
-its state: a successful process exit alone is not proof of chain confirmation.
+accepts a bounded record-specific JSON download and recomputes checks rather
+than trusting its exported verification summary. With explicit trusted public
+signer addresses and a read-only Base Sepolia RPC URL, exit 0 means the record
+commitment, recording signature, signer trust, batch membership and current
+canonical Base inclusion meet the 12-confirmation pilot rule. Exit 2 means the
+export is incomplete or chain verification is unavailable; exit 1 means invalid
+evidence, untrusted signer, failed transaction or chain mismatch. A later chain
+reorganisation remains possible, so record the check time and rerun when needed.
 
 The API and independent verifier accept `GOVERNANCE_RECEIPT_SIGNERS` as a JSON
 array of trusted public addresses and optional `GOVERNANCE_EVIDENCE_RPC_URL`.

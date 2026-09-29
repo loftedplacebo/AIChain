@@ -40,7 +40,10 @@ the reviewer needs to see **[decision and outcome]** and check **[evidence]**.â€
    agree with the submitted set.
 4. Review one decision and attach a human outcome or investigation note.
 5. Export one eligible record and independently check its signed receipt and
-   Base Sepolia anchor. Record pending or unavailable evidence separately.
+   Base Sepolia anchor with an explicitly trusted recording signer and a
+   read-only chain source. The [offline export verifier](../governance-receipt-base-integration.md#operator-workflow)
+   must return verified (exit 0) for the acceptance sample. Record pending or
+   unavailable evidence separately; an API or portal summary is not independent proof.
 6. Revoke the submission key and confirm a new submission is refused.
 
 ## Success measures
