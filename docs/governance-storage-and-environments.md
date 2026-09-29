@@ -118,9 +118,17 @@ spending. [Regional availability](https://docs.digitalocean.com/platform/regiona
 
 The database must accept the app's non-owner API/worker roles, grants,
 transaction-scoped RLS policies and migration owner. DigitalOcean's `doadmin`
-has `BYPASSRLS`, so it must never be an API or worker login. Test migrations,
-strict role-profile checks, forced RLS isolation and a fresh-target restore
-on a disposable managed test cluster before adopting this provider. Restrict
+has `BYPASSRLS`, so it must never be an API or worker login. **This candidate
+is not compatible with the current recovery tooling as written:** the
+PostgreSQL backup, restore invalidation, restored evidence reviews, customer
+activation and publisher release commands explicitly demand `rolsuper`, while
+DigitalOcean does not provide customer superuser access. The current backup
+runner also requires a local `127.0.0.1`/`localhost` database connection and
+native dump/restore binaries. Adapt those offline operator flows to a
+constrained managed-database administrator, then prove the entire capture,
+fresh-target restore, access invalidation and controlled release path on a
+disposable managed cluster before adopting this provider. Passing API startup
+or migrations alone is insufficient. Restrict
 database trusted sources to the VPS/operator paths and verify the server
 certificate and hostname; DigitalOcean's default `sslmode=require` does not
 verify identity. Its managed point-in-time recovery covers only the last seven
