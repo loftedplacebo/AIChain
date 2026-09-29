@@ -34,4 +34,4 @@ async function copyBackupSet({environment,directory,destinationRoot,key}){
   success=true;return {environment,directory:destination.directory,id:original.id,createdAt:original.createdAt,journalRoles:original.journalRoles,integrity:'verified',custody:'destination-filesystem-only',restore:'not-tested'};
  }finally{if(!success)files.clean(destination);}
 }
-module.exports={copyBackupSet};
+module.exports={copyBackupSet,inventory};

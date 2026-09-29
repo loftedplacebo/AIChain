@@ -79,6 +79,7 @@
     "governance:identity-replay": "node scripts/governance-identity-replay.cjs"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1143.0",
     "ethers": "^6.16.0",
     "jose": "6.2.12",
     "pg": "^8.23.0",

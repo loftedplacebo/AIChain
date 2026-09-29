@@ -878,6 +878,38 @@ domain. Restore and review from the copied archive before relying on it. The
 local managed-like PostgreSQL test does this with one synthetic record and
 keeps the restored gate closed.
 
+### S3-compatible encrypted backup transfer — 29 September 2026
+
+`node scripts/governance-backup-object-storage.cjs upload <private-config.json>`
+uploads a complete encrypted dev/test archive to an existing private
+S3-compatible bucket. `download` requires the returned exact `keyPrefix` and
+an existing absolute `outputRoot`. It downloads into a fresh private directory,
+checks each object's bounded size and SHA-256 against the transferred index,
+then authenticates/decrypts the archive with the separately held 32-byte key.
+An upload writes the completion marker last; partial uploads remain incomplete
+and are not deleted automatically. Neither command creates buckets, sets Object
+Lock, deletes objects, schedules jobs, starts services or releases publishers.
+
+The upload config contains `environment`, `directory`, `bucket`, `prefix`,
+`endpoint`, `region`, `credentialsFile` and `keyFile`. Download replaces
+`directory`/`prefix` with `keyPrefix`/`outputRoot`. The private credentials file
+contains only `accessKeyId` and `secretAccessKey`. Example non-secret layout:
+
+```json
+{"environment":"test","directory":"C:/PRIVATE_BACKUPS/pg-backup-REPLACE","bucket":"private-backups","prefix":"orvessian-pilot","endpoint":"https://s3.eu-central-003.backblazeb2.com","region":"eu-central-003","credentialsFile":"C:/PRIVATE_OPERATOR_DIRECTORY/object-credentials.json","keyFile":"C:/PRIVATE_OPERATOR_DIRECTORY/backup.key"}
+```
+
+The endpoint and region must match the chosen bucket; [Backblaze documents its
+S3-compatible endpoint and JavaScript SDK setup](https://www.backblaze.com/docs/cloud-storage-use-the-aws-sdk-for-javascript-v3-with-backblaze-b2).
+The transfer uses the official AWS S3 client with explicit credentials, HTTPS,
+path-style addressing and no implicit upload retry. It never prints the credentials or
+decryption key. The upload result means only that the remote completion marker
+was written; independently download and restore the exact set before claiming
+recovery readiness. A local synthetic S3 client test exercises marker ordering,
+download hash denial and restore from the downloaded archive. A real bucket,
+residency/retention policy, least-privilege application keys, monitoring and a
+provider-backed restore drill remain open.
+
 Off-host backup scheduling, retention/PITR, alerts, key custody/rotation, independent
 restore drills and approved owner/service activation remain release requirements.
 No scheduler, remote object store, live customer restore or production service was

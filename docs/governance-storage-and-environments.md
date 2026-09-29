@@ -390,8 +390,11 @@ The offline `copy` command can transfer and authenticate a complete encrypted
 archive to another filesystem root; the local native test restored from that
 copy. [Procedure](../services/governance/README.md#encrypted-coordinated-postgresql-backups--29-september-2026).
 This is file-copy evidence only. Backblaze or another independent store still
-needs actual provisioning, restricted credentials, upload/download validation,
-retention, monitoring and a restore from its downloaded copy.
+needs actual provisioning, restricted credentials, live upload/download
+validation, retention, monitoring and a restore from its downloaded copy. A
+[private S3-compatible transfer command](../services/governance/README.md#s3-compatible-encrypted-backup-transfer--29-september-2026)
+now prepares that flow and has passed a local synthetic object-store round trip;
+it has not contacted a real bucket.
 Do not call a backup complete until a restore into an **isolated test database**
 has been checked for migrations, tenant isolation, event/outbox counts, counters,
 sample digests and reconstructed reports. Never restore over a live database.

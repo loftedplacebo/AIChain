@@ -30,6 +30,17 @@ async function main(){
  await assert.rejects(copyBackupSet({environment:'test',directory:archive.directory,destinationRoot:path.dirname(archive.directory),key}),/separate/);
  const custodyRoot=path.join(directory,'custody');fs.mkdirSync(custodyRoot);const copied=await copyBackupSet({environment:'test',directory:archive.directory,destinationRoot:custodyRoot,key});
  assert.equal(copied.id,archive.id);assert.equal(copied.integrity,'verified');assert.equal(copied.custody,'destination-filesystem-only');
+ const {Readable}=require('node:stream'),{PutObjectCommand,GetObjectCommand}=require('@aws-sdk/client-s3'),objects=new Map(),uploads=[],objectClient={send:async command=>{
+  if(command instanceof PutObjectCommand){const chunks=[];if(Buffer.isBuffer(command.input.Body))chunks.push(command.input.Body);else for await(const chunk of command.input.Body)chunks.push(Buffer.from(chunk));const value=Buffer.concat(chunks);assert.equal(value.length,command.input.ContentLength);objects.set(command.input.Key,value);uploads.push(command.input.Key);return {};}
+  if(command instanceof GetObjectCommand){const value=objects.get(command.input.Key);if(!value)throw Error('Synthetic object missing');return {Body:Readable.from([value])};}
+  throw Error('Unexpected synthetic object operation');
+ }};
+ const remote=require('../services/governance/backup-object-storage.cjs'),uploaded=await remote.uploadBackupSet({environment:'test',directory:archive.directory,bucket:'synthetic-backups',prefix:'pilot',key,client:objectClient});
+ assert.equal(uploads.at(-1),uploaded.keyPrefix+'/complete.json');
+ const downloadRoot=path.join(directory,'downloaded');fs.mkdirSync(downloadRoot);const downloaded=await remote.downloadBackupSet({environment:'test',bucket:'synthetic-backups',keyPrefix:uploaded.keyPrefix,outputRoot:downloadRoot,key,client:objectClient});
+ assert.equal(downloaded.id,archive.id);assert.equal(downloaded.integrity,'verified');
+ const corrupted=uploaded.keyPrefix+'/postgres.gcm',originalObject=objects.get(corrupted);objects.set(corrupted,Buffer.from(originalObject));objects.get(corrupted)[20]^=1;
+ await assert.rejects(remote.downloadBackupSet({environment:'test',bucket:'synthetic-backups',keyPrefix:uploaded.keyPrefix,outputRoot:downloadRoot,key,client:objectClient}),/digest mismatch/);objects.set(corrupted,originalObject);
  const recovery=await backup.restoreBackup({environment:'test',directory:copied.directory,key,connection:{...connection,database:'postgres'},binaries,targetDatabase:'gov_restore_archive_'+id,outputRoot:path.join(directory,'restores')});
  assert.equal(recovery.activation,'review-required');assert.equal(recovery.access,'revoked-and-disabled');
  assert.equal((await backup.reviewRestore({environment:'test',connection:{...connection,database:recovery.targetDatabase},binaries,directory:recovery.directory})).review,'passed');
@@ -41,8 +52,10 @@ async function main(){
  await recovered.query('GRANT CONNECT ON DATABASE '+recovery.targetDatabase+' TO '+runtime);
  await assert.rejects(require('../services/governance/postgres-recovery.cjs').prepareAccessReview(pool(recovery.targetDatabase,runtime,runtimePassword),recoveryOptions),/offline database administrator/);
  assert.equal((await recovered.query('SELECT state FROM governance_recovery_gate')).rows[0].state,'review-required');
+ const remoteRecovery=await backup.restoreBackup({environment:'test',directory:downloaded.directory,key,connection:{...connection,database:'postgres'},binaries,targetDatabase:'gov_restore_remote_'+id,outputRoot:path.join(directory,'remote-restores')});
+ assert.equal(remoteRecovery.activation,'review-required');
  key.fill(0);
- console.log('PASS managed-like non-superuser copies the authenticated archive to a separate directory, restores from that copy and reviews pending evidence without activation');
- console.log('Synthetic databases retained: '+source+', '+target+', '+recovery.targetDatabase);
+ console.log('PASS managed-like non-superuser restores from filesystem and synthetic S3 copies; altered remote bytes are denied and restored gates stay closed');
+ console.log('Synthetic databases retained: '+source+', '+target+', '+recovery.targetDatabase+', '+remoteRecovery.targetDatabase);
 }
-main().catch(()=>{console.error('Managed-like offline administrator native acceptance failed');process.exitCode=1;}).finally(async()=>{await Promise.all(pools.map(p=>p.end()));await admin.end();});
+main().catch(error=>{console.error('Managed-like offline administrator native acceptance failed: '+error.message);process.exitCode=1;}).finally(async()=>{await Promise.all(pools.map(p=>p.end()));await admin.end();});
