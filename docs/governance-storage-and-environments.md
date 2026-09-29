@@ -44,6 +44,46 @@ VPS files were adopted or restarted. PF-01 remains partially complete.
 
 ## Four-environment deployment plan and release sequence — 29 September
 
+### Selected first-pilot hosting layout — 29 September
+
+The owner selected **VPS application + managed PostgreSQL + separate backup
+storage** for the first hosted synthetic-data pilot. This chooses the topology,
+not a provider, domain, recovery objective, purchase or release approval. The
+existing Sites deployment remains the owner-only marketing and portal preview
+until the hosted path passes its acceptance gate.
+
+The intended first-pilot request path is:
+
+1. The browser opens the Sites `/workspace` route. Its server-only gateway reads
+   the HttpOnly app-session cookie and calls the governance API over an exact configured
+   HTTPS origin. Sites cannot use the current loopback-only VPS address or a
+   private SSH tunnel. `WORKSPACE_ORIGIN` must match the actual Sites origin and
+   `GOVERNANCE_API_URL` must be the reviewed HTTPS API origin before this route
+   can serve a partner.
+2. The VPS reverse proxy terminates HTTPS for that API origin and forwards only
+   approved API paths to the loopback governance service. Customer applications
+   submit structured records to the same reviewed HTTPS API with scoped project
+   keys; browser code never receives those keys from the portal. The WorkOS
+   callback returns to the Sites origin, while signed provider webhooks reach a
+   separately reviewed HTTPS VPS route. Exact callback and webhook URLs must be
+   registered in the isolated pilot provider environment.
+3. The API and evidence worker use distinct least-privilege roles against managed
+   PostgreSQL with verified TLS and forced RLS. Migration credentials stay with
+   the release operator. Recording and publisher keys, worker journals and
+   provider secrets are isolated from the website and from other environments.
+4. Coordinated encrypted database and journal backups go to storage independent
+   of the VPS and database provider failure domains. A fresh-target restore,
+   credential revocation, reconciliation and controlled release must be proven
+   before a real-data pilot.
+
+Before partner access, provision actual domains and isolated resources; review
+reverse-proxy path/rate/IP rules and secret placement; run the shared-PostgreSQL
+browser journey and one direct API-key submission; verify an exported receipt and
+Base Sepolia anchor; rehearse alerts, rollback and a synthetic restore. The Sites
+audience remains owner-only until the synthetic hosted gate passes and named pilot
+users can be granted access. Required MFA policy is a separate pending decision.
+None of these controls is established by this topology record.
+
 Review the non-secret
 [`deployment-plan.example.json`](../deploy/governance/deployment-plan.example.json)
 with `npm run governance:review-deployment-plan -- <plan.json>`.
