@@ -95,6 +95,55 @@ audience remains owner-only until the synthetic hosted gate passes and named pil
 users can be granted access. Required MFA policy is a separate pending decision.
 None of these controls is established by this topology record.
 
+### Provisional provider shortlist — 29 September
+
+For a small synthetic-data pilot, the simplest candidate is a DigitalOcean
+Droplet and managed PostgreSQL cluster in London (`lon1`), with encrypted,
+coordinated PostgreSQL and publisher-journal backup sets in a separate
+Backblaze B2 EU Central account. The portal can stay on Sites while its
+server-side gateway calls the public HTTPS API origin on the Droplet. This is
+a **shortlist, not a provider selection or purchase**; use the owner's
+preferred providers if they meet the same acceptance checks.
+
+DigitalOcean lists London as a region and offers Droplets and managed
+PostgreSQL there. The current indicative entry prices are $12/month for a
+2 GiB Basic Droplet and $15/month for a single-node 1 GiB database; the
+single-node database is intended for preliminary development/testing rather
+than high availability. A managed primary plus standby begins at $60/month.
+These figures exclude backup storage, transfer, domain, monitoring, taxes and
+any larger VPS/database needed after a load test. Check the order page before
+spending. [Regional availability](https://docs.digitalocean.com/platform/regional-availability/),
+[Droplet pricing](https://www.digitalocean.com/pricing/droplets),
+[managed PostgreSQL pricing](https://docs.digitalocean.com/products/databases/postgresql/details/pricing/).
+
+The database must accept the app's non-owner API/worker roles, grants,
+transaction-scoped RLS policies and migration owner. DigitalOcean's `doadmin`
+has `BYPASSRLS`, so it must never be an API or worker login. Test migrations,
+strict role-profile checks, forced RLS isolation and a fresh-target restore
+on a disposable managed test cluster before adopting this provider. Restrict
+database trusted sources to the VPS/operator paths and verify the server
+certificate and hostname; DigitalOcean's default `sslmode=require` does not
+verify identity. Its managed point-in-time recovery covers only the last seven
+days and restores to a new node, so it does not replace independent backup
+sets. [Role attributes](https://docs.digitalocean.com/products/databases/postgresql/how-to/modify-user-privileges/),
+[TLS and trusted sources](https://docs.digitalocean.com/products/databases/postgresql/how-to/secure/),
+[managed limits](https://docs.digitalocean.com/products/databases/postgresql/details/limits/).
+
+Backblaze's EU Central region stores data in Amsterdam, outside the UK. Its
+account region cannot be changed later. Confirm the pilot's residency and
+contract terms before creating that account. Object Lock can protect a
+retained backup from deletion, but enabling it for a bucket cannot be undone;
+set the retention period only after the deletion policy is agreed. Encrypt
+backup sets before upload with a key held outside both providers, restrict
+write/read/delete credentials separately, and prove a fresh restore of the
+database **and** journals. [Data regions](https://www.backblaze.com/docs/cloud-storage-data-regions),
+[Object Lock](https://www.backblaze.com/docs/cloud-storage-object-lock).
+
+Next decision: confirm providers, domain, UK-versus-EU backup residency,
+recovery point/time targets and backup retention. Then provision only an
+isolated test environment, run the managed-role compatibility and full
+restore drill, and measure actual capacity/cost before staging.
+
 Review the non-secret
 [`deployment-plan.example.json`](../deploy/governance/deployment-plan.example.json)
 with `npm run governance:review-deployment-plan -- <plan.json>`.
