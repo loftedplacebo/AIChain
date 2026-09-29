@@ -449,6 +449,11 @@ validation, retention, monitoring and a restore from its downloaded copy. A
 [private S3-compatible transfer command](../services/governance/README.md#s3-compatible-encrypted-backup-transfer--29-september-2026)
 now prepares that flow and has passed a local synthetic object-store round trip;
 it has not contacted a real bucket.
+An optional private latest-upload pointer now lets a fixed monitor configuration
+follow the most recently completed upload. The pointer advances only after the
+remote completion marker returns successfully; the monitor still authenticates
+the exact remote set. This enables future scheduling without making capture
+safe while services are writing. No timer or provider bucket was configured.
 Do not call a backup complete until a restore into an **isolated test database**
 has been checked for migrations, tenant isolation, event/outbox counts, counters,
 sample digests and reconstructed reports. Never restore over a live database.

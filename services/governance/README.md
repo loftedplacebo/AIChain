@@ -896,7 +896,15 @@ and are not deleted automatically. Neither command creates buckets, sets Object
 Lock, deletes objects, schedules jobs, starts services or releases publishers.
 
 The upload config contains `environment`, `directory`, `bucket`, `prefix`,
-`endpoint`, `region`, `credentialsFile` and `keyFile`. Download replaces
+`endpoint`, `region`, `credentialsFile` and `keyFile`, with optional absolute
+`latestFile` outside the source archive. Only after the completion marker upload
+succeeds, that private pointer is atomically advanced to the exact new key
+prefix. Monitor config accepts exactly one of `keyPrefix` or `latestFile`;
+the latter lets a fixed monitor config follow new uploads. It still downloads
+and authenticates the referenced set and reports old, missing or altered sets
+as not ready. A failed upload leaves the previous pointer in place, which will
+eventually fail freshness. The pointer is local operator state, not proof of
+remote retention or a substitute for a restore drill. Download replaces
 `directory`/`prefix` with `keyPrefix`/`outputRoot`. The private credentials file
 contains only `accessKeyId` and `secretAccessKey`. Example non-secret layout:
 
