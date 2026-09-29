@@ -15,7 +15,35 @@ test('WorkOS configuration is opt-in, complete and restricts redirect destinatio
  assert.equal(workosConfig({}),null);assert.throws(()=>workosConfig({GOVERNANCE_IDENTITY_PROVIDER:'unknown'}),/provider/);
  const env={GOVERNANCE_IDENTITY_PROVIDER:'workos',WORKOS_CLIENT_ID:config.clientId,WORKOS_API_KEY:config.apiKey,GOVERNANCE_IDENTITY_SEAL_KEY:'ab'.repeat(32)};
  for(const WORKOS_REDIRECT_URI of ['http://evil.test/api/auth/callback','https://example.test/other','https://user@example.test/api/auth/callback','https://example.test/api/auth/callback?next=evil'])assert.throws(()=>workosConfig({...env,WORKOS_REDIRECT_URI}));
- assert.equal(workosConfig({...env,WORKOS_REDIRECT_URI:'https://example.test/api/auth/callback'}).redirectUri,'https://example.test/api/auth/callback');
+ const hosted={...env,WORKOS_REDIRECT_URI:'https://example.test/api/auth/callback'};
+ assert.throws(()=>workosConfig(hosted),/pilot admission list/);
+ assert.deepEqual([...workosConfig({...hosted,WORKOS_PILOT_ALLOWED_EMAILS:' Alice@Example.test, bob@example.test '}).allowedEmails],['alice@example.test','bob@example.test']);
+ for(const list of ['', 'alice@example.test,ALICE@example.test','*@example.test','alice@example.test,','not-an-email'])assert.throws(()=>workosConfig({...hosted,WORKOS_PILOT_ALLOWED_EMAILS:list}),/pilot admission list/);
+});
+
+test('pilot admission denies unknown verified accounts before identity or session creation',async()=>{
+ const f=await fixture();try{
+  f.provider.config={...config,allowedEmails:new Set(['partner@example.test'])};
+  await assert.rejects(f.provider.callback(await f.start()),e=>e.status===403);
+  assert.equal(f.db.prepare('SELECT count(*) n FROM customer_identities').get().n,0);
+  assert.equal(f.db.prepare('SELECT count(*) n FROM workspace_sessions').get().n,0);
+  f.provider.config={...config,allowedEmails:new Set(['alice@example.test'])};
+  const session=await f.provider.callback(await f.start());assert.ok(await f.provider.resolve(session.token));
+  f.provider.config={...config,allowedEmails:new Set(['partner@example.test'])};
+  assert.deepEqual(await Promise.all(Array.from({length:8},()=>f.provider.resolve(session.token))),Array(8).fill(null));
+  assert.equal(f.db.prepare('SELECT count(*) n FROM workspace_sessions').get().n,0);
+ }finally{f.close();}
+});
+
+test('pilot admission rejects a changed provider email during renewal',async()=>{
+ const f=await fixture();try{
+  f.provider.config={...config,allowedEmails:new Set(['alice@example.test'])};
+  const session=await f.provider.callback(await f.start());f.advance(100000);
+  f.response({user:{id:'user_alice',email:'other@example.test',email_verified:true},access_token:await f.token(),refresh_token:'replacement-secret'});
+  assert.equal(await f.provider.resolve(session.token),null);
+  assert.equal(f.db.prepare('SELECT count(*) n FROM workspace_sessions').get().n,0);
+  assert.equal(f.db.prepare('SELECT count(*) n FROM workspace_provider_refresh').get().n,0);
+ }finally{f.close();}
 });
 
 test('start admission rejects excess before creating flow state but preserves a prior callback',async()=>{

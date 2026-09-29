@@ -1,5 +1,24 @@
 # Authenticated customer workspaces — 2026-09-26
 
+## First-pilot customer admission — 29 September 2026
+
+The supervised pilot now has a server-side WorkOS admission gate. A non-loopback
+callback URL requires `WORKOS_PILOT_ALLOWED_EMAILS` in protected API configuration;
+the list contains exact verified email addresses, not domains or wildcards. The
+callback checks the current verified provider email before creating an identity or
+app session. Existing app sessions are checked against the current list on each
+request, and a provider email outside the list is denied during renewal. Removing
+a participant therefore ends their app session and saved renewal credential when
+they next use the service. The provider account itself is not removed.
+
+This is a controlled pilot admission policy, not MFA, a public signup policy or a
+replacement for workspace invitations and roles. The list must be reviewed with
+named pilot participants and installed consistently across all hosted API
+processes. Local loopback development may omit it. Forty WorkOS tests pass,
+including unlisted callback denial before identity/session creation, removal of
+an existing app session and denial after a provider email change on renewal. Hosted
+shared-PostgreSQL and real provider acceptance remain open.
+
 ## Shared customer request controls — 29 September 2026
 
 The shared-control launcher also supplies aggregate sign-in start capacity via

@@ -8,15 +8,25 @@ function workosConfig(env){
  if(!/^client_[A-Za-z0-9]+$/.test(env.WORKOS_CLIENT_ID||'')||!/^sk_[A-Za-z0-9_]+$/.test(env.WORKOS_API_KEY||'')||!/^[a-f0-9]{64}$/.test(env.GOVERNANCE_IDENTITY_SEAL_KEY||''))throw new Error('WorkOS server credentials and sealing key required');
  const redirect=new URL(env.WORKOS_REDIRECT_URI||'');
  if(redirect.username||redirect.password||redirect.hash||redirect.search||redirect.pathname!=='/api/auth/callback'||(redirect.protocol!=='https:'&&!(redirect.protocol==='http:'&&['localhost','127.0.0.1'].includes(redirect.hostname))))throw new Error('Invalid WorkOS redirect URI');
+ const pilotEmails=env.WORKOS_PILOT_ALLOWED_EMAILS;
+ let allowedEmails=null;
+ if(pilotEmails!==undefined){
+  if(typeof pilotEmails!=='string'||!pilotEmails||pilotEmails.length>8192)throw new Error('Invalid pilot admission list');
+  const entries=pilotEmails.split(',').map(email=>email.trim().toLowerCase());
+  if(entries.length>100||entries.some(email=>email.length>254||!/^[^\s@,*]+@[^\s@,*]+\.[^\s@,*]+$/.test(email))||new Set(entries).size!==entries.length)throw new Error('Invalid pilot admission list');
+  allowedEmails=new Set(entries);
+ }
+ if(!['localhost','127.0.0.1'].includes(redirect.hostname)&&!allowedEmails)throw new Error('Hosted WorkOS requires a pilot admission list');
  const webhookSecret=env.WORKOS_WEBHOOK_SECRET||null;
  if(webhookSecret&&(typeof webhookSecret!=='string'||webhookSecret.length<32||webhookSecret.length>256||/[\x00-\x20\x7f]/.test(webhookSecret)))throw new Error('Invalid WorkOS webhook secret');
- return {clientId:env.WORKOS_CLIENT_ID,apiKey:env.WORKOS_API_KEY,sealKey:Buffer.from(env.GOVERNANCE_IDENTITY_SEAL_KEY,'hex'),redirectUri:redirect.href,webhookSecret};
+ return {clientId:env.WORKOS_CLIENT_ID,apiKey:env.WORKOS_API_KEY,sealKey:Buffer.from(env.GOVERNANCE_IDENTITY_SEAL_KEY,'hex'),redirectUri:redirect.href,webhookSecret,allowedEmails};
 }
 class WorkosAuth {
  constructor(db,directory,auth,config,{fetcher=fetch,now=Date.now,keySet=null,sessions=null,startRequestLimits=null}={}){
   this.directory=directory;this.auth=auth;this.config=config;this.fetcher=fetcher;this.now=now;this.keySet=keySet;this.renewals=new Map();
   this.sessions=sessions||new (require('./sqlite-provider-sessions.cjs').SqliteProviderSessions)(db);this.startRequestLimits=startRequestLimits;
  }
+ admitted(email){return typeof email==='string'&&(!this.config.allowedEmails||this.config.allowedEmails.has(email.toLowerCase()));}
  async replayRevocations(options){
   if(!options||Object.keys(options).some(k=>!['rangeStart','rangeEnd','maxPages','maxEvents'].includes(k)))throw Error('Invalid revocation replay options');
   return require('./workos-revocation-replay.cjs').replayRevocations({...options,clientId:this.config.clientId,apiKey:this.config.apiKey,fetcher:this.fetcher,repository:this.sessions.revocations,now:this.now});
@@ -59,7 +69,7 @@ class WorkosAuth {
   if(!/^[a-f0-9]{64}$/.test(token||''))return null;
   const sessionHash=hash(token);
   if(this.renewals.has(sessionHash))return this.renewals.get(sessionHash);
-  const pending=this.resolveSession(token,sessionHash);this.renewals.set(sessionHash,pending);
+  const pending=(async()=>{const principal=await this.resolveSession(token,sessionHash);if(principal?.customer&&!this.admitted(principal.email)){await this.auth.logout(token);return null;}return principal;})();this.renewals.set(sessionHash,pending);
   try{return await pending;}finally{this.renewals.delete(sessionHash);}
  }
  async resolveSession(token,sessionHash){
@@ -83,6 +93,7 @@ class WorkosAuth {
   try{
    const result=await this.exchange({grant_type:'refresh_token',refresh_token:this.unseal(claimed.credential,'refresh:'+sessionHash)});
    const {user,payload}=await this.verifiedResult(result),currentIdentity=await this.directory.identity(row.user_id);
+   if(!this.admitted(user.email))throw fail(403,'Pilot access is by invitation');
    if(user.id!==await this.sessions.subject(row.user_id)||payload.sid!==provider.session_id||!currentIdentity||row.version!=='provider:'+await this.auth.version(currentIdentity))throw fail(401,'Renewal identity changed');
    const credential=this.refreshCredential(result,sessionHash);
    if(await this.sessions.revocations.revoked(this.config.clientId,provider.session_id,user.id))throw fail(401,'Provider session revoked');
@@ -110,6 +121,7 @@ class WorkosAuth {
   try{
    const verifier=this.unseal(row.verifier,hash(state));
    const result=await this.exchange({grant_type:'authorization_code',code,code_verifier:verifier}),{user,payload}=await this.verifiedResult(result);
+   if(!this.admitted(user.email))throw fail(403,'Pilot access is by invitation');
    if(row.reauth_user_id&&(user.id!==await this.sessions.subject(row.reauth_user_id)||!Number.isSafeInteger(payload.auth_time)||this.now()-payload.auth_time*1000>=300000))throw fail(401,'Fresh authentication for the same customer is required');
    const identity=await this.directory.verifiedIdentity({provider:'workos:'+this.config.clientId,subject:user.id,email:user.email,emailVerified:true});
    if(await this.sessions.revocations.revoked(this.config.clientId,payload.sid,user.id))throw fail(401,'Provider session revoked');

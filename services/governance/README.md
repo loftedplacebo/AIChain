@@ -641,6 +641,19 @@ gateway checks the configured origin and never accepts a caller-selected return
 URL or forwards provider credentials to browser JavaScript. Custom auth domains
 are not supported in this increment; issuer/JWKS/API endpoints are fixed to WorkOS.
 
+For a non-loopback WorkOS callback, `WORKOS_PILOT_ALLOWED_EMAILS` is required: a
+comma-separated, bounded list of up to 100 exact verified email addresses. It is
+normalized to lowercase and rejects duplicates, wildcards and malformed entries.
+An unlisted verified user is denied before the customer identity or app session is
+created. An already signed-in user removed from the list loses the app session and
+saved refresh credential on the next request; a provider email change outside the
+list is denied during renewal. Loopback development may omit the list to retain
+existing local tests. Keep the list in protected server configuration, review it
+with the named pilot participants and deploy the same policy to every API process.
+This gate does not revoke a WorkOS account or prove MFA, provider revocation
+delivery, invitation acceptance or hosted deployment. WorkOS sign-up may still
+create a provider account before our callback denies admission.
+
 State is random, hashed in SQLite and bound to a random browser cookie. PKCE uses
 S256; its verifier is encrypted with AES-256-GCM and state-bound authenticated
 data. State lasts five minutes, is consumed atomically before code exchange, and
