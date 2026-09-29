@@ -846,7 +846,7 @@ absent. The destination still must be a fresh, differently named database.
 Acceptance uses a local dev/test cluster; independent-host recovery and release
 activation still require a deployment design and drill.
 
-The CLI is `node scripts/governance-postgres-recovery.cjs backup|restore|review|inspect|monitor
+The CLI is `node scripts/governance-postgres-recovery.cjs backup|restore|review|inspect|monitor|rotate-key|copy
 private-config.json`. Connections and backup keys are read from private files;
 neither belongs in command arguments or chat. Procedure and configuration fields
 are in [the operations runbook](../../docs/operations-runbook.md#encrypted-coordinated-local-recovery).
@@ -866,6 +866,17 @@ Results report integrity and freshness with no connection credentials or custome
 records. Exit 0 means verified/fresh, 2 verified/stale, 1 failure. This is an
 operator I/O task, not a public HTTP probe, and does not replace a native restore
 drill or prove an off-host copy exists.
+
+`copy` accepts a private config with `environment`, absolute `directory` of a
+complete encrypted archive, absolute existing `destinationRoot`, and `keyFile`.
+It authenticates the source, copies a fixed inventory with the completion marker
+last, compares source and destination file hashes, and authenticates the copy.
+The destination must be a separate directory tree; the operation does not create
+or select a cloud bucket. It reports `destination-filesystem-only` because a
+path alone cannot prove another provider, retention, or independent failure
+domain. Restore and review from the copied archive before relying on it. The
+local managed-like PostgreSQL test does this with one synthetic record and
+keeps the restored gate closed.
 
 Off-host backup scheduling, retention/PITR, alerts, key custody/rotation, independent
 restore drills and approved owner/service activation remain release requirements.

@@ -26,7 +26,11 @@ async function main(){
  console.log('PASS managed-like non-superuser owns source, migrates and creates an isolated restore target; runtime role denied');
  const backup=require('../services/governance/postgres-backup.cjs'),binaries=path.join(__dirname,'../build/postgres-runtime/pgsql/bin'),key=randomBytes(32),connection={host:config.host,port:config.port,database:source,user:role,password};
  const archive=await backup.createBackup({environment:'test',connection,binaries,outputRoot:path.join(directory,'backups'),key,consistency:'quiesced'});
- const recovery=await backup.restoreBackup({environment:'test',directory:archive.directory,key,connection:{...connection,database:'postgres'},binaries,targetDatabase:'gov_restore_archive_'+id,outputRoot:path.join(directory,'restores')});
+ const copyBackupSet=require('../services/governance/backup-custody-copy.cjs').copyBackupSet;
+ await assert.rejects(copyBackupSet({environment:'test',directory:archive.directory,destinationRoot:path.dirname(archive.directory),key}),/separate/);
+ const custodyRoot=path.join(directory,'custody');fs.mkdirSync(custodyRoot);const copied=await copyBackupSet({environment:'test',directory:archive.directory,destinationRoot:custodyRoot,key});
+ assert.equal(copied.id,archive.id);assert.equal(copied.integrity,'verified');assert.equal(copied.custody,'destination-filesystem-only');
+ const recovery=await backup.restoreBackup({environment:'test',directory:copied.directory,key,connection:{...connection,database:'postgres'},binaries,targetDatabase:'gov_restore_archive_'+id,outputRoot:path.join(directory,'restores')});
  assert.equal(recovery.activation,'review-required');assert.equal(recovery.access,'revoked-and-disabled');
  assert.equal((await backup.reviewRestore({environment:'test',connection:{...connection,database:recovery.targetDatabase},binaries,directory:recovery.directory})).review,'passed');
  const recovered=pool(recovery.targetDatabase,role,password),recoveryOptions={environment:'test',restoreId:recovery.restoreId};
@@ -38,7 +42,7 @@ async function main(){
  await assert.rejects(require('../services/governance/postgres-recovery.cjs').prepareAccessReview(pool(recovery.targetDatabase,runtime,runtimePassword),recoveryOptions),/offline database administrator/);
  assert.equal((await recovered.query('SELECT state FROM governance_recovery_gate')).rows[0].state,'review-required');
  key.fill(0);
- console.log('PASS managed-like non-superuser captures a runtime-submitted record, restores to a revoked target and reviews pending evidence without activation');
+ console.log('PASS managed-like non-superuser copies the authenticated archive to a separate directory, restores from that copy and reviews pending evidence without activation');
  console.log('Synthetic databases retained: '+source+', '+target+', '+recovery.targetDatabase);
 }
 main().catch(()=>{console.error('Managed-like offline administrator native acceptance failed');process.exitCode=1;}).finally(async()=>{await Promise.all(pools.map(p=>p.end()));await admin.end();});

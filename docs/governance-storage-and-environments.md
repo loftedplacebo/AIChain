@@ -386,6 +386,12 @@ and billed again. Public commitments cannot restore deleted off-chain evidence.
 Recommended first operational implementation: encrypted daily backups with a
 separate access-controlled destination, then WAL/PITR when the agreed recovery
 objective requires it. Exact schedules and retention await those decisions.
+The offline `copy` command can transfer and authenticate a complete encrypted
+archive to another filesystem root; the local native test restored from that
+copy. [Procedure](../services/governance/README.md#encrypted-coordinated-postgresql-backups--29-september-2026).
+This is file-copy evidence only. Backblaze or another independent store still
+needs actual provisioning, restricted credentials, upload/download validation,
+retention, monitoring and a restore from its downloaded copy.
 Do not call a backup complete until a restore into an **isolated test database**
 has been checked for migrations, tenant isolation, event/outbox counts, counters,
 sample digests and reconstructed reports. Never restore over a live database.
