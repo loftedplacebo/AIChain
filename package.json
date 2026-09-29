@@ -64,6 +64,7 @@
     "governance:worker-local": "node scripts/run-governance-worker-local.cjs",
     "test:governance-worker": "node --test services/governance/worker.test.cjs",
     "test:governance-postgres-runtime-profiles-native": "node scripts/test-governance-postgres-runtime-profiles-native.cjs",
+    "test:governance-postgres-offline-admin-native": "node scripts/test-governance-postgres-offline-admin-native.cjs",
     "governance:review-deployment-plan": "node scripts/governance-deployment-plan.cjs",
     "test:governance-deployment-plan": "node --test services/governance/deployment-plan.test.cjs services/governance/environment.test.cjs",
     "test:governance-backup-monitor": "node --test services/governance/backup-monitor.test.cjs",

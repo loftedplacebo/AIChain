@@ -18,7 +18,7 @@ async function context(pool,options){
  await verifyProfile(options.runtimePool,'evidence-worker');
  const worker=(await options.runtimePool.query('SELECT current_user name,current_database() database, (SELECT oid FROM pg_database WHERE datname=current_database()) oid')).rows[0];
  const c=await pool.connect();try{
-  if(!(await c.query('SELECT rolsuper FROM pg_roles WHERE rolname=current_user')).rows[0]?.rolsuper)throw Error('Offline recovery administrator required');await verify(c);
+  await require('./postgres-offline-administrator.cjs').assertOfflineAdministrator(c);await verify(c);
   const database=(await c.query('SELECT current_database() name,oid FROM pg_database WHERE datname=current_database()')).rows[0],gate=(await c.query('SELECT * FROM governance_recovery_gate')).rows,stage=(await c.query('SELECT name FROM governance_environment')).rows;
   if(!database.name.startsWith('gov_restore_')||database.name!==worker.database||database.oid!==worker.oid||stage.length!==1||stage[0].name!==options.environment||gate.length!==1||gate[0].state!=='customer-active'||gate[0].restore_id!==options.restoreId)throw Error('Publisher release requires matching customer-active restore and runtime database');
   return {workerRole:worker.name,database,gate};
@@ -45,7 +45,7 @@ async function activatePublisherRelease(pool,options,input){
  try{
   db=new DatabaseSync(options.file);db.exec('PRAGMA busy_timeout=5000; PRAGMA synchronous=FULL; BEGIN IMMEDIATE');
   c=await pool.connect();await c.query('BEGIN');await c.query("SELECT set_config('statement_timeout','30000',true),set_config('lock_timeout','5000',true)");
-  if(!(await c.query('SELECT rolsuper FROM pg_roles WHERE rolname=current_user')).rows[0]?.rolsuper)throw Error('Offline recovery administrator required');
+  await require('./postgres-offline-administrator.cjs').assertOfflineAdministrator(c);
   // These modes prevent mutations while allowing the separate read-only review connections.
   await c.query('LOCK TABLE governance_recovery_gate,governance_recovery_publisher_releases,governance_recovery_publisher_reviews IN SHARE ROW EXCLUSIVE MODE');
   await c.query('LOCK TABLE governance_environment,governance_migrations,governance_events,governance_evidence IN SHARE MODE');
@@ -82,7 +82,7 @@ async function revokePublisherRelease(pool,{environment,restoreId,releaseId,tena
  if(!['dev','test'].includes(environment)||![restoreId,releaseId].every(v=>typeof v==='string'&&/^[-a-f0-9]{36}$/.test(v))||![tenant,project].every(v=>typeof v==='string'&&/^[A-Za-z0-9._:-]{1,200}$/.test(v))||typeof reviewReference!=='string'||!/^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$/.test(reviewReference))throw Error('Exact scoped publisher revocation review required');
  const c=await pool.connect();try{
   await c.query('BEGIN');await c.query("SELECT set_config('statement_timeout','30000',true),set_config('lock_timeout','5000',true)");
-  if(!(await c.query('SELECT rolsuper FROM pg_roles WHERE rolname=current_user')).rows[0]?.rolsuper)throw Error('Offline recovery administrator required');await verify(c);
+  await require('./postgres-offline-administrator.cjs').assertOfflineAdministrator(c);await verify(c);
   await c.query('LOCK TABLE governance_recovery_gate,governance_recovery_publisher_releases,governance_recovery_publisher_reviews IN SHARE ROW EXCLUSIVE MODE');
   const stage=(await c.query('SELECT name FROM governance_environment')).rows,gate=(await c.query('SELECT * FROM governance_recovery_gate')).rows,database=(await c.query('SELECT current_database() name')).rows[0];
   if(stage.length!==1||stage[0].name!==environment||!database.name.startsWith('gov_restore_')||gate.length!==1||gate[0].state!=='customer-active'||gate[0].restore_id!==restoreId)throw Error('Publisher revocation restore mismatch');

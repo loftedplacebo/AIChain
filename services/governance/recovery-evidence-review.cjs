@@ -26,7 +26,7 @@ async function reviewEvidence(pool,{environment,restoreId,trustedSigners,maxReco
  try{
   await c.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
   await c.query("SELECT set_config('statement_timeout','30000',true),set_config('lock_timeout','5000',true)");
-  if(!(await c.query('SELECT rolsuper FROM pg_roles WHERE rolname=current_user')).rows[0]?.rolsuper)throw Error('Offline recovery administrator required');await verify(c);
+  await require('./postgres-offline-administrator.cjs').assertOfflineAdministrator(c);await verify(c);
   const stage=(await c.query('SELECT name FROM governance_environment')).rows,gate=(await c.query('SELECT * FROM governance_recovery_gate')).rows;
   const database=(await c.query('SELECT current_database() name,oid FROM pg_database WHERE datname=current_database()')).rows[0];
   if(stage.length!==1||stage[0].name!==environment||gate.length!==1||!['review-required','access-reviewed'].includes(gate[0].state)||gate[0].restore_id!==restoreId||!database.name.startsWith('gov_restore_'))throw Error('Recovery gate or environment mismatch');

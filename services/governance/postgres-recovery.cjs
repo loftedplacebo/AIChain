@@ -1,6 +1,7 @@
 'use strict';
 const {randomUUID}=require('node:crypto');
 const {verify}=require('./postgres-migrate.cjs');
+const {assertOfflineAdministrator}=require('./postgres-offline-administrator.cjs');
 const issued=new WeakSet(),name=v=>typeof v==='string'&&/^[a-z][a-z0-9_]{0,62}$/.test(v);
 async function assertActive(pool,{publisher=false,binding=null,principal=null}={}){
  const rows=(await pool.query('SELECT state,restore_id FROM governance_recovery_gate')).rows;
@@ -15,15 +16,14 @@ async function assertActive(pool,{publisher=false,binding=null,principal=null}={
  throw Error('Restored PostgreSQL database requires reviewed recovery before use');
 }
 async function operator(c){
- const row=(await c.query('SELECT rolsuper FROM pg_roles WHERE rolname=current_user')).rows[0];
- if(!row?.rolsuper)throw Error('Isolated restore requires the offline database administrator');
+ await assertOfflineAdministrator(c);
 }
 // A fresh destination issued by this process is the only invalidation target.
 // Arbitrary existing databases cannot be passed to invalidateRestore.
 async function createRestoreTarget(admin,{sourceDatabase,targetDatabase,environment,sourceMayBeAbsent=false}){
  if(!['dev','test'].includes(environment)||!name(sourceDatabase)||!name(targetDatabase)||!targetDatabase.startsWith('gov_restore_')||sourceDatabase===targetDatabase||typeof sourceMayBeAbsent!=='boolean')throw Error('Explicit dev/test source and fresh restore database required');
  const c=await admin.connect();try{
-  await operator(c);
+  await assertOfflineAdministrator(c,{createDatabase:true,requireDatabaseOwner:false});
   const source=(await c.query('SELECT oid FROM pg_database WHERE datname=$1',[sourceDatabase])).rows[0];if(!source&&!sourceMayBeAbsent)throw Error('Source database not found');
   // CREATE DATABASE fails on collisions: never drop/reuse an existing target.
   await c.query('CREATE DATABASE '+targetDatabase);

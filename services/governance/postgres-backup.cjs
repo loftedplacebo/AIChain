@@ -2,6 +2,7 @@
 const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),{randomUUID}=require('node:crypto'),{Pool}=require('pg');
 const run=require('node:util').promisify(require('node:child_process').execFile);
 const sqlite=require('./recovery.cjs'),files=sqlite.recoveryFiles,pg=require('./postgres-recovery.cjs'),{verify}=require('./postgres-migrate.cjs');
+const {assertOfflineAdministrator}=require('./postgres-offline-administrator.cjs');
 const roles=['worker','rules','indexer','relayer'],ref=v=>typeof v==='string'&&/^[a-z][a-z0-9_]{0,62}$/.test(v);
 function configuration(environment,connection,binaries){
  if(!['dev','test'].includes(environment))throw Error('PostgreSQL backup tooling is limited to dev/test');
@@ -15,8 +16,9 @@ async function native(exe,args,connection){try{await run(exe,args,{env:nativeEnv
 function marker(directory,name){const file=path.join(directory,name);files.regular(file);if(fs.statSync(file).size>65536)throw Error('Recovery marker too large');return JSON.parse(fs.readFileSync(file,'utf8'));}
 async function sourceCheck(pool,environment){
  await verify(pool);await pg.assertActive(pool);
- const row=(await pool.query('SELECT rolsuper FROM pg_roles WHERE rolname=current_user')).rows[0],stage=(await pool.query('SELECT name FROM governance_environment')).rows;
- if(!row?.rolsuper||stage.length!==1||stage[0].name!==environment)throw Error('Offline dev/test database administrator and matching environment required');
+ await assertOfflineAdministrator(pool);
+ const stage=(await pool.query('SELECT name FROM governance_environment')).rows;
+ if(stage.length!==1||stage[0].name!==environment)throw Error('Offline dev/test database administrator and matching environment required');
 }
 async function createBackup({environment,connection,binaries,journals=[],outputRoot,key,consistency}){
  configuration(environment,connection,binaries);files.keyCheck(key);
