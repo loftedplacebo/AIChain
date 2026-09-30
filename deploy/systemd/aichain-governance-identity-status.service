@@ -1,0 +1,21 @@
+[Unit]
+Description=Check synthetic-test WorkOS revocation replay coverage
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=aichain-governance-api
+Group=aichain-governance-api
+WorkingDirectory=/opt/aichain/governance-worker
+ExecStart=/opt/aichain/.toolchains/node-v24.21.0-linux-x64/bin/node scripts/governance-identity-status.cjs /etc/aichain-governance/identity-status.json
+TimeoutStartSec=30
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ReadOnlyPaths=/etc/aichain-governance/identity-status.json
+MemoryMax=256M
+CPUQuota=100%

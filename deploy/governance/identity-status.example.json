@@ -1,0 +1,8 @@
+{
+  "environment": "test",
+  "storage": "postgres",
+  "clientId": "REPLACE_WITH_TEST_WORKOS_CLIENT_ID",
+  "maxLagSeconds": 300,
+  "databaseUrlFile": "/etc/aichain-governance/api-database-url",
+  "caFile": "/etc/aichain-governance/managed-postgresql-ca.pem"
+}
