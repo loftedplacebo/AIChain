@@ -11,6 +11,7 @@ type Anchor = {
   schemaVersion: string;
   transactionHash: string;
   blockNumber: number;
+  logIndex: number;
 };
 type RecentData = { network: string; chainId: number; latestBlock: number; fromBlock: number; scannedBlocks: number; anchors: Anchor[] };
 type Verification = {

@@ -7,9 +7,10 @@
   },
   "scripts": {
     "dev": "vinext dev",
+    "typecheck": "tsc --noEmit",
     "build": "vinext build",
     "start": "vinext start",
-    "test": "npm run build && node --test tests/rendered-html.test.mjs tests/base-sepolia-explorer.test.mjs tests/receipt-manifest.test.mjs tests/tool-activity.test.mjs tests/keys-panel.test.mjs tests/customer-settings.test.mjs tests/account-sessions.test.mjs tests/workspace-response.test.mjs tests/gateway-origins.test.mjs",
+    "test": "npm run typecheck && npm run build && node --test tests/rendered-html.test.mjs tests/base-sepolia-explorer.test.mjs tests/receipt-manifest.test.mjs tests/tool-activity.test.mjs tests/keys-panel.test.mjs tests/customer-settings.test.mjs tests/account-sessions.test.mjs tests/workspace-response.test.mjs tests/gateway-origins.test.mjs",
     "test:explorer": "node --test tests/base-sepolia-explorer.test.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "db:generate": "drizzle-kit generate"
