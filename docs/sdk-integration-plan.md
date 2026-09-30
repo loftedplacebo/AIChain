@@ -1,5 +1,11 @@
 # SDK and integration plan
 
+30 September follow-up: the Site source now passes full deployed-app TypeScript
+checking, production build and 42 website tests in one `npm test` command. The
+explorer `Anchor.logIndex` type and Cloudflare worker binding type were corrected;
+unused D1 starter/example files are excluded from the deployed-app check. The
+28 September audit below records the state at that time.
+
 ## Current seven-wave delivery status — 28 September 2026
 
 This table supersedes older checkpoint descriptions below. These are locally

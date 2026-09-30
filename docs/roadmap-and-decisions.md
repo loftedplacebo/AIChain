@@ -1,10 +1,10 @@
-# Roadmap and decisions — updated 29 September 2026
+# Roadmap and decisions — updated 30 September 2026
 
-## Current priority — production foundations and customer onboarding, 29 September
+## Current priority — production foundations and customer onboarding, 30 September
 
 The SDK/integration pass is complete at local alpha scope; see [the audited SDK plan](sdk-integration-plan.md). The production-foundations/onboarding goal remains **active and incomplete**. Local implementation and synthetic/native validation do not establish hosted readiness. Staging and production startup remain hard-gated. Billing/checkout follows this package; website pricing is indicative.
 
-For first-partner outreach, use the [design-partner pilot brief template](examples/design-partner-pilot-brief-template.md) to scope one workflow, synthetic records, named contacts and measurable acceptance. The owner-only marketing Site was refreshed to version 26 on 29 September. Its server gateways now reject incomplete or malformed hosted portal/API origins, including IP literals and local-only names, before forwarding a session. The hosted customer workspace still has no API connection. Do not issue partner credentials until the hosted synthetic-data acceptance gate in the brief is met.
+For first-partner outreach, use the [design-partner pilot brief template](examples/design-partner-pilot-brief-template.md) to scope one workflow, synthetic records, named contacts and measurable acceptance. The owner-only marketing Site was refreshed to version 27 on 30 September. Its server gateways reject incomplete or malformed hosted portal/API origins, including IP literals and local-only names, before forwarding a session. Full Site TypeScript checking, the production build and 42 website tests now pass together in `npm test`; unused D1 starter/example files are outside the deployed Site typecheck. The hosted customer workspace still has no API connection. Do not issue partner credentials until the hosted synthetic-data acceptance gate in the brief is met.
 
 | Requirement | Implemented and evidenced | Required before completion |
 | --- | --- | --- |
@@ -503,3 +503,7 @@ interactive portal workflows and production readiness are not asserted. No
 registry publication, deployment, new paid inference or external notifications
 were performed. The next product phase should address pilot readiness and a
 selected customer's integration needs rather than claim broad vendor support.
+
+30 September follow-up: the website typechecking failure recorded in this
+28 September audit is closed for the deployed Site application; see the current
+priority section above. Hosted portal/browser acceptance remains open.
