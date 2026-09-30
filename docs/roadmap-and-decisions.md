@@ -20,6 +20,8 @@ Pilot recovery decision: take one coordinated encrypted database-and-journal bac
 
 Pilot identity decision: require MFA for invited partner and Orvessian operator sign-in. The owner prefers authenticator-app TOTP. WorkOS AuthKit supports a Required TOTP policy for non-SSO users; SSO users require their IdP's MFA policy. Confirm enrolment, recovery and actual provider/browser enforcement in the isolated pilot environment before invitations. The provider policy has not been changed. Select the first design partner and workflow after technical setup, while keeping the hosted synthetic acceptance gate before any partner credential is issued.
 
+Chain and payments timing: run the supervised synthetic design-partner pilot on Base Sepolia without live checkout. After partner validation, use observed usage and costs to settle plans, billing units and payment terms; then choose a hosted billing/payment provider (Stripe is a candidate, not a decision). In parallel, prepare a separately approved Base mainnet release with production contract, wallet/key custody, gas budget, monitoring, recovery and independently verified receipts. Both the mainnet release gate and tested metering, billing, invoices and plan changes must pass before a paid public launch. Switching networks is an explicit deployment decision, not an automatic pilot milestone.
+
 Revocation operations follow-up: one-minute systemd service/timer examples run the existing bounded WorkOS Events replay and separately check its coverage against a five-minute lag threshold on an isolated hosted `test` database. Their example identifiers are deliberately invalid until an operator sets the real client and reviewed replay baseline. Replay/status CLI tests pass; both untouched examples reject before reading credentials or contacting WorkOS. No timer, alert route or coverage monitor has been installed on a VPS. A target-host unit check, one manual live step, observed-fresh status, stale-coverage alert and controlled session-revocation exercise remain acceptance gates.
 
 | Requirement | Implemented and evidenced | Required before completion |
@@ -130,9 +132,10 @@ behaviour. Combined directory/environment/scheduler/key/workspace/route suite:
 these tests do not prove WorkOS registration or live provider operation.
 See [customer provisioning boundaries](../services/governance/README.md#customer-directory-and-provisioning--28-september-2026).
 
-Follow-on phases: reconciled accepted-event metering and backend plan entitlements;
-hosted checkout/billing/invoices and explicit plan-change semantics; controlled
-design-partner pilot; public paid launch and a separate Base mainnet gate.
+Follow-on phases: controlled design-partner pilot; reconciled accepted-event
+metering and backend plan entitlements informed by pilot usage; selection and
+implementation of hosted checkout/billing/invoices with explicit plan-change
+semantics; separately approved Base mainnet release; then public paid launch.
 No duplicate retry, rejected submission, ordinary read or chain batch should become
 another accepted-event charge.
 
@@ -268,7 +271,7 @@ The active roadmap is the governance platform on Base. Historical own-PoW Phase 
 | 3 | Capacity and integration | Bounded index/journal scans, backpressure, rate ramps, batching evaluation and a structured-telemetry adapter |
 | 4 | Governance workflows and repeatable reports | Versioned rules, alert delivery, incident ownership/resolution, saved views and scheduled scoped reporting |
 | 5 | Customer readiness | Separate environments, production identity and roles, PostgreSQL rollout, managed keys, encryption and scheduled restore-tested backups |
-| 6 | Partner validation and commercial release | Demonstrated investigation/reporting value, quotas/metering, cost evidence, support terms, security review and Base mainnet gate |
+| 6 | Partner validation and commercial release | Demonstrated investigation/reporting value, quotas/metering, cost evidence, payment-provider selection and tested billing, support terms, security review and a separate Base mainnet gate before paid launch |
 
 The 24-hour run is still in progress. Indicative website prices are authorised in the [commercial model](commercial-model.md); charging, data marketplace and production SLAs remain gated. Mining, ASIC compatibility and native-token allocation are not launch dependencies. Legal, manufacturing and vehicle views require explicit domain profiles and metric validation.
 
