@@ -57,11 +57,20 @@ VPS files were adopted or restarted. PF-01 remains partially complete.
 
 ### Selected first-pilot hosting layout — 29 September
 
-The owner selected **VPS application + managed PostgreSQL + separate backup
-storage** for the first hosted synthetic-data pilot. This chooses the topology,
-not a provider, domain, recovery objective, purchase or release approval. The
-existing Sites deployment remains the owner-only marketing and portal preview
-until the hosted path passes its acceptance gate.
+The owner selected **the existing VPS for the application + managed PostgreSQL +
+separate backup storage** for the first supervised, synthetic-data design-partner
+pilot. Reuse of that VPS is conditional on a capacity, isolation, firewall and
+secret-placement check; no replacement VPS is selected or authorised for this
+pilot. The database and backup providers, domain, recovery objective, purchase
+and release approval remain undecided. The existing Sites deployment remains
+the owner-only marketing and portal preview until the hosted path passes its
+acceptance gate.
+
+**After the design partners and before onboarding any paying customer**, review
+the pilot's load, incidents, operating effort and recovery results; select and
+validate a longer-term application hosting provider and deployment layout. A
+move requires its own migration, rollback and recovery rehearsal. The current
+VPS decision does not approve it as the paid-customer host.
 
 The non-secret deployment-plan schema is now version 3. Each environment
 declares application, database and backup providers/regions, a backup account
@@ -173,23 +182,24 @@ not establish signed WorkOS delivery, provider policy, customer browser flow, da
 custody, signed evidence or release readiness. The example plan's local test
 origin deliberately fails this hosted check.
 
-### Provisional provider shortlist — 29 September
+### Provisional database and backup provider shortlist — updated 30 September
 
-For a small synthetic-data pilot, the simplest candidate is a DigitalOcean
-Droplet and managed PostgreSQL cluster in London (`lon1`), with encrypted,
-coordinated PostgreSQL and publisher-journal backup sets in a separate
-Backblaze B2 EU Central account. The portal can stay on Sites while its
-server-side gateway calls the public HTTPS API origin on the Droplet. This is
-a **shortlist, not a provider selection or purchase**; use the owner's
-preferred providers if they meet the same acceptance checks.
+The existing VPS is the selected application host for the synthetic pilot,
+subject to the checks above. A DigitalOcean managed PostgreSQL cluster in
+London (`lon1`) and a separate Backblaze B2 EU Central account remain candidate
+database and encrypted backup providers. A new DigitalOcean Droplet is only a
+fallback if the existing VPS fails the pilot suitability check, and requires a
+new owner decision. The portal can stay on Sites while its server-side gateway
+calls the reviewed public HTTPS API origin on the selected VPS. This is a
+**provider shortlist, not a purchase**; use the owner's preferred database and
+backup providers if they meet the same acceptance checks.
 
-DigitalOcean lists London as a region and offers Droplets and managed
-PostgreSQL there. The current indicative entry prices are $12/month for a
-2 GiB Basic Droplet and $15/month for a single-node 1 GiB database; the
+DigitalOcean lists London as a region and offers managed PostgreSQL there.
+The current indicative entry price is $15/month for a single-node 1 GiB database; the
 single-node database is intended for preliminary development/testing rather
 than high availability. A managed primary plus standby begins at $60/month.
-These figures exclude backup storage, transfer, domain, monitoring, taxes and
-any larger VPS/database needed after a load test. Check the order page before
+This excludes the existing VPS, backup storage, transfer, domain, monitoring,
+taxes and any larger database needed after a load test. Check the order page before
 spending. [Regional availability](https://docs.digitalocean.com/platform/regional-availability/),
 [Droplet pricing](https://www.digitalocean.com/pricing/droplets),
 [managed PostgreSQL pricing](https://docs.digitalocean.com/products/databases/postgresql/details/pricing/).
