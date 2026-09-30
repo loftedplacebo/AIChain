@@ -456,7 +456,10 @@ GOVERNANCE_CONTROL_STORAGE=postgres
 Prepare a non-secret four-environment topology with
 `npm run governance:review-deployment-plan -- <plan.json>` before provisioning.
 The [example](../../deploy/governance/deployment-plan.example.json) uses dummy
-identifiers; validation is offline and never approves release. Hosted runtime
+identifiers and schema version 3; validation is offline and never approves release.
+It requires separate declared backup providers for hosted resources and distinct
+backup account references across environments. Provider identity and custody
+still need independent review. Hosted runtime
 gates remain unchanged. See the
 [release sequence](../../docs/governance-storage-and-environments.md#four-environment-deployment-plan-and-release-sequence--29-september).
 

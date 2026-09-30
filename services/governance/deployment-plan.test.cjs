@@ -5,7 +5,7 @@ const file=path.resolve(__dirname,'../../deploy/governance/deployment-plan.examp
 test('four-environment topology is reviewable but never release approval',()=>{
  assert.deepEqual(validatePlan(fixture()),{valid:true,releaseReady:false,errors:[]});
  const result=spawnSync(process.execPath,[path.resolve(__dirname,'../../scripts/governance-deployment-plan.cjs'),file],{encoding:'utf8'});assert.equal(result.status,0);assert.equal(JSON.parse(result.stdout).releaseReady,false);
- for(const value of [null,{},[],{schemaVersion:3,environments:[]}])assert.equal(validatePlan(value).valid,false);
+ for(const value of [null,{},[],{schemaVersion:4,environments:[]}])assert.equal(validatePlan(value).valid,false);
  const plan=fixture();plan.environments[3].stage='test';assert.equal(validatePlan(plan).valid,false);
 });
 test('cross-environment state, identity, keys, wallets and backups cannot be shared',()=>{
@@ -14,8 +14,8 @@ test('cross-environment state, identity, keys, wallets and backups cannot be sha
  const plan=fixture();plan.environments[2].evidence.relayerAddress=plan.environments[2].evidence.recordingAddress;assert.equal(validatePlan(plan).valid,false);
  const roles=fixture();roles.environments[2].database.workerRole=roles.environments[2].database.apiRole;assert.equal(validatePlan(roles).valid,false);
 });
-test('hosted TLS, HTTPS, independent storage and bounded recovery objectives are required',()=>{
- const mutations=[e=>e.database.tls='local',e=>e.identity.callbackUrl='http://staging.example.test/callback',e=>e.identity.webhookUrl='https://user:password@staging.example.test/webhook',e=>e.identity.callbackUrl='https://staging.example.test/callback?token=private',e=>e.backup.custody='local-synthetic',e=>e.backup.rpoMinutes=0,e=>e.evidence.chainId=1,e=>e.evidence.relayerAddress='0x'+'0'.repeat(40)];
+test('hosted TLS, HTTPS, independent backup provider and bounded recovery objectives are required',()=>{
+ const mutations=[e=>e.database.tls='local',e=>e.identity.callbackUrl='http://staging.example.test/callback',e=>e.identity.webhookUrl='https://user:password@staging.example.test/webhook',e=>e.identity.callbackUrl='https://staging.example.test/callback?token=private',e=>e.backup.custody='local-synthetic',e=>e.hosting.backupProvider=e.hosting.appProvider,e=>e.hosting.backupProvider=e.hosting.databaseProvider,e=>e.hosting.backupProvider=e.hosting.appProvider.toUpperCase(),e=>e.hosting.backupRegion='',e=>e.backup.rpoMinutes=0,e=>e.evidence.chainId=1,e=>e.evidence.relayerAddress='0x'+'0'.repeat(40)];
  for(const mutate of mutations){const plan=fixture();mutate(plan.environments[2]);assert.equal(validatePlan(plan).valid,false);}
  const plan=fixture();plan.environments[0].identity.callbackUrl='http://example.test/callback';assert.equal(validatePlan(plan).valid,false);
 });
@@ -31,6 +31,7 @@ test('an HTTPS synthetic test pilot has hosted isolation and public DNS requirem
  pilot.identity.callbackUrl=pilot.portal.origin+'/api/auth/callback';
  pilot.identity.webhookUrl=pilot.portal.apiOrigin+'/v1/auth/workos-webhook';
  pilot.database.tls='verify-full';pilot.backup.custody='independent-storage';
+ pilot.hosting.backupProvider='replace-test-backup-provider';
  assert.equal(validatePlan(hosted).valid,true);
  for(const mutate of [
   e=>e.portal.apiOrigin='https://127.0.0.2',
@@ -38,10 +39,12 @@ test('an HTTPS synthetic test pilot has hosted isolation and public DNS requirem
   e=>e.portal.apiOrigin='https://api.localhost',
   e=>e.database.host='127.0.0.2',
   e=>e.database.tls='local',
-  e=>e.backup.custody='local-synthetic'
+  e=>e.backup.custody='local-synthetic',
+  e=>e.hosting.backupProvider=e.hosting.appProvider
  ]){const plan=structuredClone(hosted);mutate(plan.environments[1]);assert.equal(validatePlan(plan).valid,false);}
 });
 test('unknown fields and inline credential objects are rejected without reflecting values',()=>{
  const plan=fixture();plan.environments[2].secrets.workosApi={value:'private-secret-value'};plan.environments[3].database.password='private-secret-value';const result=validatePlan(plan);assert.equal(result.valid,false);assert.ok(!JSON.stringify(result).includes('private-secret-value'));
  const unknown=fixture();unknown.approved=true;assert.equal(validatePlan(unknown).valid,false);
+ const sharedBackup=fixture();sharedBackup.environments[3].hosting.backupAccountRef=sharedBackup.environments[2].hosting.backupAccountRef;assert.equal(validatePlan(sharedBackup).valid,false);
 });

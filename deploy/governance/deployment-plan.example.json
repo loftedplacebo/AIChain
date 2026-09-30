@@ -1,8 +1,9 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "environments": [
     {
       "stage": "dev",
+      "hosting": {"appProvider": "local-dev", "appRegion": "local", "databaseProvider": "local-dev", "databaseRegion": "local", "backupProvider": "local-dev", "backupRegion": "local", "backupAccountRef": "replace/dev/backup-account", "operatorRef": "replace/dev/operator"},
       "portal": {"origin": "http://127.0.0.1:3002", "apiOrigin": "http://127.0.0.1:8790"},
       "database": {
         "host": "dev.db.example.test",
@@ -45,6 +46,7 @@
     },
     {
       "stage": "test",
+      "hosting": {"appProvider": "local-test", "appRegion": "local", "databaseProvider": "local-test", "databaseRegion": "local", "backupProvider": "local-test", "backupRegion": "local", "backupAccountRef": "replace/test/backup-account", "operatorRef": "replace/test/operator"},
       "portal": {"origin": "http://127.0.0.1:3003", "apiOrigin": "http://127.0.0.1:8791"},
       "database": {
         "host": "test.db.example.test",
@@ -87,6 +89,7 @@
     },
     {
       "stage": "staging",
+      "hosting": {"appProvider": "replace-staging-vps-provider", "appRegion": "replace-staging-app-region", "databaseProvider": "replace-staging-database-provider", "databaseRegion": "replace-staging-database-region", "backupProvider": "replace-staging-backup-provider", "backupRegion": "replace-staging-backup-region", "backupAccountRef": "replace/staging/backup-account", "operatorRef": "replace/staging/operator"},
       "portal": {"origin": "https://staging.example.test", "apiOrigin": "https://api.staging.example.test"},
       "database": {
         "host": "staging.db.example.test",
@@ -129,6 +132,7 @@
     },
     {
       "stage": "prod",
+      "hosting": {"appProvider": "replace-prod-vps-provider", "appRegion": "replace-prod-app-region", "databaseProvider": "replace-prod-database-provider", "databaseRegion": "replace-prod-database-region", "backupProvider": "replace-prod-backup-provider", "backupRegion": "replace-prod-backup-region", "backupAccountRef": "replace/prod/backup-account", "operatorRef": "replace/prod/operator"},
       "portal": {"origin": "https://prod.example.test", "apiOrigin": "https://api.prod.example.test"},
       "database": {
         "host": "prod.db.example.test",

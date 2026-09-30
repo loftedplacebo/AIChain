@@ -63,6 +63,15 @@ not a provider, domain, recovery objective, purchase or release approval. The
 existing Sites deployment remains the owner-only marketing and portal preview
 until the hosted path passes its acceptance gate.
 
+The non-secret deployment-plan schema is now version 3. Each environment
+declares application, database and backup providers/regions, a backup account
+reference and an operator reference. For a hosted environment, the checker
+rejects a backup provider matching either the VPS or database provider and
+rejects reuse of a backup account reference across environments. Update any
+private version-2 plan before review. These are operator declarations: a
+passing plan cannot verify provider accounts, physical failure domains,
+residency, custody or recovery. `releaseReady` remains false.
+
 The intended first-pilot request path is:
 
 1. The browser opens the Sites `/workspace` route. Its server-only gateway reads

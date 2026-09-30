@@ -13,13 +13,19 @@ function exact(value,fields,location,errors){
 function validatePlan(plan){
  const errors=[],resources=new Map();
  const unique=(kind,value,stage)=>{const key=kind+':'+value;if(resources.has(key))errors.push(stage+': '+kind+' must be separate from '+resources.get(key));else resources.set(key,stage);};
- if(!exact(plan,['schemaVersion','environments'],'plan',errors)||plan.schemaVersion!==2){return {valid:false,releaseReady:false,errors:errors.length?errors:['plan: unsupported schema']};}
+ if(!exact(plan,['schemaVersion','environments'],'plan',errors)||plan.schemaVersion!==3){return {valid:false,releaseReady:false,errors:errors.length?errors:['plan: unsupported schema']};}
  if(!Array.isArray(plan.environments)||plan.environments.length!==4)return {valid:false,releaseReady:false,errors:['plan: exactly dev, test, staging and prod required']};
  const seen=new Set();
  for(const env of plan.environments){
-  if(!exact(env,['stage','portal','database','identity','secrets','evidence','backup'],'environment',errors))continue;
+  if(!exact(env,['stage','hosting','portal','database','identity','secrets','evidence','backup'],'environment',errors))continue;
   const stage=env.stage;if(!stages.includes(stage)||seen.has(stage)){errors.push('environment: invalid or repeated stage');continue;}seen.add(stage);
   const hosted=['staging','prod'].includes(stage)||stage==='test'&&['origin','apiOrigin'].some(field=>typeof env.portal?.[field]==='string'&&env.portal[field].startsWith('https:'));
+  if(exact(env.hosting,['appProvider','appRegion','databaseProvider','databaseRegion','backupProvider','backupRegion','backupAccountRef','operatorRef'],'hosting',errors)){
+   const hosting=env.hosting;
+   for(const field of ['appProvider','appRegion','databaseProvider','databaseRegion','backupProvider','backupRegion','backupAccountRef','operatorRef'])if(!scalar(hosting[field]))errors.push(stage+': invalid hosting '+field);
+   if(hosted&&scalar(hosting.backupProvider)&&[hosting.appProvider,hosting.databaseProvider].some(provider=>scalar(provider)&&provider.toLowerCase()===hosting.backupProvider.toLowerCase()))errors.push(stage+': backup provider must be independent of application and database providers');
+   if(scalar(hosting.backupAccountRef))unique('backup account',hosting.backupAccountRef,stage);
+  }
   let portalOrigin=null,apiOrigin=null;
   if(exact(env.portal,['origin','apiOrigin'],'portal',errors)){
    for(const field of ['origin','apiOrigin']){
