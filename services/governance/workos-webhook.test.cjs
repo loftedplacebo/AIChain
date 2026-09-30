@@ -9,6 +9,19 @@ test('raw-body signatures bind timestamp, client, type, session and provider sub
  assert.throws(()=>verifiedEvent(Buffer.from(body+' '),sign(body,now),secret,clientId,parseStrictJson,now),e=>e.status===401);
  for(const value of [{...event(),context:{client_id:'client_other'}},{...event(),data:{object:'session',id:'session_test',user_id:'other'}},{...event(),event:'user.deleted'}]){const raw=JSON.stringify(value);assert.throws(()=>verifiedEvent(Buffer.from(raw),sign(raw,now),secret,clientId,parseStrictJson,now));}
 });
+test('provider-shaped session revocation requires explicit client context',()=>{
+ const now=Date.now();
+ const providerShape={
+  id:'event_01HRZ9WAX5S5ZCBAN96EK8TQBA',event:'session.revoked',
+  data:{object:'session',id:'session_01HR8QXN9ET2JP0JFDWHBHMR97',user_id:'user_01HR8QXMH4X8Q46349R6EQAD1D',organization_id:'org_01HR8QX01S2B4JDDMKM1KMQH7E',status:'revoked',auth_method:'password',expires_at:'2024-03-02T19:07:33.155Z'},
+  created_at:'2024-03-02T19:07:33.155Z'
+ };
+ const clientBound={...providerShape,context:{client_id:clientId}};
+ const boundBody=JSON.stringify(clientBound);
+ assert.equal(verifiedEvent(Buffer.from(boundBody),sign(boundBody,now),secret,clientId,parseStrictJson,now).sessionId,providerShape.data.id);
+ const unboundBody=JSON.stringify(providerShape);
+ assert.throws(()=>verifiedEvent(Buffer.from(unboundBody),sign(unboundBody,now),secret,clientId,parseStrictJson,now),e=>e.status===400);
+});
 test('signed HTTP revocation clears access once, preserves unrelated sessions and rejects forged/replayed changes',async()=>{
  const store=new (require('./store').GovernanceStore)(':memory:'),directory=new (require('./customer-directory.cjs').CustomerDirectory)(store.db),auth=new (require('./auth.cjs').WorkspaceAuth)(store.db,[],Date.now,directory);
  const config={clientId,apiKey:'sk_synthetic',sealKey:Buffer.alloc(32,1),redirectUri:'http://localhost:3001/api/auth/callback',webhookSecret:secret};
