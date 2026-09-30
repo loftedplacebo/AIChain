@@ -894,8 +894,18 @@ in temporary private storage, then reports freshness and missing required
 journal roles. It exits 0 when ready, 2 when not ready, and 1 on invalid
 configuration. The monitor needs `maxAgeHours` (1–720) and optional
 `requiredJournalRoles`; it does not list a bucket or select a newer set.
+`discover` lists object keys under one exact `prefix/environment/` and returns
+only generated set prefixes with a `complete.json` marker. It needs the bucket,
+endpoint, region and a list-capable `credentialsFile`, but no archive key or
+local latest pointer. It is read-only, bounded to 20 pages, 10,000 objects and
+1,000 candidates, and fails if the listing is incomplete. These are **unverified
+candidates**, not authenticated backups or a latest-set decision. After loss of
+the original host, use an independently held credential to discover candidate
+prefixes, then run `download` and a fresh-target restore on an independent host
+with the separately held decryption key. Do not activate the restored service
+until its access and evidence reviews pass.
 An upload writes the completion marker last; partial uploads remain incomplete
-and are not deleted automatically. Neither command creates buckets, sets Object
+and are not deleted automatically. None of these commands creates buckets, sets Object
 Lock, deletes objects, schedules jobs, starts services or releases publishers.
 
 The upload config contains `environment`, `directory`, `bucket`, `prefix`,
@@ -914,6 +924,12 @@ contains only `accessKeyId` and `secretAccessKey`. Example non-secret layout:
 ```json
 {"environment":"test","directory":"C:/PRIVATE_BACKUPS/pg-backup-REPLACE","bucket":"private-backups","prefix":"orvessian-pilot","endpoint":"https://s3.eu-central-003.backblazeb2.com","region":"eu-central-003","credentialsFile":"C:/PRIVATE_OPERATOR_DIRECTORY/object-credentials.json","keyFile":"C:/PRIVATE_OPERATOR_DIRECTORY/backup.key"}
 ```
+
+For `discover`, use only `environment`, `bucket`, `prefix`, `endpoint`,
+`region` and `credentialsFile`. Its result deliberately omits archive contents,
+customer data and decryption material. It cannot prove that an object is still
+readable, authentic, current or retained; the subsequent exact-prefix download
+performs those archive checks.
 
 The endpoint and region must match the chosen bucket; [Backblaze documents its
 S3-compatible endpoint and JavaScript SDK setup](https://www.backblaze.com/docs/cloud-storage-use-the-aws-sdk-for-javascript-v3-with-backblaze-b2).

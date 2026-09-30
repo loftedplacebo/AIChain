@@ -69,6 +69,7 @@
     "governance:preflight-hosted-edge": "node scripts/governance-hosted-edge-preflight.cjs",
     "test:governance-deployment-plan": "node --test services/governance/deployment-plan.test.cjs services/governance/environment.test.cjs services/governance/hosted-edge-preflight.test.cjs",
     "test:governance-backup-monitor": "node --test services/governance/backup-monitor.test.cjs",
+    "test:governance-backup-object-storage": "node --test services/governance/backup-object-storage.test.cjs",
     "test:governance-postgres-connection": "node --test services/governance/postgres-connection.test.cjs services/governance/environment.test.cjs",
     "test:governance-evidence-status": "node --test services/governance/evidence-status.test.cjs",
     "test:governance-onboarding-python": "node scripts/test-governance-onboarding-python.cjs",

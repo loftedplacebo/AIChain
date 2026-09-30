@@ -2,13 +2,14 @@
 // Offline transfer only. Object credentials and the archive decryption key are
 // separate. No bucket creation, object deletion, scheduler or service release.
 const fs=require('node:fs'),path=require('node:path'),{randomUUID,createHash}=require('node:crypto'),{Transform}=require('node:stream'),{pipeline}=require('node:stream/promises');
-const {S3Client,PutObjectCommand,GetObjectCommand}=require('@aws-sdk/client-s3');
+const {S3Client,PutObjectCommand,GetObjectCommand,ListObjectsV2Command}=require('@aws-sdk/client-s3');
 const {recoveryFiles:files}=require('./recovery.cjs'),{inspectBackup}=require('./postgres-backup.cjs'),{inventory}=require('./backup-custody-copy.cjs');
 const roles=['worker','rules','indexer','relayer'];
 const safePrefix=value=>typeof value==='string'&&value.length<=240&&value.split('/').every(part=>/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,127}$/.test(part)&&part!=='.'&&part!=='..');
 const bucketName=value=>typeof value==='string'&&/^[a-z0-9][a-z0-9-]{1,61}[a-z0-9]$/.test(value);
 const knownFiles=journalRoles=>['postgres.gcm','manifest.gcm',...(journalRoles.length?['journals/manifest.gcm',...journalRoles.map(role=>'journals/'+role+'.gcm'),'journals/complete.json']:[]),'complete.json'];
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
+const generatedSetName=/^[a-f0-9-]{36}-[a-f0-9-]{36}$/;
 
 function createStorageClient({endpoint,region,accessKeyId,secretAccessKey}){
  if(typeof endpoint!=='string'||typeof region!=='string'||!/^[a-z0-9-]{2,40}$/.test(region)||typeof accessKeyId!=='string'||!accessKeyId||typeof secretAccessKey!=='string'||!secretAccessKey)throw Error('Explicit object-storage endpoint, region and credentials required');
@@ -18,6 +19,30 @@ function createStorageClient({endpoint,region,accessKeyId,secretAccessKey}){
 }
 function transferPolicy({environment,bucket,prefix,client,key}){
  if(!['dev','test'].includes(environment)||!bucketName(bucket)||!safePrefix(prefix)||!client||typeof client.send!=='function')throw Error('Explicit bounded object-storage transfer required');files.keyCheck(key);
+}
+function discoveryPolicy({environment,bucket,prefix,client}){
+ if(!['dev','test'].includes(environment)||!bucketName(bucket)||!safePrefix(prefix)||!client||typeof client.send!=='function')throw Error('Explicit bounded object-storage discovery required');
+}
+async function discoverBackupPrefixes({environment,bucket,prefix,client}){
+ discoveryPolicy({environment,bucket,prefix,client});
+ const base=prefix+'/'+environment+'/',candidates=new Set(),seenTokens=new Set();let token,objects=0,pages=0;
+ do{
+  if(++pages>20)throw Error('Object-storage discovery exceeds page limit');
+  const result=await client.send(new ListObjectsV2Command({Bucket:bucket,Prefix:base,MaxKeys:1000,...(token?{ContinuationToken:token}:{})}));
+  if(!result||result.Contents!==undefined&&!Array.isArray(result.Contents)||result.Contents?.length>1000)throw Error('Invalid object-storage listing');
+  for(const item of result.Contents||[]){
+   if(++objects>10000||typeof item?.Key!=='string'||!item.Key.startsWith(base))throw Error('Invalid or oversized object-storage listing');
+   if(!item.Key.endsWith('/complete.json'))continue;
+   const name=item.Key.slice(base.length,-'/complete.json'.length);
+   if(!generatedSetName.test(name))continue;
+   candidates.add(base+name);
+   if(candidates.size>1000)throw Error('Object-storage discovery exceeds candidate limit');
+  }
+  if(!result.IsTruncated)break;
+  if(typeof result.NextContinuationToken!=='string'||!result.NextContinuationToken||seenTokens.has(result.NextContinuationToken))throw Error('Invalid object-storage continuation');
+  token=result.NextContinuationToken;seenTokens.add(token);
+ }while(true);
+ return {environment,bucket,prefix,candidates:[...candidates].sort(),candidateStatus:'unverified-completion-marker',pages,objectsScanned:objects,scope:'Exact-prefix candidates only; authenticate a downloaded set before restore'};
 }
 async function smallObject(client,bucket,objectKey,max){
  const response=await client.send(new GetObjectCommand({Bucket:bucket,Key:objectKey}));if(!response.Body||typeof response.Body[Symbol.asyncIterator]!=='function')throw Error('Object-storage response has no readable body');
@@ -67,4 +92,4 @@ async function downloadBackupSet({environment,bucket,keyPrefix,outputRoot,key,cl
   success=true;return {environment,directory:destination.directory,id:verified.id,createdAt:verified.createdAt,journalRoles:verified.journalRoles,integrity:'verified',remoteRestore:'not-tested'};
  }finally{if(!success)files.clean(destination);}
 }
-module.exports={createStorageClient,uploadBackupSet,downloadBackupSet,validateTransferPolicy:transferPolicy};
+module.exports={createStorageClient,uploadBackupSet,downloadBackupSet,discoverBackupPrefixes,validateTransferPolicy:transferPolicy};
