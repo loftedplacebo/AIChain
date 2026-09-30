@@ -65,7 +65,8 @@ pilot. The owner selected DigitalOcean managed PostgreSQL for the pilot on
 30 September; no cluster has been provisioned. The owner selected Backblaze B2
 EU Central for independent encrypted pilot backups and accepted EU storage.
 No B2 account or bucket has been recorded or validated. The owner moved domain
-purchase into pilot preparation; the exact domain and purchase remain open.
+purchase into pilot preparation and chose `orvessian.com`, subject to
+availability, price review and purchase.
 Recovery targets and retention are recorded below. Release approval remains
 open. The existing Sites deployment remains
 the owner-only marketing and portal preview until the hosted path passes its
@@ -79,13 +80,15 @@ memory and disk at that checkpoint, but no listener on public ports 80 or 443;
 that observation is not a load, isolation, TLS or browser acceptance test. The
 current portal is deployed through Sites/Cloudflare. A standalone Node build
 passed locally, but VPS deployment still needs a reviewed HTTPS reverse proxy.
-The owner subsequently requested an Orvessian domain as a pilot action. The
+The owner subsequently chose `orvessian.com` as a pilot action. The
 preferred branded layout uses the website at the apex/`www` (Sites custom
 domain if available) and distinct `portal.` and `api.` origins on the VPS.
 That meets the current gateway's distinct-origin rule without weakening it.
 Confirm the exact Site DNS requirements, Cloudflare proxy compatibility,
 origin certificate, browser flow and WorkOS URLs before partner access. Keep
-the existing Site private until the hosted synthetic customer journey passes.
+the existing Site owner-only until the domain resolves with valid HTTPS and a
+signed-out visitor smoke check passes. Then make the marketing website public
+as requested; portal access remains limited until hosted synthetic acceptance.
 
 **After the design partners and before onboarding any paying customer**, review
 the pilot's load, incidents, operating effort and recovery results; select and
@@ -132,7 +135,8 @@ browser journey and one direct API-key submission; verify an exported receipt an
 Base Sepolia anchor; rehearse alerts, rollback and a synthetic restore. The
 existing Site remains owner-only until the marketing audience is deliberately
 set; the VPS portal admits only named pilot users after the hosted synthetic
-gate passes. Required MFA policy is a separate pending decision.
+gate passes. Required authenticator-app MFA is selected but not enabled or
+verified in the pilot WorkOS environment.
 None of these controls is established by this topology record.
 
 #### Hosted synthetic API entry point
@@ -287,8 +291,10 @@ from the complete backup cadence and monitoring, while RTO depends on an
 exercised restore procedure. Review retention and recovery targets again
 before accepting real customer data or paying customers.
 
-Next owner choices: exact domain and purchase, pilot MFA policy, and one named
-partner workflow. See the [owner action checklist](pilot-owner-actions.md).
+Next owner actions: confirm domain availability and price, buy it, and set up
+the pilot operator's authenticator after WorkOS environment preparation.
+Choose one named partner workflow after technical setup. See the
+[owner action checklist](pilot-owner-actions.md).
 Then provision only an isolated test environment, run the managed-role
 compatibility and full restore drill, and measure actual capacity/cost before
 staging.
