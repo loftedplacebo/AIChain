@@ -82,9 +82,9 @@
       "backup": {
         "destination": "replace/test/backups",
         "custody": "local-synthetic",
-        "retentionDays": 7,
+        "retentionDays": 14,
         "rpoMinutes": 1440,
-        "rtoMinutes": 240
+        "rtoMinutes": 1440
       }
     },
     {

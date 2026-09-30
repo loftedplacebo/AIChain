@@ -269,8 +269,21 @@ write/read/delete credentials separately, and prove a fresh restore of the
 database **and** journals. [Data regions](https://www.backblaze.com/docs/cloud-storage-data-regions),
 [Object Lock](https://www.backblaze.com/docs/cloud-storage-object-lock).
 
-Next decisions: portal/API address and routing, recovery point/time targets,
-and backup retention. Then provision only an
+For the supervised synthetic pilot, the owner accepted one coordinated encrypted
+database-and-journal backup to B2 each day, 14 days of retention, a 24-hour
+recovery point target (RPO) and a 24-hour recovery time target (RTO). Check for
+missed daily backups, prove a full fresh-target restore before partner access,
+and repeat a restore check monthly. These are targets, not achieved service
+levels: no hosted schedule, B2 lifecycle rule, monitor, alert or timed restore
+has been configured. A B2 lifecycle rule can later expire old copies after
+14 days; optional Object Lock would separately prevent early deletion. Review
+both against the restore and deletion policy before enabling them. The
+VPS/operator process must perform encryption and daily uploads. RPO comes
+from the complete backup cadence and monitoring, while RTO depends on an
+exercised restore procedure. Review retention and recovery targets again
+before accepting real customer data or paying customers.
+
+Next decision: portal/API address and routing. Then provision only an
 isolated test environment, run the managed-role compatibility and full
 restore drill, and measure actual capacity/cost before staging.
 
@@ -278,8 +291,9 @@ Review the non-secret
 [`deployment-plan.example.json`](../deploy/governance/deployment-plan.example.json)
 with `npm run governance:review-deployment-plan -- <plan.json>`.
 The example contains reserved `.example.test` hosts, dummy addresses, replacement
-provider/secret references and illustrative recovery objectives. It is not a
-provisioned environment or an agreed RPO/RTO. Keep actual credential values in the
+provider/secret references; its synthetic `test` stage now carries the pilot's
+agreed recovery targets, while other stages remain illustrative. It is not a
+provisioned environment or proof of a met RPO/RTO. Keep actual credential values in the
 protected secret store; put only inventory references in this plan. Use a reviewed
 private copy for real infrastructure identifiers. The checker reads at most 64 KiB,
 prints only validation errors/status, opens no network connection and makes no
