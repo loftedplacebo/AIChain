@@ -61,8 +61,9 @@ The owner selected **the existing VPS for the application + managed PostgreSQL +
 separate backup storage** for the first supervised, synthetic-data design-partner
 pilot. Reuse of that VPS is conditional on a capacity, isolation, firewall and
 secret-placement check; no replacement VPS is selected or authorised for this
-pilot. The database and backup providers, domain, recovery objective, purchase
-and release approval remain undecided. The existing Sites deployment remains
+pilot. The owner selected DigitalOcean managed PostgreSQL for the pilot on
+30 September; no cluster has been provisioned. The backup provider, domain,
+recovery objective, purchase and release approval remain undecided. The existing Sites deployment remains
 the owner-only marketing and portal preview until the hosted path passes its
 acceptance gate.
 
@@ -197,17 +198,26 @@ not establish signed WorkOS delivery, provider policy, customer browser flow, da
 custody, signed evidence or release readiness. The example plan's local test
 origin deliberately fails this hosted check.
 
-### Provisional database and backup provider shortlist — updated 30 September
+### Selected pilot database and backup provider shortlist — updated 30 September
 
 The existing VPS is the selected application host for the synthetic pilot,
-subject to the checks above. A DigitalOcean managed PostgreSQL cluster in
-London (`lon1`) and a separate Backblaze B2 EU Central account remain candidate
-database and encrypted backup providers. A new DigitalOcean Droplet is only a
+subject to the checks above. The owner selected DigitalOcean managed PostgreSQL
+for the pilot, with London (`lon1`) the planned region pending order-page review.
+A separate Backblaze B2 EU Central account remains a candidate for encrypted
+backup storage. A new DigitalOcean Droplet is only a
 fallback if the existing VPS fails the pilot suitability check, and requires a
 new owner decision. The portal can stay on Sites while its server-side gateway
 calls the reviewed public HTTPS API origin on the selected VPS. This is a
-**provider shortlist, not a purchase**; use the owner's preferred database and
-backup providers if they meet the same acceptance checks.
+**database selection, not a purchase**; the backup provider remains open.
+
+The [provider inventory template](../deploy/governance/provider-inventory.example.env)
+lists current vendors, login URLs, operator credential references and connection
+fields. Keep the completed copy at `C:/AIChain/.env.providers`, which Git ignores.
+Record login account identifiers and password-manager item references there,
+not account passwords or service tokens. Actual database URLs and passwords
+belong in restricted per-environment runtime secret files once provisioned;
+never put them in the website or browser configuration. The inventory is a
+locator, not a backup of credentials or proof that an account exists.
 
 DigitalOcean lists London as a region and offers managed PostgreSQL there.
 The current indicative entry price is $15/month for a single-node 1 GiB database; the
