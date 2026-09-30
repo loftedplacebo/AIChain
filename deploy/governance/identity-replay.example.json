@@ -1,0 +1,9 @@
+{
+  "environment": "test",
+  "storage": "postgres",
+  "clientId": "REPLACE_WITH_TEST_WORKOS_CLIENT_ID",
+  "startAt": "REPLACE_WITH_REVIEWED_UTC_BASELINE",
+  "apiKeyFile": "/etc/aichain-governance/workos-api-key",
+  "databaseUrlFile": "/etc/aichain-governance/api-database-url",
+  "caFile": "/etc/aichain-governance/managed-postgresql-ca.pem"
+}

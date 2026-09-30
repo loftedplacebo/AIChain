@@ -1,0 +1,11 @@
+[Unit]
+Description=Run the synthetic-test WorkOS revocation replay each minute
+
+[Timer]
+OnCalendar=*-*-* *:*:00
+Persistent=true
+AccuracySec=10s
+Unit=aichain-governance-identity-replay.service
+
+[Install]
+WantedBy=timers.target
