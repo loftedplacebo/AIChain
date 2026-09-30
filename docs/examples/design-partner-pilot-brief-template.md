@@ -36,6 +36,16 @@ the reviewer needs to see **[decision and outcome]** and check **[evidence]**.â€
 1. Sign in, select a workspace and project, and connect one application.
 2. Submit a small synthetic set containing a normal outcome, an unresolved
    outcome and one exception worth reviewing.
+   For a content-free rehearsal, use
+   [`design-partner-synthetic-set.py`](../../examples/design-partner-synthetic-set.py):
+   set `ORVESSIAN_TENANT` and `ORVESSIAN_PROJECT` to the portal's project
+   references, then run `python examples/design-partner-synthetic-set.py prepare
+   pilot-set.json`. Set `ORVESSIAN_API_URL` to the approved test API origin and
+   `ORVESSIAN_API_KEY` to a test project's write-scoped key, then run the same
+   script with `submit pilot-set.json`. The file contains three fixed synthetic
+   records and no key or source content. Keep it private and reuse that exact
+   file when retrying; a second `prepare` creates different IDs. This rehearsal
+   is not the partner's own integration or evidence verification.
 3. Find the records in the portal; check that totals and missing-data labels
    agree with the submitted set.
 4. Review one decision and attach a human outcome or investigation note.

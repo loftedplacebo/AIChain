@@ -73,6 +73,7 @@
     "test:governance-postgres-connection": "node --test services/governance/postgres-connection.test.cjs services/governance/environment.test.cjs",
     "test:governance-evidence-status": "node --test services/governance/evidence-status.test.cjs",
     "test:governance-onboarding-python": "node scripts/test-governance-onboarding-python.cjs",
+    "test:design-partner-synthetic-set": "node scripts/test-design-partner-synthetic-set.cjs",
     "test:governance-recovery-worker": "node --test services/governance/recovery-worker-spend.test.cjs services/governance/recovery-worker-nonces.test.cjs services/governance/recovery-worker-evidence.test.cjs services/governance/recovery-worker-review.test.cjs services/governance/worker.test.cjs services/governance/worker-launch-binding.test.cjs services/governance/publisher-review-rpc.test.cjs",
     "test:governance-recovery-index": "node --test services/governance/recovery-index-review.test.cjs sdk/typescript/avr-event-indexer.test.js scripts/base-sepolia-avr-indexer.test.cjs",
     "test:governance-recovery-delivery": "node --test services/governance/recovery-rule-evidence.test.cjs services/governance/recovery-rule-links.test.cjs services/governance/recovery-delivery-review.test.cjs services/governance/governance-rules.test.cjs services/governance/webhook-delivery.test.cjs services/governance/webhook-signatures.test.cjs",
