@@ -156,6 +156,17 @@ under `/v1/`; register that exact HTTPS URL and test delivery. This example
 has not been syntax-checked on the target VPS or enabled. It does not prove
 per-person abuse protection, provider registration or public reachability.
 
+After installing the reviewed proxy on an isolated synthetic `test` host, run
+`npm run governance:preflight-hosted-edge -- <non-secret-plan.json>` from an
+independent network path. It accepts only a valid hosted test plan and uses
+ordinary certificate-verified HTTPS GET requests with no credentials and no
+redirect following. It requires `/v1/session` to return 401 and `/health` and
+`/ready` to return 404 from the public API origin. Any different status fails.
+This checks external routing and a narrow anonymous access boundary; it does
+not establish WorkOS policy, customer browser flow, database recovery, backup
+custody, signed evidence or release readiness. The example plan's local test
+origin deliberately fails this hosted check.
+
 ### Provisional provider shortlist — 29 September
 
 For a small synthetic-data pilot, the simplest candidate is a DigitalOcean

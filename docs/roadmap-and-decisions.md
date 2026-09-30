@@ -8,6 +8,8 @@ For first-partner outreach, use the [design-partner pilot brief template](exampl
 
 Hosting topology follow-up: deployment-plan schema version 3 now records application, managed-database and backup providers/regions plus backup account and operator references. Offline validation rejects a hosted backup provider shared with the application or database provider and a reused backup account reference. It still cannot verify the real accounts or regions; provider/domain/residency and recovery decisions remain open.
 
+Hosted edge follow-up: a read-only synthetic `test` preflight now checks the actual public HTTPS API route from outside after installation. It requires an anonymous session request to return 401 and internal health/readiness paths to return 404 without following redirects. Local tests pass, but no real API origin has been configured or probed.
+
 | Requirement | Implemented and evidenced | Required before completion |
 | --- | --- | --- |
 | PF-01 Environment separation | Dev/test state binding; full shared PostgreSQL control mode; separate strict API/worker grants; verified TLS outside loopback; offline four-environment topology validation | Actual separate hosted resources, provider/secret/wallet isolation, reviewed migration and release configuration. Hosting selection is pending. [Environment/release procedure](governance-storage-and-environments.md) |
