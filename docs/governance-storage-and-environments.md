@@ -66,11 +66,26 @@ and release approval remain undecided. The existing Sites deployment remains
 the owner-only marketing and portal preview until the hosted path passes its
 acceptance gate.
 
+On 30 September the owner preferred the VPS's existing provider hostname for
+the **partner portal** if it can be made suitable. DNS reverse and forward checks
+identify `vmi3235919.contaboserver.net` for the existing VPS, and a read-only SSH
+check confirms that hostname on the server. The VPS has ample observed free
+memory and disk at that checkpoint, but no listener on public ports 80 or 443;
+that observation is not a load, isolation, TLS or browser acceptance test. The
+current portal is deployed through Sites/Cloudflare, so serving it from the VPS
+requires a separate Node-compatible build/deployment and reviewed HTTPS reverse
+proxy. The current deployment-plan and Site gateway also require distinct portal
+and API origins; using one provider hostname for both requires a reviewed routing
+change or a second valid API hostname. Keep the existing Site private until an
+actual VPS portal passes the complete synthetic customer journey.
+
 **After the design partners and before onboarding any paying customer**, review
 the pilot's load, incidents, operating effort and recovery results; select and
-validate a longer-term application hosting provider and deployment layout. A
-move requires its own migration, rollback and recovery rehearsal. The current
-VPS decision does not approve it as the paid-customer host.
+validate a longer-term application hosting provider and deployment layout. The
+owner intends to buy an Orvessian domain then, move the portal to a subdomain,
+and migrate with that architecture. That move requires its own DNS/TLS, WorkOS
+callback, data migration, rollback and recovery rehearsal. The current VPS and
+provider-hostname decisions do not approve them for paying customers.
 
 The non-secret deployment-plan schema is now version 3. Each environment
 declares application, database and backup providers/regions, a backup account
