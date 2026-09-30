@@ -942,6 +942,15 @@ download hash denial, ready/not-ready monitoring and restore from the downloaded
 residency/retention policy, least-privilege application keys, monitoring and a
 provider-backed restore drill remain open.
 
+On 30 September, `npm run test:governance-postgres-offline-admin-native`
+completed a fresh managed-like local PostgreSQL run. It uploaded an encrypted
+archive to a synthetic S3 client, discovered its completion-marker prefix while
+ignoring an incomplete set, downloaded that discovered prefix and restored it
+to a new gated database. Altered remote bytes were denied. The test cluster
+was stopped afterward; its synthetic databases remain available for inspection.
+This verifies the local code path, not a real bucket, independent host or
+provider retention policy.
+
 Off-host backup scheduling, retention/PITR, alerts, key custody/rotation, independent
 restore drills and approved owner/service activation remain release requirements.
 No scheduler, remote object store, live customer restore or production service was

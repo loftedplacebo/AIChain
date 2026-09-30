@@ -30,17 +30,21 @@ async function main(){
  await assert.rejects(copyBackupSet({environment:'test',directory:archive.directory,destinationRoot:path.dirname(archive.directory),key}),/separate/);
  const custodyRoot=path.join(directory,'custody');fs.mkdirSync(custodyRoot);const copied=await copyBackupSet({environment:'test',directory:archive.directory,destinationRoot:custodyRoot,key});
  assert.equal(copied.id,archive.id);assert.equal(copied.integrity,'verified');assert.equal(copied.custody,'destination-filesystem-only');
- const {Readable}=require('node:stream'),{PutObjectCommand,GetObjectCommand}=require('@aws-sdk/client-s3'),objects=new Map(),uploads=[],objectClient={send:async command=>{
+ const {Readable}=require('node:stream'),{PutObjectCommand,GetObjectCommand,ListObjectsV2Command}=require('@aws-sdk/client-s3'),objects=new Map(),uploads=[],objectClient={send:async command=>{
   if(command instanceof PutObjectCommand){const chunks=[];if(Buffer.isBuffer(command.input.Body))chunks.push(command.input.Body);else for await(const chunk of command.input.Body)chunks.push(Buffer.from(chunk));const value=Buffer.concat(chunks);assert.equal(value.length,command.input.ContentLength);objects.set(command.input.Key,value);uploads.push(command.input.Key);return {};}
   if(command instanceof GetObjectCommand){const value=objects.get(command.input.Key);if(!value)throw Error('Synthetic object missing');return {Body:Readable.from([value])};}
+  if(command instanceof ListObjectsV2Command){assert.equal(command.input.Prefix,'pilot/test/');return {Contents:[...objects.keys()].filter(key=>key.startsWith(command.input.Prefix)).sort().map(Key=>({Key})),IsTruncated:false};}
   throw Error('Unexpected synthetic object operation');
  }};
  const remote=require('../services/governance/backup-object-storage.cjs'),uploaded=await remote.uploadBackupSet({environment:'test',directory:archive.directory,bucket:'synthetic-backups',prefix:'pilot',key,client:objectClient});
  assert.equal(uploads.at(-1),uploaded.keyPrefix+'/complete.json');
- const remotePolicy={environment:'test',bucket:'synthetic-backups',keyPrefix:uploaded.keyPrefix,key,client:objectClient},monitor=require('../services/governance/backup-object-monitor.cjs').checkRemoteBackup;
+ objects.set('pilot/test/11111111-1111-4111-8111-111111111111-22222222-2222-4222-8222-222222222222/index.json',Buffer.from('{}'));
+ const discovered=await remote.discoverBackupPrefixes({environment:'test',bucket:'synthetic-backups',prefix:'pilot',client:objectClient});
+ assert.deepEqual(discovered.candidates,[uploaded.keyPrefix]);
+ const remotePolicy={environment:'test',bucket:'synthetic-backups',keyPrefix:discovered.candidates[0],key,client:objectClient},monitor=require('../services/governance/backup-object-monitor.cjs').checkRemoteBackup;
  assert.equal((await monitor(remotePolicy)).status,'ready');
  assert.equal((await monitor({...remotePolicy,requiredJournalRoles:['worker']})).reason,'missing-journals');
- const downloadRoot=path.join(directory,'downloaded');fs.mkdirSync(downloadRoot);const downloaded=await remote.downloadBackupSet({environment:'test',bucket:'synthetic-backups',keyPrefix:uploaded.keyPrefix,outputRoot:downloadRoot,key,client:objectClient});
+ const downloadRoot=path.join(directory,'downloaded');fs.mkdirSync(downloadRoot);const downloaded=await remote.downloadBackupSet({environment:'test',bucket:'synthetic-backups',keyPrefix:discovered.candidates[0],outputRoot:downloadRoot,key,client:objectClient});
  assert.equal(downloaded.id,archive.id);assert.equal(downloaded.integrity,'verified');
  const corrupted=uploaded.keyPrefix+'/postgres.gcm',originalObject=objects.get(corrupted);objects.set(corrupted,Buffer.from(originalObject));objects.get(corrupted)[20]^=1;
  await assert.rejects(remote.downloadBackupSet({environment:'test',bucket:'synthetic-backups',keyPrefix:uploaded.keyPrefix,outputRoot:downloadRoot,key,client:objectClient}),/digest mismatch/);objects.set(corrupted,originalObject);
