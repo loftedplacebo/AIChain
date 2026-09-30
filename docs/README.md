@@ -24,6 +24,7 @@ Exact protocol/API specifications, implementation notes and operator procedures 
 - [API](../services/governance/README.md), [schemas](../spec/), [receipt SDK](verification-receipt-developer-guide.md).
 - [Architecture decisions](decisions/), [validation snapshots](validation/), [deployments](deployments/), [examples](examples/).
 - [Website repository](../website/README.md).
+- [Pilot owner actions](pilot-owner-actions.md): domain, MFA, first partner and account setup choices.
 - [Competitor research and monitoring](competitor-research.md): dated vendor evidence, trade-offs and complementary positioning.
 - [SDK integration plan](sdk-integration-plan.md): prioritised adapters and release criteria; planned compatibility is not shipped support.
 - [Historical archive and relocation catalog](archive/README.md).

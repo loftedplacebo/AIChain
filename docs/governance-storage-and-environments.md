@@ -64,31 +64,35 @@ secret-placement check; no replacement VPS is selected or authorised for this
 pilot. The owner selected DigitalOcean managed PostgreSQL for the pilot on
 30 September; no cluster has been provisioned. The owner selected Backblaze B2
 EU Central for independent encrypted pilot backups and accepted EU storage.
-No B2 account or bucket has been recorded or validated. The domain, recovery objective,
-retention, purchase and release approval remain undecided. The existing Sites deployment remains
+No B2 account or bucket has been recorded or validated. The owner moved domain
+purchase into pilot preparation; the exact domain and purchase remain open.
+Recovery targets and retention are recorded below. Release approval remains
+open. The existing Sites deployment remains
 the owner-only marketing and portal preview until the hosted path passes its
 acceptance gate.
 
-On 30 September the owner preferred the VPS's existing provider hostname for
-the **partner portal** if it can be made suitable. DNS reverse and forward checks
+On 30 September the owner initially preferred the VPS's existing provider
+hostname for the **partner portal** if it could be made suitable. DNS reverse and forward checks
 identify `vmi3235919.contaboserver.net` for the existing VPS, and a read-only SSH
 check confirms that hostname on the server. The VPS has ample observed free
 memory and disk at that checkpoint, but no listener on public ports 80 or 443;
 that observation is not a load, isolation, TLS or browser acceptance test. The
-current portal is deployed through Sites/Cloudflare, so serving it from the VPS
-requires a separate Node-compatible build/deployment and reviewed HTTPS reverse
-proxy. The current deployment-plan and Site gateway also require distinct portal
-and API origins; using one provider hostname for both requires a reviewed routing
-change or a second valid API hostname. Keep the existing Site private until an
-actual VPS portal passes the complete synthetic customer journey.
+current portal is deployed through Sites/Cloudflare. A standalone Node build
+passed locally, but VPS deployment still needs a reviewed HTTPS reverse proxy.
+The owner subsequently requested an Orvessian domain as a pilot action. The
+preferred branded layout uses the website at the apex/`www` (Sites custom
+domain if available) and distinct `portal.` and `api.` origins on the VPS.
+That meets the current gateway's distinct-origin rule without weakening it.
+Confirm the exact Site DNS requirements, Cloudflare proxy compatibility,
+origin certificate, browser flow and WorkOS URLs before partner access. Keep
+the existing Site private until the hosted synthetic customer journey passes.
 
 **After the design partners and before onboarding any paying customer**, review
 the pilot's load, incidents, operating effort and recovery results; select and
-validate a longer-term application hosting provider and deployment layout. The
-owner intends to buy an Orvessian domain then, move the portal to a subdomain,
-and migrate with that architecture. That move requires its own DNS/TLS, WorkOS
-callback, data migration, rollback and recovery rehearsal. The current VPS and
-provider-hostname decisions do not approve them for paying customers.
+validate a longer-term application hosting provider and deployment layout.
+Rehearse any service, DNS, WorkOS callback, data, rollback and recovery changes
+needed to keep the pilot domain while moving off the VPS. The current VPS and
+pilot domain plan do not approve them for paying customers.
 
 The non-secret deployment-plan schema is now version 3. Each environment
 declares application, database and backup providers/regions, a backup account
@@ -101,17 +105,16 @@ residency, custody or recovery. `releaseReady` remains false.
 
 The intended first-pilot request path is:
 
-1. The browser opens the Sites `/workspace` route. Its server-only gateway reads
+1. The browser opens the VPS-hosted `portal.` `/workspace` route. Its server-only gateway reads
    the HttpOnly app-session cookie and calls the governance API over an exact configured
-   HTTPS origin. Sites cannot use the current loopback-only VPS address or a
-   private SSH tunnel. `WORKSPACE_ORIGIN` must match the actual Sites origin and
+   HTTPS origin. `WORKSPACE_ORIGIN` must match the actual portal origin and
    `GOVERNANCE_API_URL` must be the reviewed HTTPS API origin before this route
    can serve a partner.
 2. The VPS reverse proxy terminates HTTPS for that API origin and forwards only
    approved API paths to the loopback governance service. Customer applications
    submit structured records to the same reviewed HTTPS API with scoped project
    keys; browser code never receives those keys from the portal. The WorkOS
-   callback returns to the Sites origin, while signed provider webhooks reach a
+   callback returns to the portal origin, while signed provider webhooks reach a
    separately reviewed HTTPS VPS route. Exact callback and webhook URLs must be
    registered in the isolated pilot provider environment.
 3. The API and evidence worker use distinct least-privilege roles against managed
@@ -126,9 +129,10 @@ The intended first-pilot request path is:
 Before partner access, provision actual domains and isolated resources; review
 reverse-proxy path/rate/IP rules and secret placement; run the shared-PostgreSQL
 browser journey and one direct API-key submission; verify an exported receipt and
-Base Sepolia anchor; rehearse alerts, rollback and a synthetic restore. The Sites
-audience remains owner-only until the synthetic hosted gate passes and named pilot
-users can be granted access. Required MFA policy is a separate pending decision.
+Base Sepolia anchor; rehearse alerts, rollback and a synthetic restore. The
+existing Site remains owner-only until the marketing audience is deliberately
+set; the VPS portal admits only named pilot users after the hosted synthetic
+gate passes. Required MFA policy is a separate pending decision.
 None of these controls is established by this topology record.
 
 #### Hosted synthetic API entry point
@@ -208,8 +212,8 @@ for the pilot, with London (`lon1`) the planned region pending order-page review
 The owner selected a separate Backblaze B2 EU Central account for encrypted
 backup storage. A new DigitalOcean Droplet is only a
 fallback if the existing VPS fails the pilot suitability check, and requires a
-new owner decision. The portal can stay on Sites while its server-side gateway
-calls the reviewed public HTTPS API origin on the selected VPS. This is a
+new owner decision. The portal is planned for the VPS `portal.` subdomain,
+with the marketing site on Sites if custom domains are available. This is a
 **provider selection, not a purchase or live backup**.
 
 The [provider inventory template](../deploy/governance/provider-inventory.example.env)
@@ -283,9 +287,11 @@ from the complete backup cadence and monitoring, while RTO depends on an
 exercised restore procedure. Review retention and recovery targets again
 before accepting real customer data or paying customers.
 
-Next decision: portal/API address and routing. Then provision only an
-isolated test environment, run the managed-role compatibility and full
-restore drill, and measure actual capacity/cost before staging.
+Next owner choices: exact domain and purchase, pilot MFA policy, and one named
+partner workflow. See the [owner action checklist](pilot-owner-actions.md).
+Then provision only an isolated test environment, run the managed-role
+compatibility and full restore drill, and measure actual capacity/cost before
+staging.
 
 Review the non-secret
 [`deployment-plan.example.json`](../deploy/governance/deployment-plan.example.json)
