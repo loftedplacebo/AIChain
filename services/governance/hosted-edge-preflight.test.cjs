@@ -13,12 +13,13 @@ function hosted(){
  return plan;
 }
 test('hosted test edge checks exact unauthenticated and internal route statuses without credentials',async()=>{
- const calls=[],statuses=[401,404,404],plan=hosted();
- const result=await checkEdge(plan,async(url,options)=>{calls.push({url,options});const status=statuses.shift();return status===401?anonymousSession():new Response('',{status});});
+ const calls=[],statuses=[401,404,404,401],plan=hosted();
+ const result=await checkEdge(plan,async(url,options)=>{calls.push({url,options});const status=statuses.shift();return url.endsWith('/v1/session')?anonymousSession():url.endsWith('/v1/auth/workos-webhook')?unsignedWebhook():new Response('',{status});});
  assert.equal(result.status,'passed');
- assert.deepEqual(result.observations.map(item=>item.path),['/v1/session','/health','/ready']);
- assert.deepEqual(calls.map(call=>call.url),['https://api.pilot.example.test/v1/session','https://api.pilot.example.test/health','https://api.pilot.example.test/ready']);
- assert.ok(calls.every(call=>call.options.method==='GET'&&call.options.redirect==='manual'&&!call.options.headers));
+ assert.deepEqual(result.observations.map(item=>item.path),['/v1/session','/health','/ready','/v1/auth/workos-webhook']);
+ assert.deepEqual(calls.map(call=>call.url),['https://api.pilot.example.test/v1/session','https://api.pilot.example.test/health','https://api.pilot.example.test/ready','https://api.pilot.example.test/v1/auth/workos-webhook']);
+ assert.ok(calls.slice(0,3).every(call=>call.options.method==='GET'&&call.options.redirect==='manual'&&!call.options.headers));
+ assert.deepEqual({method:calls[3].options.method,headers:calls[3].options.headers,body:calls[3].options.body,redirect:calls[3].options.redirect},{method:'POST',headers:{'content-type':'application/json'},body:'{}',redirect:'manual'});
 });
 test('unhosted or invalid plan never makes an external request',async()=>{
  let calls=0;
@@ -37,6 +38,7 @@ test('a leaked health route, redirect or successful anonymous session fails acce
 function anonymousSession(body=JSON.stringify({error:'Sign in required'}),headers={}){
  return new Response(body,{status:401,headers:{'content-type':'application/json','cache-control':'no-store','x-content-type-options':'nosniff',...headers}});
 }
+function unsignedWebhook(){return anonymousSession(JSON.stringify({error:'Webhook signature required'}));}
 test('a generic proxy denial or oversized response cannot impersonate the API',async()=>{
  for(const response of [
   new Response('Denied',{status:401}),
@@ -45,4 +47,9 @@ test('a generic proxy denial or oversized response cannot impersonate the API',a
   anonymousSession('{invalid json'),
   anonymousSession(undefined,{'cache-control':'public'})
  ])await assert.rejects(checkEdge(hosted(),async()=>response),/\/v1\/session/);
+});
+test('webhook probe rejects missing configuration, proxy denial and redirects',async()=>{
+ for(const bad of [new Response('',{status:503}),new Response('Denied',{status:401}),anonymousSession(),new Response('',{status:302})]){
+  await assert.rejects(checkEdge(hosted(),async(url)=>url.endsWith('/v1/session')?anonymousSession():url.endsWith('/v1/auth/workos-webhook')?bad:new Response('',{status:404})),/\/v1\/auth\/workos-webhook/);
+ }
 });

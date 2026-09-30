@@ -31,6 +31,8 @@ test('signed HTTP revocation clears access once, preserves unrelated sessions an
  const server=createServer(store,[],[],store.db,{}, {directory,auth,workosConfig:config});await new Promise(r=>server.listen(0,'127.0.0.1',r));const base='http://127.0.0.1:'+server.address().port;
  const call=(value,signature)=>{const body=typeof value==='string'?value:JSON.stringify(value);return fetch(base+'/v1/auth/workos-webhook',{method:'POST',headers:{'content-type':'application/json','workos-signature':signature||sign(body)},body});};
  try{
+  const unsigned=await fetch(base+'/v1/auth/workos-webhook',{method:'POST',headers:{'content-type':'application/json'},body:'{}'});
+  assert.equal(unsigned.status,401);assert.deepEqual(await unsigned.json(),{error:'Webhook signature required'});assert.ok(auth.resolve(session.token));
   assert.equal((await call(event(), 'bad')).status,401);assert.ok(auth.resolve(session.token));
   assert.equal((await call({...event(),context:{client_id:'client_other'}})).status,400);assert.ok(auth.resolve(session.token));
   const responses=await Promise.all(Array.from({length:12},()=>call(event())));assert.ok(responses.every(r=>r.status===200));const results=await Promise.all(responses.map(r=>r.json()));assert.equal(results.filter(r=>r.status==='applied').length,1);assert.equal(auth.resolve(session.token),null);assert.ok(auth.resolve(other.token));

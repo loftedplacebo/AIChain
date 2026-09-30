@@ -159,13 +159,17 @@ per-person abuse protection, provider registration or public reachability.
 After installing the reviewed proxy on an isolated synthetic `test` host, run
 `npm run governance:preflight-hosted-edge -- <non-secret-plan.json>` from an
 independent network path. It accepts only a valid hosted test plan and uses
-ordinary certificate-verified HTTPS GET requests with no credentials and no
+ordinary certificate-verified HTTPS requests with no credentials and no
 redirect following. It requires `/v1/session` to return the governance API's
 bounded 401 JSON response with no-store and nosniff headers, and `/health` and
-`/ready` to return 404 from the public API origin. A generic proxy 401, redirect,
-oversized response or exposed internal endpoint fails.
+`/ready` to return 404 from the public API origin. It also sends an unsigned
+`POST` containing only `{}` to `/v1/auth/workos-webhook` and requires the
+configured app route's bounded `Webhook signature required` 401 response. That
+probe cannot apply a revocation; it checks that the route and signing-secret
+configuration are present. A generic proxy 401, missing webhook configuration,
+redirect, oversized response or exposed internal endpoint fails.
 This checks external routing and a narrow anonymous access boundary; it does
-not establish WorkOS policy, customer browser flow, database recovery, backup
+not establish signed WorkOS delivery, provider policy, customer browser flow, database recovery, backup
 custody, signed evidence or release readiness. The example plan's local test
 origin deliberately fails this hosted check.
 
