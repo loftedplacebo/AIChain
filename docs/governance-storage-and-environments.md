@@ -62,8 +62,10 @@ separate backup storage** for the first supervised, synthetic-data design-partne
 pilot. Reuse of that VPS is conditional on a capacity, isolation, firewall and
 secret-placement check; no replacement VPS is selected or authorised for this
 pilot. The owner selected DigitalOcean managed PostgreSQL for the pilot on
-30 September; no cluster has been provisioned. The backup provider, domain,
-recovery objective, purchase and release approval remain undecided. The existing Sites deployment remains
+30 September; no cluster has been provisioned. The owner selected Backblaze B2
+EU Central for independent encrypted pilot backups and accepted EU storage.
+No B2 account or bucket has been recorded or validated. The domain, recovery objective,
+retention, purchase and release approval remain undecided. The existing Sites deployment remains
 the owner-only marketing and portal preview until the hosted path passes its
 acceptance gate.
 
@@ -198,17 +200,17 @@ not establish signed WorkOS delivery, provider policy, customer browser flow, da
 custody, signed evidence or release readiness. The example plan's local test
 origin deliberately fails this hosted check.
 
-### Selected pilot database and backup provider shortlist — updated 30 September
+### Selected pilot database and backup providers — updated 30 September
 
 The existing VPS is the selected application host for the synthetic pilot,
 subject to the checks above. The owner selected DigitalOcean managed PostgreSQL
 for the pilot, with London (`lon1`) the planned region pending order-page review.
-A separate Backblaze B2 EU Central account remains a candidate for encrypted
+The owner selected a separate Backblaze B2 EU Central account for encrypted
 backup storage. A new DigitalOcean Droplet is only a
 fallback if the existing VPS fails the pilot suitability check, and requires a
 new owner decision. The portal can stay on Sites while its server-side gateway
 calls the reviewed public HTTPS API origin on the selected VPS. This is a
-**database selection, not a purchase**; the backup provider remains open.
+**provider selection, not a purchase or live backup**.
 
 The [provider inventory template](../deploy/governance/provider-inventory.example.env)
 lists current vendors, login URLs, operator credential references and connection
@@ -257,9 +259,9 @@ sets. [Role attributes](https://docs.digitalocean.com/products/databases/postgre
 [TLS and trusted sources](https://docs.digitalocean.com/products/databases/postgresql/how-to/secure/),
 [managed limits](https://docs.digitalocean.com/products/databases/postgresql/details/limits/).
 
-Backblaze's EU Central region stores data in Amsterdam, outside the UK. Its
-account region cannot be changed later. Confirm the pilot's residency and
-contract terms before creating that account. Object Lock can protect a
+Backblaze's EU Central region stores data in Amsterdam, outside the UK. The
+owner accepted EU storage for the pilot. Its account region cannot be changed
+later; confirm the account is created in EU Central. Object Lock can protect a
 retained backup from deletion, but enabling it for a bucket cannot be undone;
 set the retention period only after the deletion policy is agreed. Encrypt
 backup sets before upload with a key held outside both providers, restrict
@@ -267,8 +269,8 @@ write/read/delete credentials separately, and prove a fresh restore of the
 database **and** journals. [Data regions](https://www.backblaze.com/docs/cloud-storage-data-regions),
 [Object Lock](https://www.backblaze.com/docs/cloud-storage-object-lock).
 
-Next decision: confirm providers, domain, UK-versus-EU backup residency,
-recovery point/time targets and backup retention. Then provision only an
+Next decisions: portal/API address and routing, recovery point/time targets,
+and backup retention. Then provision only an
 isolated test environment, run the managed-role compatibility and full
 restore drill, and measure actual capacity/cost before staging.
 
