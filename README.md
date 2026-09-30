@@ -20,6 +20,24 @@ Drizzle support.
 
 - Node.js `>=22.13.0`
 
+## Standalone Node build probe
+
+Set `ORVESSIAN_NODE_BUILD=1` when building for a VPS. This selects vinext's
+standalone output and omits the Sites/Cloudflare Vite plugins. The ordinary
+`npm run build` still produces the Site build.
+
+```powershell
+$env:ORVESSIAN_NODE_BUILD = '1'
+npm run build
+$env:HOST = '127.0.0.1'
+$env:PORT = '3177'
+node dist/standalone/server.js
+```
+
+This only proves that the frontend can build and serve on Node. Hosted sign-in
+still needs configured HTTPS portal/API routing, WorkOS callbacks and a live
+governance API. Keep the Node listener on loopback behind a reviewed TLS proxy.
+
 ## Quick Start
 
 ```bash
