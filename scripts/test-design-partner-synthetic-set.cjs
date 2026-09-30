@@ -24,15 +24,25 @@ async function main(){
   const altered=structuredClone(manifest);altered.events[0].prompt='must never leave this file';fs.writeFileSync(file,JSON.stringify(altered));
   await assert.rejects(run('submit'),error=>error.code===1&&/Synthetic set was changed/.test(error.stderr));
   assert.equal(store.list(principal).total,0);fs.writeFileSync(file,original);
+  await assert.rejects(run('check',{ORVESSIAN_READ_API_KEY:read.secret}),error=>error.code===1&&/HTTP 404/.test(error.stderr));
   const first=await run('submit');assert.equal((first.stdout.match(/ accepted/g)||[]).length,3);assert.equal(store.list(principal).total,3);
   const retry=await run('submit');assert.equal((retry.stdout.match(/ duplicate/g)||[]).length,3);assert.equal(store.list(principal).total,3);
+  const checked=await run('check',{ORVESSIAN_READ_API_KEY:read.secret});assert.equal((checked.stdout.match(/ recorded/g)||[]).length,3);
+  await assert.rejects(run('check',{ORVESSIAN_READ_API_KEY:write.secret}),error=>error.code===1&&/HTTP 403/.test(error.stderr));
   await assert.rejects(run('submit',{ORVESSIAN_TENANT:'foreign-partner'}),error=>error.code===1&&/scope does not match/.test(error.stderr));
   await assert.rejects(run('submit',{ORVESSIAN_API_KEY:read.secret}),error=>error.code===1&&/HTTP 403/.test(error.stderr));
   assert.equal(store.list(principal).total,3);
   let forwarded=0;const target=http.createServer((req,res)=>{forwarded++;req.resume();res.end('unexpected');});await listen(target);
   const redirect=http.createServer((req,res)=>{req.resume();res.writeHead(307,{Location:'http://127.0.0.1:'+target.address().port+'/capture'});res.end();});await listen(redirect);
-  try{await assert.rejects(run('submit',{ORVESSIAN_API_URL:'http://127.0.0.1:'+redirect.address().port}),error=>error.code===1&&/HTTP 307/.test(error.stderr));assert.equal(forwarded,0);}finally{await Promise.all([close(target),close(redirect)]);}
-  console.log('PASS pilot synthetic set: three valid events, exact replay, scope and key denial, no redirect forwarding');
+  try{
+   const redirectOrigin='http://127.0.0.1:'+redirect.address().port;
+   await assert.rejects(run('submit',{ORVESSIAN_API_URL:redirectOrigin}),error=>error.code===1&&/HTTP 307/.test(error.stderr));
+   await assert.rejects(run('check',{ORVESSIAN_API_URL:redirectOrigin,ORVESSIAN_READ_API_KEY:read.secret}),error=>error.code===1&&/HTTP 307/.test(error.stderr));
+   assert.equal(forwarded,0);
+  }finally{await Promise.all([close(target),close(redirect)]);}
+  store.db.prepare("UPDATE events SET body=json_set(body,'$.result.status','failed') WHERE id=?").run(manifest.events[0].eventId);
+  await assert.rejects(run('check',{ORVESSIAN_READ_API_KEY:read.secret}),error=>error.code===1&&/Stored record differs/.test(error.stderr));
+  console.log('PASS pilot synthetic set: three valid events, exact replay, read-key reconciliation, scope and key denial, no redirect forwarding');
  }finally{await close(server);store.close();if(fs.existsSync(file))fs.unlinkSync(file);fs.rmdirSync(directory);}
 }
 main().catch(error=>{console.error('Pilot synthetic set acceptance failed: '+(error.code||error.message));process.exitCode=1;});

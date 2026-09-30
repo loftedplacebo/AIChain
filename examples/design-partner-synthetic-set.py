@@ -12,7 +12,7 @@ import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.error import HTTPError, URLError
-from urllib.parse import urlsplit
+from urllib.parse import quote, urlsplit
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 REF = re.compile(r"^[A-Za-z0-9._:-]{1,128}$")
@@ -88,7 +88,7 @@ def api_origin():
     return api
 
 
-def submit(target):
+def load_manifest(target):
     tenant, project = scope()
     if target.is_symlink() or not target.is_file() or target.stat().st_size > 65536:
         raise ValueError("Use the original regular synthetic set file (at most 64 KiB)")
@@ -105,6 +105,11 @@ def submit(target):
     timestamp = events[0].get("occurredAt")
     if not match or not isinstance(timestamp, str) or manifest != build_manifest(tenant, project, match.group(1), timestamp):
         raise ValueError("Synthetic set was changed or is outside the test project")
+    return events
+
+
+def submit(target):
+    events = load_manifest(target)
     api = api_origin()
     key = os.environ["ORVESSIAN_API_KEY"]
     if not key:
@@ -132,14 +137,47 @@ def submit(target):
             raise ValueError(f"API request failed for {event['eventId']}; retry the same file") from None
 
 
+def check(target):
+    events = load_manifest(target)
+    api = api_origin()
+    key = os.environ["ORVESSIAN_READ_API_KEY"]
+    if not key:
+        raise ValueError("A separate read-scoped project API key is required")
+    opener = build_opener(NoRedirect())
+    for event in events:
+        request = Request(api + "/v1/events/" + quote(event["eventId"], safe=""),
+                          headers={"Authorization": "Bearer " + key}, method="GET")
+        try:
+            with opener.open(request, timeout=10) as response:
+                body = response.read(65537)
+                if len(body) > 65536:
+                    raise ValueError("API response exceeds 64 KiB")
+                recorded = json.loads(body)
+                if (response.status != 200 or not isinstance(recorded, dict)
+                        or not isinstance(recorded.get("receivedAt"), str)):
+                    raise ValueError("API record lookup failed")
+                recorded.pop("receivedAt", None)
+                expected = dict(event)
+                expected.pop("receivedAt", None)
+                if recorded != expected:
+                    raise ValueError("Stored record differs from the prepared synthetic event")
+                print(event["eventId"], "recorded")
+        except HTTPError as error:
+            raise ValueError(f"API returned HTTP {error.code} for {event['eventId']}") from None
+        except URLError:
+            raise ValueError(f"API request failed for {event['eventId']}; retry the same file") from None
+
+
 def main():
-    if len(sys.argv) != 3 or sys.argv[1] not in ("prepare", "submit"):
-        raise ValueError("Usage: python design-partner-synthetic-set.py prepare|submit PATH")
+    if len(sys.argv) != 3 or sys.argv[1] not in ("prepare", "submit", "check"):
+        raise ValueError("Usage: python design-partner-synthetic-set.py prepare|submit|check PATH")
     target = Path(sys.argv[2]).absolute()
     if sys.argv[1] == "prepare":
         prepare(target)
-    else:
+    elif sys.argv[1] == "submit":
         submit(target)
+    else:
+        check(target)
 
 
 if __name__ == "__main__":

@@ -44,8 +44,11 @@ the reviewer needs to see **[decision and outcome]** and check **[evidence]**.â€
    `ORVESSIAN_API_KEY` to a test project's write-scoped key, then run the same
    script with `submit pilot-set.json`. The file contains three fixed synthetic
    records and no key or source content. Keep it private and reuse that exact
-   file when retrying; a second `prepare` creates different IDs. This rehearsal
-   is not the partner's own integration or evidence verification.
+   file when retrying; a second `prepare` creates different IDs. Set a separate
+   read-scoped key as `ORVESSIAN_READ_API_KEY` and run `check pilot-set.json`
+   to compare the three stored records with the prepared file. Then inspect
+   those IDs in the portal. The API check proves neither the portal view nor
+   signed receipt/Base inclusion; keep the independent export step below.
 3. Find the records in the portal; check that totals and missing-data labels
    agree with the submitted set.
 4. Review one decision and attach a human outcome or investigation note.
