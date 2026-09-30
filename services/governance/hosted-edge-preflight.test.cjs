@@ -14,7 +14,7 @@ function hosted(){
 }
 test('hosted test edge checks exact unauthenticated and internal route statuses without credentials',async()=>{
  const calls=[],statuses=[401,404,404],plan=hosted();
- const result=await checkEdge(plan,async(url,options)=>{calls.push({url,options});return new Response('',{status:statuses.shift()});});
+ const result=await checkEdge(plan,async(url,options)=>{calls.push({url,options});const status=statuses.shift();return status===401?anonymousSession():new Response('',{status});});
  assert.equal(result.status,'passed');
  assert.deepEqual(result.observations.map(item=>item.path),['/v1/session','/health','/ready']);
  assert.deepEqual(calls.map(call=>call.url),['https://api.pilot.example.test/v1/session','https://api.pilot.example.test/health','https://api.pilot.example.test/ready']);
@@ -31,6 +31,18 @@ test('unhosted or invalid plan never makes an external request',async()=>{
 test('a leaked health route, redirect or successful anonymous session fails acceptance',async()=>{
  for(const statuses of [[401,200,404],[302,404,404],[200,404,404]]){
   let index=0;
-  await assert.rejects(checkEdge(hosted(),async()=>new Response('',{status:statuses[index++]})),/expected HTTP/);
+  await assert.rejects(checkEdge(hosted(),async()=>{const status=statuses[index++];return status===401?anonymousSession():new Response('',{status});}),/expected HTTP/);
  }
+});
+function anonymousSession(body=JSON.stringify({error:'Sign in required'}),headers={}){
+ return new Response(body,{status:401,headers:{'content-type':'application/json','cache-control':'no-store','x-content-type-options':'nosniff',...headers}});
+}
+test('a generic proxy denial or oversized response cannot impersonate the API',async()=>{
+ for(const response of [
+  new Response('Denied',{status:401}),
+  anonymousSession(JSON.stringify({error:'Forbidden'})),
+  anonymousSession('x'.repeat(257)),
+  anonymousSession('{invalid json'),
+  anonymousSession(undefined,{'cache-control':'public'})
+ ])await assert.rejects(checkEdge(hosted(),async()=>response),/\/v1\/session/);
 });

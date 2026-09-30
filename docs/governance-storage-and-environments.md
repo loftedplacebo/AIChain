@@ -160,8 +160,10 @@ After installing the reviewed proxy on an isolated synthetic `test` host, run
 `npm run governance:preflight-hosted-edge -- <non-secret-plan.json>` from an
 independent network path. It accepts only a valid hosted test plan and uses
 ordinary certificate-verified HTTPS GET requests with no credentials and no
-redirect following. It requires `/v1/session` to return 401 and `/health` and
-`/ready` to return 404 from the public API origin. Any different status fails.
+redirect following. It requires `/v1/session` to return the governance API's
+bounded 401 JSON response with no-store and nosniff headers, and `/health` and
+`/ready` to return 404 from the public API origin. A generic proxy 401, redirect,
+oversized response or exposed internal endpoint fails.
 This checks external routing and a narrow anonymous access boundary; it does
 not establish WorkOS policy, customer browser flow, database recovery, backup
 custody, signed evidence or release readiness. The example plan's local test

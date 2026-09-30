@@ -8,7 +8,7 @@ For first-partner outreach, use the [design-partner pilot brief template](exampl
 
 Hosting topology follow-up: deployment-plan schema version 3 now records application, managed-database and backup providers/regions plus backup account and operator references. Offline validation rejects a hosted backup provider shared with the application or database provider and a reused backup account reference. It still cannot verify the real accounts or regions; provider/domain/residency and recovery decisions remain open.
 
-Hosted edge follow-up: a read-only synthetic `test` preflight now checks the actual public HTTPS API route from outside after installation. It requires an anonymous session request to return 401 and internal health/readiness paths to return 404 without following redirects. Local tests pass, but no real API origin has been configured or probed.
+Hosted edge follow-up: a read-only synthetic `test` preflight now checks the actual public HTTPS API route from outside after installation. It requires the governance API's bounded anonymous-session JSON response and internal health/readiness paths to return 404 without following redirects. A generic proxy 401 cannot pass. Local tests pass, but no real API origin has been configured or probed.
 
 | Requirement | Implemented and evidenced | Required before completion |
 | --- | --- | --- |
