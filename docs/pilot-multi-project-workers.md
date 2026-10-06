@@ -125,6 +125,7 @@ two-journal set after both projects had confirmed Base Sepolia evidence.
 The two synthetic projects have separate active workers, confirmed evidence,
 scoped isolation, coordinated B2 capture and closed restore. Missing-worker
 detection and an injected stale-job threshold check passed. Stage C owner
-sign-off still needs a supported project count, workload and latency limits,
-plus an alternate for the existing primary owner. The first partner's acceptance and any
+sign-off still needs a supported project count, workload and latency limits
+accepted by the existing primary owner. An alternate contact remains a
+separate first-partner trial gate. The first partner's acceptance and any
 production-data release remain separate gates.
