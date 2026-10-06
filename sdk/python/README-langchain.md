@@ -132,6 +132,39 @@ This is not a zero-retention guarantee for the model provider. Source text is se
 to the chosen inference provider as required for inference, never to Orvessian.
 The smoke prompt is synthetic; it does not import customer conversations.
 
+### Hosted Base Sepolia smoke
+
+`examples/governance-hosted-openai-smoke.py` runs the same fixed, one-request
+classification against the hosted `Synthetic Validation` project. It registers
+the demo deployment, submits only the mapped decision and bounded run metadata
+through the Python SDK, then checks evidence status for up to 90 seconds. It
+never prints the prompt, model response, API credentials or provider error body.
+The OpenAI env file may be the existing ignored `build/provider-smoke.env`.
+Create an ignored `build/orvessian-agent.env` with the hosted API origin, tenant,
+project, persistent queue path, a short-lived write-only project key and a
+separate read-only project key for evidence polling. Copy
+`examples/governance-hosted-agent.env.example` to the ignored
+`build/orvessian-agent.env` and replace its reference placeholders. Keep both
+keys local; do not commit them or paste them into chat. The hosted worker
+currently covers only `Synthetic Validation`.
+
+Run from the engineering root after setting those local values:
+
+```powershell
+build/framework-venv/Scripts/python.exe examples/governance-hosted-openai-smoke.py `
+  --live `
+  --openai-env-file build/provider-smoke.env `
+  --orvessian-env-file build/orvessian-agent.env
+```
+
+The first local run can take up to 90 seconds while the worker prepares and
+anchors the receipt. `confirmed` means the hosted API's current Base Sepolia
+check passed. Download that event's evidence export from the workspace and run
+`node scripts/governance-evidence.cjs verify <export.json>` with
+`GOVERNANCE_RECEIPT_SIGNERS` and `GOVERNANCE_EVIDENCE_RPC_URL` set for the
+separate offline export-verifier check. An `HTTP 201` ingestion acknowledgement
+alone does not establish signature or chain confirmation.
+
 | Governance field | Source |
 |---|---|
 | eventId / streamRef | `lc-` plus configured framework root run UUID |

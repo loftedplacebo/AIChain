@@ -22,6 +22,7 @@ from orvessian_openai import create_chat_model, decision_chain
 OPENAI_ENV = {'OPENAI_API_KEY', 'OPENAI_MODEL'}
 ORVESSIAN_ENV = {'ORVESSIAN_API_URL', 'ORVESSIAN_TOKEN', 'ORVESSIAN_TENANT',
                  'ORVESSIAN_PROJECT', 'ORVESSIAN_QUEUE_PATH'}
+ORVESSIAN_READ_ENV = {'ORVESSIAN_READ_TOKEN'}
 LABELS = ('approve', 'review', 'reject')
 AGENT = 'openai-synthetic-reviewer'
 DEPLOYMENT = 'openai-synthetic-reviewer-v1'
@@ -66,7 +67,7 @@ def main():
         raise ValueError('Evidence wait must be between 0 and 300 seconds')
 
     load_env_file(args.openai_env_file, OPENAI_ENV)
-    load_env_file(args.orvessian_env_file, ORVESSIAN_ENV)
+    load_env_file(args.orvessian_env_file, ORVESSIAN_ENV | ORVESSIAN_READ_ENV)
     required = OPENAI_ENV | ORVESSIAN_ENV
     if any(not os.environ.get(name) for name in required):
         raise ValueError('Required local configuration is missing')
@@ -75,6 +76,10 @@ def main():
     model_ref = os.environ['OPENAI_MODEL']
     api = Client(os.environ['ORVESSIAN_API_URL'], os.environ['ORVESSIAN_TOKEN'],
                  os.environ['ORVESSIAN_TENANT'], os.environ['ORVESSIAN_PROJECT'])
+    read_api = None
+    if os.environ.get('ORVESSIAN_READ_TOKEN'):
+        read_api = Client(os.environ['ORVESSIAN_API_URL'], os.environ['ORVESSIAN_READ_TOKEN'],
+                          os.environ['ORVESSIAN_TENANT'], os.environ['ORVESSIAN_PROJECT'])
     queue = DeliveryQueue(os.environ['ORVESSIAN_QUEUE_PATH'], api)
     run_id = uuid4()
     handler = GovernanceCallback(
@@ -106,11 +111,11 @@ def main():
             provider_failure = 'http-' + str(status) if status else 'provider-or-decision-mapping'
 
         acknowledged = queue.flush()
-        if provider_succeeded and handler.capture_status == 'queued' and acknowledged:
+        if provider_succeeded and handler.capture_status == 'queued' and acknowledged and read_api:
             deadline = time.monotonic() + args.wait_seconds
             while True:
                 try:
-                    result = api.evidence(event_id)
+                    result = read_api.evidence(event_id)
                     current = result.get('verification', {})
                     evidence = {name: current[name] for name in
                                 ('state', 'signature', 'recordCommitment', 'batchMembership',
@@ -126,6 +131,8 @@ def main():
                 if remaining <= 0:
                     break
                 time.sleep(min(5, remaining))
+        elif provider_succeeded and not read_api:
+            evidence = {'state': 'read-key-missing'}
 
         output = {
             'providerSucceeded': provider_succeeded,

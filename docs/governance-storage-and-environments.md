@@ -166,8 +166,13 @@ selectors to `postgres`, `GOVERNANCE_DATABASE_URL` for the restricted API role,
 `GOVERNANCE_DATABASE_CA_FILE`, `PORT`, `GOVERNANCE_IDENTITY_PROVIDER=workos`,
 `WORKOS_API_KEY`, `WORKOS_CLIENT_ID`, `WORKOS_REDIRECT_URI`,
 `WORKOS_PILOT_ALLOWED_EMAILS`, `WORKOS_WEBHOOK_SECRET` and
-`GOVERNANCE_IDENTITY_SEAL_KEY`. Keep migration credentials, worker signing keys
-and backup keys out of this service. The unit's Node path and working directory
+`GOVERNANCE_IDENTITY_SEAL_KEY`. For hosted Base Sepolia evidence, also set
+`GOVERNANCE_RECEIPT_SIGNERS` to the explicit recording-service address allowlist
+and `GOVERNANCE_EVIDENCE_RPC_URL` to a read-only HTTPS Base Sepolia RPC endpoint.
+The synthetic pilot's configured recorder is
+`0x02B38234B2875f72835193241ecF56FB83098934`; adding its public address does not
+grant signing or transaction-broadcast access. Keep migration credentials,
+worker signing keys and backup keys out of this service. The unit's Node path and working directory
 must match the actual installation. Do not enable it until the managed database
 drill, HTTPS reverse-proxy rules, WorkOS URLs and isolated secrets are reviewed.
 The service listens on loopback only; its existence does not connect Sites or
