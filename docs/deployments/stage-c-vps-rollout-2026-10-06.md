@@ -77,3 +77,19 @@ disabled. The same-cluster timed drill took 9.38 seconds overall, including
 review. A subsequent read-only check found both worker units, API, portal,
 backup health and combined hosted health passing. This does not establish a
 lost-cluster recovery time or activate the restored service.
+
+## Periodic agent scope check
+
+The separate 48-hour Base Sepolia watcher is active and had recorded two
+events on 6 October:
+`watch-98d9051c-c15f-4b4d-a72d-937bc626bb9b` and
+`watch-8c1fa381-97fa-4d6c-ba74-a2e374f435da`. Read-only scoped database
+checks found both in the operator's Synthetic Validation project and neither
+in the new SDK Receipt Smoke Test project. Independent evidence verification
+for both returned `verified`: valid trusted recording signatures, matching
+record commitments, valid batch membership and confirmed Base Sepolia
+transactions. The corresponding transaction hashes were
+`0xc5f3665cdd69817dd475ae19a1fb359984950d7217742703d086daa8255b0430`
+and `0x1f1339a1fb9fec2acf606b1325ea273bbf132de132febe12e67f9e35e4989919`.
+This proves the operator-project watcher path; it does not exercise the new
+project's worker or meet the two-project concurrent evidence gate.
