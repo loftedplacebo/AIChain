@@ -176,3 +176,19 @@ balances after the run were 8,989,159,257,161,673 wei for the operator and
 2,993,724,529,258,848 wei for the internal worker. The run did not include
 an independent notification-delivery observation or a post-load closed B2
 restore; the populated two-journal restore earlier in this record passed.
+
+## Scheduled alert delivery drill
+
+At 21:00 UTC on 6 October, the one-time Codex heartbeat ran the read-only
+injected stale-evidence checker on the VPS. The checker returned
+`stalled_evidence_injected_check=passed`, `healthy: false` and
+`workerJournalHealthy: false` for internal role
+`worker_260ea33bcf622acf411da2bb`, with one synthetic unresolved job aged
+1,801 seconds and three attempts. The heartbeat posted a clearly labelled
+TEST ALERT to the owner chat and was then paused. The next regular runtime
+heartbeat at 21:01 UTC ran the full hosted check and stayed quiet because
+both projects and workers were healthy, with zero awaiting submissions and
+zero unresolved worker jobs. This proves the chat heartbeat's injected alert
+delivery and healthy silence; it does not prove an out-of-band page or a real
+incident response. Michael Grant remains the named primary pilot support and
+alert owner. His proposed workload-envelope sign-off is still pending.

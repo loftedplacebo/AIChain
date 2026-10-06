@@ -45,7 +45,7 @@ Stage C sign-off.
 
 ## Proposed supervised Stage C envelope for owner review
 
-Subject to the alert drill passing, support at most two active
+Subject to owner approval, support at most two active
 synthetic projects at once, with at most eight new receipts per project in any
 rolling 60-minute window during a prearranged test. Reserve the remaining two
 of the worker's ten hourly transaction slots for the operator watcher and

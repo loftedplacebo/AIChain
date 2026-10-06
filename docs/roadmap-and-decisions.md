@@ -21,7 +21,9 @@ accepted and independently verified 20 receipts across the two projects.
 The operator's final receipt waited for its ten-transaction rolling-hour
 worker limit and took 380 seconds to mine; the draft ten-receipt/hour pilot
 ceiling was revised to eight receipts per project per rolling hour for owner
-review. Actual chat alert delivery remains unobserved. Backup support
+review. A scheduled injected stale-evidence heartbeat delivered a labelled
+TEST ALERT to the owner chat and paused itself; the following healthy
+runtime check stayed quiet. Backup support
 coverage remains a first-
 partner trial gate. The 5 October partner
 credential gate remains separate.

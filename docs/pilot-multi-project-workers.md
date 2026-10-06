@@ -6,7 +6,9 @@ and the existing worker was registered. A second internal synthetic project was
 provisioned with a dedicated worker, then funded and activated. A two-journal
 version-2 B2 upload, independent closed restore and combined health check
 passed. A bounded simultaneous two-project evidence run subsequently passed;
-the owner workload sign-off and actual alert delivery remain open. The hosted pilot
+the owner workload sign-off remains open. A scheduled injected stale-evidence
+heartbeat subsequently delivered a labelled TEST ALERT in the owner chat and
+paused itself. The hosted pilot
 remains synthetic `test` on Base Sepolia. See the [rollout record](deployments/stage-c-vps-rollout-2026-10-06.md).
 
 ## Inventory and provisioning contract
