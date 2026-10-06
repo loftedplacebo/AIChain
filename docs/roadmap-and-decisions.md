@@ -16,7 +16,7 @@ produced separately verified Base Sepolia evidence while their workers were
 active. A populated two-journal B2 set passed an independent same-cluster
 download and closed restore. Missing-worker detection and an injected
 stale-job threshold check passed. Supported capacity, evidence-latency and
-support-owner limits remain for Stage C sign-off. The 5 October partner
+backup support coverage remain for Stage C sign-off. The 5 October partner
 credential gate remains separate.
 
 ## Current design-partner readiness — 5 October 2026

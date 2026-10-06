@@ -39,8 +39,8 @@ combined health check, missing-worker drill and two-project same-cluster
 closed restore passed. Both projects then produced separately verified Base
 Sepolia evidence while both workers were active. A populated two-journal B2
 set passed independent download and closed restore, and an injected stale-job
-summary failed health as expected. Supported capacity and support ownership
-remain open for Stage C owner sign-off.
+summary failed health as expected. Supported capacity and an alternate for
+the existing primary support owner remain open for Stage C owner sign-off.
 
 ## Additional production gates after Stage C
 
@@ -77,8 +77,8 @@ technical evidence.
 
 The earlier three-to-six-day Stage B/C estimate described work now implemented
 and exercised in the internal synthetic two-project pilot. A sustained load
-and evidence-latency test, supported capacity decision and named operator
-ownership remain for Stage C sign-off. Automating approval and provisioning
+and evidence-latency test, supported capacity decision and backup support
+coverage remain for Stage C sign-off. Automating approval and provisioning
 for open-ended self-service is a separate project. Stage D duration depends on
 real-data scope, legal and company setup, the production evidence-chain choice,
 security findings and the replacement-cluster recovery drill.

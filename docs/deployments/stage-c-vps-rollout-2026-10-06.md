@@ -131,6 +131,8 @@ available. The registered legacy and internal worker units showed about
 40.8 MB and 32.2 MB `MemoryCurrent` respectively. This validates the
 checker's threshold, not delivery of an actual heartbeat notification or
 behavior under sustained multi-project load. The owner heartbeat runs the
-combined check every 30 minutes; backup health is checked daily. A supported
-pilot project count, workload ceiling, evidence-latency target and support
-owner still need to be recorded before Stage C owner sign-off.
+combined check every 30 minutes; backup health is checked daily. Michael Grant
+is the accepted primary pilot alert and support owner; an alternate is not yet
+assigned. A supported pilot project count, workload ceiling and
+evidence-latency target still need to be recorded before Stage C owner
+sign-off.

@@ -126,5 +126,5 @@ The two synthetic projects have separate active workers, confirmed evidence,
 scoped isolation, coordinated B2 capture and closed restore. Missing-worker
 detection and an injected stale-job threshold check passed. Stage C owner
 sign-off still needs a supported project count, workload and latency limits,
-and named support ownership. The first partner's acceptance and any
+plus an alternate for the existing primary owner. The first partner's acceptance and any
 production-data release remain separate gates.
