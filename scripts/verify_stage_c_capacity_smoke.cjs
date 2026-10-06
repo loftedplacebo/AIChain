@@ -17,20 +17,62 @@ const projects = [
 ];
 const rpcUrl = 'https://sepolia.base.org';
 
+function cachedProvider(base) {
+  const network={value:null}, code=new Map(), blocks=new Map(), receipts=new Map();
+  const head={value:null};
+  return {
+    getNetwork:async()=>network.value||(network.value=await base.getNetwork()),
+    getCode:async address=>{
+      if(!code.has(address))code.set(address,await base.getCode(address));
+      return code.get(address);
+    },
+    getBlockNumber:async()=>head.value??(head.value=await base.getBlockNumber()),
+    getBlock:async number=>{
+      if(!blocks.has(number))blocks.set(number,await base.getBlock(number));
+      return blocks.get(number);
+    },
+    getTransactionReceipt:async hash=>{
+      if(!receipts.has(hash)){
+        const receipt=await base.getTransactionReceipt(hash);
+        if(receipt)receipts.set(hash,receipt);
+        return receipt;
+      }
+      return receipts.get(hash);
+    }
+  };
+}
+
+async function verifiedWithRetry(event,evidence,signer,provider) {
+  let result;
+  for(let attempt=0;attempt<3;attempt++) {
+    result=await verifyExport({event,evidence},{trustedSigners:[signer],provider});
+    if(result.state!=='unavailable')break;
+    if(attempt<2)await new Promise(resolve=>setTimeout(resolve,1000));
+  }
+  return result;
+}
+
 async function blockTime(hash, provider, cache) {
   if (cache.has(hash)) return cache.get(hash);
-  const receipt = await provider.getTransactionReceipt(hash);
-  if (!receipt || receipt.status !== 1) return null;
-  const response = await fetch(rpcUrl, {method:'POST',
-    headers:{'content-type':'application/json', 'user-agent':'orvessian-stage-c-verifier/1.0'},
-    body:JSON.stringify({jsonrpc:'2.0',id:1,method:'eth_getBlockByNumber',
-      params:['0x'+receipt.blockNumber.toString(16),false]}),
-    signal:AbortSignal.timeout(5000),redirect:'error'});
-  if (!response.ok) return null;
-  const body = await response.json();
-  const value = body.result?.timestamp ? Number(BigInt(body.result.timestamp))*1000 : null;
-  cache.set(hash, value);
-  return value;
+  try {
+    const receipt = await provider.getTransactionReceipt(hash);
+    if (!receipt || receipt.status !== 1) return null;
+    for(let attempt=0;attempt<3;attempt++) {
+      try {
+        const response = await fetch(rpcUrl, {method:'POST',
+          headers:{'content-type':'application/json', 'user-agent':'orvessian-stage-c-verifier/1.0'},
+          body:JSON.stringify({jsonrpc:'2.0',id:1,method:'eth_getBlockByNumber',
+            params:['0x'+receipt.blockNumber.toString(16),false]}),
+          signal:AbortSignal.timeout(5000),redirect:'error'});
+        if (!response.ok) continue;
+        const body = await response.json();
+        const value = body.result?.timestamp ? Number(BigInt(body.result.timestamp))*1000 : null;
+        if(value!==null)cache.set(hash,value);
+        return value;
+      } catch { /* A metric query may be retried without changing evidence. */ }
+    }
+  } catch { /* The signed/chain verdict above is reported independently. */ }
+  return null;
 }
 
 async function main() {
@@ -44,7 +86,7 @@ async function main() {
     const store = new PostgresGovernanceStore(pool,{runtimeProfile:'api'});
     await store.ready('test');
     const workers = loadPilotWorkers();
-    const provider = evidenceProvider(rpcUrl), cache = new Map();
+    const provider = cachedProvider(evidenceProvider(rpcUrl)), cache = new Map();
     const report = [];
     for (const scope of projects) {
       const signer = workers.find(w=>w.tenant===scope.tenant && w.project===scope.project)?.recorder;
@@ -54,12 +96,12 @@ async function main() {
         const eventId=`stagec-${runId}-${String(index).padStart(2,'0')}`;
         const event=await store.get(scope,eventId);
         const evidence=event ? await store.evidence(scope,eventId) : null;
-        const result=event ? await verifyExport({event,evidence},
-          {trustedSigners:[signer],provider}) : null;
+        const result=event ? await verifiedWithRetry(event,evidence,signer,provider) : null;
         const received=event?.receivedAt ? Date.parse(event.receivedAt) : null;
         const signed=evidence?.bundle?.createdAt ? Date.parse(evidence.bundle.createdAt) : null;
         const mined=result?.transactionHash ? await blockTime(result.transactionHash,provider,cache) : null;
-        items.push({eventId,verification:result?.exportVerification||'missing',
+        items.push({eventId,state:result?.state||'missing',
+          verification:result?.exportVerification||'missing',
           signature:result?.signature||null, trustedSigner:result?.trustedSigner??null,
           recordCommitment:result?.recordCommitment??null,
           batchMembership:result?.batchMembership??null,

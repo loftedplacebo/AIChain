@@ -25,6 +25,10 @@ On the VPS, run it with the protected API environment and
 worker registry to select each project's trusted signer. It checks each
 event's signature, record commitment, batch membership and confirmed chain
 transaction, and reports receipt-to-signing and receipt-to-mined time.
+The public RPC can be temporarily unavailable; the verifier retries that
+read-only query three times and reports chain state separately from signature
+and proof validity. A single `incomplete` observation is not evidence of a
+failed receipt.
 
 The pilot acceptance record should include: accepted/duplicate/rejected count
 per project, first and last acceptance times, time to confirmed evidence,
