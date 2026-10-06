@@ -136,3 +136,13 @@ is the accepted primary pilot alert and support owner; an alternate is not yet
 assigned. A supported pilot project count, workload ceiling and
 evidence-latency target still need to be recorded before Stage C owner
 sign-off.
+
+The Codex runtime heartbeat's saved schedule was checked after the drill: it
+had been set to one 18:30 run per day despite its 30-minute prompt. It was
+corrected to `FREQ=MINUTELY;INTERVAL=30` and targeted to the current owner
+chat. The daily backup-failure heartbeat was also targeted to that chat, with
+its 05:30 schedule preserved. The exact combined health command used by the
+runtime heartbeat returned green after these changes: two registered
+projects/workers, zero awaiting submissions, fresh revocation coverage and
+no missing projects or unresolved worker jobs. These checks confirm the saved
+automation configuration and command result, not an observed alert delivery.
