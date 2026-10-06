@@ -146,3 +146,33 @@ runtime heartbeat returned green after these changes: two registered
 projects/workers, zero awaiting submissions, fresh revocation coverage and
 no missing projects or unresolved worker jobs. These checks confirm the saved
 automation configuration and command result, not an observed alert delivery.
+
+## Two-project capacity smoke, 6 October
+
+Run `20261006-a` completed in both transient load units with exit status zero.
+Each project accepted ten distinct SDK receipts at six-minute intervals; the
+unit logs show ten accepted and a completion event, with no rejected write.
+Independent read-only verification checked each receipt's trusted recording
+signature, record commitment, batch proof and confirmed Base Sepolia
+transaction. All 20 passed. The internal project's maximum receipt-to-mined
+time was 31 seconds. Nine operator receipts took at most 52 seconds; the
+final operator receipt took 380 seconds. It remained durably batched while the
+worker returned `rate-limited`, then submitted at 20:51:43 UTC and verified
+after the rolling-hour limit cleared. The operator worker has a policy cap of
+ten signed transactions in any rolling hour, and its separate watcher also
+uses that budget. The draft proposal of ten test receipts per project per
+hour is therefore withdrawn. The proposed supervised ceiling is eight new
+receipts per project per rolling hour, with headroom for the watcher and
+recovery. It is an operating inference for owner review, not a sustained-load
+claim or an enforced API quota.
+
+After final verification, hosted health reported two healthy projects and
+workers, zero awaiting evidence, zero unresolved worker jobs, fresh
+revocation coverage, API and portal loopback HTTP 200, 90% free disk and
+95.9% available memory. The two worker processes used 52,113,408 and
+51,781,632 bytes respectively. Backup health passed with both workers
+active and the latest completed B2 upload 1.26 hours old. Public relayer
+balances after the run were 8,989,159,257,161,673 wei for the operator and
+2,993,724,529,258,848 wei for the internal worker. The run did not include
+an independent notification-delivery observation or a post-load closed B2
+restore; the populated two-journal restore earlier in this record passed.

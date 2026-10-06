@@ -45,9 +45,13 @@ Stage C sign-off.
 
 ## Proposed supervised Stage C envelope for owner review
 
-Subject to the full run and alert drill passing, support at most two active
-synthetic projects at once, with at most ten new receipts per project per hour
-in a prearranged test window. Require each accepted receipt to reach confirmed,
+Subject to the alert drill passing, support at most two active
+synthetic projects at once, with at most eight new receipts per project in any
+rolling 60-minute window during a prearranged test. Reserve the remaining two
+of the worker's ten hourly transaction slots for the operator watcher and
+recovery margin. Count every separately published batch against this limit;
+pause new submissions if other publication work consumes the margin. Require
+each accepted receipt to reach confirmed,
 independently verifiable Base Sepolia evidence within 30 minutes; the hosted
 health checker treats older unresolved work as a failure. If a project exceeds
 that delay, pause its trial and reconcile its durable receipt and worker job
@@ -59,11 +63,17 @@ This is a proposed pilot operating limit for owner approval, not an automatic
 quota or production availability commitment.
 
 On 6 October 2026, transient units `orvessian-stage-c-load-operator.service`
-and `orvessian-stage-c-load-internal.service` started the bounded run with
-ID `20261006-a`. Each accepted event `stagec-20261006-a-00` in its separate
-project. The first event in each project passed independent signed/Base
-Sepolia verification. Receipt-to-mined time was 27 seconds for the operator
-project and 12 seconds for the internal project. Completion and full-run
-latency are pending; see the
+and `orvessian-stage-c-load-internal.service` completed run `20261006-a`:
+ten accepted events each, six minutes apart, with no rejected submission and
+successful unit exits. Independent verification found all 20 valid recording
+signatures, record commitments, batch proofs and confirmed Base Sepolia
+transactions. The internal project's maximum receipt-to-mined time was 31
+seconds. Nine operator events took at most 52 seconds; the tenth took 380
+seconds because the normal watcher used an hourly signing slot and the
+worker's ten-transaction rolling-hour cap queued the final load event. The
+queue cleared without intervention, but repeating ten test receipts per hour
+alongside watcher traffic would exceed the policy. The proposed eight-receipt
+envelope is a conservative operating inference from this result, not a
+sustained-load measurement. See the
 [rollout record](deployments/stage-c-vps-rollout-2026-10-06.md) for the
-pre-run backup, restore and health evidence.
+backup, restore, load and health evidence.

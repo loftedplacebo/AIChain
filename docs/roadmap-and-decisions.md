@@ -16,7 +16,13 @@ produced separately verified Base Sepolia evidence while their workers were
 active. A populated two-journal B2 set passed an independent same-cluster
 download and closed restore. Missing-worker detection and an injected
 stale-job threshold check passed. Supported capacity and evidence-latency
-limits still need owner sign-off. Backup support coverage remains a first-
+limits still need owner sign-off. A bounded simultaneous load subsequently
+accepted and independently verified 20 receipts across the two projects.
+The operator's final receipt waited for its ten-transaction rolling-hour
+worker limit and took 380 seconds to mine; the draft ten-receipt/hour pilot
+ceiling was revised to eight receipts per project per rolling hour for owner
+review. Actual chat alert delivery remains unobserved. Backup support
+coverage remains a first-
 partner trial gate. The 5 October partner
 credential gate remains separate.
 

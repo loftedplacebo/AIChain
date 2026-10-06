@@ -129,3 +129,10 @@ sign-off still needs a supported project count, workload and latency limits
 accepted by the existing primary owner. An alternate contact remains a
 separate first-partner trial gate. The first partner's acceptance and any
 production-data release remain separate gates.
+
+The bounded simultaneous load subsequently accepted and independently
+verified ten synthetic SDK receipts in each project. One operator receipt
+waited at the ten-transaction rolling-hour policy cap while its watcher used
+the same budget; it mined 380 seconds after acceptance. The [capacity smoke
+record](pilot-stage-c-capacity-smoke.md) proposes eight new receipts per
+project per rolling hour with a 30-minute evidence target for owner review.

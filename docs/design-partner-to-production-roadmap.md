@@ -40,8 +40,13 @@ closed restore passed. Both projects then produced separately verified Base
 Sepolia evidence while both workers were active. A populated two-journal B2
 set passed independent download and closed restore, and an injected stale-job
 summary failed health as expected. Supported capacity still needs the existing
-primary support owner's sign-off. An alternate contact remains a first-partner
-trial gate.
+primary support owner's sign-off. The bounded simultaneous load accepted and
+independently verified ten receipts in each project; one operator receipt
+waited for the worker's rolling-hour transaction cap and took 380 seconds to
+mine. The [proposed supervised limit](pilot-stage-c-capacity-smoke.md) is now
+eight receipts per project in any rolling hour and a 30-minute evidence
+target. Actual chat alert delivery remains to be observed. An alternate
+contact remains a first-partner trial gate.
 
 ## Additional production gates after Stage C
 
@@ -77,9 +82,11 @@ technical evidence.
 ## Indicative effort and dependencies
 
 The earlier three-to-six-day Stage B/C estimate described work now implemented
-and exercised in the internal synthetic two-project pilot. A sustained load
-and evidence-latency test and supported capacity decision remain for Stage C
-sign-off. Backup support coverage remains a first-partner trial gate.
+and exercised in the internal synthetic two-project pilot. The bounded
+two-project load and evidence-latency smoke passed with a rate-limit finding;
+owner acceptance of the revised pilot envelope and observed alert delivery
+remain for Stage C sign-off. Sustained capacity is a later production gate.
+Backup support coverage remains a first-partner trial gate.
 Automating approval and provisioning
 for open-ended self-service is a separate project. Stage D duration depends on
 real-data scope, legal and company setup, the production evidence-chain choice,
