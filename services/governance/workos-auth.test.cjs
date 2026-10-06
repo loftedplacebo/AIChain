@@ -18,6 +18,8 @@ test('WorkOS configuration is opt-in, complete and restricts redirect destinatio
  const hosted={...env,WORKOS_REDIRECT_URI:'https://example.test/api/auth/callback'};
  assert.throws(()=>workosConfig(hosted),/pilot admission list/);
  assert.deepEqual([...workosConfig({...hosted,WORKOS_PILOT_ALLOWED_EMAILS:' Alice@Example.test, bob@example.test '}).allowedEmails],['alice@example.test','bob@example.test']);
+ assert.equal(workosConfig({...hosted,WORKOS_PILOT_ALLOWED_EMAILS:'alice@example.test',WORKOS_WEBHOOK_SECRET:'xb'+'a'.repeat(22)}).webhookSecret,'xb'+'a'.repeat(22));
+ assert.throws(()=>workosConfig({...hosted,WORKOS_PILOT_ALLOWED_EMAILS:'alice@example.test',WORKOS_WEBHOOK_SECRET:'xb'+'a'.repeat(21)}),/webhook secret/);
  for(const list of ['', 'alice@example.test,ALICE@example.test','*@example.test','alice@example.test,','not-an-email'])assert.throws(()=>workosConfig({...hosted,WORKOS_PILOT_ALLOWED_EMAILS:list}),/pilot admission list/);
 });
 

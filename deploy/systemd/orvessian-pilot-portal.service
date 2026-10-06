@@ -1,0 +1,31 @@
+[Unit]
+Description=Orvessian pilot portal (loopback only)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=orvessian-pilot-portal
+Group=orvessian-pilot-portal
+WorkingDirectory=/opt/aichain/orvessian-pilot-portal
+Environment=NODE_ENV=production
+Environment=PORT=3002
+Environment=HOST=127.0.0.1
+Environment=VINEXT_TRUSTED_HOSTS=portal.orvessian.com
+Environment=WORKSPACE_ORIGIN=https://portal.orvessian.com
+Environment=GOVERNANCE_API_URL=https://api.orvessian.com
+ExecStart=/opt/aichain/.toolchains/node-v24.21.0-linux-x64/bin/node server.js
+Restart=on-failure
+RestartSec=5
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+MemoryMax=512M
+CPUQuota=100%
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target

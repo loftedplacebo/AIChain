@@ -1,0 +1,11 @@
+[Unit]
+Description=Run Orvessian pilot WorkOS revocation replay every minute
+
+[Timer]
+OnCalendar=*-*-* *:*:00 UTC
+AccuracySec=10s
+Persistent=true
+Unit=orvessian-pilot-identity-replay.service
+
+[Install]
+WantedBy=timers.target

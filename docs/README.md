@@ -1,11 +1,19 @@
 # Orvessian documentation
 
-Seven guides are the active starting points. Reviewed 27 September 2026; runtime status requires a fresh operational check.
+Seven guides are the active starting points. Reviewed 5 October 2026; live
+runtime status still requires a fresh operational check.
 
-Production-foundations status was consolidated on 29 September: the roadmap now
-has one current requirement/evidence/gate matrix. Intermediate implementation
-chronology is archived; exact native, browser and provider checks retain their
-scope in linked supporting records. Hosted readiness remains incomplete.
+The [roadmap's 5 October checkpoint](roadmap-and-decisions.md#current-design-partner-readiness--5-october-2026)
+is the current design-partner decision. The public Site, hosted synthetic
+portal/API and separate evidence worker are live. The operator and one
+owner-controlled second account have completed the supervised sign-in tests.
+The first hosted record passed independent signed-export and Base Sepolia
+verification; encrypted B2 backup plus a closed same-cluster restore have
+passed. Key revocation and basic hosted health monitoring have passed for the
+Synthetic Validation project. Partner credentials remain gated on the
+[pilot owner queue](pilot-owner-actions.md#readiness-checkpoint--5-october-2026).
+The 29–30 September roadmap matrix and implementation chronology are historical
+snapshots; linked checks retain their original scope.
 
 | Guide | Purpose |
 |---|---|
@@ -24,7 +32,13 @@ Exact protocol/API specifications, implementation notes and operator procedures 
 - [API](../services/governance/README.md), [schemas](../spec/), [receipt SDK](verification-receipt-developer-guide.md).
 - [Architecture decisions](decisions/), [validation snapshots](validation/), [deployments](deployments/), [examples](examples/).
 - [Website repository](../website/README.md).
-- [Pilot owner actions](pilot-owner-actions.md): domain, MFA, first partner and account setup choices.
+- [Pilot owner actions](pilot-owner-actions.md): current partner start gate and owner decisions.
+- [Design-partner to production roadmap](design-partner-to-production-roadmap.md): staged partner experience, engineering work and later production gates.
+- [VPS disk inventory](vps-disk-inventory-2026-10-05.md): read-only space, active dependencies and reviewed cleanup candidates as of 5 October 2026.
+- [Pilot support and incident runbook](pilot-support-and-incident-runbook.md): named owner, alerts, health checks and emergency pause.
+- [First design-partner proposal](examples/first-design-partner-synthetic-pilot-proposal.md): internal synthetic workflow, fields and proposed measures awaiting partner agreement.
+- [Production release checklist](production-release-checklist.md): business, legal, security, recovery and commercial gates for a future paid service.
+- [Hosted pilot integration](hosted-pilot-application-integration.md): live portal/API, waitlist approval procedure, backup checks and remaining hosted gates.
 - [Competitor research and monitoring](competitor-research.md): dated vendor evidence, trade-offs and complementary positioning.
 - [SDK integration plan](sdk-integration-plan.md): prioritised adapters and release criteria; planned compatibility is not shipped support.
 - [Historical archive and relocation catalog](archive/README.md).

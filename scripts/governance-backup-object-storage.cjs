@@ -19,4 +19,13 @@ async function main(){
  let key;if(operation!=='discover'){const raw=privateFile(config.keyFile,128).trim();if(!/^[a-f0-9]{64}$/.test(raw))throw Error('Separate 32-byte archive decryption key required');key=Buffer.from(raw,'hex');}
  let client;try{client=storage.createStorageClient({...config,...credentials});const run=operation==='upload'?storage.uploadBackupSet:operation==='download'?storage.downloadBackupSet:operation==='discover'?storage.discoverBackupPrefixes:require('../services/governance/backup-object-monitor.cjs').checkRemoteBackup;const result=await run({...config,key,client});if(operation==='upload'&&config.latestFile)savePointer({file:config.latestFile,environment:config.environment,bucket:config.bucket,keyPrefix:result.keyPrefix,sourceDirectory:config.directory});console.log(JSON.stringify({operation,...result},null,2));if(result.status==='not-ready')process.exitCode=2;}finally{key?.fill(0);client?.destroy();}
 }
-main().catch(()=>{console.error('Encrypted backup object-storage transfer failed; check private configuration, remote inventory, archive integrity and access. No services were activated.');process.exitCode=1;});
+main().catch(error=>{
+ console.error('Encrypted backup object-storage transfer failed; check private configuration, remote inventory, archive integrity and access. No services were activated.');
+ if(process.env.ORVESSIAN_BACKUP_DIAGNOSTIC==='1'){
+  const codes=new Set(['AccessDenied','InvalidAccessKeyId','SignatureDoesNotMatch','NoSuchBucket','InvalidRequest','NetworkingError','TimeoutError']);
+  const name=codes.has(error?.name)?error.name:'Other';
+  const status=Number.isInteger(error?.$metadata?.httpStatusCode)?error.$metadata.httpStatusCode:'none';
+  console.error(`Safe diagnostic: ${name}; HTTP status ${status}`);
+ }
+ process.exitCode=1;
+});

@@ -18,7 +18,7 @@ function workosConfig(env){
  }
  if(!['localhost','127.0.0.1'].includes(redirect.hostname)&&!allowedEmails)throw new Error('Hosted WorkOS requires a pilot admission list');
  const webhookSecret=env.WORKOS_WEBHOOK_SECRET||null;
- if(webhookSecret&&(typeof webhookSecret!=='string'||webhookSecret.length<32||webhookSecret.length>256||/[\x00-\x20\x7f]/.test(webhookSecret)))throw new Error('Invalid WorkOS webhook secret');
+ if(webhookSecret&&(typeof webhookSecret!=='string'||webhookSecret.length<24||webhookSecret.length>512||/[\x00-\x20\x7f]/.test(webhookSecret)))throw new Error('Invalid WorkOS webhook secret');
  return {clientId:env.WORKOS_CLIENT_ID,apiKey:env.WORKOS_API_KEY,sealKey:Buffer.from(env.GOVERNANCE_IDENTITY_SEAL_KEY,'hex'),redirectUri:redirect.href,webhookSecret,allowedEmails};
 }
 class WorkosAuth {

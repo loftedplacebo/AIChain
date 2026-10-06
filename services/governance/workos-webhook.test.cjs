@@ -9,7 +9,7 @@ test('raw-body signatures bind timestamp, client, type, session and provider sub
  assert.throws(()=>verifiedEvent(Buffer.from(body+' '),sign(body,now),secret,clientId,parseStrictJson,now),e=>e.status===401);
  for(const value of [{...event(),context:{client_id:'client_other'}},{...event(),data:{object:'session',id:'session_test',user_id:'other'}},{...event(),event:'user.deleted'}]){const raw=JSON.stringify(value);assert.throws(()=>verifiedEvent(Buffer.from(raw),sign(raw,now),secret,clientId,parseStrictJson,now));}
 });
-test('provider-shaped session revocation requires explicit client context',()=>{
+test('provider-shaped signed session revocation accepts omitted context but rejects a foreign client',()=>{
  const now=Date.now();
  const providerShape={
   id:'event_01HRZ9WAX5S5ZCBAN96EK8TQBA',event:'session.revoked',
@@ -20,7 +20,9 @@ test('provider-shaped session revocation requires explicit client context',()=>{
  const boundBody=JSON.stringify(clientBound);
  assert.equal(verifiedEvent(Buffer.from(boundBody),sign(boundBody,now),secret,clientId,parseStrictJson,now).sessionId,providerShape.data.id);
  const unboundBody=JSON.stringify(providerShape);
- assert.throws(()=>verifiedEvent(Buffer.from(unboundBody),sign(unboundBody,now),secret,clientId,parseStrictJson,now),e=>e.status===400);
+ assert.equal(verifiedEvent(Buffer.from(unboundBody),sign(unboundBody,now),secret,clientId,parseStrictJson,now).sessionId,providerShape.data.id);
+ const foreignBody=JSON.stringify({...providerShape,context:{client_id:'client_other'}});
+ assert.throws(()=>verifiedEvent(Buffer.from(foreignBody),sign(foreignBody,now),secret,clientId,parseStrictJson,now),e=>e.status===400);
 });
 test('signed HTTP revocation clears access once, preserves unrelated sessions and rejects forged/replayed changes',async()=>{
  const store=new (require('./store').GovernanceStore)(':memory:'),directory=new (require('./customer-directory.cjs').CustomerDirectory)(store.db),auth=new (require('./auth.cjs').WorkspaceAuth)(store.db,[],Date.now,directory);

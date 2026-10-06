@@ -12,7 +12,7 @@ function verifiedEvent(raw,signature,secret,clientId,parse,now=Date.now()){
 }
 // Shared by signature-verified webhooks and authenticated server-side replay.
 function normalizedRevocation(event,clientId){
- if(!event||typeof event!=='object'||Array.isArray(event)||typeof event.id!=='string'||!/^event_[A-Za-z0-9]+$/.test(event.id)||event.id.length>128||event.context?.client_id!==clientId)throw fail(400,'Invalid webhook identity or client context');
+ if(!event||typeof event!=='object'||Array.isArray(event)||typeof event.id!=='string'||!/^event_[A-Za-z0-9]+$/.test(event.id)||event.id.length>128||(event.context!==undefined&&event.context?.client_id!==clientId))throw fail(400,'Invalid webhook identity or client context');
  if(event.event!=='session.revoked')throw fail(422,'Webhook event is not supported');
  if(event.data?.object!=='session'||typeof event.data.id!=='string'||!/^session_[A-Za-z0-9]+$/.test(event.data.id)||event.data.id.length>128||typeof event.data.user_id!=='string'||!/^user_[A-Za-z0-9]+$/.test(event.data.user_id)||event.data.user_id.length>128)throw fail(400,'Invalid session revocation');
  return {eventId:event.id,sessionId:event.data.id,subject:event.data.user_id,digest:createHash('sha256').update(JSON.stringify(canonical(event))).digest('hex')};

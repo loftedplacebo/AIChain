@@ -1,8 +1,27 @@
 # Operations runbook
 
-Reviewed 27 September 2026. This is the operational entry point for the private synthetic Base Sepolia pilot. Detailed procedures below remain supporting references. This page is not a live health monitor.
+Reviewed 5 October 2026. This is the operational entry point for the synthetic
+pilot. It is not a live health monitor.
 
-## Current deployment and ownership
+## Current hosted-pilot operating mode — 5 October 2026
+
+The public marketing Site, admitted-user HTTPS portal/API, separate hosted
+evidence worker, DigitalOcean managed `test` PostgreSQL database and daily
+encrypted Backblaze B2 backup are in use. The 03:00 UTC backup timer and daily
+failure heartbeat are active. A downloaded B2 archive passed an authenticated
+restore into a new closed database in the same cluster. A separate 30-minute
+hosted health alert and one-minute WorkOS session-revocation replay now run.
+For the actual pilot service, use the
+[hosted integration and backup procedure](hosted-pilot-application-integration.md#pilot-backup-operations),
+[DigitalOcean setup record](digitalocean-pilot-cluster-setup.md) and
+[current partner start gate](pilot-owner-actions.md#readiness-checkpoint--5-october-2026).
+For alerts and an emergency pause, use the
+[pilot support runbook](pilot-support-and-incident-runbook.md). The SQLite VPS worker
+and tunnel procedures below concern the earlier demonstration, which remains a
+different service. Dated statements below about missing MFA, public HTTPS,
+managed PostgreSQL or scheduled backups describe those earlier checkpoints.
+
+## Earlier SQLite demonstration deployment and ownership
 
 The supervised VPS API and worker share the synthetic SQLite store. API access is loopback-only, through an SSH tunnel from the local website (local 8794 to VPS 8795). The website is not publicly connected to a production customer API. Base Sepolia chain ID is 84532.
 
@@ -36,7 +55,7 @@ do not point synthetic stress traffic at a live customer workspace.
 | Review native database recovery evidence | [PostgreSQL validation](governance-postgres-native-validation.md) |
 | Run one bounded provider session-revocation replay step | [Operator replay command](authenticated-customer-workspaces.md#one-step-operator-revocation-replay) |
 
-## Managed identity acceptance before hosted customer access
+## Historical managed identity acceptance notes — 29 September
 
 Read the actual WorkOS environment settings before changing policy. On 29 September,
 the connected Staging environment still reported required email verification,
@@ -179,7 +198,8 @@ Exit codes are 0 for verified/fresh, 2 for verified/stale and 1 for failure. A
 completion marker alone is insufficient. A future or changed timestamp fails;
 the freshness clock allows at most five minutes of future clock skew. Monitor
 failure/staleness at the backup schedule boundary using an agreed recovery point
-objective. No monitoring schedule or outbound alert has been installed. Inspection
+objective. This historical local-archive inspection had no monitoring schedule
+or outbound alert; the current hosted pilot has separate alerts. Inspection
 performs substantial disk I/O; run it as an operator task rather than a customer
 request. It establishes archive integrity, not successful native restoration,
 off-host custody, retention compliance or approved recovery activation.
