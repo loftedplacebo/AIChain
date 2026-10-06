@@ -59,10 +59,21 @@ registered projects, one active worker and one paused worker. A coordinated
 encrypted B2 upload completed as
 `152a7aae-0ba1-4b20-a90a-54b823f3c6b2`; its version-2 pointer lists
 `worker` and `worker_260ea33bcf622acf411da2bb`. Backup health passed. The
-B2 set has not yet been downloaded and restored closed.
+B2 set was subsequently downloaded and restored closed, as recorded below.
 
 The owner funded the new public relayer with 0.003 Base Sepolia ETH, above the
 0.001 ETH request target. The guarded activation then reported `activated`.
 Both evidence-worker units are now enabled and active. The combined hosted
 check and backup health check passed with both projects and workers. No agent
 record had yet been submitted to the new project at that check.
+
+The owner ran the separately authenticated B2 restore command at hidden
+prompts. Backup `152a7aae-0ba1-4b20-a90a-54b823f3c6b2` was discoverable,
+downloaded and authenticated. Both registered worker journals restored and
+passed identity checks. A new database `gov_restore_b2_c308eaf13583` passed
+the closed PostgreSQL review with access revoked and service activation
+disabled. The same-cluster timed drill took 9.38 seconds overall, including
+1.53 seconds for B2 download/authentication and 7.51 seconds for restore and
+review. A subsequent read-only check found both worker units, API, portal,
+backup health and combined hosted health passing. This does not establish a
+lost-cluster recovery time or activate the restored service.

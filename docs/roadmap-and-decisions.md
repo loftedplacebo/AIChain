@@ -10,8 +10,9 @@ See the [multi-project procedure](pilot-multi-project-workers.md). The
 [hosted rollout](deployments/stage-c-vps-rollout-2026-10-06.md) registered the
 existing worker, funded and activated a second internal synthetic project
 worker, passed a fresh version-2 B2 upload containing both journals and combined
-health check, and exercised missing-worker detection. The two-project closed
-restore and evidence drill remain open. The
+health check, and exercised missing-worker detection. An independent B2
+download and two-project closed restore passed. Concurrent evidence and
+capacity acceptance remain open. The
 5 October partner credential gate and Stage C hosted acceptance remain open.
 
 ## Current design-partner readiness — 5 October 2026

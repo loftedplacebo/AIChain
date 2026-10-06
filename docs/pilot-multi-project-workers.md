@@ -4,8 +4,8 @@ This is the implementation and operator procedure for Stage C's worker, backup
 and monitoring work. The code was deployed to the pilot VPS on 6 October 2026
 and the existing worker was registered. A second internal synthetic project was
 provisioned with a dedicated worker, then funded and activated. A two-journal
-version-2 B2 upload and the combined health check passed. Concurrent evidence
-and a closed restore remain open. The hosted pilot
+version-2 B2 upload, independent closed restore and combined health check
+passed. Concurrent evidence remains open. The hosted pilot
 remains synthetic `test` on Base Sepolia. See the [rollout record](deployments/stage-c-vps-rollout-2026-10-06.md).
 
 ## Inventory and provisioning contract

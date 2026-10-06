@@ -37,8 +37,8 @@ synthetic PostgreSQL recovery test passes for two worker journals. On 6 October,
 the [hosted VPS rollout](deployments/stage-c-vps-rollout-2026-10-06.md)
 registered the existing worker, then funded and activated a second internal
 synthetic project worker. A version-2 B2 upload containing both journals,
-combined health check and missing-worker drill passed. The two-project closed
-restore, concurrent evidence and capacity acceptance remain open.
+combined health check, missing-worker drill and two-project same-cluster
+closed restore passed. Concurrent evidence and capacity acceptance remain open.
 
 ## Additional production gates after Stage C
 
