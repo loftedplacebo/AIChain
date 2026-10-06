@@ -43,6 +43,21 @@ throughput claim or a production service limit. The owner must approve an
 explicit supported project count, volume and evidence-delay target before
 Stage C sign-off.
 
+## Proposed supervised Stage C envelope for owner review
+
+Subject to the full run and alert drill passing, support at most two active
+synthetic projects at once, with at most ten new receipts per project per hour
+in a prearranged test window. Require each accepted receipt to reach confirmed,
+independently verifiable Base Sepolia evidence within 30 minutes; the hosted
+health checker treats older unresolved work as a failure. If a project exceeds
+that delay, pause its trial and reconcile its durable receipt and worker job
+before resuming. Michael Grant is the primary alert and support owner, reached
+through the current Codex chat; each partner trial still needs its own support
+window, escalation contact and alternate operator. Daily B2 capture and the
+documented pause and restore procedure remain part of the supervised service.
+This is a proposed pilot operating limit for owner approval, not an automatic
+quota or production availability commitment.
+
 On 6 October 2026, transient units `orvessian-stage-c-load-operator.service`
 and `orvessian-stage-c-load-internal.service` started the bounded run with
 ID `20261006-a`. Each accepted event `stagec-20261006-a-00` in its separate
