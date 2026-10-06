@@ -65,6 +65,28 @@ backup, same-cluster restore, hosted evidence export and independent Base
 Sepolia verification have passed. The non-operator journey and key revocation
 checks remain open.
 
+### Bounded periodic Base Sepolia health watcher — 6 October 2026
+
+The isolated `orvessian-base-health-watcher.service` is running as
+`orvessian-chain-watch`, using the write-only `Synthetic Validation` project
+key and the existing OpenAI API key. It reads the Base Sepolia chain ID, latest
+block and pinned anchor-contract presence, asks `gpt-4.1-mini` for a bounded
+`healthy`/`degraded` label, then submits only that label and run metadata through
+the Orvessian Python SDK. It holds no receipt or relayer key. The existing
+hosted evidence worker remains responsible for signing and anchoring.
+
+This run is capped at one check per hour, 48 model calls, and a hard 48-hour
+window ending `2026-10-08T18:18:09Z`. It does not catch up missed runs. The
+first check returned `healthy` at Base block `47771201`; event
+`watch-98d9051c-c15f-4b4d-a72d-937bc626bb9b` is confirmed in transaction
+`0xc5f3665cdd69817dd475ae19a1fb359984950d7217742703d086daa8255b0430`, with a
+valid trusted signature, record commitment and batch membership at the
+`12`-confirmation pilot threshold. OpenAI model charges are estimated below
+`$0.02` for the full window using a conservative 1,000-input/8-output-token
+allowance per run. Testnet broadcasting remains subject to the worker's
+existing rolling transaction and reservation caps. This is an operator demo,
+not a partner trial or a mainnet service.
+
 ## Public request and approval journey
 
 The marketing home page should offer **Explore demo** beside **Sign in / Request
