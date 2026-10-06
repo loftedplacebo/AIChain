@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+
+Sitemap: https://orvessian.mjgrant.chatgpt.site/sitemap.xml

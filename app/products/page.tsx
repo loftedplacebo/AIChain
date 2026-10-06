@@ -2,9 +2,9 @@ import { Footer, PageHeader } from '../components';
 import PricingPreview from './governance-preview/pricing-preview';
 
 export const metadata = {
-  title: 'Plans | Orvessian',
+  title: 'AI governance plans',
   description: 'Compare Evaluate, Operate and Enterprise: a synthetic demo today and proposed governance workspace plans.',
-  openGraph: { images: [] }, twitter: { images: [] },
+  alternates: { canonical: '/products' },
 };
 
 export default function Products() {

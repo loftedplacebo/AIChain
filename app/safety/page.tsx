@@ -1,6 +1,6 @@
 import { Footer, PageHeader } from "../components";
 
-export const metadata = { title: "Safeguard | Orvessian", description: "A clear record around the controls and interventions that matter in autonomous work.", openGraph: { images: [] }, twitter: { images: [] } };
+export const metadata = { title: "AI safety evidence", description: "A clear record around the controls and interventions that matter in autonomous work.", alternates: { canonical: "/safety" } };
 
 const stages = [
   ["01", "Bind the policy", "Record the selected policy version, authority and execution context that applied to a meaningful action."],

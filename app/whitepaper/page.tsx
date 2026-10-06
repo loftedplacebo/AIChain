@@ -1,10 +1,9 @@
 import { Footer, PageHeader, repository } from "../components";
 
 export const metadata = {
-  title: "Technical paper | Orvessian",
+  title: "Technical paper",
   description: "A working technical paper on verification receipts for autonomous systems, grounded in the current alpha source baseline.",
-  openGraph: { images: [] },
-  twitter: { images: [] },
+  alternates: { canonical: "/whitepaper" },
 };
 
 const claims = [

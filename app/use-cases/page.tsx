@@ -2,7 +2,7 @@ import { Footer, PageHeader } from "../components";
 import { EvidenceBoundary } from "../evidence-boundary";
 import { StoryExperience } from "../story-experience";
 
-export const metadata = { title: "Examples | Orvessian", description: "A simple example of authority, an exception and a decision around autonomous work.", openGraph: { images: [] }, twitter: { images: [] } };
+export const metadata = { title: "AI agent governance example", description: "Follow an illustrative AI agent decision through authority, evidence, human review and an exception.", alternates: { canonical: "/in-action" } };
 
 const chapters = [
   { id: "brief", title: "The team sets the brief.", role: "Operations lead", copy: "Prepare a supplier recommendation using approved sources. Check the required documents. Do not place an order or accept commercial terms. The team delegates the research, not the final commitment.", record: "What the record should retain", items: ["The brief and its version", "The responsible organisation and agent", "The scope and approval boundary"] },

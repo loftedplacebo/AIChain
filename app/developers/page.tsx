@@ -1,6 +1,6 @@
 import { Footer, PageHeader, repository } from "../components";
 
-export const metadata = { title: "Developers | Orvessian", description: "Local reference tooling for 0.4.0-alpha verification receipts and their explicit boundaries.", openGraph: { images: [] }, twitter: { images: [] } };
+export const metadata = { title: "Developer verification tooling", description: "Local reference tooling for 0.4.0-alpha verification receipts and their explicit boundaries.", alternates: { canonical: "/developers" } };
 
 const flow = [
   ["01", "Commit the bytes", "Create a commitment over exact evidence bytes. Keep the returned random salt, source material and access policy in your own private evidence store."],

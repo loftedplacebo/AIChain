@@ -1,6 +1,6 @@
 import { Footer, Nav } from "../components";
 
-export const metadata = { title: "Our vision | Orvessian", description: "A world that can delegate to autonomous systems and still govern and account for the outcome.", openGraph: { images: [] }, twitter: { images: [] } };
+export const metadata = { title: "Our vision", description: "A world that can delegate to autonomous systems and still govern and account for the outcome.", alternates: { canonical: "/vision" } };
 
 export default function Vision() {
   return <main>

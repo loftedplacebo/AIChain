@@ -2,9 +2,10 @@ import PricingPreview from './pricing-preview';
 import { PageHeader, Footer } from '../../components';
 
 export const metadata = {
-  title: 'Governance plans preview | Orvessian',
+  title: 'Governance plans preview',
   description: 'Explore Evaluate, Operate and Enterprise, with clear scope, proposed billing and current availability.',
   robots: { index: false, follow: false },
+  alternates: { canonical: '/products' },
 };
 
 export default function GovernanceProductPreview() {

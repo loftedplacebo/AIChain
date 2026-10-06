@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { readFile } from "node:fs/promises";
 
 async function request(pathname) {
   const workerUrl = new URL("../dist/server/index.js", import.meta.url);
@@ -23,16 +24,47 @@ test("server-renders the Orvessian homepage and links to the explorer", async ()
   const response = await request("/");
   assert.equal(response.status, 200);
   const html = await response.text();
-  assert.match(html, /<title>Orvessian \| AI governance and verification<\/title>/);
+  assert.match(html, /<title>Orvessian \| AI agent governance and verification<\/title>/);
   assert.match(html, /href="\/explorer"/);
-  assert.match(html, /A governance workspace for AI activity, outcomes and independently checkable evidence/);
+  assert.match(html, /Understand recorded AI agent activity, investigate decisions and check the supporting evidence/);
+});
+
+test("indexable routes expose one main heading, a canonical URL and a useful description", async () => {
+  const origin = "https://orvessian.mjgrant.chatgpt.site";
+  const routes = ["/", "/product", "/products", "/in-action", "/technology", "/developers", "/safety", "/vision", "/film", "/whitepaper", "/status", "/insights/eu-ai-act-record-keeping"];
+  const sitemap = await readFile(new URL("../public/sitemap.xml", import.meta.url), "utf8");
+  for (const route of routes) {
+    const response = await request(route);
+    assert.equal(response.status, 200, route);
+    const html = await response.text();
+    assert.equal((html.match(/<h1\b/g) ?? []).length, 1, `${route}: one H1`);
+    assert.match(html, /<meta name="description" content="[^"]{40,}"/, `${route}: description`);
+    assert.match(html, /<meta property="og:image" content="https:\/\/orvessian\.mjgrant\.chatgpt\.site\/og\.png"/, `${route}: social image`);
+    assert.ok(html.includes(`<link rel="canonical" href="${origin}${route === "/" ? "" : route}"`), `${route}: canonical`);
+    assert.doesNotMatch(html, /<meta name="robots" content="noindex/, `${route}: indexable`);
+    assert.ok(sitemap.includes(`<loc>${origin}${route}</loc>`), `${route}: sitemap`);
+  }
+  const product = await (await request("/product")).text();
+  assert.match(product, /<meta property="og:title" content="AI governance platform \| Orvessian"/, "page-specific social title");
+  for (const [route, canonical] of [["/technical", "/technology"], ["/use-cases", "/in-action"], ["/products/governance-preview", "/products"]]) {
+    const html = await (await request(route)).text();
+    assert.ok(html.includes(`<link rel="canonical" href="${origin}${canonical}"`), `${route}: duplicate canonical`);
+    assert.ok(!sitemap.includes(`<loc>${origin}${route}</loc>`), `${route}: absent from sitemap`);
+  }
+  for (const route of ["/portal", "/workspace", "/explorer"]) {
+    const html = await (await request(route)).text();
+    assert.match(html, /<meta name="robots" content="noindex, nofollow"/, `${route}: private or preview route`);
+    assert.ok(!sitemap.includes(`<loc>${origin}${route}</loc>`), `${route}: absent from sitemap`);
+  }
+  const robots = await readFile(new URL("../public/robots.txt", import.meta.url), "utf8");
+  assert.ok(robots.includes(`Sitemap: ${origin}/sitemap.xml`));
 });
 
 test("server-renders the Base Sepolia explorer and its evidence boundary", async () => {
   const response = await request("/explorer");
   assert.equal(response.status, 200);
   const html = await response.text();
-  assert.match(html, /<title>Base Sepolia Explorer \| Orvessian<\/title>/);
+  assert.match(html, /<title>Base Sepolia explorer \| Orvessian<\/title>/);
   assert.match(html, /Check the public anchor/);
   assert.match(html, /Verify transaction/);
   assert.match(html, /membership/);

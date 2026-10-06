@@ -1,0 +1,16 @@
+.gp-signin-shell{justify-content:center;align-items:flex-start;padding:clamp(32px,8vh,88px) 20px 40px}
+.gp-signin-card{width:min(100%,520px);height:fit-content;padding:clamp(24px,4vw,36px);box-shadow:0 12px 40px #102e400d}
+.gp-signin-brand{display:inline-flex;align-items:center;gap:8px;padding:8px 0;margin-bottom:26px;font-size:17px;font-weight:700;color:#163b4d;text-decoration:underline;text-decoration-color:#9bb4c1;text-underline-offset:5px}
+.gp-signin-brand:hover{color:#27617a;text-decoration-color:currentColor}
+.gp-signin-card h1{font-family:Georgia,serif;font-size:clamp(27px,4vw,34px);font-weight:400;line-height:1.18;letter-spacing:-.025em;margin:0 0 14px}
+.gp-signin-card>p{font-size:14px;line-height:1.55;margin:0 0 20px;color:#526a76}
+.gp-signin-card .gp-signin-action{display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:12px 18px;border:1px solid #173e50;border-radius:7px;font-size:14px;font-weight:700;line-height:1.3;text-align:center;text-decoration:none;transition:background-color .15s,border-color .15s,color .15s}
+.gp-signin-card .gp-signin-action-primary{background:#173e50;color:#fff}
+.gp-signin-card .gp-signin-action-primary:hover{background:#285d73;border-color:#285d73}
+.gp-signin-card .gp-signin-action-secondary{background:#fff;color:#173e50}
+.gp-signin-card .gp-signin-action-secondary:hover{background:#eaf2f3}
+.gp-signin-card .gp-signin-action+.gp-signin-action{margin-top:10px}
+.gp-signin-card .gp-signin-note{margin:25px 0 14px;padding-top:20px;border-top:1px solid #dbe4e7;font-size:12px}
+.gp-signin-card .gp-signin-pending{padding:12px 14px;border:1px solid #b8d2c5;border-radius:6px;background:#eef7f1;color:#21533b}
+.gp-signin-card .gp-signin-error{padding:12px 14px;border:1px solid #dfbdaa;border-radius:6px;background:#fff4ee;color:#813b24}
+@media(max-width:520px){.gp-signin-shell{padding:20px 12px}.gp-signin-card{margin:0}}

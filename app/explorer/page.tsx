@@ -2,11 +2,10 @@ import { Footer, Nav } from "../components";
 import { ExplorerDashboard } from "./explorer-dashboard";
 
 export const metadata = {
-  title: "Base Sepolia Explorer | Orvessian",
+  title: "Base Sepolia explorer",
   description: "Inspect Orvessian batch anchors and verify their Base Sepolia transaction receipts.",
   robots: { index: false, follow: false },
-  openGraph: { images: [] },
-  twitter: { images: [] }
+  alternates: { canonical: "/explorer" },
 };
 
 export default function ExplorerPage() {
