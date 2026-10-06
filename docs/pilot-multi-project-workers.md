@@ -1,8 +1,11 @@
 # Repeatable multi-project pilot workers — development acceptance, 6 October 2026
 
-This is the local implementation and operator procedure for Stage C's worker,
-backup and monitoring work. It does not record a VPS rollout or a two-partner
-hosted acceptance. The hosted pilot remains synthetic `test` on Base Sepolia.
+This is the implementation and operator procedure for Stage C's worker, backup
+and monitoring work. The code was deployed to the pilot VPS on 6 October 2026
+and the existing worker was registered. A fresh version-2 B2 backup and the
+combined health check passed. The catalog still contains one project, so a
+two-project hosted acceptance and closed restore remain open. The hosted pilot
+remains synthetic `test` on Base Sepolia. See the [rollout record](deployments/stage-c-vps-rollout-2026-10-06.md).
 
 ## Inventory and provisioning contract
 
@@ -114,8 +117,9 @@ journals through encrypted capture, authenticated inspection, gated restore
 and review. The managed-like native administrator test also passed two worker
 journals through synthetic S3 upload, download, monitor, filesystem copy and
 closed restore. The local Python registry, journal binding and request tests
-pass. This proves the code path, not current VPS deployment or independent B2
-restoration of a multi-project live set.
+pass. This proves the code path and is supplemented by the single-project
+hosted rollout. It does not prove independent B2 restoration of a multi-project
+live set.
 
 Before Stage C hosted sign-off, provision at least two separate synthetic
 projects, verify their units and journals, submit evidence concurrently, run

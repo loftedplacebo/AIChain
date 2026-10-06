@@ -30,12 +30,14 @@ Neither becomes multi-partner coverage merely because the API can create a new
 workspace. WorkOS waitlist approval also needs a separate exact-email API
 admission update today.
 
-Local Stage C development now has a [repeatable multi-project worker and
-recovery procedure](pilot-multi-project-workers.md), including per-project
-provisioning, bounded multi-journal archives and project-wide health checks.
-The native synthetic PostgreSQL recovery test passes for two worker journals.
-The hosted VPS has not yet been migrated to the protected registry or passed
-the two-project B2 and alert drills, so Stage C exit remains open.
+Stage C has a [repeatable multi-project worker and recovery
+procedure](pilot-multi-project-workers.md), including per-project provisioning,
+bounded multi-journal archives and project-wide health checks. The native
+synthetic PostgreSQL recovery test passes for two worker journals. On 6 October,
+the [hosted VPS rollout](deployments/stage-c-vps-rollout-2026-10-06.md)
+registered the existing worker and passed a version-2 single-project B2 upload,
+combined health check and missing-worker drill. The two-project hosted B2
+restore, evidence and capacity acceptance remain open.
 
 ## Additional production gates after Stage C
 

@@ -6,10 +6,12 @@ The local code now supports deterministic per-project pilot worker provisioning,
 multi-journal encrypted backup/closed restore, and project-wide worker,
 backlog and missing-project checks. Native synthetic PostgreSQL tests passed
 two worker journals through recovery and synthetic object-storage transfer.
-See the [multi-project procedure](pilot-multi-project-workers.md). This is a
-development result: the hosted VPS still uses its one-project worker and has
-not passed a two-project B2 restore or alert drill. The 5 October partner
-credential gate and Stage C hosted acceptance remain open.
+See the [multi-project procedure](pilot-multi-project-workers.md). The
+[hosted rollout](deployments/stage-c-vps-rollout-2026-10-06.md) registered the
+existing worker, passed a fresh version-2 B2 upload and combined health check,
+and exercised missing-worker detection. The VPS catalog still contains one
+project, so the two-project B2 restore and evidence drill remain open. The
+5 October partner credential gate and Stage C hosted acceptance remain open.
 
 ## Current design-partner readiness — 5 October 2026
 
