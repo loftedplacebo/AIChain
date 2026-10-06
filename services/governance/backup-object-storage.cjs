@@ -4,7 +4,7 @@
 const fs=require('node:fs'),path=require('node:path'),{randomUUID,createHash}=require('node:crypto'),{Transform}=require('node:stream'),{pipeline}=require('node:stream/promises');
 const {S3Client,PutObjectCommand,GetObjectCommand,ListObjectsV2Command}=require('@aws-sdk/client-s3');
 const {recoveryFiles:files}=require('./recovery.cjs'),{inspectBackup}=require('./postgres-backup.cjs'),{inventory}=require('./backup-custody-copy.cjs');
-const roles=['worker','rules','indexer','relayer'];
+const {MAX_JOURNALS,validRole}=require('./journal-roles.cjs');
 const safePrefix=value=>typeof value==='string'&&value.length<=240&&value.split('/').every(part=>/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,127}$/.test(part)&&part!=='.'&&part!=='..');
 const bucketName=value=>typeof value==='string'&&/^[a-z0-9][a-z0-9-]{1,61}[a-z0-9]$/.test(value);
 const knownFiles=journalRoles=>['postgres.gcm','manifest.gcm',...(journalRoles.length?['journals/manifest.gcm',...journalRoles.map(role=>'journals/'+role+'.gcm'),'journals/complete.json']:[]),'complete.json'];
@@ -69,14 +69,14 @@ async function uploadBackupSet({environment,directory,bucket,prefix,key,client})
  if(JSON.stringify(before)!==JSON.stringify(await inventory(source,verified.journalRoles)))throw Error('Source archive changed during object upload');
  const marker=fs.readFileSync(path.join(source,'complete.json'));if(sha(marker)!==before['complete.json'].sha256)throw Error('Source completion marker changed during object upload');
  await client.send(new PutObjectCommand({Bucket:bucket,Key:keyPrefix+'/complete.json',Body:marker,ContentLength:marker.length}));
- return {environment,bucket,keyPrefix,id:verified.id,createdAt:verified.createdAt,objects:names.length+1,upload:'complete-marker-written',remoteRestore:'not-tested'};
+ return {environment,bucket,keyPrefix,id:verified.id,createdAt:verified.createdAt,journalRoles:verified.journalRoles,objects:names.length+1,upload:'complete-marker-written',remoteRestore:'not-tested'};
 }
 async function downloadBackupSet({environment,bucket,keyPrefix,outputRoot,key,client}){
  transferPolicy({environment,bucket,prefix:keyPrefix,key,client});if(typeof outputRoot!=='string'||!path.isAbsolute(outputRoot))throw Error('Absolute restore download root required');
  const rootStat=fs.lstatSync(outputRoot);if(!rootStat.isDirectory()||rootStat.isSymbolicLink()||fs.existsSync(path.join(outputRoot,'complete.json')))throw Error('Regular dedicated download root required');
  const marker=await smallObject(client,bucket,keyPrefix+'/complete.json',4096),indexBytes=await smallObject(client,bucket,keyPrefix+'/index.json',65536);let index;
  try{index=JSON.parse(indexBytes.toString('utf8'));}catch{throw Error('Invalid object-storage index');}
- if(index?.version!==1||index.kind!=='orvessian-encrypted-backup'||index.environment!==environment||typeof index.id!=='string'||!/^[a-f0-9-]{36}$/.test(index.id)||!Array.isArray(index.journalRoles)||index.journalRoles.length>4||new Set(index.journalRoles).size!==index.journalRoles.length||index.journalRoles.some(role=>!roles.includes(role)))throw Error('Object-storage index identity invalid');
+ if(index?.version!==1||index.kind!=='orvessian-encrypted-backup'||index.environment!==environment||typeof index.id!=='string'||!/^[a-f0-9-]{36}$/.test(index.id)||!Array.isArray(index.journalRoles)||index.journalRoles.length>MAX_JOURNALS||new Set(index.journalRoles).size!==index.journalRoles.length||index.journalRoles.some(role=>!validRole(role,{postgres:true})))throw Error('Object-storage index identity invalid');
  const names=knownFiles(index.journalRoles),expected=index.files;if(!expected||typeof expected!=='object'||Array.isArray(expected)||JSON.stringify(Object.keys(expected).sort())!==JSON.stringify(names.slice().sort()))throw Error('Object-storage file inventory invalid');
  for(const name of names){const entry=expected[name];if(!entry||!Number.isSafeInteger(entry.bytes)||entry.bytes<1||entry.bytes>files.MAX_BYTES+33||typeof entry.sha256!=='string'||!/^[a-f0-9]{64}$/.test(entry.sha256))throw Error('Object-storage file metadata invalid');}
  if(marker.length!==expected['complete.json'].bytes||sha(marker)!==expected['complete.json'].sha256)throw Error('Object-storage completion marker mismatch');

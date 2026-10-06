@@ -10,6 +10,7 @@ import stat
 import subprocess
 import sys
 import tempfile
+from pilot_worker_registry import LOCK, load_registry, verify_journal_binding
 
 
 ROOT = pathlib.Path('/etc/aichain/pilot-backup')
@@ -20,9 +21,7 @@ SCHEDULED_PASSWORD = ROOT / 'database-password'
 SERVICES = (
     'orvessian-pilot-portal.service',
     'aichain-governance-synthetic-api.service',
-    'aichain-governance-pilot-evidence-worker.service',
 )
-WORKER_JOURNAL = pathlib.Path('/var/lib/aichain-governance-pilot-worker/worker.sqlite')
 
 
 def write_json(directory: pathlib.Path, name: str, value: dict) -> pathlib.Path:
@@ -52,11 +51,26 @@ def main() -> None:
         fcntl.flock(lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
     except BlockingIOError:
         raise SystemExit('Another pilot backup is already running') from None
+    registry_fd = os.open(LOCK, os.O_RDWR | os.O_CREAT | os.O_NOFOLLOW, 0o600)
+    lock_info = os.fstat(registry_fd)
+    if lock_info.st_uid != 0 or lock_info.st_mode & 0o077:
+        raise SystemExit('Protected worker registry lock required')
+    try:
+        fcntl.flock(registry_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except BlockingIOError:
+        raise SystemExit('Worker provisioning or activation is in progress') from None
     for required in (ROOT / 'backup.key', ROOT / 'b2-upload-credentials.json',
                      RUNNER / 'scripts/governance-postgres-recovery.cjs',
                      RUNNER / 'scripts/governance-backup-object-storage.cjs'):
         if not required.is_file():
             raise SystemExit(f'Missing backup prerequisite: {required}')
+    workers = load_registry()
+    for worker in workers:
+        verify_journal_binding(worker)
+        active = subprocess.run(('systemctl', 'is-active', '--quiet', worker['unit']),
+                                check=False).returncode == 0
+        if worker['state'] == 'active' and not active:
+            raise SystemExit('Registered active worker unavailable: ' + worker['role'])
     ARCHIVES.mkdir(mode=0o700, parents=True, exist_ok=True)
     os.chmod(ARCHIVES, 0o700)
     if scheduled:
@@ -83,12 +97,12 @@ def main() -> None:
         capture = write_json(private, 'capture.json', {
             'environment': 'test', 'connectionFile': str(connection),
             'binaries': '/usr/lib/postgresql/17/bin',
-            'journals': ([{'role': 'worker', 'path': str(WORKER_JOURNAL)}]
-                         if WORKER_JOURNAL.is_file() else []),
+            'journals': [{'role': worker['role'], 'path': worker['journal']}
+                         for worker in workers],
             'outputRoot': str(ARCHIVES), 'keyFile': str(ROOT / 'backup.key'),
             'consistency': 'quiesced',
         })
-        active = [service for service in SERVICES if subprocess.run(
+        active = [service for service in (*SERVICES, *(w['unit'] for w in workers)) if subprocess.run(
             ('systemctl', 'is-active', '--quiet', service), check=False).returncode == 0]
         stopped = []
         try:
@@ -98,6 +112,8 @@ def main() -> None:
                 subprocess.run(('systemctl', 'stop', service), check=True, timeout=45)
             result = json.loads(run(NODE, 'scripts/governance-postgres-recovery.cjs',
                                     'backup', str(capture)).stdout)
+            if set(result.get('journalRoles', [])) != {w['role'] for w in workers}:
+                raise ValueError('Backup omitted a registered worker journal')
         finally:
             restart_failures = []
             for service in reversed(stopped):

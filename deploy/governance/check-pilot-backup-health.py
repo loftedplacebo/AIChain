@@ -6,6 +6,7 @@ import os
 import pathlib
 import subprocess
 import time
+from pilot_worker_registry import load_registry
 
 
 POINTER = pathlib.Path('/etc/aichain/pilot-backup/latest-upload.json')
@@ -22,11 +23,17 @@ def main() -> None:
     if os.geteuid() != 0:
         raise SystemExit('Run as root')
     marker = json.loads(POINTER.read_text(encoding='utf-8'))
-    valid_marker = (marker.get('version') == 1 and
+    workers = load_registry()
+    required_roles = {worker['role'] for worker in workers}
+    valid_marker = (marker.get('version') == 2 and
                     marker.get('environment') == 'test' and
                     marker.get('bucket') == 'orvessian-pilot-test-backups' and
                     isinstance(marker.get('keyPrefix'), str) and
-                    marker['keyPrefix'].startswith('orvessian-pilot/test/'))
+                    marker['keyPrefix'].startswith('orvessian-pilot/test/') and
+                    isinstance(marker.get('journalRoles'), list) and
+                    all(isinstance(role, str) for role in marker['journalRoles']) and
+                    set(marker['journalRoles']) == required_roles and
+                    len(marker['journalRoles']) == len(required_roles))
     age_hours = round((time.time() - POINTER.stat().st_mtime) / 3600, 2)
     timer = systemctl('is-active', 'orvessian-pilot-backup.timer')
     enabled = systemctl('is-enabled', 'orvessian-pilot-backup.timer')
@@ -34,11 +41,15 @@ def main() -> None:
                        'orvessian-pilot-backup.service')
     portal = systemctl('is-active', 'orvessian-pilot-portal.service')
     api = systemctl('is-active', 'aichain-governance-synthetic-api.service')
-    worker = systemctl('is-active', 'aichain-governance-pilot-evidence-worker.service')
+    worker_states = {worker['role']: systemctl('is-active', worker['unit'])
+                     for worker in workers}
+    workers_healthy = all(worker_states[worker['role']] ==
+                          ('active' if worker['state'] == 'active' else 'inactive')
+                          for worker in workers)
     healthy = (valid_marker and 0 <= age_hours < MAX_AGE_HOURS and
                timer == 'active' and enabled == 'enabled' and
                result == 'success' and portal == 'active' and api == 'active' and
-               worker == 'active')
+               workers_healthy)
     print(json.dumps({
         'healthy': healthy,
         'last_completed_upload_age_hours': age_hours,
@@ -48,7 +59,7 @@ def main() -> None:
         'last_service_result': result or 'unavailable',
         'portal': portal or 'unavailable',
         'api': api or 'unavailable',
-        'worker': worker or 'unavailable',
+        'workers': worker_states,
     }, sort_keys=True))
     if not healthy:
         raise SystemExit(1)

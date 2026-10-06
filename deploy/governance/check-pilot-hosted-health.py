@@ -11,6 +11,10 @@ APP_DATA = ('systemd-run', '--quiet', '--wait', '--collect', '--pipe',
             '-p', 'EnvironmentFile=/etc/aichain-governance-synthetic-api.env',
             '/opt/aichain/.toolchains/node-v24.21.0-linux-x64/bin/node',
             'scripts/check-pilot-app-data.cjs')
+PROJECTS = ('systemd-run', '--quiet', '--wait', '--collect', '--pipe',
+            '-p', 'WorkingDirectory=/opt/aichain/governance-pilot-api',
+            '/opt/aichain/.toolchains/node-v24.21.0-linux-x64/bin/node',
+            'scripts/check-pilot-project-inventory.cjs')
 
 
 def check(command: tuple[str, ...]) -> dict:
@@ -33,8 +37,11 @@ def main() -> None:
         raise SystemExit('Run as root')
     runtime = check(RUNTIME)
     app_data = check(APP_DATA)
-    healthy = runtime.get('healthy') is True and app_data.get('healthy') is True
-    print(json.dumps({'healthy': healthy, 'runtime': runtime, 'appData': app_data},
+    projects = check(PROJECTS)
+    healthy = (runtime.get('healthy') is True and app_data.get('healthy') is True
+               and projects.get('healthy') is True)
+    print(json.dumps({'healthy': healthy, 'runtime': runtime, 'appData': app_data,
+                      'projects': projects},
                      sort_keys=True))
     if not healthy:
         raise SystemExit(1)

@@ -30,6 +30,13 @@ Neither becomes multi-partner coverage merely because the API can create a new
 workspace. WorkOS waitlist approval also needs a separate exact-email API
 admission update today.
 
+Local Stage C development now has a [repeatable multi-project worker and
+recovery procedure](pilot-multi-project-workers.md), including per-project
+provisioning, bounded multi-journal archives and project-wide health checks.
+The native synthetic PostgreSQL recovery test passes for two worker journals.
+The hosted VPS has not yet been migrated to the protected registry or passed
+the two-project B2 and alert drills, so Stage C exit remains open.
+
 ## Additional production gates after Stage C
 
 These are the main differences between a polished synthetic pilot and a

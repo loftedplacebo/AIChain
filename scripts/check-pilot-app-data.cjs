@@ -7,8 +7,8 @@ const {PostgresCustomerDirectory}=require('../services/governance/postgres-custo
 const {PostgresReplayProgress}=require('../services/governance/provider-replay-state.cjs');
 const {revocationStatus}=require('../services/governance/workos-revocation-status.cjs');
 const {connectionOptions}=require('../services/governance/postgres-connection.cjs');
+const {loadPilotWorkers}=require('../services/governance/pilot-worker-inventory.cjs');
 
-const principal={tenant:'org-831aa048-b268-4fce-98f3-455429034ef8',project:'prj-d9109260-1232-4561-ab4a-ab2e5c8f658f'};
 async function main(){
  if(process.env.GOVERNANCE_ENV!=='test'||process.env.GOVERNANCE_IDENTITY_PROVIDER!=='workos'||
     process.env.WORKOS_CLIENT_ID!=='client_01M415264WYTWS294EMP8CNJNT'||
@@ -17,19 +17,24 @@ async function main(){
  try{
   const store=new PostgresGovernanceStore(pool,{runtimeProfile:'api'});
   await store.ready('test');
-  const evidence=await store.evidenceStatus(principal);
+  const workers=loadPilotWorkers();
+  const evidence=[];
+  for(const worker of workers){
+   const status=await store.evidenceStatus({tenant:worker.tenant,project:worker.project});
+   evidence.push({role:worker.role,total:status.total,counts:status.counts,
+    awaitingSubmission:status.awaitingSubmission,oldestAwaitingAgeSeconds:status.oldestAwaitingAgeSeconds});
+  }
   const directory=new PostgresCustomerDirectory(pool);
   await directory.ready('test');
   const progress=new PostgresReplayProgress(directory);
   await progress.ready();
   const revocation=await revocationStatus({progress,clientId:process.env.WORKOS_CLIENT_ID,maxLagSeconds:300});
-  const evidenceHealthy=evidence.awaitingSubmission<=10&&
-   (evidence.oldestAwaitingAgeSeconds===null||evidence.oldestAwaitingAgeSeconds<=1800);
+  const evidenceHealthy=evidence.every(item=>
+   item.awaitingSubmission<=10&&
+   (item.oldestAwaitingAgeSeconds===null||item.oldestAwaitingAgeSeconds<=1800));
   const revocationHealthy=revocation.status==='observed-fresh';
   console.log(JSON.stringify({healthy:evidenceHealthy&&revocationHealthy,evidenceHealthy,revocationHealthy,
-   evidence:{scope:'Synthetic Validation project only',total:evidence.total,
-    counts:evidence.counts,awaitingSubmission:evidence.awaitingSubmission,
-    oldestAwaitingAgeSeconds:evidence.oldestAwaitingAgeSeconds},
+   evidence:{projects:evidence},
    revocation:{status:revocation.status,lagSeconds:revocation.lagSeconds??null,
     maxLagSeconds:revocation.maxLagSeconds,coveredUntil:revocation.coveredUntil}}));
   if(!evidenceHealthy||!revocationHealthy)process.exitCode=1;

@@ -25,7 +25,10 @@ async function main(){
  const restored=pool(target,role,password);assert.deepEqual(await assertOfflineAdministrator(restored),{superuser:false,managedAdministrator:true});
  console.log('PASS managed-like non-superuser owns source, migrates and creates an isolated restore target; runtime role denied');
  const backup=require('../services/governance/postgres-backup.cjs'),binaries=path.join(__dirname,'../build/postgres-runtime/pgsql/bin'),key=randomBytes(32),connection={host:config.host,port:config.port,database:source,user:role,password};
- const archive=await backup.createBackup({environment:'test',connection,binaries,outputRoot:path.join(directory,'backups'),key,consistency:'quiesced'});
+ const {DatabaseSync}=require('node:sqlite'),{bindSqlite}=require('../services/governance/environment.cjs'),projectRole=require('../services/governance/journal-roles.cjs').projectWorkerRole('org-831aa048-b268-4fce-98f3-455429034ef8','prj-a9109260-1232-4561-ab4a-ab2e5c8f658f');
+ const journals=[{role:'worker',path:path.join(directory,'legacy-worker.sqlite')},{role:projectRole,path:path.join(directory,'project-worker.sqlite')}];
+ for(const item of journals){bindSqlite(item.path,'test');const db=new DatabaseSync(item.path);db.exec('CREATE TABLE marker(value TEXT)');db.prepare('INSERT INTO marker VALUES(?)').run(item.role);db.close();}
+ const archive=await backup.createBackup({environment:'test',connection,binaries,journals,outputRoot:path.join(directory,'backups'),key,consistency:'quiesced'});
  const copyBackupSet=require('../services/governance/backup-custody-copy.cjs').copyBackupSet;
  await assert.rejects(copyBackupSet({environment:'test',directory:archive.directory,destinationRoot:path.dirname(archive.directory),key}),/separate/);
  const custodyRoot=path.join(directory,'custody');fs.mkdirSync(custodyRoot);const copied=await copyBackupSet({environment:'test',directory:archive.directory,destinationRoot:custodyRoot,key});
@@ -37,15 +40,17 @@ async function main(){
   throw Error('Unexpected synthetic object operation');
  }};
  const remote=require('../services/governance/backup-object-storage.cjs'),uploaded=await remote.uploadBackupSet({environment:'test',directory:archive.directory,bucket:'synthetic-backups',prefix:'pilot',key,client:objectClient});
+ assert.deepEqual(uploaded.journalRoles,['worker',projectRole]);
  assert.equal(uploads.at(-1),uploaded.keyPrefix+'/complete.json');
  objects.set('pilot/test/11111111-1111-4111-8111-111111111111-22222222-2222-4222-8222-222222222222/index.json',Buffer.from('{}'));
  const discovered=await remote.discoverBackupPrefixes({environment:'test',bucket:'synthetic-backups',prefix:'pilot',client:objectClient});
  assert.deepEqual(discovered.candidates,[uploaded.keyPrefix]);
  const remotePolicy={environment:'test',bucket:'synthetic-backups',keyPrefix:discovered.candidates[0],key,client:objectClient},monitor=require('../services/governance/backup-object-monitor.cjs').checkRemoteBackup;
  assert.equal((await monitor(remotePolicy)).status,'ready');
- assert.equal((await monitor({...remotePolicy,requiredJournalRoles:['worker']})).reason,'missing-journals');
+ assert.equal((await monitor({...remotePolicy,requiredJournalRoles:['worker',projectRole]})).status,'ready');
+ assert.equal((await monitor({...remotePolicy,requiredJournalRoles:['worker',projectRole,'relayer']})).reason,'missing-journals');
  const downloadRoot=path.join(directory,'downloaded');fs.mkdirSync(downloadRoot);const downloaded=await remote.downloadBackupSet({environment:'test',bucket:'synthetic-backups',keyPrefix:discovered.candidates[0],outputRoot:downloadRoot,key,client:objectClient});
- assert.equal(downloaded.id,archive.id);assert.equal(downloaded.integrity,'verified');
+ assert.equal(downloaded.id,archive.id);assert.equal(downloaded.integrity,'verified');assert.deepEqual(downloaded.journalRoles,['worker',projectRole]);
  const corrupted=uploaded.keyPrefix+'/postgres.gcm',originalObject=objects.get(corrupted);objects.set(corrupted,Buffer.from(originalObject));objects.get(corrupted)[20]^=1;
  await assert.rejects(remote.downloadBackupSet({environment:'test',bucket:'synthetic-backups',keyPrefix:uploaded.keyPrefix,outputRoot:downloadRoot,key,client:objectClient}),/digest mismatch/);objects.set(corrupted,originalObject);
  objects.set(corrupted,Buffer.from(originalObject));objects.get(corrupted)[20]^=1;assert.equal((await monitor(remotePolicy)).status,'not-ready');objects.set(corrupted,originalObject);
@@ -61,7 +66,7 @@ async function main(){
  await assert.rejects(require('../services/governance/postgres-recovery.cjs').prepareAccessReview(pool(recovery.targetDatabase,runtime,runtimePassword),recoveryOptions),/offline database administrator/);
  assert.equal((await recovered.query('SELECT state FROM governance_recovery_gate')).rows[0].state,'review-required');
  const remoteRecovery=await backup.restoreBackup({environment:'test',directory:downloaded.directory,key,connection:{...connection,database:'postgres'},binaries,targetDatabase:'gov_restore_remote_'+id,outputRoot:path.join(directory,'remote-restores')});
- assert.equal(remoteRecovery.activation,'review-required');
+ assert.equal(remoteRecovery.activation,'review-required');assert.deepEqual(remoteRecovery.journalRoles,['worker',projectRole]);
  key.fill(0);
  console.log('PASS managed-like non-superuser restores from filesystem and synthetic S3 copies; altered remote bytes are denied and restored gates stay closed');
  console.log('Synthetic databases retained: '+source+', '+target+', '+recovery.targetDatabase+', '+remoteRecovery.targetDatabase);

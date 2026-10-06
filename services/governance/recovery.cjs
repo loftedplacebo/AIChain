@@ -4,8 +4,8 @@ const {DatabaseSync,backup}=require('node:sqlite');
 const {randomBytes,randomUUID,createHash,createCipheriv,createDecipheriv}=require('node:crypto');
 const {pipeline}=require('node:stream/promises');
 const {Transform}=require('node:stream');
+const {MAX_JOURNALS,validRole}=require('./journal-roles.cjs');
 const MAGIC=Buffer.from('OVBK1'),MAX_BYTES=512*1024*1024;
-const ROLES=['events','control','rules','worker','indexer','relayer'];
 function keyCheck(key){if(!Buffer.isBuffer(key)||key.length!==32)throw new Error('A separate 32-byte backup key is required');}
 function stageCheck(stage){if(!['dev','test'].includes(stage))throw new Error('SQLite recovery tooling is limited to dev/test; production recovery remains gated');}
 function privateDirectory(directory){
@@ -49,7 +49,7 @@ async function decryptFile(source,target,key,aad,max=MAX_BYTES){
 async function createBackup({environment,files,outputRoot,key,consistency}){
  stageCheck(environment);keyCheck(key);
  if(consistency!=='quiesced')throw new Error('Stop all writers and acknowledge quiesced capture before multi-database backup');
- if(!Array.isArray(files)||!files.length||files.length>6||files.some(f=>!ROLES.includes(f.role)||typeof f.path!=='string'||f.path===':memory:')||new Set(files.map(f=>f.role)).size!==files.length||new Set(files.map(f=>fs.realpathSync(f.path))).size!==files.length)throw new Error('Explicit unique database roles/paths required');
+ if(!Array.isArray(files)||!files.length||files.length>MAX_JOURNALS||files.some(f=>!validRole(f.role)||typeof f.path!=='string'||f.path===':memory:')||new Set(files.map(f=>f.role)).size!==files.length||new Set(files.map(f=>fs.realpathSync(f.path))).size!==files.length)throw new Error('Explicit unique database roles/paths required');
  const destination=freshDirectory(outputRoot,'backup-'),scratch=freshDirectory(os.tmpdir(),'ov-backup-');let succeeded=false;
  try{
   const id=randomUUID(),createdAt=new Date().toISOString(),manifest={version:1,id,environment,createdAt,consistency,files:[]};
@@ -88,9 +88,9 @@ async function restoreBackup({environment,directory,outputRoot,key}){
  try{
   const manifestPath=path.join(destination.directory,'manifest.json');await decryptFile(path.join(directory,'manifest.gcm'),manifestPath,key,[marker.id,environment,'manifest'].join(':'),65536);
   const manifest=JSON.parse(fs.readFileSync(manifestPath,'utf8'));fs.unlinkSync(manifestPath);
-  if(manifest.version!==1||manifest.id!==marker.id||manifest.environment!==environment||manifest.consistency!=='quiesced'||!Array.isArray(manifest.files)||!manifest.files.length||manifest.files.length>6||new Set(manifest.files.map(f=>f.role)).size!==manifest.files.length)throw new Error('Invalid authenticated backup manifest');
+  if(manifest.version!==1||manifest.id!==marker.id||manifest.environment!==environment||manifest.consistency!=='quiesced'||!Array.isArray(manifest.files)||!manifest.files.length||manifest.files.length>MAX_JOURNALS||new Set(manifest.files.map(f=>f.role)).size!==manifest.files.length)throw new Error('Invalid authenticated backup manifest');
   for(const item of manifest.files){
-   if(!ROLES.includes(item.role)||!Number.isSafeInteger(item.bytes)||item.bytes<0||item.bytes>MAX_BYTES||!/^[a-f0-9]{64}$/.test(item.sha256))throw new Error('Invalid backup entry');
+   if(!validRole(item.role)||!Number.isSafeInteger(item.bytes)||item.bytes<0||item.bytes>MAX_BYTES||!/^[a-f0-9]{64}$/.test(item.sha256))throw new Error('Invalid backup entry');
    const file=path.join(destination.directory,item.role+'.sqlite');await decryptFile(path.join(directory,item.role+'.gcm'),file,key,[marker.id,environment,item.role].join(':'));
    if(fs.statSync(file).size!==item.bytes||await digestFile(file)!==item.sha256||JSON.stringify(sqliteInspection(file,environment))!==JSON.stringify(item.tables))throw new Error('Restored snapshot does not match authenticated manifest');
    invalidateRestoredAccess(file);durable(file);
@@ -107,7 +107,7 @@ function reviewRestore({environment,directory}){
  const markerFile=path.join(directory,'recovery.json');regular(markerFile);
  if(fs.statSync(markerFile).size>4096)throw new Error('Invalid recovery marker');
  const marker=JSON.parse(fs.readFileSync(markerFile,'utf8'));
- if(marker.version!==1||marker.environment!==environment||marker.activation!=='review-required'||marker.access!=='revoked-and-disabled'||typeof marker.backupId!=='string'||!/^[a-f0-9-]{36}$/.test(marker.backupId)||!Array.isArray(marker.files)||!marker.files.length||marker.files.length>6||new Set(marker.files).size!==marker.files.length||marker.files.some(role=>!ROLES.includes(role)))throw new Error('Invalid recovery marker');
+ if(marker.version!==1||marker.environment!==environment||marker.activation!=='review-required'||marker.access!=='revoked-and-disabled'||typeof marker.backupId!=='string'||!/^[a-f0-9-]{36}$/.test(marker.backupId)||!Array.isArray(marker.files)||!marker.files.length||marker.files.length>MAX_JOURNALS||new Set(marker.files).size!==marker.files.length||marker.files.some(role=>!validRole(role)))throw new Error('Invalid recovery marker');
  const actual=fs.readdirSync(directory).sort(),expected=['recovery.json',...marker.files.map(role=>role+'.sqlite')].sort();
  if(JSON.stringify(actual)!==JSON.stringify(expected))throw new Error('Recovery directory contains unexpected or missing files; stop writers before review');
  const files=marker.files.map(role=>{

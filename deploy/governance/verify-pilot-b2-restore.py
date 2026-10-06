@@ -10,6 +10,7 @@ import secrets
 import subprocess
 import tempfile
 import time
+from pilot_worker_registry import load_registry, verify_journal_binding
 
 
 ROOT = pathlib.Path('/etc/aichain/pilot-backup')
@@ -50,12 +51,18 @@ def run(script: str, operation: str, config: pathlib.Path,
 def main() -> None:
     if os.geteuid() != 0:
         raise SystemExit('Run as root')
+    workers = load_registry()
+    required_roles = {worker['role'] for worker in workers}
     pointer = json.loads((ROOT / 'latest-upload.json').read_text(encoding='utf-8'))
     key_prefix = pointer.get('keyPrefix')
-    if pointer.get('version') != 1 or pointer.get('environment') != 'test' or \
+    if pointer.get('version') != 2 or pointer.get('environment') != 'test' or \
             pointer.get('bucket') != 'orvessian-pilot-test-backups' or \
             not isinstance(key_prefix, str) or \
-            not re.fullmatch(r'orvessian-pilot/test/[a-f0-9-]{73}', key_prefix):
+            not re.fullmatch(r'orvessian-pilot/test/[a-f0-9-]{73}', key_prefix) or \
+            not isinstance(pointer.get('journalRoles'), list) or \
+            not all(isinstance(role, str) for role in pointer['journalRoles']) or \
+            set(pointer['journalRoles']) != required_roles or \
+            len(pointer['journalRoles']) != len(required_roles):
         raise SystemExit('No valid completed pilot B2 upload pointer')
 
     key_id = input('1Password B2 restore keyID: ').strip()
@@ -111,6 +118,8 @@ def main() -> None:
         if downloaded.get('integrity') != 'verified' or \
                 not isinstance(downloaded.get('directory'), str):
             raise SystemExit('Downloaded backup was not authenticated')
+        if set(downloaded.get('journalRoles', [])) != required_roles:
+            raise SystemExit('B2 archive does not cover every registered worker')
         print('B2 download and archive authentication: VERIFIED', flush=True)
         downloaded_at = time.monotonic()
 
@@ -130,8 +139,12 @@ def main() -> None:
                 restored.get('activation') != 'review-required' or \
                 restored.get('access') != 'revoked-and-disabled':
             raise SystemExit('Fresh restore did not remain closed')
-        if 'worker' not in restored.get('journalRoles', []):
-            raise SystemExit('Hosted evidence worker journal missing from B2 restore')
+        if set(restored.get('journalRoles', [])) != required_roles:
+            raise SystemExit('Registered worker journals missing from B2 restore')
+        journal_directory = pathlib.Path(restored['directory']) / restored['journalsDirectory']
+        for worker in workers:
+            verify_journal_binding({**worker, 'journal': str(
+                journal_directory / (worker['role'] + '.sqlite'))})
 
         review_connection = json.loads(connection.read_text(encoding='utf-8'))
         review_connection['database'] = target
@@ -143,7 +156,7 @@ def main() -> None:
         })
         run('scripts/governance-postgres-recovery.cjs', 'review', review)
         print('Fresh hosted-pilot PostgreSQL restore: REVIEW PASSED')
-        print('Hosted evidence worker journal: RESTORED AND CLOSED')
+        print('Registered evidence worker journals: RESTORED AND CLOSED')
         print('Restored database:', target)
         print('Restored access: REVOKED AND CLOSED')
         print('Backup ID:', downloaded.get('id'))

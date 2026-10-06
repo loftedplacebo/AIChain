@@ -9,12 +9,15 @@ test('latest remote backup pointer advances atomically outside the encrypted sou
  const file=path.join(privateDirectory,'latest.json'),base={file,environment:'test',bucket:'pilot-backups',sourceDirectory:source};
  savePointer({...base,keyPrefix:'pilot/test/first'});
  assert.equal(readPointer(base),'pilot/test/first');
- savePointer({...base,keyPrefix:'pilot/test/second'});
+ savePointer({...base,keyPrefix:'pilot/test/second',journalRoles:['worker','worker_dbd944b9cbffcf78489e6713']});
  assert.equal(readPointer(base),'pilot/test/second');
+ assert.deepEqual(JSON.parse(fs.readFileSync(file,'utf8')).journalRoles,['worker','worker_dbd944b9cbffcf78489e6713']);
  assert.deepEqual(fs.readdirSync(privateDirectory),['latest.json']);
  assert.throws(()=>readPointer({...base,bucket:'different-bucket'}),/does not match/);
  assert.throws(()=>savePointer({...base,file:path.join(source,'latest.json'),keyPrefix:'pilot/test/third'}),/outside/);
  assert.equal(readPointer(base),'pilot/test/second');
+ fs.writeFileSync(file,JSON.stringify({version:1,environment:'test',bucket:'pilot-backups',keyPrefix:'pilot/test/legacy'}),{mode:0o600});
+ assert.equal(readPointer(base),'pilot/test/legacy');
  fs.writeFileSync(file,'{"version":1,"environment":"test","bucket":"pilot-backups","keyPrefix":"pilot/test/third","keyPrefix":"forged"}',{mode:0o600});
  assert.throws(()=>readPointer(base),/Duplicate JSON key/);
 });

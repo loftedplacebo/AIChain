@@ -34,6 +34,7 @@ Exact protocol/API specifications, implementation notes and operator procedures 
 - [Website repository](../website/README.md).
 - [Pilot owner actions](pilot-owner-actions.md): current partner start gate and owner decisions.
 - [Design-partner to production roadmap](design-partner-to-production-roadmap.md): staged partner experience, engineering work and later production gates.
+- [Multi-project pilot workers](pilot-multi-project-workers.md): repeatable worker provisioning, journal recovery and project-wide monitoring development.
 - [VPS disk inventory](vps-disk-inventory-2026-10-05.md): read-only space, active dependencies and reviewed cleanup candidates as of 5 October 2026.
 - [Pilot support and incident runbook](pilot-support-and-incident-runbook.md): named owner, alerts, health checks and emergency pause.
 - [First design-partner proposal](examples/first-design-partner-synthetic-pilot-proposal.md): internal synthetic workflow, fields and proposed measures awaiting partner agreement.
