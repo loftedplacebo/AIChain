@@ -37,19 +37,26 @@ def save(path, state):
             temp.unlink()
 
 
-def load(path, run_id, count):
+def load(path, run_id, count, interval_seconds, tenant, project):
+    expected = {'version': 2, 'runId': run_id, 'count': count,
+                'intervalSeconds': interval_seconds, 'tenant': tenant,
+                'project': project}
     if path.is_symlink():
         raise ValueError('State path cannot be a symbolic link')
     if path.exists():
         if os.name == 'posix' and path.stat().st_mode & 0o077:
             raise ValueError('State path must be owner-only')
         state = json.loads(path.read_text(encoding='utf-8'))
-        if state.get('runId') != run_id or state.get('count') != count:
-            raise ValueError('Existing run parameters differ')
-        if not 0 <= state.get('accepted', -1) <= count:
+        if any(state.get(key) != value for key, value in expected.items()):
+            raise ValueError('Existing run scope or parameters differ')
+        if type(state.get('accepted')) is not int or not 0 <= state['accepted'] <= count:
             raise ValueError('Existing run state is invalid')
+        if type(state.get('nextAt')) not in (int, float) or state['nextAt'] < 0:
+            raise ValueError('Existing run time is invalid')
+        if state.get('pendingAt') is not None and not isinstance(state['pendingAt'], str):
+            raise ValueError('Existing pending timestamp is invalid')
         return state
-    state = {'runId': run_id, 'count': count, 'accepted': 0,
+    state = {**expected, 'accepted': 0,
              'nextAt': time.time(), 'pendingAt': None}
     save(path, state)
     return state
@@ -77,8 +84,9 @@ def main():
         parser.error('Bound the run to 1–10 records at intervals of 60–3600 seconds')
     if not args.state.is_absolute() or not args.state.parent.is_dir():
         parser.error('Use an existing absolute state directory')
-    state = load(args.state, args.run_id, args.count)
     api = client()
+    state = load(args.state, args.run_id, args.count,
+                 args.interval_seconds, api.tenant, api.project)
     deployment = 'load-' + args.run_id
     registration = api.register_agent(agent_ref=AGENT, environment='test',
                                       deployment_ref=deployment,

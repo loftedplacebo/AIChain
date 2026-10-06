@@ -9,6 +9,10 @@ The hosted evidence workers perform signing and Base Sepolia submission.
 Each process is capped at ten distinct events, at intervals of at least one
 minute. The run ID, event sequence, timestamp and accepted count are saved in
 an owner-only state file. A restart reuses a pending event ID and timestamp.
+New runs bind the state file to its tenant, project, run ID, count and interval;
+changing any of these values fails closed. The active `20261006-a` run started
+with the earlier state format, so keep its deployed script in place until both
+units finish. Use a new state file for a later run with the scope-bound format.
 The current trial uses ten events per project, six minutes apart, with both
 project processes active at the same time. The project's normal write, storage,
 worker gas and evidence-backlog limits remain in force.
