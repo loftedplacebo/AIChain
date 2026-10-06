@@ -29,7 +29,7 @@ Read-only acceptance after install:
 Hosted Stage C exit is still open. At initial rollout the database contained
 only the Synthetic Validation project. The second internal workspace and
 paused worker were added later the same day, as recorded below. Its separate
-Base Sepolia relayer still needs funding and activation. Submit concurrent
+Base Sepolia relayer was subsequently funded and activated. Submit concurrent
 evidence in both projects, then run a coordinated upload with their active
 journals and download and review a closed restore with the separate B2 restore
 credential. Exercise the stale-evidence threshold and record capacity and
@@ -60,3 +60,9 @@ encrypted B2 upload completed as
 `152a7aae-0ba1-4b20-a90a-54b823f3c6b2`; its version-2 pointer lists
 `worker` and `worker_260ea33bcf622acf411da2bb`. Backup health passed. The
 B2 set has not yet been downloaded and restored closed.
+
+The owner funded the new public relayer with 0.003 Base Sepolia ETH, above the
+0.001 ETH request target. The guarded activation then reported `activated`.
+Both evidence-worker units are now enabled and active. The combined hosted
+check and backup health check passed with both projects and workers. No agent
+record had yet been submitted to the new project at that check.
