@@ -19,7 +19,12 @@ the two projects. Stop the transient load units to pause the test; keep their
 state files for safe replay. Logs print event IDs, project references and
 counts, never credentials. The accepted `stagec-<run-id>-<sequence>` IDs can
 be checked through scoped database reads and independent signed evidence/Base
-Sepolia verification.
+Sepolia verification with the [read-only verifier](../scripts/verify_stage_c_capacity_smoke.cjs).
+On the VPS, run it with the protected API environment and
+`PILOT_API_ROOT=/opt/aichain/governance-pilot-api`; it reads the protected
+worker registry to select each project's trusted signer. It checks each
+event's signature, record commitment, batch membership and confirmed chain
+transaction, and reports receipt-to-signing and receipt-to-mined time.
 
 The pilot acceptance record should include: accepted/duplicate/rejected count
 per project, first and last acceptance times, time to confirmed evidence,
@@ -33,6 +38,9 @@ Stage C sign-off.
 On 6 October 2026, transient units `orvessian-stage-c-load-operator.service`
 and `orvessian-stage-c-load-internal.service` started the bounded run with
 ID `20261006-a`. Each accepted event `stagec-20261006-a-00` in its separate
-project. Completion and evidence latency are pending; see the
+project. The first event in each project passed independent signed/Base
+Sepolia verification. Receipt-to-mined time was 27 seconds for the operator
+project and 12 seconds for the internal project. Completion and full-run
+latency are pending; see the
 [rollout record](deployments/stage-c-vps-rollout-2026-10-06.md) for the
 pre-run backup, restore and health evidence.
