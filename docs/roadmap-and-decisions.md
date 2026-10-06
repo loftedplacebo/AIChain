@@ -1,5 +1,16 @@
 # Roadmap and decisions — current checkpoint 5 October 2026
 
+## Stage C development update — 6 October 2026
+
+The local code now supports deterministic per-project pilot worker provisioning,
+multi-journal encrypted backup/closed restore, and project-wide worker,
+backlog and missing-project checks. Native synthetic PostgreSQL tests passed
+two worker journals through recovery and synthetic object-storage transfer.
+See the [multi-project procedure](pilot-multi-project-workers.md). This is a
+development result: the hosted VPS still uses its one-project worker and has
+not passed a two-project B2 restore or alert drill. The 5 October partner
+credential gate and Stage C hosted acceptance remain open.
+
 ## Current design-partner readiness — 5 October 2026
 
 **Ready for outreach and scoping; not yet ready to issue the first partner credential.** The public marketing Site and synthetic demo are live. The Site's sign-in/request-access action opens the hosted pilot portal; a visitor can reach the WorkOS waitlist, but requests require operator approval. The hosted `test` portal and API run on the Contabo VPS over HTTPS, use the DigitalOcean managed PostgreSQL cluster with restricted runtime access, and currently admit the operator plus one owner-controlled second-account test email. That second address has an approved WorkOS waitlist entry, accepted invitation, completed sign-in, enrolled TOTP factor and owner-confirmed Orvessian workspace access. Operator sign-in with required TOTP, password reset and sign-out, a project key, one HTTP 201 synthetic record and its portal view have passed. A signed WorkOS webhook has reached the API. Daily encrypted Backblaze B2 upload, alerting, and a downloaded/authenticated fresh restore into a closed database in the same cluster have passed; the 4 October timed drill took 8.25 seconds. A read-only 4 October health check found portal, API and backup timer active, the last backup service successful, and the upload marker fresh. See the [hosted integration record](hosted-pilot-application-integration.md), [cluster setup](digitalocean-pilot-cluster-setup.md) and [owner queue](pilot-owner-actions.md).
