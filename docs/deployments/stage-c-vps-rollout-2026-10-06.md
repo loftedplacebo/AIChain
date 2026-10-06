@@ -93,3 +93,22 @@ transactions. The corresponding transaction hashes were
 and `0x1f1339a1fb9fec2acf606b1325ea273bbf132de132febe12e67f9e35e4989919`.
 This proves the operator-project watcher path; it does not exercise the new
 project's worker or meet the two-project concurrent evidence gate.
+
+## New-project agent evidence
+
+A separate one-run agent used the internal project's short-lived write-only
+key while the original 48-hour operator watcher remained active. Its event
+`watch-33cd3da9-07e1-480a-ac85-573221fac079` appeared only in
+`prj-1e8d2ecd-6bbf-4cb6-b49b-fb599ba9626c`, not in the operator project.
+Independent verification returned `verified`: valid trusted recording
+signature, matching record commitment, valid batch membership and 15 Base
+Sepolia confirmations at the check. The transaction was
+`0xd376af04557c91e2defc83d720d5ffebe6ea75ec7ff1f260fa045a463d1471dd`.
+Both hosted workers and project-wide health remained healthy. A repeat start
+of the one-run service emitted only `one-shot-complete` with accepted count 1;
+it made no second model call or submission.
+
+Coordinated encrypted backup `5d5737b4-8961-4494-9816-642220d7f6cd`
+completed after this event, stopping and restarting both active workers. The
+version-2 backup health check passed with both journal roles. A separate B2
+download and closed restore of this populated set is still pending.
