@@ -37,3 +37,22 @@ environment file and a persistent state directory. Configure these values in
 parser; the file is readable only by root and the service account. The Orvessian
 credential is write-only and project-scoped.
 The runtime validates the API origin and model and will not load a chain signer.
+
+## Separate internal project acceptance run
+
+The Stage C `SDK Receipt Smoke Test` project uses a separate one-run unit,
+`orvessian-base-health-internal-once.service`. It uses the existing protected
+OpenAI key file through systemd, while a second root/group-protected env file
+holds only the new project's short-lived write-only Orvessian key and scope.
+It writes a separate durable state journal under
+`/var/lib/orvessian-chain-watch-internal`. The original 48-hour operator
+watcher and its state continue unchanged. A repeated start after a successful
+record exits without another model call or duplicate event.
+
+Create the new project's short-lived write-only key in the portal. Install it
+at a hidden prompt with `ssh -tt root@62.171.161.32 python3
+/opt/aichain/governance-pilot-db-setup/configure-internal-agent-run.py`.
+Then run `systemctl start orvessian-base-health-internal-once.service`. Its
+log prints the event ID but no credentials. Verify that event against the new
+project's scoped record and independent signed/Base Sepolia evidence. Revoke
+the temporary project key after the trial.

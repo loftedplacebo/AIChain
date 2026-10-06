@@ -226,15 +226,18 @@ def make_client():
                   required_env('ORVESSIAN_PROJECT'), timeout=10, attempts=1)
 
 
-def main():
+def main(once=False):
+    state_path = Path(os.environ.get('AGENT_STATE_FILE',
+                        '/var/lib/orvessian-chain-watch/state.json'))
+    state = load_state(state_path)
+    if once and state['accepted'] >= 1 and state['pending'] is None:
+        emit(event='one-shot-complete', accepted=state['accepted'])
+        return 0
     api_key = secret_env('OPENAI_API_KEY_B64')
     model = os.environ.get('OPENAI_MODEL', MODEL)
     if model != MODEL:
         raise ValueError('Unexpected model configuration')
     client = make_client()
-    state_path = Path(os.environ.get('AGENT_STATE_FILE',
-                        '/var/lib/orvessian-chain-watch/state.json'))
-    state = load_state(state_path)
     stop = False
 
     def request_stop(_signum, _frame):
@@ -254,6 +257,9 @@ def main():
          intervalSeconds=INTERVAL_SECONDS, maxModelCalls=MAX_MODEL_CALLS)
 
     while not stop:
+        if once and state['accepted'] >= 1 and state['pending'] is None:
+            emit(event='one-shot-complete', accepted=state['accepted'])
+            return 0
         now = time.time()
         if now >= state['expiresAt']:
             emit(event='window-complete', attempts=state['attempts'],
@@ -262,14 +268,21 @@ def main():
 
         if state['pending'] is not None:
             if now < state['retryAt']:
+                if once:
+                    emit(event='one-shot-deferred', retryAt=utc_timestamp(state['retryAt']))
+                    return 2
                 time.sleep(min(30, state['retryAt'] - now))
                 continue
             if send_pending(client, state_path, state):
                 continue
+            if once:
+                return 2
             time.sleep(5)
             continue
 
         if state['attempts'] >= MAX_MODEL_CALLS:
+            if once:
+                return 2
             time.sleep(min(60, state['expiresAt'] - now))
             continue
 
@@ -321,6 +334,8 @@ def main():
         emit(event='check-complete', slot=slot, decision=decision or 'unavailable',
              block=block, modelCall=state['attempts'])
         send_pending(client, state_path, state)
+        if once and state['pending'] is not None:
+            return 2
 
     emit(event='stopped', attempts=state['attempts'], accepted=state['accepted'])
     return 0
@@ -333,7 +348,9 @@ if __name__ == '__main__':
         sys.exit(0 if signals['expectedChain'] and signals['blockAvailable']
                  and signals['contractPresent'] else 1)
     try:
-        sys.exit(main())
+        if sys.argv[1:] not in ([], ['--once']):
+            raise ValueError('Unexpected agent argument')
+        sys.exit(main(once=sys.argv[1:] == ['--once']))
     except (OSError, ValueError, IngestionError):
         emit(event='agent-exit', reason='configuration-or-transport')
         sys.exit(1)
