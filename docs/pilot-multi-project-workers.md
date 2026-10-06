@@ -6,10 +6,10 @@ and the existing worker was registered. A second internal synthetic project was
 provisioned with a dedicated worker, then funded and activated. A two-journal
 version-2 B2 upload, independent closed restore and combined health check
 passed. A bounded simultaneous two-project evidence run subsequently passed;
-the owner workload sign-off remains open. A scheduled injected stale-evidence
-heartbeat subsequently delivered a labelled TEST ALERT in the owner chat and
-paused itself. The hosted pilot
-remains synthetic `test` on Base Sepolia. See the [rollout record](deployments/stage-c-vps-rollout-2026-10-06.md).
+the owner approved the workload envelope on 6 October. A scheduled injected
+stale-evidence heartbeat delivered a labelled TEST ALERT in the owner chat
+and paused itself. The hosted pilot remains synthetic `test` on Base Sepolia.
+See the [rollout record](deployments/stage-c-vps-rollout-2026-10-06.md).
 
 ## Inventory and provisioning contract
 
@@ -127,9 +127,9 @@ two-journal set after both projects had confirmed Base Sepolia evidence.
 
 The two synthetic projects have separate active workers, confirmed evidence,
 scoped isolation, coordinated B2 capture and closed restore. Missing-worker
-detection and an injected stale-job threshold check passed. Stage C owner
-sign-off still needs a supported project count, workload and latency limits
-accepted by the existing primary owner. An alternate contact remains a
+detection and an injected stale-job threshold check passed. The primary owner
+approved Stage C's supported project count, workload and latency target.
+An alternate contact remains a
 separate first-partner trial gate. The first partner's acceptance and any
 production-data release remain separate gates.
 
@@ -137,5 +137,6 @@ The bounded simultaneous load subsequently accepted and independently
 verified ten synthetic SDK receipts in each project. One operator receipt
 waited at the ten-transaction rolling-hour policy cap while its watcher used
 the same budget; it mined 380 seconds after acceptance. The [capacity smoke
-record](pilot-stage-c-capacity-smoke.md) proposes eight new receipts per
-project per rolling hour with a 30-minute evidence target for owner review.
+record](pilot-stage-c-capacity-smoke.md) records eight new receipts per
+project per rolling hour with a 30-minute evidence target, approved by
+Michael Grant on 6 October 2026 for supervised synthetic trials.

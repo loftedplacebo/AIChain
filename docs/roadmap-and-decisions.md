@@ -15,17 +15,16 @@ download and two-project closed restore passed. Both projects subsequently
 produced separately verified Base Sepolia evidence while their workers were
 active. A populated two-journal B2 set passed an independent same-cluster
 download and closed restore. Missing-worker detection and an injected
-stale-job threshold check passed. Supported capacity and evidence-latency
-limits still need owner sign-off. A bounded simultaneous load subsequently
-accepted and independently verified 20 receipts across the two projects.
-The operator's final receipt waited for its ten-transaction rolling-hour
+stale-job threshold check passed. A bounded simultaneous load then accepted
+and independently verified 20 receipts across the two projects. The
+operator's final receipt waited for its ten-transaction rolling-hour
 worker limit and took 380 seconds to mine; the draft ten-receipt/hour pilot
-ceiling was revised to eight receipts per project per rolling hour for owner
-review. A scheduled injected stale-evidence heartbeat delivered a labelled
-TEST ALERT to the owner chat and paused itself; the following healthy
-runtime check stayed quiet. Backup support
-coverage remains a first-
-partner trial gate. The 5 October partner
+ceiling was revised to eight receipts per project per rolling hour, with at
+most two active projects and a 30-minute evidence target; Michael Grant
+approved that supervised synthetic pilot envelope on 6 October. A scheduled
+injected stale-evidence heartbeat delivered a labelled TEST ALERT to the owner
+chat and paused itself; the following healthy runtime check stayed quiet.
+Backup support coverage remains a first-partner trial gate. The 5 October partner
 credential gate remains separate.
 
 ## Current design-partner readiness — 5 October 2026

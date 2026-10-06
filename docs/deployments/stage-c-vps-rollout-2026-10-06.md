@@ -191,4 +191,8 @@ both projects and workers were healthy, with zero awaiting submissions and
 zero unresolved worker jobs. This proves the chat heartbeat's injected alert
 delivery and healthy silence; it does not prove an out-of-band page or a real
 incident response. Michael Grant remains the named primary pilot support and
-alert owner. His proposed workload-envelope sign-off is still pending.
+alert owner. On 6 October, Michael Grant approved the supervised synthetic
+pilot envelope of at most two active projects, eight new receipts per project
+in any rolling hour, and confirmed evidence within 30 minutes. This is an
+operating limit for prearranged trials, not an enforced API quota or a
+production release approval.

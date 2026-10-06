@@ -39,11 +39,10 @@ combined health check, missing-worker drill and two-project same-cluster
 closed restore passed. Both projects then produced separately verified Base
 Sepolia evidence while both workers were active. A populated two-journal B2
 set passed independent download and closed restore, and an injected stale-job
-summary failed health as expected. Supported capacity still needs the existing
-primary support owner's sign-off. The bounded simultaneous load accepted and
+summary failed health as expected. The bounded simultaneous load accepted and
 independently verified ten receipts in each project; one operator receipt
 waited for the worker's rolling-hour transaction cap and took 380 seconds to
-mine. The [proposed supervised limit](pilot-stage-c-capacity-smoke.md) is now
+mine. The [approved supervised limit](pilot-stage-c-capacity-smoke.md) is
 eight receipts per project in any rolling hour and a 30-minute evidence
 target. A scheduled injected stale-evidence heartbeat delivered a labelled
 TEST ALERT to the owner chat and paused itself; the next healthy runtime
@@ -86,9 +85,11 @@ technical evidence.
 The earlier three-to-six-day Stage B/C estimate described work now implemented
 and exercised in the internal synthetic two-project pilot. The bounded
 two-project load and evidence-latency smoke passed with a rate-limit finding;
-owner acceptance of the revised pilot envelope remains for Stage C sign-off.
-The scheduled injected alert drill delivered in the owner chat. Sustained
-capacity is a later production gate.
+Michael Grant approved the revised supervised pilot envelope on 6 October:
+two active synthetic projects, eight new receipts per project per rolling hour,
+and confirmed evidence within 30 minutes. The scheduled injected alert drill
+delivered in the owner chat. Stage C's internal synthetic technical and owner
+gates are complete. Sustained capacity is a later production gate.
 Backup support coverage remains a first-partner trial gate.
 Automating approval and provisioning
 for open-ended self-service is a separate project. Stage D duration depends on
