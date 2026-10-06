@@ -1,4 +1,4 @@
-# Roadmap and decisions — current checkpoint 5 October 2026
+# Roadmap and decisions — current checkpoint 6 October 2026
 
 ## Stage C development update — 6 October 2026
 
@@ -11,9 +11,13 @@ See the [multi-project procedure](pilot-multi-project-workers.md). The
 existing worker, funded and activated a second internal synthetic project
 worker, passed a fresh version-2 B2 upload containing both journals and combined
 health check, and exercised missing-worker detection. An independent B2
-download and two-project closed restore passed. Concurrent evidence and
-capacity acceptance remain open. The
-5 October partner credential gate and Stage C hosted acceptance remain open.
+download and two-project closed restore passed. Both projects subsequently
+produced separately verified Base Sepolia evidence while their workers were
+active. A populated two-journal B2 set passed an independent same-cluster
+download and closed restore. Missing-worker detection and an injected
+stale-job threshold check passed. Supported capacity, evidence-latency and
+support-owner limits remain for Stage C sign-off. The 5 October partner
+credential gate remains separate.
 
 ## Current design-partner readiness — 5 October 2026
 

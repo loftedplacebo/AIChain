@@ -23,12 +23,10 @@ code, not a new codebase per partner. Keep project journals and relayer nonce
 ownership separate. A shared dynamic multi-project publisher is a later design
 choice that needs its own concurrency, custody and recovery review.
 
-The current backup includes the PostgreSQL database, which holds all projects,
-but its coordinated stop list and archive name **one** hosted worker journal.
-The runtime/evidence health check also names one worker and one project.
-Neither becomes multi-partner coverage merely because the API can create a new
-workspace. WorkOS waitlist approval also needs a separate exact-email API
-admission update today.
+The coordinated backup now captures the PostgreSQL database and every
+registered worker journal. Project-wide health checks cover each registered
+worker and project. WorkOS waitlist approval still needs a separate exact-email
+API admission update for each approved participant.
 
 Stage C has a [repeatable multi-project worker and recovery
 procedure](pilot-multi-project-workers.md), including per-project provisioning,
@@ -38,7 +36,11 @@ the [hosted VPS rollout](deployments/stage-c-vps-rollout-2026-10-06.md)
 registered the existing worker, then funded and activated a second internal
 synthetic project worker. A version-2 B2 upload containing both journals,
 combined health check, missing-worker drill and two-project same-cluster
-closed restore passed. Concurrent evidence and capacity acceptance remain open.
+closed restore passed. Both projects then produced separately verified Base
+Sepolia evidence while both workers were active. A populated two-journal B2
+set passed independent download and closed restore, and an injected stale-job
+summary failed health as expected. Supported capacity and support ownership
+remain open for Stage C owner sign-off.
 
 ## Additional production gates after Stage C
 
@@ -73,19 +75,13 @@ technical evidence.
 
 ## Indicative effort and dependencies
 
-Assuming one engineer focused on the existing code, manual WorkOS/API approval,
-operator-run worker provisioning and a small synthetic cohort, the Stage B/C
-technical work is roughly **three to six focused engineering days**. The main
-pieces are a reusable per-project worker instance/configuration, multi-journal
-backup and restore, per-project health checks, and a fresh-account end-to-end
-test. The backup archive currently accepts only one journal with the `worker`
-role, so that part needs a real format/recovery change. These are planning
-ranges, not tested schedules; unexpected recovery or isolation failures could
-add time. Automating approval and worker provisioning for open-ended self-service
-is a separate project. Stage D is another program whose duration depends on
+The earlier three-to-six-day Stage B/C estimate described work now implemented
+and exercised in the internal synthetic two-project pilot. A sustained load
+and evidence-latency test, supported capacity decision and named operator
+ownership remain for Stage C sign-off. Automating approval and provisioning
+for open-ended self-service is a separate project. Stage D duration depends on
 real-data scope, legal and company setup, the production evidence-chain choice,
-security findings, and the replacement-cluster recovery drill. Estimate it
-after the first partner workflow and data boundary are agreed.
+security findings and the replacement-cluster recovery drill.
 
 For the first partner, the next actionable sequence is: agree the synthetic
 brief; complete Stage A's separate-project smoke test; then deploy, back up,
@@ -94,12 +90,12 @@ while the supervised trial is running, using the observed partner workflow.
 
 ## Separate engineering task — scheduled synthetic OpenAI workload
 
-- [ ] Create a dedicated internal synthetic test workspace/project and a
+- [x] Create a dedicated internal synthetic test workspace/project and a
   short-lived Orvessian submission key. Keep it separate from design partners.
 - [ ] Run a bounded synthetic agent task on a timer using the OpenAI Responses
-  API. Use a dedicated OpenAI Platform project key with protected VPS storage,
-  expiry/rotation, usage monitoring and a spend limit. Do not send partner data.
-- [ ] Convert only validated, allowlisted outcome metadata into governance
+  API. The isolated one-run internal check passed; timer, dedicated key and
+  spend controls remain to be reviewed. Do not send partner data.
+- [x] Convert only validated, allowlisted outcome metadata into governance
   events; do not submit raw prompts or model responses. Use stable event IDs
   for retries, a low fixed run frequency, timeouts and a pause switch.
 - [ ] Verify API acceptance, portal read-back, evidence-worker processing and
@@ -107,5 +103,7 @@ while the supervised trial is running, using the observed partner workflow.
   runs without treating generated outputs as ground truth.
 
 This is an internal product exercise and an end-to-end canary, not a design
-partner or a production availability claim. It needs an OpenAI API account,
-billing/spend configuration and a separate protected API key before activation.
+partner or a production availability claim. Its one-run check reused a
+protected OpenAI key and a short-lived internal-project Orvessian write key.
+A recurring run needs an explicit schedule, spend controls and key lifecycle
+review.

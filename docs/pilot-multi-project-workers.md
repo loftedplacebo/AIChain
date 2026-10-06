@@ -118,13 +118,13 @@ journals through encrypted capture, authenticated inspection, gated restore
 and review. The managed-like native administrator test also passed two worker
 journals through synthetic S3 upload, download, monitor, filesystem copy and
 closed restore. The local Python registry, journal binding and request tests
-pass. This proves the code path and is supplemented by the single-project
-hosted rollout. It does not prove independent B2 restoration of a multi-project
-live set.
+pass. The [6 October hosted rollout](deployments/stage-c-vps-rollout-2026-10-06.md)
+then passed independent B2 download and closed restore of a populated
+two-journal set after both projects had confirmed Base Sepolia evidence.
 
-Before Stage C hosted sign-off, provision at least two separate synthetic
-projects, verify their units and journals, submit evidence concurrently, run
-a scheduled B2 capture, download and review a closed restore, exercise a
-missing-worker and stalled-evidence alert, and record observed limits and
-operator ownership. The first partner's acceptance and any production-data
-release remain separate gates.
+The two synthetic projects have separate active workers, confirmed evidence,
+scoped isolation, coordinated B2 capture and closed restore. Missing-worker
+detection and an injected stale-job threshold check passed. Stage C owner
+sign-off still needs a supported project count, workload and latency limits,
+and named support ownership. The first partner's acceptance and any
+production-data release remain separate gates.

@@ -26,14 +26,12 @@ Read-only acceptance after install:
   check every 30 minutes and alert only on failed health or coverage. This is
   chat alerting, not a phone paging service.
 
-Hosted Stage C exit is still open. At initial rollout the database contained
-only the Synthetic Validation project. The second internal workspace and
-paused worker were added later the same day, as recorded below. Its separate
-Base Sepolia relayer was subsequently funded and activated. Submit concurrent
-evidence in both projects, then run a coordinated upload with their active
-journals and download and review a closed restore with the separate B2 restore
-credential. Exercise the stale-evidence threshold and record capacity and
-owner support limits before calling the two-project acceptance complete.
+At initial rollout the database contained only the Synthetic Validation
+project. The second internal workspace and worker were added later the same
+day, as recorded below. The two-project evidence, backup, restore and
+health-detection exercises below passed. Stage C owner sign-off still needs a
+supported capacity and support limit; the single-run observations below are
+not a sustained load test.
 
 ## Internal synthetic project added later on 6 October
 
@@ -110,5 +108,29 @@ it made no second model call or submission.
 
 Coordinated encrypted backup `5d5737b4-8961-4494-9816-642220d7f6cd`
 completed after this event, stopping and restarting both active workers. The
-version-2 backup health check passed with both journal roles. A separate B2
-download and closed restore of this populated set is still pending.
+version-2 backup health check passed with both journal roles. The owner then
+used the separate B2 restore credential at hidden VPS prompts. The populated
+set was discoverable, downloaded and authenticated; both registered worker
+journals were restored and closed. Fresh database
+`gov_restore_b2_c1e41b11b58a` passed the hosted PostgreSQL review with
+access revoked and service activation disabled. The same-cluster drill took
+12.32 seconds overall, including 1.57 seconds for B2 download/authentication
+and 9.84 seconds for fresh restore and review. This does not establish
+lost-cluster recovery time.
+
+## Health detection and resource snapshot
+
+Stopping either registered worker made the project-wide hosted health check
+fail; restarting each restored green health. A read-only drill injected a
+summary for the internal worker with one unresolved job aged 1,801 seconds
+and three attempts into the runtime checker. It returned `healthy: false` and
+`workerJournalHealthy: false`. An immediate normal check returned
+`healthy: true`, with both worker journals at zero unresolved jobs, both
+units active, API and portal loopback HTTP 200, 90% disk free and 96% memory
+available. The registered legacy and internal worker units showed about
+40.8 MB and 32.2 MB `MemoryCurrent` respectively. This validates the
+checker's threshold, not delivery of an actual heartbeat notification or
+behavior under sustained multi-project load. The owner heartbeat runs the
+combined check every 30 minutes; backup health is checked daily. A supported
+pilot project count, workload ceiling, evidence-latency target and support
+owner still need to be recorded before Stage C owner sign-off.
