@@ -7,6 +7,7 @@ import tempfile
 import json
 from contextlib import closing
 import unittest
+from unittest.mock import patch
 from pilot_worker_registry import instance_for, validate_registry, verify_journal_binding
 
 HERE = pathlib.Path(__file__).parent
@@ -18,6 +19,10 @@ RUNTIME_SPEC = importlib.util.spec_from_file_location(
     'check_pilot_runtime', HERE / 'check-pilot-runtime-health.py')
 RUNTIME = importlib.util.module_from_spec(RUNTIME_SPEC)
 RUNTIME_SPEC.loader.exec_module(RUNTIME)
+BACKUP_SPEC = importlib.util.spec_from_file_location(
+    'check_pilot_backup', HERE / 'check-pilot-backup-health.py')
+BACKUP = importlib.util.module_from_spec(BACKUP_SPEC)
+BACKUP_SPEC.loader.exec_module(BACKUP)
 TENANT = 'org-831aa048-b268-4fce-98f3-455429034ef8'
 PROJECTS = ('prj-d9109260-1232-4561-ab4a-ab2e5c8f658f',
             'prj-a9109260-1232-4561-ab4a-ab2e5c8f658f')
@@ -33,6 +38,16 @@ def worker(project, recorder, relayer):
 
 
 class InventoryTests(unittest.TestCase):
+    def test_inactive_worker_state_is_preserved_by_health_checks(self):
+        class Result:
+            returncode = 3
+            stdout = 'inactive\n'
+
+        with patch.object(RUNTIME.subprocess, 'run', return_value=Result()):
+            self.assertEqual(RUNTIME.systemctl('is-active', 'paused.service'), 'inactive')
+        with patch.object(BACKUP.subprocess, 'run', return_value=Result()):
+            self.assertEqual(BACKUP.systemctl('is-active', 'paused.service'), 'inactive')
+
     def test_two_projects_have_isolated_deterministic_bindings(self):
         workers = [worker(PROJECTS[0], '0x' + '1' * 40, '0x' + '2' * 40),
                    worker(PROJECTS[1], '0x' + '3' * 40, '0x' + '4' * 40)]

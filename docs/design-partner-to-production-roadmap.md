@@ -35,9 +35,11 @@ procedure](pilot-multi-project-workers.md), including per-project provisioning,
 bounded multi-journal archives and project-wide health checks. The native
 synthetic PostgreSQL recovery test passes for two worker journals. On 6 October,
 the [hosted VPS rollout](deployments/stage-c-vps-rollout-2026-10-06.md)
-registered the existing worker and passed a version-2 single-project B2 upload,
-combined health check and missing-worker drill. The two-project hosted B2
-restore, evidence and capacity acceptance remain open.
+registered the existing worker, then prepared a second internal synthetic
+project worker in paused mode. A version-2 B2 upload containing both journals,
+combined health check and missing-worker drill passed. The second worker's
+funding and activation, two-project closed restore, concurrent evidence and
+capacity acceptance remain open.
 
 ## Additional production gates after Stage C
 

@@ -8,9 +8,10 @@ backlog and missing-project checks. Native synthetic PostgreSQL tests passed
 two worker journals through recovery and synthetic object-storage transfer.
 See the [multi-project procedure](pilot-multi-project-workers.md). The
 [hosted rollout](deployments/stage-c-vps-rollout-2026-10-06.md) registered the
-existing worker, passed a fresh version-2 B2 upload and combined health check,
-and exercised missing-worker detection. The VPS catalog still contains one
-project, so the two-project B2 restore and evidence drill remain open. The
+existing worker, prepared a second internal synthetic project worker in paused
+mode, passed a fresh version-2 B2 upload containing both journals and combined
+health check, and exercised missing-worker detection. The second worker's
+funding and activation, two-project closed restore and evidence drill remain open. The
 5 October partner credential gate and Stage C hosted acceptance remain open.
 
 ## Current design-partner readiness — 5 October 2026

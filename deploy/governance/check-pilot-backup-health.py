@@ -16,7 +16,7 @@ MAX_AGE_HOURS = 4
 def systemctl(*args: str) -> str:
     result = subprocess.run(('systemctl', *args), capture_output=True,
                             text=True, timeout=15, check=False)
-    return result.stdout.strip() if result.returncode == 0 else ''
+    return result.stdout.strip()
 
 
 def main() -> None:

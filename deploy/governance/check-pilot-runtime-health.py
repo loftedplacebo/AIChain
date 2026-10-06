@@ -20,7 +20,7 @@ TIMERS = ('orvessian-pilot-backup.timer',
 def systemctl(*args: str) -> str:
     result = subprocess.run(('systemctl', *args), capture_output=True,
                             text=True, timeout=10, check=False)
-    return result.stdout.strip() if result.returncode == 0 else ''
+    return result.stdout.strip()
 
 
 def unexpected_project_units(registered: set[str]) -> list[str]:

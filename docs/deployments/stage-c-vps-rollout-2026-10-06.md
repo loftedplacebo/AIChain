@@ -26,12 +26,37 @@ Read-only acceptance after install:
   check every 30 minutes and alert only on failed health or coverage. This is
   chat alerting, not a phone paging service.
 
-Hosted Stage C exit is still open. At the time of this rollout the database
-contained only the Synthetic Validation project. The next independent
-synthetic workspace must be created through the admitted-user journey, then
-given a reviewed project worker request, a separate funded Base Sepolia
-relayer, and a successful activation. Submit concurrent evidence in both
-projects, run a new coordinated upload containing both journals, and download
-and review a closed restore with the separate B2 restore credential. Exercise
-the stale-evidence threshold and record capacity and owner support limits
-before calling the two-project acceptance complete.
+Hosted Stage C exit is still open. At initial rollout the database contained
+only the Synthetic Validation project. The second internal workspace and
+paused worker were added later the same day, as recorded below. Its separate
+Base Sepolia relayer still needs funding and activation. Submit concurrent
+evidence in both projects, then run a coordinated upload with their active
+journals and download and review a closed restore with the separate B2 restore
+credential. Exercise the stale-evidence threshold and record capacity and
+owner support limits before calling the two-project acceptance complete.
+
+## Internal synthetic project added later on 6 October
+
+The owner created workspace `org-61f98eac-1218-439d-9e93-f3717e1dfe37`
+and project `prj-1e8d2ecd-6bbf-4cb6-b49b-fb599ba9626c` through the portal.
+The privileged catalog check observed exactly those two projects and flagged
+the new one as missing a worker before provisioning. A root-only request with
+the documented bounded policy and 0.001 Base Sepolia ETH funding target
+prepared project role `worker_260ea33bcf622acf411da2bb`. Its separate
+journal and keys have private ownership and permissions; its systemd unit is
+disabled/inactive by design. Repeating provisioning returned
+`already-provisioned`. Its public signer is
+`0x429487B3e5f6Bd51CF5555dc92aFB69Db42eb3a7`; its public relayer is
+`0x96c5f9DAE27eCCE5Ed57062caf3Ba62a174C7210`. A read-only chain query
+found chain 84532, fee quote below the configured cap, and zero relayer
+balance. No funding or transaction was sent.
+
+The first combined check incorrectly treated a paused unit's `systemctl`
+`inactive` response as unavailable because the command exits nonzero. The
+runtime and backup checks now retain stdout for that expected state. Five
+focused Python tests passed on the VPS; combined health then passed with two
+registered projects, one active worker and one paused worker. A coordinated
+encrypted B2 upload completed as
+`152a7aae-0ba1-4b20-a90a-54b823f3c6b2`; its version-2 pointer lists
+`worker` and `worker_260ea33bcf622acf411da2bb`. Backup health passed. The
+B2 set has not yet been downloaded and restored closed.
