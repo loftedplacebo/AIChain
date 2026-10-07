@@ -11,9 +11,13 @@ published availability promise or a production incident policy.
 - **Backup owner:** not assigned. A partner trial should have an alternate
   contact before its start decision.
 - The existing daily backup-failure heartbeat checks the 03:00 UTC encrypted
-  B2 upload. A separate 30-minute heartbeat runs the read-only combined
-  hosted health check and alerts Michael in the current Codex chat only when
-  it fails. These are chat notifications; they do not page a phone or email a
+  B2 upload. While the synthetic pilot is idle, a separate daily heartbeat at
+  09:00 Europe/London runs the read-only combined hosted health check and
+  alerts Michael in the current Codex chat only when it fails. Before an
+  active partner submission window, restore the runtime heartbeat to every
+  30 minutes for that window so stalled evidence is detected near the approved
+  30-minute target. The daily cadence alone can delay detection by up to a
+  day. These are chat notifications; they do not page a phone or email a
   partner. Michael must agree the trial support window and partner escalation
   contact in the pilot brief.
 

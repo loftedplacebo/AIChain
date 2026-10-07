@@ -9,8 +9,10 @@ The public marketing Site, admitted-user HTTPS portal/API, separate hosted
 evidence worker, DigitalOcean managed `test` PostgreSQL database and daily
 encrypted Backblaze B2 backup are in use. The 03:00 UTC backup timer and daily
 failure heartbeat are active. A downloaded B2 archive passed an authenticated
-restore into a new closed database in the same cluster. A separate 30-minute
-hosted health alert and one-minute WorkOS session-revocation replay now run.
+restore into a new closed database in the same cluster. The hosted health
+alert runs daily at 09:00 Europe/London while the synthetic pilot is idle;
+restore a 30-minute cadence during active partner submission windows. The
+one-minute WorkOS session-revocation replay remains active.
 For the actual pilot service, use the
 [hosted integration and backup procedure](hosted-pilot-application-integration.md#pilot-backup-operations),
 [DigitalOcean setup record](digitalocean-pilot-cluster-setup.md) and

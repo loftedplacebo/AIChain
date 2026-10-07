@@ -196,3 +196,12 @@ pilot envelope of at most two active projects, eight new receipts per project
 in any rolling hour, and confirmed evidence within 30 minutes. This is an
 operating limit for prearranged trials, not an enforced API quota or a
 production release approval.
+
+On 7 October, after the synthetic pilot returned to an idle monitoring mode,
+Michael Grant asked to reduce the regular runtime/evidence chat check from
+every 30 minutes to once daily. Its active Codex heartbeat now runs at 09:00
+Europe/London and stays quiet when healthy. Restore the 30-minute cadence
+before an active supervised partner submission window; otherwise a stalled
+worker can remain undetected by this heartbeat for up to a day, despite the
+pilot's 30-minute evidence target. The VPS worker, API and backup schedules
+were not changed.
