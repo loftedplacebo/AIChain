@@ -32,8 +32,11 @@ projects. This record does not authorize production data or a paid launch.
   Its isolated worker submitted one receipt. The portal showed that exact
   event, a valid recording-service signature, a valid one-receipt batch proof,
   and Base Sepolia L2 confirmation. All three workers remained active with no
-  evidence backlog. The portal evidence download was blocked by Edge, so an
-  independent CLI check of this specific export remains open.
+  evidence backlog. Edge blocked the portal download, but a separate read-only
+  verifier loaded the record and evidence through the restricted database role
+  and reported `exportVerification=verified`, `signature=valid`, trusted signer,
+  exact record commitment, valid batch membership, and 323/12 Base Sepolia
+  confirmations. No credential or private key appeared in the verifier output.
 - The API open-pilot admission setting, portal build, and WorkOS pilot AuthKit
   sign-up are active. WorkOS reports `allowSignUp=true`, waitlist disabled,
   required MFA, and required email verification. The public portal sign-up
@@ -44,10 +47,7 @@ projects. This record does not authorize production data or a paid launch.
 
 ## Acceptance sequence still required
 
-1. Obtain the new project's evidence JSON through an unblocked authorized
-   client and run the independent verifier. Portal verification and project
-   isolation already passed.
-2. Exercise a fresh account's first workspace/project journey. The database
+1. Exercise a fresh account's first workspace/project journey. The database
    capacity boundary itself passed a rollback-only probe; a browser/API 429
    response under a full live quota remains unexercised.
 

@@ -96,8 +96,9 @@ self-service onboarding workstream. The bounded synthetic pilot now has open
 verified-user sign-up, automatic per-project worker provisioning, protected
 testnet funding, coordinated backup coverage, monitoring and a five-project
 database quota. A fresh portal-created third project accepted an event and
-showed signed, Base Sepolia-confirmed evidence. A fresh-account end-to-end
-journey and independent export check for that project remain to be exercised.
+showed signed, Base Sepolia-confirmed evidence. A separate restricted-role
+verifier confirmed its signer, exact record commitment, batch proof and chain
+inclusion. A fresh-account end-to-end journey remains to be exercised.
 Stage D duration
 depends on real-data scope, legal and company setup, the production evidence
 chain choice, security findings and the replacement-cluster recovery drill.
