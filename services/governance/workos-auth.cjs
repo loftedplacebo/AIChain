@@ -9,6 +9,9 @@ function workosConfig(env){
  const redirect=new URL(env.WORKOS_REDIRECT_URI||'');
  if(redirect.username||redirect.password||redirect.hash||redirect.search||redirect.pathname!=='/api/auth/callback'||(redirect.protocol!=='https:'&&!(redirect.protocol==='http:'&&['localhost','127.0.0.1'].includes(redirect.hostname))))throw new Error('Invalid WorkOS redirect URI');
  const pilotEmails=env.WORKOS_PILOT_ALLOWED_EMAILS;
+ const admissionMode=env.WORKOS_ADMISSION_MODE||'pilot-list';
+ if(!['pilot-list','open-pilot'].includes(admissionMode))throw new Error('Invalid WorkOS admission mode');
+ if(admissionMode==='open-pilot'&&(env.GOVERNANCE_ENV!=='test'||pilotEmails!==undefined))throw new Error('Open pilot admission requires test environment and no email list');
  let allowedEmails=null;
  if(pilotEmails!==undefined){
   if(typeof pilotEmails!=='string'||!pilotEmails||pilotEmails.length>8192)throw new Error('Invalid pilot admission list');
@@ -16,10 +19,10 @@ function workosConfig(env){
   if(entries.length>100||entries.some(email=>email.length>254||!/^[^\s@,*]+@[^\s@,*]+\.[^\s@,*]+$/.test(email))||new Set(entries).size!==entries.length)throw new Error('Invalid pilot admission list');
   allowedEmails=new Set(entries);
  }
- if(!['localhost','127.0.0.1'].includes(redirect.hostname)&&!allowedEmails)throw new Error('Hosted WorkOS requires a pilot admission list');
+ if(!['localhost','127.0.0.1'].includes(redirect.hostname)&&!allowedEmails&&admissionMode!=='open-pilot')throw new Error('Hosted WorkOS requires a pilot admission list');
  const webhookSecret=env.WORKOS_WEBHOOK_SECRET||null;
  if(webhookSecret&&(typeof webhookSecret!=='string'||webhookSecret.length<24||webhookSecret.length>512||/[\x00-\x20\x7f]/.test(webhookSecret)))throw new Error('Invalid WorkOS webhook secret');
- return {clientId:env.WORKOS_CLIENT_ID,apiKey:env.WORKOS_API_KEY,sealKey:Buffer.from(env.GOVERNANCE_IDENTITY_SEAL_KEY,'hex'),redirectUri:redirect.href,webhookSecret,allowedEmails};
+ return {clientId:env.WORKOS_CLIENT_ID,apiKey:env.WORKOS_API_KEY,sealKey:Buffer.from(env.GOVERNANCE_IDENTITY_SEAL_KEY,'hex'),redirectUri:redirect.href,webhookSecret,allowedEmails,admissionMode};
 }
 class WorkosAuth {
  constructor(db,directory,auth,config,{fetcher=fetch,now=Date.now,keySet=null,sessions=null,startRequestLimits=null}={}){

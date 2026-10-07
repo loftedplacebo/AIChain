@@ -17,6 +17,9 @@ test('WorkOS configuration is opt-in, complete and restricts redirect destinatio
  for(const WORKOS_REDIRECT_URI of ['http://evil.test/api/auth/callback','https://example.test/other','https://user@example.test/api/auth/callback','https://example.test/api/auth/callback?next=evil'])assert.throws(()=>workosConfig({...env,WORKOS_REDIRECT_URI}));
  const hosted={...env,WORKOS_REDIRECT_URI:'https://example.test/api/auth/callback'};
  assert.throws(()=>workosConfig(hosted),/pilot admission list/);
+ assert.equal(workosConfig({...hosted,GOVERNANCE_ENV:'test',WORKOS_ADMISSION_MODE:'open-pilot'}).admissionMode,'open-pilot');
+ assert.throws(()=>workosConfig({...hosted,GOVERNANCE_ENV:'production',WORKOS_ADMISSION_MODE:'open-pilot'}),/Open pilot admission/);
+ assert.throws(()=>workosConfig({...hosted,GOVERNANCE_ENV:'test',WORKOS_ADMISSION_MODE:'open-pilot',WORKOS_PILOT_ALLOWED_EMAILS:'alice@example.test'}),/Open pilot admission/);
  assert.deepEqual([...workosConfig({...hosted,WORKOS_PILOT_ALLOWED_EMAILS:' Alice@Example.test, bob@example.test '}).allowedEmails],['alice@example.test','bob@example.test']);
  assert.equal(workosConfig({...hosted,WORKOS_PILOT_ALLOWED_EMAILS:'alice@example.test',WORKOS_WEBHOOK_SECRET:'xb'+'a'.repeat(22)}).webhookSecret,'xb'+'a'.repeat(22));
  assert.throws(()=>workosConfig({...hosted,WORKOS_PILOT_ALLOWED_EMAILS:'alice@example.test',WORKOS_WEBHOOK_SECRET:'xb'+'a'.repeat(21)}),/webhook secret/);

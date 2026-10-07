@@ -1,0 +1,10 @@
+[Unit]
+Description=Provision new synthetic pilot projects automatically
+
+[Timer]
+OnBootSec=2min
+OnUnitInactiveSec=2min
+Unit=orvessian-pilot-self-service.service
+
+[Install]
+WantedBy=timers.target

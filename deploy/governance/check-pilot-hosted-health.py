@@ -15,6 +15,8 @@ PROJECTS = ('systemd-run', '--quiet', '--wait', '--collect', '--pipe',
             '-p', 'WorkingDirectory=/opt/aichain/governance-pilot-api',
             '/opt/aichain/.toolchains/node-v24.21.0-linux-x64/bin/node',
             'scripts/check-pilot-project-inventory.cjs')
+CANARY = ('python3', '/opt/aichain/governance-pilot-db-setup/check-internal-canary-health.py')
+SELF_SERVICE = ('python3', '/opt/aichain/governance-pilot-db-setup/check-pilot-self-service-health.py')
 
 
 def check(command: tuple[str, ...]) -> dict:
@@ -38,10 +40,16 @@ def main() -> None:
     runtime = check(RUNTIME)
     app_data = check(APP_DATA)
     projects = check(PROJECTS)
+    canary = check(CANARY) if os.path.exists(
+        '/opt/aichain/governance-pilot-db-setup/check-internal-canary-health.py') else {'healthy': True, 'configured': False}
+    self_service = check(SELF_SERVICE) if os.path.exists(
+        '/opt/aichain/governance-pilot-db-setup/check-pilot-self-service-health.py') else {'healthy': True, 'configured': False}
     healthy = (runtime.get('healthy') is True and app_data.get('healthy') is True
-               and projects.get('healthy') is True)
+               and projects.get('healthy') is True and canary.get('healthy') is True
+               and self_service.get('healthy') is True)
     print(json.dumps({'healthy': healthy, 'runtime': runtime, 'appData': app_data,
-                      'projects': projects},
+                      'projects': projects, 'internalCanary': canary,
+                      'selfService': self_service},
                      sort_keys=True))
     if not healthy:
         raise SystemExit(1)

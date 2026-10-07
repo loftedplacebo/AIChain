@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "enabled": false,
+  "maxProjects": 5,
+  "databaseUrlFile": "/etc/aichain/governance-workers/project-database-url",
+  "databaseCaFile": "/etc/aichain/governance/digitalocean-ca.crt",
+  "workerPolicy": {
+    "batchSize": 100,
+    "maxTransactionsPerHour": 10,
+    "maxGasPriceWei": "100000000",
+    "dailyReservationWei": "1000000000000000",
+    "l1AllowanceWei": "10000000000000"
+  },
+  "fundingTargetWei": "1000000000000000"
+}

@@ -109,18 +109,24 @@ still requires its separate Stage A/B acceptance.
 
 - [x] Create a dedicated internal synthetic test workspace/project and a
   short-lived Orvessian submission key. Keep it separate from design partners.
-- [ ] Run a bounded synthetic agent task on a timer using the OpenAI Responses
-  API. The isolated one-run internal check passed; timer, dedicated key and
-  spend controls remain to be reviewed. Do not send partner data.
+- [x] Run a bounded synthetic agent task on a timer using the OpenAI Responses
+  API. The internal daily timer is active for 09:00 Europe/London. A supervised
+  run on 7 October accepted `canary-20261007`; a same-day restart returned
+  `already-verified` without a second model call. No partner data is sent.
 - [x] Convert only validated, allowlisted outcome metadata into governance
   events; do not submit raw prompts or model responses. Use stable event IDs
   for retries, a low fixed run frequency, timeouts and a pause switch.
-- [ ] Verify API acceptance, portal read-back, evidence-worker processing and
-  independent signed export/Base Sepolia checks. Alert on failed or missing
-  runs without treating generated outputs as ground truth.
+- [x] Verify API acceptance, portal read-back, evidence-worker processing and
+  independent signed export/Base Sepolia checks. The 7 October supervised run
+  reached `verified` through independent signed export and Base Sepolia checks;
+  the portal Decisions view showed the same event in the internal project.
+  The first scheduled recurring run remains to be observed.
+  The combined pilot health check covers missing and failed canary runs.
 
 This is an internal product exercise and an end-to-end canary, not a design
-partner or a production availability claim. Its one-run check reused a
-protected OpenAI key and a short-lived internal-project Orvessian write key.
-A recurring run needs an explicit schedule, spend controls and key lifecycle
-review.
+partner or a production availability claim. It reuses the protected OpenAI key
+and internal-project write key and uses a separate internal-project read key.
+The timer is limited to one automatic model attempt each day, fixed model,
+strict allowlisted JSON output, no raw prompt/response submission, a durable
+event ID, and a pause switch. The read key was installed at a hidden VPS prompt;
+key values are absent from this record.
