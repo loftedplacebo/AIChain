@@ -6,6 +6,8 @@ import os
 import pathlib
 import subprocess
 import time
+import json
+import sys
 
 ENV = pathlib.Path('/etc/orvessian-chain-watch-internal.env')
 PASSWORD = pathlib.Path('/etc/aichain/pilot-backup/database-password')
@@ -19,6 +21,8 @@ DSN = ('host=orvessian-pilot-test-do-user-45565720-0.k.db.ondigitalocean.com '
 def main():
     if os.geteuid() != 0:
         raise ValueError('Root required')
+    if sys.argv[1:] not in ([], ['--json']):
+        raise ValueError('Unexpected argument')
     values = dict(line.split('=', 1) for line in ENV.read_text().splitlines()
                   if '=' in line and not line.startswith('#'))
     if values.get('ORVESSIAN_TENANT') != TENANT or values.get('ORVESSIAN_PROJECT') != PROJECT:
@@ -32,13 +36,19 @@ def main():
                             capture_output=True, text=True, env=env, timeout=20, check=True)
     rows = [line for line in result.stdout.splitlines() if line.strip()]
     if len(rows) != 1:
-        print('internal_write_key_status=missing')
+        if sys.argv[1:] == ['--json']:
+            print(json.dumps({'active': False, 'expiresInHours': None}))
+        else:
+            print('internal_write_key_status=missing')
         return
     expiry, revoked = (int(item) for item in rows[0].split(','))
     now = int(time.time() * 1000)
-    print('internal_write_key_status=' + ('active' if expiry > now and
-                                           (revoked == 0 or revoked > now)
-                                           else 'expired-or-revoked'))
+    active = expiry > now and (revoked == 0 or revoked > now)
+    hours = round((expiry - now) / 3600000, 1)
+    if sys.argv[1:] == ['--json']:
+        print(json.dumps({'active': active, 'expiresInHours': hours}))
+    else:
+        print('internal_write_key_status=' + ('active' if active else 'expired-or-revoked'))
 
 
 if __name__ == '__main__':

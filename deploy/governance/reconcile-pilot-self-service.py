@@ -13,6 +13,7 @@ import re
 import stat
 import subprocess
 import sys
+from pilot_worker_registry import load_registry
 
 POLICY = pathlib.Path('/etc/aichain/pilot-self-service-policy.json')
 REQUESTS = pathlib.Path('/etc/aichain/pilot-self-service-requests')
@@ -44,7 +45,7 @@ def policy(require_enabled=True):
             value['version'] != 1 or type(value['enabled']) is not bool or \
             (require_enabled and value['enabled'] is not True) or \
             type(value['maxProjects']) is not int or not 2 <= value['maxProjects'] <= 30 or \
-            value['databaseUrlFile'] != '/etc/aichain/governance-workers/project-database-url' or \
+            value['databaseUrlFile'] != '/etc/aichain/governance-workers/pilot-evidence-database-url' or \
             value['databaseCaFile'] != '/etc/aichain/governance/digitalocean-ca.crt' or \
             not isinstance(value['workerPolicy'], dict) or \
             set(value['workerPolicy']) != POLICY_KEYS or \
@@ -140,22 +141,29 @@ def main():
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         settings = policy(require_enabled=not check_only)
         data = catalog()
+        paused = [worker for worker in load_registry() if worker['state'] == 'paused']
         if check_only:
             print(json.dumps({'healthy': data['projects'] <= settings['maxProjects'],
                               'enabled': settings['enabled'],
                               'maxProjects': settings['maxProjects'],
                               'projects': data['projects'],
-                              'pending': len(data['missingProjects'])}))
+                              'pending': len(data['missingProjects']) + len(paused)}))
             return
         if data['projects'] > settings['maxProjects']:
             raise ValueError('Approved pilot project capacity exceeded')
-        if not data['missingProjects']:
+        if not data['missingProjects'] and not paused:
             checked(('python3', SIGNERS, '--apply'), 60)
             ensure_backup()
             print(json.dumps({'healthy': True, 'projects': data['projects'],
                               'pending': 0}))
             return
-        item = data['missingProjects'][0]
+        if paused:
+            item = {'tenant': paused[0]['tenant'], 'project': paused[0]['project']}
+            instance = hashlib.sha256((item['tenant'] + '\0' + item['project']).encode()).hexdigest()[:24]
+            if not (REQUESTS / (instance + '.json')).is_file():
+                raise ValueError('Paused operator worker has no auto-policy request')
+        else:
+            item = data['missingProjects'][0]
         request = request_for(item, settings)
         checked(('python3', PROVISION, str(request)), 120)
         checked(('python3', SIGNERS, '--apply'), 60)

@@ -11,6 +11,7 @@ CONFIG = Path('/etc/orvessian-internal-responses-canary.env')
 STATE = Path('/var/lib/orvessian-internal-responses-canary/state.json')
 TIMER = 'orvessian-internal-responses-canary.timer'
 SERVICE = 'orvessian-internal-responses-canary.service'
+KEY_CHECK = '/opt/aichain/governance-pilot-db-setup/check-internal-agent-write-key.py'
 
 
 def status(*args):
@@ -28,6 +29,9 @@ def check(now=None):
     timer = {'active': status('is-active', TIMER), 'enabled': status('is-enabled', TIMER)}
     service = {'active': status('is-active', SERVICE),
                'result': status('show', SERVICE, '-p', 'Result', '--value')}
+    key_result = subprocess.run(('python3', KEY_CHECK, '--json'), capture_output=True,
+                                text=True, timeout=30, check=False)
+    key = json.loads(key_result.stdout) if key_result.returncode == 0 else {}
     state = None
     if STATE.is_file() and not STATE.is_symlink():
         info = STATE.stat()
@@ -40,9 +44,13 @@ def check(now=None):
                service['result'] == 'success' and state is not None and
                state.get('phase') == 'verified' and
                isinstance(state.get('date'), str) and
-               state['date'] >= expected.isoformat())
+               state['date'] >= expected.isoformat() and
+               key.get('active') is True and
+               isinstance(key.get('expiresInHours'), (int, float)) and
+               key['expiresInHours'] >= 48)
     return {'healthy': healthy, 'configured': True, 'expectedDate': expected.isoformat(),
-            'timer': timer, 'service': service, 'lastRun': state}
+            'timer': timer, 'service': service, 'lastRun': state,
+            'writeKey': key}
 
 
 if __name__ == '__main__':

@@ -2,7 +2,7 @@
   "version": 1,
   "enabled": false,
   "maxProjects": 5,
-  "databaseUrlFile": "/etc/aichain/governance-workers/project-database-url",
+  "databaseUrlFile": "/etc/aichain/governance-workers/pilot-evidence-database-url",
   "databaseCaFile": "/etc/aichain/governance/digitalocean-ca.crt",
   "workerPolicy": {
     "batchSize": 100,

@@ -6,6 +6,7 @@ import subprocess
 
 RECONCILE = '/opt/aichain/governance-pilot-db-setup/reconcile-pilot-self-service.py'
 FUND = '/opt/aichain/governance-pilot-db-setup/fund-pilot-project-relayer.cjs'
+CAPACITY = '/opt/aichain/governance-pilot-db-setup/check-pilot-capacity.cjs'
 NODE = '/opt/aichain/.toolchains/node-v24.21.0-linux-x64/bin/node'
 TIMER = 'orvessian-pilot-self-service.timer'
 SERVICE = 'orvessian-pilot-self-service.service'
@@ -25,6 +26,9 @@ def main():
     funding = command((NODE, FUND, '--check'))
     lines = [line for line in funding.stdout.splitlines() if line.startswith('{')]
     wallet = json.loads(lines[-1]) if funding.returncode == 0 and len(lines) == 1 else {}
+    quota_check = command((NODE, CAPACITY))
+    lines = [line for line in quota_check.stdout.splitlines() if line.startswith('{')]
+    quota = json.loads(lines[-1]) if quota_check.returncode == 0 and len(lines) == 1 else {}
     timer_enabled = command(('systemctl', 'is-enabled', '--quiet', TIMER)).returncode == 0
     timer_active = command(('systemctl', 'is-active', '--quiet', TIMER)).returncode == 0
     service_failed = command(('systemctl', 'is-failed', '--quiet', SERVICE)).returncode == 0
@@ -36,12 +40,15 @@ def main():
     funding_ready = balance >= 1050000000000000 or projects == cap
     healthy = (state.get('healthy') is True and state.get('enabled') is True
                and pending == 0 and timer_enabled and timer_active
-               and not service_failed and funding_ready)
+               and not service_failed and funding_ready and
+               quota.get('triggerEnabled') is True and
+               quota.get('used') == projects and quota.get('maxProjects') == cap)
     print(json.dumps({'healthy': healthy, 'projects': projects,
                       'maxProjects': cap, 'pending': pending,
                       'timerEnabled': timer_enabled, 'timerActive': timer_active,
                       'serviceFailed': service_failed, 'fundingReady': funding_ready,
-                      'fundingBalanceWei': str(balance)}, sort_keys=True))
+                      'fundingBalanceWei': str(balance), 'capacity': quota},
+                     sort_keys=True))
     if not healthy:
         raise SystemExit(1)
 

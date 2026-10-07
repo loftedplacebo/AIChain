@@ -16,10 +16,18 @@ projects. This record does not authorize production data or a paid launch.
   funds its relayer through a write-ahead signed transaction journal, activates
   the worker, and requires coordinated backup coverage. Protected request
   files and funding journals make retries idempotent.
-- The timer is active, and its first run with the two existing projects
-  succeeded. The read-only self-service health check reports two projects,
-  zero pending, an active timer and adequate wallet balance. The combined
-  pilot health check also reports healthy.
+- The timer is active. A fresh portal-created internal project,
+  `prj-2e7bb2dd-b180-49f6-9083-22b84b402b66`, exposed an incorrect worker
+  database input path and a file-mode mismatch under the service's restrictive
+  umask. Both were corrected. Its relayer was funded, its isolated worker was
+  activated, public signer trust was synchronized, and a new coordinated B2
+  upload covers all three journals. The combined pilot health check reports
+  three of three workers active, no evidence backlog, and no pending projects.
+- A database trigger now enforces five total projects before insertion. The
+  API has the matching clean capacity error handler. A transaction-rolled-back
+  probe filled the counter to five, verified that a sixth insertion was denied,
+  and confirmed the live counter returned to three. The read-only health check
+  compares that counter with the privileged project catalog and funding balance.
 - The API's open-pilot auth code has been deployed and restarted while the
   existing exact-email admission list remains in force. WorkOS sign-up and
   waitlist settings remain closed. The new portal build and reversible API
@@ -27,19 +35,15 @@ projects. This record does not authorize production data or a paid launch.
 
 ## Acceptance sequence still required
 
-1. Reauthenticate the owner's portal session and create an internal synthetic
-   project through Settings. Verify the worker, funding, signer, backup and
-   combined health checks for its new project ID.
-2. Submit and independently verify one synthetic receipt in that project;
+1. Submit and independently verify one synthetic receipt in the new project;
    confirm portal read-back and isolation from the existing two projects.
-3. Apply the reversible API open-pilot switch, activate the staged portal
+2. Apply the reversible API open-pilot switch, activate the staged portal
    build, then turn on WorkOS sign-up and disable its waitlist in the pilot
    environment. Verify the provider settings, signed-out portal copy and
    health checks.
-4. Exercise a fresh account's first workspace/project journey and a capacity
-   boundary. A project limit must fail cleanly before issuing a project that
-   cannot receive a worker. The current reconciler stops after five projects,
-   but the API does not yet reject project creation at that global boundary.
+3. Exercise a fresh account's first workspace/project journey. The database
+   capacity boundary itself passed a rollback-only probe; a browser/API 429
+   response under a full live quota remains unexercised.
 
 The pilot continues to use the previously supervised rate of eight new
 receipts per project per rolling hour and a 30-minute evidence target until

@@ -29,8 +29,8 @@ async function verifyProfile(pool,profile){
  ARRAY(SELECT privilege FROM unnest($1::text[]) privilege WHERE has_table_privilege(current_user,c.oid,privilege)) table_privileges
  FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relkind IN ('r','p')`,[operations])).rows;
  for(const table of new Set([...Object.keys(api),...Object.keys(worker)]))if(!rows.some(row=>row.relname===table))throw Error('Runtime profile tables are incomplete');
- for(const row of rows){const expected=allowed[row.relname]||[];
-  if(row.owner_access||expected.some(privilege=>!row.table_privileges.includes(privilege))||row.privileges.some(privilege=>!expected.includes(privilege))||(Object.hasOwn(api,row.relname)||Object.hasOwn(worker,row.relname))&&!metadata.includes(row.relname)&&(!row.relrowsecurity||!row.relforcerowsecurity))throw Error('Runtime profile privileges or forced row security are invalid');
+ for(const row of rows){const expected=row.relname==='governance_pilot_project_capacity'&&profile==='api'?['SELECT']:allowed[row.relname]||[];
+  if(row.owner_access||expected.some(privilege=>!row.table_privileges.includes(privilege))||row.privileges.some(privilege=>!expected.includes(privilege))||(Object.hasOwn(api,row.relname)||Object.hasOwn(worker,row.relname))&&!metadata.includes(row.relname)&&row.relname!=='governance_pilot_project_capacity'&&(!row.relrowsecurity||!row.relforcerowsecurity))throw Error('Runtime profile privileges or forced row security are invalid');
  }
  return {profile,validated:true};
 }

@@ -214,13 +214,16 @@ def main() -> None:
     if env_file.exists():
         info = env_file.lstat()
         if not stat.S_ISREG(info.st_mode) or info.st_uid != 0 or \
-                info.st_gid != identity.pw_gid or stat.S_IMODE(info.st_mode) != 0o640 or \
+                info.st_gid != identity.pw_gid or stat.S_IMODE(info.st_mode) not in (0o600, 0o640) or \
                 env_file.read_text(encoding='utf-8') != env:
             raise ValueError('Existing project worker environment differs')
+        if stat.S_IMODE(info.st_mode) == 0o600:
+            env_file.chmod(0o640)
     else:
         fd = os.open(env_file, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o640)
         with os.fdopen(fd, 'w', encoding='utf-8') as handle:
             os.fchown(handle.fileno(), 0, identity.pw_gid)
+            os.fchmod(handle.fileno(), 0o640)
             handle.write(env)
             handle.flush()
             os.fsync(handle.fileno())
