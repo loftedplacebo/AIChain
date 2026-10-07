@@ -5,6 +5,7 @@ import pathlib
 import sqlite3
 import tempfile
 import json
+from datetime import datetime, timezone
 from contextlib import closing
 import unittest
 from unittest.mock import patch
@@ -38,6 +39,19 @@ def worker(project, recorder, relayer):
 
 
 class InventoryTests(unittest.TestCase):
+    def test_daily_backup_window_handles_on_time_late_check_and_missed_run(self):
+        def instant(day, hour, minute=0):
+            return datetime(2026, 10, day, hour, minute,
+                            tzinfo=timezone.utc).timestamp()
+
+        previous = instant(6, 3, 1)
+        today = instant(7, 3, 1)
+        self.assertTrue(BACKUP.covers_latest_due_backup(previous, instant(7, 3, 59)))
+        self.assertFalse(BACKUP.covers_latest_due_backup(previous, instant(7, 4)))
+        self.assertTrue(BACKUP.covers_latest_due_backup(today, instant(7, 19)))
+        self.assertFalse(BACKUP.covers_latest_due_backup(previous, instant(7, 19)))
+        self.assertFalse(BACKUP.covers_latest_due_backup(instant(7, 20), instant(7, 19)))
+
     def test_inactive_worker_state_is_preserved_by_health_checks(self):
         class Result:
             returncode = 3

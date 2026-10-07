@@ -418,6 +418,19 @@ separately before deletion. An uploaded set alone does not prove the recovery
 time target. The daily Codex health check supplies failure notification in
 this chat; it does not inspect B2 object contents or prove recovery readiness.
 
+On 7 October 2026, the laptop resumed the daily Codex check late and its old
+four-hour age rule alerted even though the VPS timer had run at 03:00 UTC and
+completed the B2 upload at 03:00:39 UTC. The VPS service result was successful,
+and the timer, portal, API and both registered workers were active. The
+read-only checker now requires a valid version-2 completion marker newer than
+the latest due 03:00 UTC daily window; the new window becomes due at 04:00 UTC.
+It reports marker validity, exact completion time, due-window start and
+coverage. A delayed chat check therefore recognizes a completed daily backup,
+while a missed window or invalid marker remains unhealthy. Six local
+registry/backup checks passed and the deployed VPS checker returned healthy
+with the same 03:00:39 UTC completion marker. The Codex backup heartbeat was
+updated to use these fields; it remains a daily owner chat alert.
+
 The API preflight verified database configuration and the restricted role.
 Public route, signed webhook and anonymous-access checks were completed
 separately. Encrypted B2 upload and a closed fresh-database restore have passed.
