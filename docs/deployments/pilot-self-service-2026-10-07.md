@@ -28,20 +28,26 @@ projects. This record does not authorize production data or a paid launch.
   probe filled the counter to five, verified that a sixth insertion was denied,
   and confirmed the live counter returned to three. The read-only health check
   compares that counter with the privileged project catalog and funding balance.
-- The API's open-pilot auth code has been deployed and restarted while the
-  existing exact-email admission list remains in force. WorkOS sign-up and
-  waitlist settings remain closed. The new portal build and reversible API
-  admission switch are staged but not active.
+- The new project accepted `self-service-acceptance-6490f75f73587f9bdf0b2b8bac555ccc`.
+  Its isolated worker submitted one receipt. The portal showed that exact
+  event, a valid recording-service signature, a valid one-receipt batch proof,
+  and Base Sepolia L2 confirmation. All three workers remained active with no
+  evidence backlog. The portal evidence download was blocked by Edge, so an
+  independent CLI check of this specific export remains open.
+- The API open-pilot admission setting, portal build, and WorkOS pilot AuthKit
+  sign-up are active. WorkOS reports `allowSignUp=true`, waitlist disabled,
+  required MFA, and required email verification. The public portal sign-up
+  endpoint redirects to this pilot WorkOS client with `screen_hint=sign-up`.
+  An initial API startup check still required the legacy admission list;
+  its fix was tested and deployed. A portal release readiness race was also
+  corrected. The combined hosted health check passed after both corrections.
 
 ## Acceptance sequence still required
 
-1. Submit and independently verify one synthetic receipt in the new project;
-   confirm portal read-back and isolation from the existing two projects.
-2. Apply the reversible API open-pilot switch, activate the staged portal
-   build, then turn on WorkOS sign-up and disable its waitlist in the pilot
-   environment. Verify the provider settings, signed-out portal copy and
-   health checks.
-3. Exercise a fresh account's first workspace/project journey. The database
+1. Obtain the new project's evidence JSON through an unblocked authorized
+   client and run the independent verifier. Portal verification and project
+   isolation already passed.
+2. Exercise a fresh account's first workspace/project journey. The database
    capacity boundary itself passed a rollback-only probe; a browser/API 429
    response under a full live quota remains unexercised.
 

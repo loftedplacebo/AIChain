@@ -19,6 +19,7 @@ test('hosted synthetic launcher requires the restricted remote shared-PostgreSQL
   WORKOS_WEBHOOK_SECRET:'synthetic-webhook-secret-'.repeat(2),GOVERNANCE_IDENTITY_SEAL_KEY:'ab'.repeat(32),PORT:'8796'
  };
  assert.deepEqual(validate(env),{databaseHost:'managed-db.example.test',portalOrigin:'https://portal.example.test',port:8796});
+ assert.deepEqual(validate({...env,WORKOS_PILOT_ALLOWED_EMAILS:undefined,WORKOS_ADMISSION_MODE:'open-pilot'}),{databaseHost:'managed-db.example.test',portalOrigin:'https://portal.example.test',port:8796});
  const rejects=[
   [{GOVERNANCE_ENV:'staging'},/test-stage/],
   [{GOVERNANCE_CONTROL_STORAGE:'sqlite'},/shared PostgreSQL/],
@@ -28,7 +29,7 @@ test('hosted synthetic launcher requires the restricted remote shared-PostgreSQL
   [{GOVERNANCE_DATABASE_URL:env.GOVERNANCE_DATABASE_URL.replace('governance_api','doadmin')},/remote restricted/],
   [{WORKOS_REDIRECT_URI:'http://localhost:3001/api/auth/callback'},/HTTPS portal/],
   [{WORKOS_REDIRECT_URI:'https://portal.localhost/api/auth/callback'},/HTTPS portal/],
-  [{WORKOS_PILOT_ALLOWED_EMAILS:''},/named admission/],
+  [{WORKOS_PILOT_ALLOWED_EMAILS:''},/admission policy/],
   [{WORKOS_WEBHOOK_SECRET:''},/webhook verification/],
   [{GOVERNANCE_USERS:'[]'},/seeded accounts/],
   [{GOVERNANCE_RULES_DB:'/tmp/rules.sqlite'},/SQLite/],

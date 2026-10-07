@@ -92,10 +92,13 @@ delivered in the owner chat. Stage C's internal synthetic technical and owner
 gates are complete. Sustained capacity is a later production gate.
 Backup support coverage remains a first-partner trial gate.
 Stage C's repeatable operator-run onboarding is the foundation for the same
-self-service onboarding workstream. The next phase automates the remaining
-manual approval/admission and per-project worker, key, backup, monitoring and
-quota setup, then verifies that a new customer can complete and safely exit the
-standard journey without routine operator intervention. Stage D duration
+self-service onboarding workstream. The bounded synthetic pilot now has open
+verified-user sign-up, automatic per-project worker provisioning, protected
+testnet funding, coordinated backup coverage, monitoring and a five-project
+database quota. A fresh portal-created third project accepted an event and
+showed signed, Base Sepolia-confirmed evidence. A fresh-account end-to-end
+journey and independent export check for that project remain to be exercised.
+Stage D duration
 depends on real-data scope, legal and company setup, the production evidence
 chain choice, security findings and the replacement-cluster recovery drill.
 

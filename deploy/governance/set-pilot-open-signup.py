@@ -68,13 +68,14 @@ def main():
     if open_mode and not allow:
         print('pilot_signup_mode=open')
         return
-    if len(allow) != 1 or open_mode or BACKUP.exists():
+    if len(allow) != 1 or open_mode or (BACKUP.exists() and protected(BACKUP) != current):
         raise ValueError('Unexpected admission configuration or backup')
-    fd = os.open(BACKUP, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
-    with os.fdopen(fd, 'w', encoding='utf-8') as stream:
-        stream.write(current)
-        stream.flush()
-        os.fsync(stream.fileno())
+    if not BACKUP.exists():
+        fd = os.open(BACKUP, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
+        with os.fdopen(fd, 'w', encoding='utf-8') as stream:
+            stream.write(current)
+            stream.flush()
+            os.fsync(stream.fileno())
     updated = current.replace(allow[0] + '\n', 'WORKOS_ADMISSION_MODE=open-pilot\n')
     atomic(ENV, updated)
     try:

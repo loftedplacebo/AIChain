@@ -8,7 +8,7 @@ const localHost=host=>{const value=host.toLowerCase().replace(/^\[|\]$/g,'').rep
 
 function validate(env){
  if(env.GOVERNANCE_ENV!=='test'||env.GOVERNANCE_STORAGE!=='postgres'||env.GOVERNANCE_KEY_STORAGE!=='postgres'||env.GOVERNANCE_CONTROL_STORAGE!=='postgres')throw Error('Hosted synthetic API requires explicit test-stage shared PostgreSQL storage');
- if(env.GOVERNANCE_IDENTITY_PROVIDER!=='workos'||!env.WORKOS_PILOT_ALLOWED_EMAILS||!env.WORKOS_WEBHOOK_SECRET)throw Error('Hosted synthetic API requires WorkOS, named admission and webhook verification');
+ if(env.GOVERNANCE_IDENTITY_PROVIDER!=='workos'||!env.WORKOS_WEBHOOK_SECRET||(!env.WORKOS_PILOT_ALLOWED_EMAILS&&env.WORKOS_ADMISSION_MODE!=='open-pilot'))throw Error('Hosted synthetic API requires WorkOS, admission policy and webhook verification');
  if(env.GOVERNANCE_USERS||env.GOVERNANCE_CREDENTIALS||env.GOVERNANCE_SESSION_DB||env.GOVERNANCE_DB||env.GOVERNANCE_RULES_DB||env.GOVERNANCE_ADOPT_UNBOUND_SQLITE||env.GOVERNANCE_RULE_PROCESSING_ENABLED==='true')throw Error('Hosted synthetic API cannot use seeded accounts, SQLite or rule processing');
  if(!env.GOVERNANCE_DATABASE_CA_FILE||!isAbsolute(env.GOVERNANCE_DATABASE_CA_FILE))throw Error('Hosted synthetic API requires an absolute managed database CA file');
  const url=new URL(env.GOVERNANCE_DATABASE_URL||'');
