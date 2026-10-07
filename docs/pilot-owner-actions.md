@@ -37,8 +37,10 @@ Before inviting an approved applicant into the portal:
   documented way to pause submissions. The disposable one-day key accepted
   one hosted record (HTTP 201), then portal revocation after fresh sign-in
   caused the same secret to be rejected (HTTP 401). Michael Grant accepted
-  primary pilot support and incident ownership on 5 October. The 30-minute
-  runtime/evidence alert and one-minute WorkOS revocation replay are active;
+  primary pilot support and incident ownership on 5 October. The runtime and
+  evidence alert runs daily at 09:00 Europe/London while the pilot is idle;
+  restore its 30-minute cadence for an active partner submission window. The
+  one-minute WorkOS revocation replay remains active;
   a bounded API pause/resume rehearsal passed. These checks cover the current
   Synthetic Validation project. See the
   [support runbook](pilot-support-and-incident-runbook.md).

@@ -119,9 +119,14 @@ key-revocation rehearsal and complete lost-cluster recovery are still open.
 - [x] Pass API preflight, hosted synthetic submission, encrypted PostgreSQL
   capture and B2 upload, followed by authenticated fresh-target restore and
   review with access revoked/closed in the existing managed cluster.
-- [ ] Provision and accept the separate evidence-worker runtime and journal,
-  signed receipt, independent Base Sepolia verification, access invalidation
-  and controlled release against the hosted managed-provider path.
+- [x] Provision and accept separate evidence-worker runtimes and journals for
+  two synthetic projects, signed receipts and independent Base Sepolia
+  verification against the hosted managed-provider path. Both journals passed
+  an authenticated, closed same-cluster B2 restore on 6 October; see the
+  [Stage C rollout](deployments/stage-c-vps-rollout-2026-10-06.md).
+- [ ] Before production recovery claims, rehearse restored-worker access
+  invalidation and controlled publisher release against the replacement
+  managed-provider path.
 - [ ] Rehearse replacing an unavailable cluster and activating a reviewed
   restored service before claiming the full recovery-time target.
 

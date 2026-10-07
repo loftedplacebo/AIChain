@@ -52,7 +52,7 @@ independent evidence verification before claiming competitive advantage.
 
 ## Delivery and commercial sequence
 
-Finish the current VPS reliability run; add portal-wide verification summaries and capacity controls; build configurable governance workflows; validate a partner use case. Establish identity, environments, storage, managed keys, backup/restore and retention controls before real customer data. Agree commercial terms only after cost and operational evidence.
+The bounded VPS reliability run and Stage C synthetic pilot checks are complete. Add a recurring internal agent canary, portal-wide verification summaries and capacity controls; build configurable governance workflows; then validate a partner use case. Establish isolated production environments, managed keys, replacement-cluster recovery and retention controls before real customer data. Agree commercial terms only after cost and operational evidence.
 
 Monthly/annual workspace subscriptions with included accepted-event usage and measured overages are the current hypothesis. Evaluate/Operate/Enterprise remain proposed packaging, not active paid offers. Indicative website prices and allowances are recorded in the [commercial model](commercial-model.md); they require validation before charging. SLAs and support scope remain open.
 

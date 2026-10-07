@@ -98,8 +98,9 @@ security findings and the replacement-cluster recovery drill.
 
 For the first partner, the next actionable sequence is: agree the synthetic
 brief; complete Stage A's separate-project smoke test; then deploy, back up,
-monitor and verify that project's worker for Stage B. Stage C can be built
-while the supervised trial is running, using the observed partner workflow.
+monitor and verify that project's worker for Stage B. The completed internal
+Stage C exercise supplies the provisioning pattern; the partner's own project
+still requires its separate Stage A/B acceptance.
 
 ## Separate engineering task — scheduled synthetic OpenAI workload
 

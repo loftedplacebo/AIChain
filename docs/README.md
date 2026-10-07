@@ -1,16 +1,17 @@
 # Orvessian documentation
 
-Seven guides are the active starting points. Reviewed 5 October 2026; live
+Seven guides are the active starting points. Reviewed 7 October 2026; live
 runtime status still requires a fresh operational check.
 
-The [roadmap's 5 October checkpoint](roadmap-and-decisions.md#current-design-partner-readiness--5-october-2026)
-is the current design-partner decision. The public Site, hosted synthetic
-portal/API and separate evidence worker are live. The operator and one
-owner-controlled second account have completed the supervised sign-in tests.
-The first hosted record passed independent signed-export and Base Sepolia
-verification; encrypted B2 backup plus a closed same-cluster restore have
-passed. Key revocation and basic hosted health monitoring have passed for the
-Synthetic Validation project. Partner credentials remain gated on the
+The [roadmap's Stage C checkpoint](roadmap-and-decisions.md#stage-c-development-update--6-october-2026)
+records the current technical pilot state. The public Site and hosted synthetic
+portal/API are live. Two isolated projects have active evidence workers and
+independently verified Base Sepolia receipts. A populated two-journal encrypted
+B2 backup passed a closed same-cluster restore, and the injected chat alert
+drill delivered. The supervised pilot capacity was approved; current runtime
+health monitoring is daily while the pilot is idle and must return to a
+30-minute cadence during an active partner submission window. Partner
+credentials remain gated on the
 [pilot owner queue](pilot-owner-actions.md#readiness-checkpoint--5-october-2026).
 The 29–30 September roadmap matrix and implementation chronology are historical
 snapshots; linked checks retain their original scope.
