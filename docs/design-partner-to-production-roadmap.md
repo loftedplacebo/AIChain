@@ -91,10 +91,13 @@ and confirmed evidence within 30 minutes. The scheduled injected alert drill
 delivered in the owner chat. Stage C's internal synthetic technical and owner
 gates are complete. Sustained capacity is a later production gate.
 Backup support coverage remains a first-partner trial gate.
-Automating approval and provisioning
-for open-ended self-service is a separate project. Stage D duration depends on
-real-data scope, legal and company setup, the production evidence-chain choice,
-security findings and the replacement-cluster recovery drill.
+Stage C's repeatable operator-run onboarding is the foundation for the same
+self-service onboarding workstream. The next phase automates the remaining
+manual approval/admission and per-project worker, key, backup, monitoring and
+quota setup, then verifies that a new customer can complete and safely exit the
+standard journey without routine operator intervention. Stage D duration
+depends on real-data scope, legal and company setup, the production evidence
+chain choice, security findings and the replacement-cluster recovery drill.
 
 For the first partner, the next actionable sequence is: agree the synthetic
 brief; complete Stage A's separate-project smoke test; then deploy, back up,
