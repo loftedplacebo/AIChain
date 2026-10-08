@@ -1,6 +1,6 @@
 # Governance storage and environment foundation — 2026-09-27
 
-> Current hosted-pilot checkpoint — 4 October 2026: [Roadmap readiness](roadmap-and-decisions.md#current-design-partner-readiness--4-october-2026), [hosted integration](hosted-pilot-application-integration.md) and [cluster setup](digitalocean-pilot-cluster-setup.md) supersede dated provisioning and launch-status statements below. The Contabo portal/API, managed DigitalOcean `test` database, and encrypted Backblaze B2 backups are in use for the operator-only synthetic pilot; partner and production release remain gated. Historical measurements and protocol semantics retain their original scope.
+> Current environment decision — 8 October 2026: [Roadmap environment strategy](roadmap-and-decisions.md#environment-strategy-decision--8-october-2026) supersedes the older four-environment steady-state topology below. Keep the hosted synthetic pilot for now, then use isolated local development with WorkOS Staging and one hosted Production platform. A permanent second hosted staging stack is not planned. The Contabo pilot portal/API, managed DigitalOcean `test` database, and encrypted Backblaze B2 backups remain in use until the production transition passes acceptance. Historical measurements and protocol semantics retain their original scope.
 
 ## Local launcher environment guards — 28 September 2026
 

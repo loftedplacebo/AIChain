@@ -79,23 +79,22 @@ work; do not describe the 24-hour RTO as measured.
 
 ## Your next actions and choices
 
-- [ ] **Use an Orvessian sign-in domain before partner-facing onboarding.**
-  The live pilot uses the `Orvessian Pilot Test` WorkOS **Staging** client.
-  WorkOS serves staging AuthKit screens on its generated `*.authkit.app` host,
-  which explains the temporary `fair-staging…` address after TOTP. A branded
-  AuthKit host such as `login.orvessian.com` requires a **Production** WorkOS
-  environment and WorkOS's paid custom-domain service; it cannot be enabled
-  on this staging environment. The pilot WorkOS project currently has only a
-  staging environment; the existing production environment is in a separate
-  WorkOS project and has no custom AuthKit domain. Before switching the portal,
-  create or select the production environment, review billing, configure its
-  client/key, exact callback, MFA, email verification, sign-up, webhook and
-  branding settings, add the WorkOS-provided DNS-only CNAME, verify the domain,
-  and test sign-in, reauthentication, sign-out and session revocation. WorkOS
-  does not copy staging users or organizations into production, so existing
-  pilot account/project ownership needs an explicit transition plan. See
-  [WorkOS AuthKit domain](https://workos.com/docs/custom-domains/authkit) and
-  [environment migration](https://workos.com/docs/authkit/environments).
+- [ ] **Prepare free hosted WorkOS Production sign-in for the live platform.**
+  Keep the existing synthetic VPS pilot and its WorkOS Staging client until a
+  production release passes independent acceptance. The long-term routine test
+  path is local development plus WorkOS Staging, without a permanent second
+  hosted staging stack. The pilot WorkOS project currently has only Staging;
+  an unused Production environment exists in a separate WorkOS project.
+  Select the live Production environment, add the required billing method,
+  configure its client/key, exact callback, MFA, email verification, sign-up,
+  webhook and branding settings, and verify sign-in, reauthentication,
+  sign-out, revocation and existing workspace ownership before cutover. WorkOS
+  does not copy Staging users or organizations into Production. Its free hosted
+  login may briefly show a WorkOS URL; that is accepted for the first live
+  service. Defer the optional $99/month `login.orvessian.com` custom domain
+  until paying customers justify it. See
+  [WorkOS environments](https://workos.com/docs/authkit/environments) and
+  [custom AuthKit domains](https://workos.com/docs/custom-domains/authkit).
 
 - [x] **Buy and connect `orvessian.com`.** GoDaddy remains authoritative DNS;
   the Site's built-in Cloudflare custom-domain service handles the marketing

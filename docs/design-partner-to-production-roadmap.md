@@ -80,6 +80,27 @@ technical evidence.
    checkout, invoicing, cancellation and customer support terms, then test
    those journeys before charging.
 
+### Selected environment shape — 8 October 2026
+
+The existing hosted synthetic pilot remains the temporary staging/test service
+while partner and production acceptance is prepared. The long-term development
+environment is local: isolated development database, loopback API/portal,
+automated tests and WorkOS Staging. The live platform uses one hosted Production
+deployment and WorkOS Production, with separate data, credentials, evidence
+keys, backup and monitoring. An always-on second hosted staging stack is not a
+default requirement; use a short-lived isolated HTTPS preview for callbacks,
+webhooks or release tests that cannot be proved locally. Do not connect a
+preview to live data or secrets.
+
+Changes move from the repository through tests/build, reviewed production
+activation, health checks and a rehearsed rollback. Keep the present pilot
+running until the new environment passes its own sign-in, ownership, receipt,
+restore and support checks, then retire or repurpose the pilot host deliberately.
+Use free hosted WorkOS Production sign-in first; its WorkOS URL is acceptable
+for the initial live service. A paid Orvessian AuthKit domain is deferred until
+paying customers justify it. WorkOS staging users do not transfer to Production;
+plan and verify account/workspace ownership explicitly before cutover.
+
 ## Indicative effort and dependencies
 
 The earlier three-to-six-day Stage B/C estimate described work now implemented

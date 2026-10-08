@@ -1,4 +1,32 @@
-# Roadmap and decisions — current checkpoint 6 October 2026
+# Roadmap and decisions — current checkpoint 8 October 2026
+
+## Environment strategy decision — 8 October 2026
+
+Keep the existing hosted synthetic `test` pilot and WorkOS Staging sign-in while
+the design-partner and production transition is prepared. After a separate
+production release has passed its own acceptance checks, use the free WorkOS
+Staging environment with the isolated local development database and loopback
+API/portal for routine development. The live platform will have **one hosted
+Production deployment** with its own WorkOS Production configuration, database,
+storage, secrets, signing/relayer keys, backups and monitoring. Do not retain a
+second always-on hosted staging stack by default. Use a short-lived isolated
+HTTPS preview only when a change needs real callbacks, webhooks or deployment
+testing that local automation cannot cover; never route that preview to live
+customer data or secrets.
+
+The release path is repository change, automated tests and build, reviewed
+production activation, public health/smoke checks and rollback. Keep the
+current hosted pilot available until production identity, account/workspace
+access, evidence, backup and operational acceptance pass; then decide whether
+to retire or repurpose its VPS resources. WorkOS staging users and settings do
+not carry into Production automatically, and current pilot project ownership
+cannot be assumed to survive a client-ID switch. The free hosted WorkOS
+Production login may briefly show a WorkOS URL; defer the $99/month custom
+AuthKit domain until paying-customer demand justifies it. This environment
+decision does not waive the separate production release gates or authorize real
+customer data in the current synthetic pilot. See the
+[transition roadmap](design-partner-to-production-roadmap.md) and
+[production checklist](production-release-checklist.md).
 
 ## Stage C development update — 6 October 2026
 

@@ -23,9 +23,15 @@ engineering record.
 
 ## Production product and access
 
-- [ ] Deploy and accept isolated staging and production identity, databases,
-  storage, signing/relayer keys, secrets and provider configuration. Rehearse
-  migration and rollback without importing synthetic pilot accounts or keys.
+- [ ] Deploy and accept one hosted Production environment with its own WorkOS
+  Production identity, database, storage, signing/relayer keys, secrets,
+  backups and provider configuration. Keep the existing hosted synthetic pilot
+  until cutover evidence passes, then use isolated local development with WorkOS
+  Staging for routine tests. Use short-lived isolated HTTPS previews only where
+  local testing cannot exercise callbacks, webhooks or release behavior.
+  Rehearse account/workspace transition and rollback; staging identities and
+  pilot keys do not transfer automatically. Start with free hosted Production
+  AuthKit; a paid custom login domain is deferred.
 - [ ] Pass the complete customer journey: registration/admission, MFA and
   recovery, organizations and roles, scoped API keys, first submission,
   revocation, signed evidence, independent export verification and deletion.
