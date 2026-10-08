@@ -65,7 +65,13 @@ MFA and created `Second Test Account / Second Test Project` with workspace
 read-back confirmed ownership. The self-service reconciler funded and activated
 the fourth isolated worker and completed a new coordinated B2 upload. Combined
 health passed with four of four workers, zero pending projects, and no evidence
-backlog. A one-record synthetic submission from this new project remains open.
+backlog. The new account used its own one-day project key to submit
+`fresh-signup-acceptance-e68926a151e8b077dc503481f8379725`; its worker
+submitted one receipt. A separate restricted-role verifier returned
+`exportVerification=verified`, valid recording-service signature, trusted
+signer, exact record commitment, valid batch membership and 26/12 Base Sepolia
+confirmations. Customer-visible portal read-back and retirement of this test
+key remain to be confirmed.
 
 The pilot continues to use the previously supervised rate of eight new
 receipts per project per rolling hour and a 30-minute evidence target until
