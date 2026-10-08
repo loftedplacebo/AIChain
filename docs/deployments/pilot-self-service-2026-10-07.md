@@ -58,8 +58,14 @@ Its old WorkOS user had no organization memberships or user API keys, and the
 pilot directory reported no workspace memberships or projects. The WorkOS
 user was deleted and no longer appeared in the pilot user list. Its orphaned
 local identity was disabled, invalidating old portal sessions while retaining
-the audit row. A new sign-up with that email is the remaining first-account
-acceptance check.
+the audit row. A new WorkOS user subsequently completed email verification and
+MFA and created `Second Test Account / Second Test Project` with workspace
+`org-2a00a025-c3e5-498f-9599-b7e290641baf` and project
+`prj-c5526c45-2b3b-4921-a58f-edf1a1b33cf3`. The scoped directory
+read-back confirmed ownership. The self-service reconciler funded and activated
+the fourth isolated worker and completed a new coordinated B2 upload. Combined
+health passed with four of four workers, zero pending projects, and no evidence
+backlog. A one-record synthetic submission from this new project remains open.
 
 The pilot continues to use the previously supervised rate of eight new
 receipts per project per rolling hour and a 30-minute evidence target until
