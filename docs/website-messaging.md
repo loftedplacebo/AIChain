@@ -1,6 +1,15 @@
 # Website and marketing plan — 27 September 2026
 
-## Current website checkpoint — 4 October 2026
+## Pilot sign-up update — 8 October 2026
+
+The hosted synthetic pilot now permits verified-user sign-up with required MFA,
+automatically provisions project workers, and enforces a five-project cap. The
+portal's signed-out page offers account creation. The public `/status` route and
+local legal-page drafts have been updated in source to describe this boundary;
+the public Site still needs a separate publication step. A fresh-account first
+project journey remains open.
+
+## Earlier website checkpoint — 4 October 2026
 
 The public `orvessian.com` Site is at version 29. Its home page places **Sign
 in / Request access** beside **Explore demo**. The account action leads to the
