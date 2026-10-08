@@ -47,11 +47,12 @@ projects. This record does not authorize production data or a paid launch.
   its fix was tested and deployed. A portal release readiness race was also
   corrected. The combined hosted health check passed after both corrections.
 
-## Acceptance sequence still required
+## Fresh account acceptance
 
-1. Exercise a fresh account's first workspace/project journey. The database
-   capacity boundary itself passed a rollback-only probe; a browser/API 429
-   response under a full live quota remains unexercised.
+The new account's first workspace, project, isolated worker, funded relayer,
+receipt and verified evidence journey passed. The database capacity boundary
+passed a rollback-only probe; a browser/API 429 response under a full live
+quota remains unexercised because the pilot currently uses four of five slots.
 
 On 8 October, the owner requested reuse of the existing secondary test email.
 Its old WorkOS user had no organization memberships or user API keys, and the
@@ -70,8 +71,7 @@ backlog. The new account used its own one-day project key to submit
 submitted one receipt. A separate restricted-role verifier returned
 `exportVerification=verified`, valid recording-service signature, trusted
 signer, exact record commitment, valid batch membership and 26/12 Base Sepolia
-confirmations. Customer-visible portal read-back and retirement of this test
-key remain to be confirmed.
+confirmations. Customer-visible portal read-back was subsequently confirmed.
 
 The owner found the fresh receipt after clicking Refresh, then opened its
 evidence detail in the portal. The Decisions view had held an absolute end time
@@ -86,7 +86,8 @@ was deployed with a rollback script on 8 October. Public `/workspace` and
 health check passed with four of four workers and no evidence backlog. The
 independent verifier then reported a valid signature, exact commitment, valid
 batch membership, and 314/12 Base Sepolia confirmations. The one-day
-acceptance key was still active at that read-back and awaits owner revocation.
+acceptance key was still active at that read-back. The owner chose to leave this
+one-day key active until its scheduled expiry on 9 October 2026 at 19:36 UTC.
 
 The pilot continues to use the previously supervised rate of eight new
 receipts per project per rolling hour and a 30-minute evidence target until
