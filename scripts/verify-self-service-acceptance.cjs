@@ -5,9 +5,11 @@ const {PostgresGovernanceStore}=require('../services/governance/postgres-store.c
 const {connectionOptions}=require('../services/governance/postgres-connection.cjs');
 const {verifyExport}=require('../services/governance/evidence-export-verifier.cjs');
 const {evidenceProvider}=require('../services/governance/evidence-provider.cjs');
+const {PostgresProjectKeys}=require('../services/governance/postgres-project-keys.cjs');
 
 const principal={tenant:'org-61f98eac-1218-439d-9e93-f3717e1dfe37',project:'prj-2e7bb2dd-b180-49f6-9083-22b84b402b66'};
 const eventId='self-service-acceptance-6490f75f73587f9bdf0b2b8bac555ccc';
+const acceptanceKeyId='key-211290d0-6b74-4e0e-8ef2-1ec39e692acf';
 
 async function main(){
  const pool=new Pool(connectionOptions(process.env.GOVERNANCE_DATABASE_URL,{caFile:process.env.GOVERNANCE_DATABASE_CA_FILE}));
@@ -21,7 +23,10 @@ async function main(){
    trustedSigners:JSON.parse(process.env.GOVERNANCE_RECEIPT_SIGNERS||'[]'),
    provider:evidenceProvider(process.env.GOVERNANCE_EVIDENCE_RPC_URL),
   });
-  console.log(JSON.stringify({eventId,exportVerification:result.exportVerification,state:result.state,signature:result.signature,trustedSigner:result.trustedSigner,recordCommitment:result.recordCommitment,batchMembership:result.batchMembership,confirmations:result.confirmations,minimumConfirmations:result.minimumConfirmations}));
+  const keys=new PostgresProjectKeys(pool);
+  await keys.ready('test');
+  const key=(await keys.list(principal)).find(item=>item.id===acceptanceKeyId);
+  console.log(JSON.stringify({eventId,exportVerification:result.exportVerification,state:result.state,signature:result.signature,trustedSigner:result.trustedSigner,recordCommitment:result.recordCommitment,batchMembership:result.batchMembership,confirmations:result.confirmations,minimumConfirmations:result.minimumConfirmations,acceptanceKeyStatus:key?.status??'missing'}));
   process.exitCode=result.exitCode;
  }finally{await store.close();}
 }

@@ -36,7 +36,9 @@ projects. This record does not authorize production data or a paid launch.
   verifier loaded the record and evidence through the restricted database role
   and reported `exportVerification=verified`, `signature=valid`, trusted signer,
   exact record commitment, valid batch membership, and 323/12 Base Sepolia
-  confirmations. No credential or private key appeared in the verifier output.
+  confirmations. The acceptance API key was subsequently revoked; a
+  restricted-role read-back reported `acceptanceKeyStatus=revoked`. No
+  credential or private key appeared in the verifier output.
 - The API open-pilot admission setting, portal build, and WorkOS pilot AuthKit
   sign-up are active. WorkOS reports `allowSignUp=true`, waitlist disabled,
   required MFA, and required email verification. The public portal sign-up
@@ -50,6 +52,14 @@ projects. This record does not authorize production data or a paid launch.
 1. Exercise a fresh account's first workspace/project journey. The database
    capacity boundary itself passed a rollback-only probe; a browser/API 429
    response under a full live quota remains unexercised.
+
+On 8 October, the owner requested reuse of the existing secondary test email.
+Its old WorkOS user had no organization memberships or user API keys, and the
+pilot directory reported no workspace memberships or projects. The WorkOS
+user was deleted and no longer appeared in the pilot user list. Its orphaned
+local identity was disabled, invalidating old portal sessions while retaining
+the audit row. A new sign-up with that email is the remaining first-account
+acceptance check.
 
 The pilot continues to use the previously supervised rate of eight new
 receipts per project per rolling hour and a 30-minute evidence target until
