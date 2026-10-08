@@ -93,3 +93,20 @@ The pilot continues to use the previously supervised rate of eight new
 receipts per project per rolling hour and a 30-minute evidence target until
 more project capacity is measured. The backup restore evidence so far is a
 same-cluster closed drill, not replacement-cluster recovery.
+
+## API key reauthentication UX — 8 October
+
+The owner confirmed key creation works after reauthentication, but the portal
+sent them to Settings and lost the in-progress key form. The backend still
+requires an authentication within five minutes before any key mutation. Portal
+commit `8c13222` now explains that check, returns to API keys and the same
+project after successful reauthentication, and restores the entered label,
+access and expiry for review. It never automatically resubmits a mutation.
+The destination and draft are held only in the current browser tab for the
+redirect, and the draft is removed after restoration. TypeScript and the
+standalone build passed. The checksum-pinned archive
+`27c72bd129728e755638da4bcb478177863a29c1ca1cbc4bf1ad2446703b78ee`
+was deployed with rollback; public `/workspace` and `/api/auth/status` returned
+HTTP 200, and the combined pilot health check stayed green. The browser
+reauthentication round trip still needs an operator session to confirm the
+new return behavior end to end.
