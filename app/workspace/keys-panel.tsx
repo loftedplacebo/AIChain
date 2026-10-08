@@ -3,8 +3,8 @@ import {useEffect,useRef,useState} from 'react';
 import {readWorkspaceResponse,mutationErrorMessage} from '../../lib/workspace-response.js';
 import FirstSubmission from './first-submission';
 type KeyInfo={id:string;label:string;scopes:string[];createdAt:string;expiresAt:string;revokedAt:string|null;lastUsedAt:string|null;status:'active'|'expired'|'revoked'};
-type KeyDraft={workspace:string;label:string;access:'read'|'write'|'both';days:number};
-export default function KeysPanel({workspace,tenantRef,revision,canManage,onReauthenticationRequired}:{workspace:string;tenantRef?:string;revision:number;canManage:boolean;onReauthenticationRequired?:()=>void}){
+type KeyDraft={workspace:string;label:string;access:'read'|'write'|'both';days:number;createdAt:number};
+export default function KeysPanel({workspace,tenantRef,revision,canManage,resumeDraft,onReauthenticationRequired}:{workspace:string;tenantRef?:string;revision:number;canManage:boolean;resumeDraft:boolean;onReauthenticationRequired?:()=>void}){
  const [keys,setKeys]=useState<KeyInfo[]|null>(null),[error,setError]=useState(''),[notice,setNotice]=useState(''),[busy,setBusy]=useState(false),[secret,setSecret]=useState(''),[selected,setSelected]=useState<KeyInfo|null>(null),[operation,setOperation]=useState<'create'|'rotate'|'revoke'>('create');
  const [draft,setDraft]=useState<KeyDraft|null>(null);
  const [state,setState]=useState('active'),[offset,setOffset]=useState(0),[total,setTotal]=useState(0),[nextOffset,setNextOffset]=useState<number|null>(null),[refreshTick,setRefreshTick]=useState(0);
@@ -14,7 +14,7 @@ export default function KeysPanel({workspace,tenantRef,revision,canManage,onReau
   return readWorkspaceResponse(response,{signal,onReauthenticationRequired:()=>{if(alive.current){setSecret('');onReauthenticationRequired?.();}}});
  }
  useEffect(()=>{alive.current=true;return()=>{alive.current=false;active.current?.abort();};},[]);
- useEffect(()=>{try{const saved=JSON.parse(sessionStorage.getItem('orvessian-key-draft')||'null');sessionStorage.removeItem('orvessian-key-draft');if(saved?.workspace===workspace&&typeof saved.label==='string'&&saved.label.length<=80&&['read','write','both'].includes(saved.access)&&Number.isInteger(saved.days)&&saved.days>=1&&saved.days<=365){setDraft(saved);setNotice('Sign-in confirmed. Review these key details, then choose Create API key again.');}}catch{}},[workspace]);
+ useEffect(()=>{if(!resumeDraft)return;try{const saved=JSON.parse(sessionStorage.getItem('orvessian-key-draft')||'null');sessionStorage.removeItem('orvessian-key-draft');if(saved?.workspace===workspace&&typeof saved.label==='string'&&saved.label.length<=80&&['read','write','both'].includes(saved.access)&&Number.isInteger(saved.days)&&saved.days>=1&&saved.days<=365&&Number.isSafeInteger(saved.createdAt)&&Date.now()-saved.createdAt>=0&&Date.now()-saved.createdAt<600000){setDraft(saved);setNotice('Sign-in confirmed. Review these key details, then choose Create API key again.');}}catch{}},[workspace,resumeDraft]);
  useEffect(()=>{if(!canManage)return;const controller=new AbortController();setKeys(null);setError('');request('keys',undefined,undefined,controller.signal).then(result=>{if(!controller.signal.aborted){setKeys(result.keys);setTotal(result.total);setNextOffset(result.nextOffset);}}).catch(e=>{if(!controller.signal.aborted)setError(e.message);});return()=>controller.abort();},[workspace,revision,canManage,state,offset,refreshTick]);
  useEffect(()=>{if(!secret)return;const hide=()=>{if(document.visibilityState==='hidden')setSecret('');};const timer=setTimeout(()=>setSecret(''),300000);document.addEventListener('visibilitychange',hide);return()=>{clearTimeout(timer);document.removeEventListener('visibilitychange',hide);};},[secret]);
  function choose(key:KeyInfo|null,next:'create'|'rotate'|'revoke'){setSecret('');setSelected(key);setOperation(next);setDraft(null);setError('');setNotice('');action.current=null;}
@@ -31,7 +31,7 @@ export default function KeysPanel({workspace,tenantRef,revision,canManage,onReau
    else setNotice('Key revoked. New requests using it will be denied.');
    setSelected(null);setOperation('create');
    setOffset(0);setRefreshTick(n=>n+1);
-  }catch(e){if(alive.current&&!controller.signal.aborted){if((e as {code?:string}).code==='reauthentication-required'&&operation==='create')try{sessionStorage.setItem('orvessian-key-draft',JSON.stringify({workspace,label:String(fields.get('label')||''),access:fields.get('access'),days:Number(fields.get('days'))}));}catch{}setError(mutationErrorMessage(e,' If the response was lost, retry the same operation; do not assume it failed.'));}}
+  }catch(e){if(alive.current&&!controller.signal.aborted){if((e as {code?:string}).code==='reauthentication-required'&&operation==='create')try{sessionStorage.setItem('orvessian-key-draft',JSON.stringify({workspace,label:String(fields.get('label')||''),access:fields.get('access'),days:Number(fields.get('days')),createdAt:Date.now()}));}catch{}setError(mutationErrorMessage(e,' If the response was lost, retry the same operation; do not assume it failed.'));}}
   finally{inFlight.current=false;if(alive.current)setBusy(false);}
  }
  if(!canManage)return <section className="gp-panel"><h2>API keys</h2><p>A workspace administrator manages project credentials.</p></section>;
