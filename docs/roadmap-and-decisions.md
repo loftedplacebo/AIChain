@@ -1,5 +1,21 @@
 # Roadmap and decisions — current checkpoint 8 October 2026
 
+## Design-partner cohort decision — 8 October 2026
+
+Target **10 independent design-partner organisations** for the supervised
+programme, recruited and onboarded in measured waves beginning with one
+partner's synthetic workflow. Count an organisation only after it has its own
+agreed pilot scope and active integration; ten API keys, users or internal
+projects do not meet the target. This exact ten-partner target supersedes the
+archived founding-programme draft's initial three and later 10–15 range.
+Each partner needs isolated project access and its own support, backup,
+evidence and exit checks before invitation. The current hosted pilot has a
+five-project total cap with four internal/test projects in use, so the target
+requires a measured capacity and project-lifecycle change before onboarding
+the full cohort. Do not raise the live cap or claim ten-partner readiness from
+this planning decision alone. See the
+[partner transition roadmap](design-partner-to-production-roadmap.md).
+
 ## Environment strategy decision — 8 October 2026
 
 Keep the existing hosted synthetic `test` pilot and WorkOS Staging sign-in while

@@ -3,6 +3,9 @@
 This is the short owner-facing queue. The [roadmap](roadmap-and-decisions.md)
 tracks engineering and release checks. The first partner trial uses synthetic
 records; none of the actions below alone makes the hosted platform ready.
+The programme target is **10 independent design partners**, admitted in waves
+after each project's isolation, capacity, support and evidence scope is ready.
+The current five-project pilot limit is not capacity approval for that cohort.
 
 ## Readiness checkpoint — 5 October 2026
 

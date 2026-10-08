@@ -1,4 +1,4 @@
-# From design partners to production — 5 October 2026
+# From design partners to production — 8 October 2026
 
 This is a planning view, not a release approval or delivery commitment. The
 current hosted environment is a supervised synthetic `test` pilot. An approved
@@ -10,7 +10,7 @@ as a production service or accepting real customer data.
 | **Now: operator pilot** | Public site, waitlist, MFA, portal, API key, synthetic ingestion, signed export and Base Sepolia check have been tested in the operator project. | Identify first partner and agree synthetic workflow, fields, contacts and support. | Current [pilot owner record](pilot-owner-actions.md). |
 | **A: first partner API test** | An approved named partner signs in, creates an isolated workspace/project and uses a short-lived key for supervised synthetic submit and read-back. Signed evidence may be pending. | Test that exact new project's access and isolation before handing over a key; agree a small test window and allowed fields. | One partner-owned event accepted and read back, duplicate retry safe, key revoked. See the [provisional checklist](examples/first-design-partner-synthetic-pilot-proposal.md#provisional-partner-onboarding-checklist). |
 | **B: complete supervised evidence trial** | Partner submits the agreed synthetic set and reviews independently verifiable signed evidence in the portal. | Provision a reviewed instance of the existing worker code for the partner project; include its journal in coordinated encrypted backup and restore; monitor that project's evidence backlog; agree support, pause and exit. | Partner project passes submission, portal reconciliation, signed export/Base Sepolia verification, backup restore review and key retirement. |
-| **C: repeatable multi-partner pilot** | Several approved partners can use the same onboarding journey without bespoke code changes for each one. | Standardize operator-run project worker provisioning, protected key custody and testnet funding; capture and restore every worker journal; discover and monitor every project; exercise fresh-account first use, quotas and load. The existing two-step WorkOS/API approval can remain manual for a small cohort. | At least two independent partner projects pass isolation, simultaneous evidence work, recovery and alert tests. A named owner signs off the supported pilot capacity. |
+| **C: repeatable multi-partner pilot** | Target ten independent design-partner organisations, onboarded in waves with isolated access and one agreed synthetic workflow each. | Prove the first partner journey, then expand worker provisioning, protected key custody, testnet funding, journal backup, project-wide monitoring, quota and support capacity before each wave. The existing five-project total cap cannot support ten partners and must be raised or replaced only after measured capacity and lifecycle tests. | Early multi-project acceptance proves isolation, simultaneous evidence work, recovery and alerts; each subsequent partner passes its own onboarding/evidence checks. A named owner signs off the tested concurrent capacity before admitting the full ten-partner cohort. |
 | **D: production release** | The service can accept the data and commitments explicitly approved for its production terms. | Complete the separate business, legal, security, production infrastructure, recovery, support and commercial gates below. | A reviewed production environment passes its own end-to-end customer, security, recovery and operations acceptance; owner records go/no-go. |
 
 ## What is reusable
@@ -27,6 +27,17 @@ The coordinated backup now captures the PostgreSQL database and every
 registered worker journal. Project-wide health checks cover each registered
 worker and project. WorkOS waitlist approval still needs a separate exact-email
 API admission update for each approved participant.
+
+The owner selected an exact **ten-partner target** on 8 October, replacing the
+archived founding-programme draft's first-three/10–15 planning range. This is
+a recruitment and activation target for distinct organisations, not ten API
+keys or an assertion of current service capacity. Start with one supervised
+partner, validate repeatability with the next partners, and schedule later
+waves against measured throughput, support, funding and recovery capacity.
+The current pilot has four of five total project slots in use; ten concurrent
+partner projects would need at least ten partner slots plus any retained
+internal projects. Change the live quota only with a tested provisioning,
+backup, monitoring, load and rollback plan.
 
 Stage C has a [repeatable multi-project worker and recovery
 procedure](pilot-multi-project-workers.md), including per-project provisioning,
