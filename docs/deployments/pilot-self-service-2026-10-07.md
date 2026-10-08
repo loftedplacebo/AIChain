@@ -73,6 +73,21 @@ signer, exact record commitment, valid batch membership and 26/12 Base Sepolia
 confirmations. Customer-visible portal read-back and retirement of this test
 key remain to be confirmed.
 
+The owner found the fresh receipt after clicking Refresh, then opened its
+evidence detail in the portal. The Decisions view had held an absolute end time
+from before submission. Portal commits `c733a31` and `0b00c65` update the query
+window on search and tab changes and add a labelled **View evidence**
+button per record and refreshes Decisions every 30 seconds while the tab is
+visible and the detail panel is closed. TypeScript and the standalone Node build
+passed. The checksum-pinned archive
+`ba889007e6b357ddf31ccef8b2a299a925d7839009d5ca434b32153fda58701e`
+was deployed with a rollback script on 8 October. Public `/workspace` and
+`/api/auth/status` returned HTTP 200; the portal service and combined pilot
+health check passed with four of four workers and no evidence backlog. The
+independent verifier then reported a valid signature, exact commitment, valid
+batch membership, and 314/12 Base Sepolia confirmations. The one-day
+acceptance key was still active at that read-back and awaits owner revocation.
+
 The pilot continues to use the previously supervised rate of eight new
 receipts per project per rolling hour and a 30-minute evidence target until
 more project capacity is measured. The backup restore evidence so far is a
