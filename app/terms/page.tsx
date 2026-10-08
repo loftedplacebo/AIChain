@@ -15,7 +15,7 @@ export default function Terms() {
       <div className="notice"><strong>Publication details to complete</strong><p>Provider: [LEGAL PERSON OR COMPANY]. Contact: [WORKING SUPPORT EMAIL]. Address and company number, if applicable: [CONFIRM]. Effective date: [SET WHEN APPROVED].</p></div>
 
       <h2>What is available now</h2>
-      <p>Orvessian provides a public marketing website, an illustrative synthetic-data demonstration and a limited, approval-only pilot workspace. Requesting access does not create an account or guarantee an invitation. The pilot may change or pause while it is being developed. No paid plan, checkout, production service level or general public API entitlement is currently offered.</p>
+      <p>Orvessian provides a public marketing website, an illustrative synthetic-data demonstration and a limited synthetic test pilot with open sign-up. Creating an account does not grant production access. The pilot may change or pause while it is being developed. No paid plan, checkout, production service level or general public API entitlement is currently offered.</p>
 
       <h2>Accounts and access</h2>
       <p>Approved users must use their own verified account, protect their credentials and complete the required multi-factor sign-in. Workspace owners are responsible for the people and project keys they authorize. An API key must be kept secret, scoped to its intended use and revoked when no longer needed. We may suspend access to protect the service or investigate misuse, with a contact process to be specified before publication.</p>

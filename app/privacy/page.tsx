@@ -15,13 +15,13 @@ export default function Privacy() {
       <div className="notice"><strong>Publication details to complete</strong><p>Operator: [LEGAL PERSON OR COMPANY]. Privacy contact: [WORKING EMAIL ADDRESS]. Postal address and company number, if applicable: [CONFIRM]. Last reviewed: 4 October 2026.</p></div>
 
       <h2>What this notice covers</h2>
-      <p>This notice is intended to cover visits to orvessian.com, requests to join the pilot waitlist, and accounts in the approval-only synthetic pilot. A separate partner agreement and data-processing terms would be needed before a partner submits real operational or personal data through the service. The public demo contains illustrative synthetic records.</p>
+      <p>This notice is intended to cover visits to orvessian.com, earlier pilot waitlist requests, and accounts in the open-sign-up synthetic test pilot. A separate partner agreement and data-processing terms would be needed before a partner submits real operational or personal data through the service. The public demo contains illustrative synthetic records.</p>
 
       <h2>Information involved</h2>
       <h3>Website and waitlist</h3>
       <p>A visitor may give an email address to request access. The website and its hosting providers also process technical request information, such as IP address, browser information, timestamps and security logs needed to deliver and protect the site. [CONFIRM whether any analytics or non-essential cookies are enabled in the deployed hosting configuration.]</p>
       <h3>Pilot accounts</h3>
-      <p>If access is approved, the identity service handles account details, email verification, authentication and multi-factor enrolment. Orvessian keeps the account and session information needed to apply its exact-email admission rule, workspace permissions and audit controls. The portal uses necessary session and security cookies.</p>
+      <p>For pilot sign-up, the identity service handles account details, email verification, authentication and multi-factor enrolment. Orvessian keeps the account and session information needed for workspace permissions and audit controls. The portal uses necessary session and security cookies.</p>
       <h3>Submitted pilot records and support</h3>
       <p>An admitted user can submit selected structured governance records and related identifiers. The first supervised trial is limited to agreed synthetic or explicitly non-sensitive fields; source conversations, documents and media should remain in the partner’s systems. Messages sent to the support or privacy contact will contain whatever the sender includes.</p>
 
@@ -32,7 +32,7 @@ export default function Privacy() {
       <p>The current pilot uses WorkOS for identity and account email, a Sites/Cloudflare service for the public website, Contabo for the portal/API host, DigitalOcean for the managed database and Backblaze B2 for encrypted backups. GoDaddy provides domain registration and DNS. Each provider receives only the information required for its function. [CONFIRM the current provider list, processing locations, contracts and any international transfer safeguards.]</p>
 
       <h2>Security, retention and deletion</h2>
-      <p>Access is limited to approved accounts, and the pilot requires authenticator-app MFA. Database backups are encrypted before upload to a separate provider. The B2 bucket hides backup objects after 14 days and removes hidden versions after at least one further day, subject to its daily lifecycle processing. This backup rule is not a general retention period for accounts, waitlist requests, logs or submitted records. [CONFIRM those periods, deletion and legal-hold procedures before publication.]</p>
+      <p>Access requires a verified account and authenticator-app MFA. Database backups are encrypted before upload to a separate provider. The B2 bucket hides backup objects after 14 days and removes hidden versions after at least one further day, subject to its daily lifecycle processing. This backup rule is not a general retention period for accounts, waitlist requests, logs or submitted records. [CONFIRM those periods, deletion and legal-hold procedures before publication.]</p>
 
       <h2>Cookies and similar technology</h2>
       <p>The sign-in journey uses cookies needed for authentication and security. [CHECK WorkOS and hosting cookies and confirm whether any analytics or other optional technology is active.] If non-essential cookies are added, provide a separate choice before using them where required.</p>

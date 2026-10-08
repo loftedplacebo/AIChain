@@ -8,20 +8,20 @@ export const metadata = {
 
 export default function Status() {
   return <main>
-    <PageHeader label="Platform status · 4 October 2026" title="Progress with the limits attached.">
-      <p>This is a dated product and deployment snapshot, not a live availability monitor or a production service promise. The public demonstration uses synthetic data. Access to the hosted pilot requires approval.</p>
+    <PageHeader label="Platform status · 8 October 2026" title="Progress with the limits attached.">
+      <p>This is a dated product and deployment snapshot, not a live availability monitor or a production service promise. The public demonstration uses synthetic data. Verified users can sign up for the bounded hosted test pilot.</p>
     </PageHeader>
     <section className="foundation-content">
       <div className="foundation-grid">
         <article>
           <span className="stage-label">Hosted synthetic pilot</span>
           <h2>Portal and API</h2>
-          <p>The operator-only pilot portal and API run over HTTPS with WorkOS sign-in, required authenticator MFA and a managed PostgreSQL database. One scoped-key synthetic submission was accepted and appeared in the workspace. New visitors can request access; approval remains manual.</p>
+          <p>The pilot portal and API run over HTTPS with WorkOS sign-in, required email verification and authenticator MFA, and a managed PostgreSQL database. Sign-up is open for synthetic testing, with a five-project limit and automatic per-project evidence workers. Three internal projects are currently provisioned; a fresh-account onboarding check remains open.</p>
         </article>
         <article>
           <span className="stage-label">Separate testnet demonstration</span>
           <h2>Signed evidence and Base</h2>
-          <p>The supervised demonstration has produced signed receipts, private batch proofs and checked Base Sepolia transactions. The new hosted managed-database record has not yet passed that worker and independent export-verification path.</p>
+          <p>The hosted pilot has produced signed receipts, private batch proofs and checked Base Sepolia transactions. A new internal project's receipt passed independent signer, record-commitment, batch-membership and chain-inclusion checks.</p>
         </article>
         <article>
           <span className="stage-label">Pilot operations</span>
@@ -31,8 +31,8 @@ export default function Status() {
       </div>
       <div className="status-update">
         <span>Before a first design-partner credential</span>
-        <h2>Complete the hosted evidence and access checks.</h2>
-        <p>Next checks are a signed hosted receipt and independently verified export, a complete non-operator approval and MFA journey, key revocation, and named application monitoring and support. The first trial will be limited to agreed synthetic records.</p>
+        <h2>Complete fresh-account and partner checks.</h2>
+        <p>Next checks are a new account's email verification, MFA and first project journey, retirement of its test key, and a separate partner-owned synthetic trial. The first partner trial will be limited to agreed synthetic records.</p>
       </div>
       <div className="status-update">
         <span>Later release work</span>
@@ -42,7 +42,7 @@ export default function Status() {
       <div className="reading-list">
         <h2>Explore the platform.</h2>
         <a href="/portal">Synthetic governance demonstration <span>Illustrative data →</span></a>
-        <a href="https://portal.orvessian.com/workspace">Sign in or request pilot access <span>Approval required →</span></a>
+        <a href="https://portal.orvessian.com/workspace">Sign in or create a pilot account <span>Synthetic test data only →</span></a>
         <a href="/technology">Architecture and assurance <span>What each check establishes →</span></a>
         <a href="/developers">Developer tooling <span>Start with the local example →</span></a>
       </div>
