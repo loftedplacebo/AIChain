@@ -33,6 +33,9 @@ customer data or secrets.
 
 The release path is repository change, automated tests and build, reviewed
 production activation, public health/smoke checks and rollback. Keep the
+[repository release gates](pilot-release-gates.md) green in both source
+repositories; they do not themselves activate or validate the hosted service.
+Keep the
 current hosted pilot available until production identity, account/workspace
 access, evidence, backup and operational acceptance pass; then decide whether
 to retire or repurpose its VPS resources. WorkOS staging users and settings do

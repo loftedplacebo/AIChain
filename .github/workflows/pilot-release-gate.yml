@@ -1,0 +1,45 @@
+name: Pilot release gate
+
+on:
+  push:
+    paths:
+      - 'deploy/governance/**'
+      - 'services/governance/**'
+      - 'scripts/check-pilot-project-inventory*'
+      - 'package*.json'
+      - '.github/workflows/pilot-release-gate.yml'
+  pull_request:
+    paths:
+      - 'deploy/governance/**'
+      - 'services/governance/**'
+      - 'scripts/check-pilot-project-inventory*'
+      - 'package*.json'
+      - '.github/workflows/pilot-release-gate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pilot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci
+      - name: Customer authentication and keys
+        run: |
+          npm run test:governance-workos
+          npm run test:governance-project-keys
+      - name: Pilot project and backup inventory
+        run: |
+          node --test services/governance/pilot-worker-inventory.test.cjs services/governance/backup-object-pointer.test.cjs scripts/check-pilot-project-inventory.test.cjs
+          npm run test:governance-backup-object-storage
+          python deploy/governance/test_pilot_cohort_capacity.py
+          python deploy/governance/test_pilot_worker_registry.py
