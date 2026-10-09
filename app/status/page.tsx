@@ -8,7 +8,7 @@ export const metadata = {
 
 export default function Status() {
   return <main>
-    <PageHeader label="Platform status · 8 October 2026" title="Progress with the limits attached.">
+    <PageHeader label="Platform status · 9 October 2026" title="Progress with the limits attached.">
       <p>This is a dated product and deployment snapshot, not a live availability monitor or a production service promise. The public demonstration uses synthetic data. Verified users can sign up for the bounded hosted test pilot.</p>
     </PageHeader>
     <section className="foundation-content">
@@ -16,7 +16,7 @@ export default function Status() {
         <article>
           <span className="stage-label">Hosted synthetic pilot</span>
           <h2>Portal and API</h2>
-          <p>The pilot portal and API run over HTTPS with WorkOS sign-in, required email verification and authenticator MFA, and a managed PostgreSQL database. Sign-up is open for synthetic testing, with a five-project limit and automatic per-project evidence workers. Three internal projects are currently provisioned; a fresh-account onboarding check remains open.</p>
+          <p>The pilot portal and API run over HTTPS with WorkOS sign-in, required email verification and authenticator MFA, and a managed PostgreSQL database. Sign-up is open for synthetic testing, with a five-project limit and automatic per-project evidence workers. Four internal projects are currently provisioned, leaving one open slot. A fresh account completed project creation and independently verified its first receipt.</p>
         </article>
         <article>
           <span className="stage-label">Separate testnet demonstration</span>
@@ -31,8 +31,8 @@ export default function Status() {
       </div>
       <div className="status-update">
         <span>Before a first design-partner credential</span>
-        <h2>Complete fresh-account and partner checks.</h2>
-        <p>Next checks are a new account's email verification, MFA and first project journey, retirement of its test key, and a separate partner-owned synthetic trial. The first partner trial will be limited to agreed synthetic records.</p>
+        <h2>Agree and test the partner's synthetic workflow.</h2>
+        <p>The next trial needs its own scope, contact and support window, isolated project, worker and backup checks, and an independently verified receipt. The current five-project cap and two-project measured workload do not establish capacity for the ten-partner programme.</p>
       </div>
       <div className="status-update">
         <span>Later release work</span>
