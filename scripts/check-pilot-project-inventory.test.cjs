@@ -10,3 +10,11 @@ test('project inventory detects newly created projects and orphan worker entries
  assert.equal(covered.healthy,true);
  assert.deepEqual(compareProjects(projects,[...workers,{tenant:'org-c',project:'prj-c',role:'worker_c'}]).staleWorkers,['worker_c']);
 });
+
+test('four internal and ten partner projects require complete worker coverage',()=>{
+ const projects=Array.from({length:14},(_,index)=>({tenant:'org-'+index,project:'prj-'+index}));
+ const workers=projects.map(({tenant,project},index)=>({tenant,project,role:'worker_'+index}));
+ assert.equal(compareProjects(projects,workers).healthy,true);
+ assert.equal(compareProjects(projects,workers.slice(0,-1)).healthy,false);
+ assert.deepEqual(compareProjects(projects,workers.slice(0,-1)).missingProjects,[projects[13]]);
+});

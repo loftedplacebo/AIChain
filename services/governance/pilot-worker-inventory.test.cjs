@@ -13,3 +13,16 @@ test('project inventory binds independent project, unit, journal and wallets',()
  assert.throws(()=>validatePilotWorkers({version:1,environment:'test',workers:[workers[0],{...workers[1],relayer:workers[0].relayer}]}),/Duplicate/);
  assert.throws(()=>validatePilotWorkers({version:1,environment:'test',workers:[{...workers[0],role:'worker_../../escape'}]}),/binding/);
 });
+
+test('four internal and ten partner projects fit independent worker registry bindings',()=>{
+ const workers=Array.from({length:14},(_,index)=>{
+  const project=`prj-${String(index+1).padStart(8,'0')}-1232-4561-ab4a-ab2e5c8f658f`;
+  const recorder='0x'+(index*2+1).toString(16).padStart(40,'0');
+  const relayer='0x'+(index*2+2).toString(16).padStart(40,'0');
+  return worker(project,recorder,relayer);
+ });
+ assert.equal(validatePilotWorkers({version:1,environment:'test',workers}).length,14);
+ assert.equal(new Set(workers.map(w=>w.role)).size,14);
+ assert.equal(new Set(workers.map(w=>w.journal)).size,14);
+ assert.equal(new Set(workers.map(w=>w.relayer)).size,14);
+});

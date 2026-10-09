@@ -21,3 +21,16 @@ test('latest remote backup pointer advances atomically outside the encrypted sou
  fs.writeFileSync(file,'{"version":1,"environment":"test","bucket":"pilot-backups","keyPrefix":"pilot/test/third","keyPrefix":"forged"}',{mode:0o600});
  assert.throws(()=>readPointer(base),/Duplicate JSON key/);
 });
+
+test('completion marker retains every journal in a fourteen-project cohort',t=>{
+ const root=fs.mkdtempSync(path.join(os.tmpdir(),'pilot-cohort-pointer-'));t.after(()=>fs.rmSync(root,{recursive:true,force:true}));
+ const source=path.join(root,'archive'),privateDirectory=path.join(root,'private');
+ fs.mkdirSync(source);fs.mkdirSync(privateDirectory);
+ const file=path.join(privateDirectory,'latest.json');
+ const base={file,environment:'test',bucket:'pilot-backups',sourceDirectory:source,
+  keyPrefix:'pilot/test/cohort'};
+ const journalRoles=Array.from({length:14},(_,index)=>'worker_'+index.toString(16).padStart(24,'0'));
+ savePointer({...base,journalRoles});
+ assert.equal(readPointer(base),'pilot/test/cohort');
+ assert.deepEqual(JSON.parse(fs.readFileSync(file,'utf8')).journalRoles,journalRoles);
+});

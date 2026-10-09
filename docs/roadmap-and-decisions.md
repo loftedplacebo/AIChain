@@ -14,7 +14,8 @@ five-project total cap with four internal/test projects in use, so the target
 requires a measured capacity and project-lifecycle change before onboarding
 the full cohort. Do not raise the live cap or claim ten-partner readiness from
 this planning decision alone. See the
-[partner transition roadmap](design-partner-to-production-roadmap.md).
+[partner transition roadmap](design-partner-to-production-roadmap.md) and the
+[ten-partner capacity checkpoint](pilot-ten-partner-capacity.md).
 
 ## Environment strategy decision — 8 October 2026
 
