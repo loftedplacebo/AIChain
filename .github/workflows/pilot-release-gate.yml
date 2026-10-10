@@ -1,5 +1,9 @@
 name: Pilot release gate
 
+concurrency:
+  group: pilot-release-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     paths:
@@ -23,6 +27,7 @@ permissions:
 jobs:
   pilot:
     runs-on: ubuntu-latest
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -35,8 +40,8 @@ jobs:
       - run: npm ci
       - name: Customer authentication and keys
         run: |
-          npm run test:governance-workos
-          npm run test:governance-project-keys
+          timeout --signal=TERM 120s npm run test:governance-workos
+          timeout --signal=TERM 120s npm run test:governance-project-keys
       - name: Pilot project and backup inventory
         run: |
           node --test services/governance/pilot-worker-inventory.test.cjs services/governance/backup-object-pointer.test.cjs scripts/check-pilot-project-inventory.test.cjs
