@@ -112,7 +112,8 @@ def test_loopback_collector_and_alert_evaluator(tmp_path: Path) -> None:
 
 def test_alert_evaluator_escalates_identity_mismatch(tmp_path: Path) -> None:
     first = {
-        "schema": "aichain.phase4-private-metrics-snapshot", "buildId": BUILD_ID,
+        "schema": "aichain.phase4-private-metrics-snapshot",
+        "schemaVersion": "0.1.0-draft", "rpcScope": "loopback", "buildId": BUILD_ID,
         "genesisHash": GENESIS, "role": "validator", "peerCount": 1,
         "head": {"number": 7, "hash": HEAD},
     }
