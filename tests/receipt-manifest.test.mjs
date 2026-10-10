@@ -11,7 +11,7 @@ import {
   verifyReceiptAgainstAnchor
 } from "../lib/receipt-manifest.js";
 
-const samplePath = new URL("../../build/base-sepolia/synthetic-anchor-manifest.json", import.meta.url);
+const samplePath = new URL("./fixtures/synthetic-anchor-manifest.json", import.meta.url);
 const sample = JSON.parse(await readFile(samplePath, "utf8"));
 const anchor = {
   verified: true,
