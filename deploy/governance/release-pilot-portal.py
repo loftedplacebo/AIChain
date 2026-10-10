@@ -14,7 +14,7 @@ import stat
 import subprocess
 import tarfile
 import time
-import urllib.request
+from urllib.request import ProxyHandler, Request, build_opener
 
 BASE = pathlib.Path('/opt/aichain')
 CURRENT = BASE / 'orvessian-pilot-portal'
@@ -82,6 +82,7 @@ def unpack_archive(archive, stage):
 
 
 def restart_and_check():
+    opener = build_opener(ProxyHandler({}))
     if subprocess.run(('systemctl', 'restart', UNIT), check=False).returncode:
         return False
     for _ in range(15):
@@ -89,10 +90,10 @@ def restart_and_check():
                                 check=False).returncode == 0
         if active:
             try:
-                request = urllib.request.Request(
+                request = Request(
                     'http://127.0.0.1:3002/workspace',
                     headers={'Host': 'portal.orvessian.com'})
-                with urllib.request.urlopen(request, timeout=2) as response:
+                with opener.open(request, timeout=2) as response:
                     if response.status == 200:
                         return True
             except (OSError, ValueError):
