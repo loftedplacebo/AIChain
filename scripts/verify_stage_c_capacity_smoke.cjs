@@ -78,17 +78,24 @@ async function blockTime(hash, provider, cache) {
 async function main() {
   if (process.env.GOVERNANCE_ENV !== 'test') throw Error('Expected test runtime');
   const runId = process.argv[2], count = Number(process.argv[3]);
-  if (!/^[-a-zA-Z0-9]{1,40}$/.test(runId||'') || !Number.isInteger(count) || count<1 || count>10)
-    throw Error('Expected bounded run ID and count 1–10');
+  const scopeMode = process.argv[4] || 'original-two';
+  if (!/^[-a-zA-Z0-9]{1,40}$/.test(runId||'') || !Number.isInteger(count) || count<1 || count>10 ||
+      !['original-two','all'].includes(scopeMode) || process.argv.length>5)
+    throw Error('Expected bounded run ID, count 1–10, and optional all scope');
   const pool = new Pool({...connectionOptions(process.env.GOVERNANCE_DATABASE_URL,
     {caFile:process.env.GOVERNANCE_DATABASE_CA_FILE}),max:1,connectionTimeoutMillis:5000});
   try {
     const store = new PostgresGovernanceStore(pool,{runtimeProfile:'api'});
     await store.ready('test');
     const workers = loadPilotWorkers();
+    if (scopeMode==='all' && workers.some(worker=>worker.state!=='active'))
+      throw Error('Every registered worker must be active for an all-project wave');
+    const selected = scopeMode==='all'
+      ? workers.map(worker=>({name:worker.role,tenant:worker.tenant,project:worker.project}))
+      : projects;
     const provider = cachedProvider(evidenceProvider(rpcUrl)), cache = new Map();
     const report = [];
-    for (const scope of projects) {
+    for (const scope of selected) {
       const signer = workers.find(w=>w.tenant===scope.tenant && w.project===scope.project)?.recorder;
       if (!signer) throw Error('Registered signer missing for '+scope.name);
       const items=[];

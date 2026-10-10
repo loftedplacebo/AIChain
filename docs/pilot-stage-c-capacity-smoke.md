@@ -33,6 +33,14 @@ read-only query three times and reports chain state separately from signature
 and proof validity. A single `incomplete` observation is not evidence of a
 failed receipt.
 
+For a later all-project synthetic wave, run the same bounded SDK runner once
+per registered project with a distinct protected state file, identical run ID
+and count. The verifier accepts `RUN_ID COUNT all` to read every registered
+project from the protected worker registry and fails if any worker is paused.
+The original two-project invocation remains the default. Stay within the
+approved eight-new-receipts-per-project rolling-hour limit; a new verifier
+mode does not increase that operating limit.
+
 The pilot acceptance record should include: accepted/duplicate/rejected count
 per project, first and last acceptance times, time to confirmed evidence,
 maximum unresolved backlog and attempts, any 429/5xx responses, worker memory,

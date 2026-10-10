@@ -29,6 +29,10 @@ operator-owned projects remain. This is a staged capacity plan for the hosted
 | Middle cohort | 10 | 6 | Raise 7 to 10 only after the early cohort passes | Repeat the same checks with six partner projects and a closed restore covering every journal. |
 | Full cohort | 14 | 10 | Raise 10 to 14 only after the middle cohort passes | Repeat at ten partners and review operator support load before calling this a supported cohort. |
 
+Use the bounded SDK runner and the verifier's `RUN_ID COUNT all` mode for a
+project-wide synthetic wave; the verifier checks each registered signer,
+receipt commitment, batch proof and Base Sepolia transaction independently.
+
 Before each cap change, record the exact Git revisions, policy and database cap,
 project and worker registry counts, wallet balance, verified backup marker,
 runtime health, pending provision requests and prior cap. Keep the current
