@@ -30,6 +30,14 @@ jobs:
     timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
+      - name: Checkout portal gateway test source
+        uses: actions/checkout@v4
+        with:
+          repository: loftedplacebo/AIChain
+          # Portal source is a separate Git history mirrored in this repo.
+          ref: 85f71d9de1919cc6cd1d03111e098826bde5c244
+          path: website
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
