@@ -13,12 +13,6 @@ on:
       - 'package*.json'
       - '.github/workflows/pilot-release-gate.yml'
   pull_request:
-    paths:
-      - 'deploy/governance/**'
-      - 'services/governance/**'
-      - 'scripts/check-pilot-project-inventory*'
-      - 'package*.json'
-      - '.github/workflows/pilot-release-gate.yml'
   workflow_dispatch:
 
 permissions:

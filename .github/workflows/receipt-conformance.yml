@@ -10,14 +10,6 @@ on:
       - '.gitattributes'
       - '.github/workflows/receipt-conformance.yml'
   pull_request:
-    paths:
-      - 'sdk/**'
-      - 'spec/**'
-      - 'fixtures/**'
-      - 'examples/verification-receipt.js'
-      - 'package*.json'
-      - '.gitattributes'
-      - '.github/workflows/receipt-conformance.yml'
   workflow_dispatch:
 permissions:
   contents: read
