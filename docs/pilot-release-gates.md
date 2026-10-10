@@ -52,13 +52,18 @@ The portal repository is not nested source controlled by the main repository:
 its workflow and commit must be checked independently. A main-repository green
 run does not imply a portal green run, or vice versa.
 
-The main repository is currently ahead of its GitHub remote, and the portal's
-primary remote is the Sites Git service rather than GitHub. The workflow files
-become remotely enforced checks only after their relevant refs are published
-to a GitHub repository with Actions enabled and branch protection configured.
-Until then, run the named test commands locally and record their results with
-the exact source revisions. Do not describe the unpushed workflows as a live
-deployment gate.
+The main repository's pilot branch is published to GitHub as
+`codex/pilot-release-path` for a draft review PR. The separate portal source
+is published to its Sites Git service and mirrored to GitHub's
+`archive/orvessian-website` branch. Both workflows have run on GitHub; the
+pilot workflow checks out an exact portal mirror commit for the gateway tests.
+The public Site status correction was deployed separately through Sites.
+Source checks are not a deployment. GitHub `main` now requires successful
+`pilot` and `sdk` checks with strict up-to-date status, including for admins.
+The draft PR still needs review and merge before the pilot workflow source is
+on `main`. The portal mirror branch runs its own workflow but does not have a
+required GitHub check. Record the exact source revisions and hosted acceptance
+for every release.
 
 The [capacity wave record](pilot-capacity-waves.md) names the measured
 two-project boundary and the admission checks required before each increase
