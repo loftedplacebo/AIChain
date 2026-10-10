@@ -18,9 +18,35 @@ identify the exact commit in each repository, the matching built artifacts,
 their SHA-256 digests, the target environment and the prior revision to restore.
 The operator then applies the reviewed activation, verifies public and internal
 health, one scoped synthetic receipt and backup coverage, and keeps the prior
-artifact until rollback is no longer needed. The current hosted activation
-scripts remain component-specific; a single repeatable deployment/rollback
-entry point is still needed before Production.
+artifact until rollback is no longer needed. For the VPS portal, use the
+checksum-pinned `deploy/governance/release-pilot-portal.py` entry point. It
+rejects unsafe archive members, stages the standalone build, moves the former
+build to a release-specific previous directory, restarts the portal, checks
+loopback HTTP, and restores the previous build if that check fails. An explicit
+`rollback` command uses the retained previous directory. This covers the VPS
+portal only; API, worker and database releases need their own reviewed paths.
+
+After building a standalone portal archive and recording its SHA-256, copy it
+and the reviewed release script to the VPS. The release ID must be unique and
+contain lowercase letters, digits or hyphens. From a root shell on the VPS:
+
+```sh
+python3 /opt/aichain/governance-pilot-db-setup/release-pilot-portal.py \
+  activate --archive /opt/aichain/portal-RELEASE.tar.gz \
+  --sha256 EXPECTED_SHA256 --release-id RELEASE
+python3 /opt/aichain/governance-pilot-db-setup/check-pilot-hosted-health.py
+```
+
+If post-release checks fail after activation reported success, restore the
+retained build with:
+
+```sh
+python3 /opt/aichain/governance-pilot-db-setup/release-pilot-portal.py \
+  rollback --release-id RELEASE
+```
+
+Keep the prior build and archive until the receipt and backup checks pass.
+Never treat a green loopback check alone as complete release acceptance.
 
 The portal repository is not nested source controlled by the main repository:
 its workflow and commit must be checked independently. A main-repository green
