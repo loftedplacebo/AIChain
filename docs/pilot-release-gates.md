@@ -59,3 +59,7 @@ to a GitHub repository with Actions enabled and branch protection configured.
 Until then, run the named test commands locally and record their results with
 the exact source revisions. Do not describe the unpushed workflows as a live
 deployment gate.
+
+The [capacity wave record](pilot-capacity-waves.md) names the measured
+two-project boundary and the admission checks required before each increase
+from the current five-project cap.
