@@ -23,7 +23,7 @@ function validatePlan(plan){
   if(exact(env.hosting,['appProvider','appRegion','appInstanceRef','databaseProvider','databaseRegion','databaseClusterRef','databaseTopology','backupProvider','backupRegion','backupAccountRef','operatorRef'],'hosting',errors)){
    const hosting=env.hosting;
    for(const field of ['appProvider','appRegion','appInstanceRef','databaseProvider','databaseRegion','databaseClusterRef','backupProvider','backupRegion','backupAccountRef','operatorRef'])if(!scalar(hosting[field]))errors.push(stage+': invalid hosting '+field);
-   if(!['dedicated','shared-with-test'].includes(hosting.databaseTopology)||stage!=='prod'&&hosting.databaseTopology!=='dedicated')errors.push(stage+': invalid database topology');
+   if(!['own-cluster','shared-with-test'].includes(hosting.databaseTopology)||stage!=='prod'&&hosting.databaseTopology!=='own-cluster')errors.push(stage+': invalid database topology');
    if(hosted&&scalar(hosting.backupProvider)&&[hosting.appProvider,hosting.databaseProvider].some(provider=>scalar(provider)&&provider.toLowerCase()===hosting.backupProvider.toLowerCase()))errors.push(stage+': backup provider must be independent of application and database providers');
    if(scalar(hosting.appInstanceRef))unique('application instance',hosting.appInstanceRef,stage);
    if(scalar(hosting.databaseClusterRef)&&hosting.databaseTopology!=='shared-with-test')unique('database cluster',hosting.databaseClusterRef,stage);
@@ -76,7 +76,7 @@ function validatePlan(plan){
  }
  const test=plan.environments.find(env=>env?.stage==='test'),prod=plan.environments.find(env=>env?.stage==='prod');
  if(prod?.hosting?.databaseTopology==='shared-with-test'){
-  if(!test||!prod.database||!test.database||!test.hosting||test.hosting.databaseTopology!=='dedicated'||
+  if(!test||!prod.database||!test.database||!test.hosting||test.hosting.databaseTopology!=='own-cluster'||
    prod.hosting.databaseClusterRef!==test.hosting.databaseClusterRef||
    prod.hosting.databaseProvider!==test.hosting.databaseProvider||
    prod.hosting.databaseRegion!==test.hosting.databaseRegion||

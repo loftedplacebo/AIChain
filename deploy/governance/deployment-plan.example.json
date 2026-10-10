@@ -3,7 +3,7 @@
   "environments": [
     {
       "stage": "dev",
-      "hosting": {"appProvider": "local-dev", "appRegion": "local", "appInstanceRef": "replace/dev/app", "databaseProvider": "local-dev", "databaseRegion": "local", "databaseClusterRef": "replace/dev/database", "databaseTopology": "dedicated", "backupProvider": "local-dev", "backupRegion": "local", "backupAccountRef": "replace/dev/backup-account", "operatorRef": "replace/dev/operator"},
+      "hosting": {"appProvider": "local-dev", "appRegion": "local", "appInstanceRef": "replace/dev/app", "databaseProvider": "local-dev", "databaseRegion": "local", "databaseClusterRef": "replace/dev/database", "databaseTopology": "own-cluster", "backupProvider": "local-dev", "backupRegion": "local", "backupAccountRef": "replace/dev/backup-account", "operatorRef": "replace/dev/operator"},
       "portal": {"origin": "http://127.0.0.1:3002", "apiOrigin": "http://127.0.0.1:8790"},
       "database": {
         "host": "dev.db.example.test",
@@ -47,7 +47,7 @@
     },
     {
       "stage": "test",
-      "hosting": {"appProvider": "contabo", "appRegion": "replace-test-app-region", "appInstanceRef": "replace/test/app", "databaseProvider": "digitalocean", "databaseRegion": "replace-shared-database-region", "databaseClusterRef": "replace/shared/pilot-and-prod-cluster", "databaseTopology": "dedicated", "backupProvider": "backblaze", "backupRegion": "replace-test-backup-region", "backupAccountRef": "replace/test/backup-account", "operatorRef": "replace/test/operator"},
+      "hosting": {"appProvider": "contabo", "appRegion": "replace-test-app-region", "appInstanceRef": "replace/test/app", "databaseProvider": "digitalocean", "databaseRegion": "replace-shared-database-region", "databaseClusterRef": "replace/shared/pilot-and-prod-cluster", "databaseTopology": "own-cluster", "backupProvider": "backblaze", "backupRegion": "replace-test-backup-region", "backupAccountRef": "replace/test/backup-account", "operatorRef": "replace/test/operator"},
       "portal": {"origin": "https://pilot.example.test", "apiOrigin": "https://api.pilot.example.test"},
       "database": {
         "host": "shared.db.example.test",

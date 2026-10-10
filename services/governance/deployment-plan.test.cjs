@@ -30,7 +30,7 @@ test('shared test and production cluster has explicit database, role and endpoin
   p=>p.environments[2].hosting.databaseTopology='unknown'
  ];
  for(const mutate of mutations){const plan=fixture();mutate(plan);assert.equal(validatePlan(plan).valid,false);}
- const dedicated=fixture();dedicated.environments[2].hosting.databaseTopology='dedicated';dedicated.environments[2].hosting.databaseClusterRef='replace/prod/dedicated-cluster';dedicated.environments[2].hosting.databaseRegion='replace-prod-database-region';dedicated.environments[2].database.host='prod.db.example.test';
+ const dedicated=fixture();dedicated.environments[2].hosting.databaseTopology='own-cluster';dedicated.environments[2].hosting.databaseClusterRef='replace/prod/dedicated-cluster';dedicated.environments[2].hosting.databaseRegion='replace-prod-database-region';dedicated.environments[2].database.host='prod.db.example.test';
  assert.equal(validatePlan(dedicated).valid,true);
  dedicated.environments[2].hosting.databaseClusterRef=dedicated.environments[1].hosting.databaseClusterRef;
  assert.equal(validatePlan(dedicated).valid,false);
