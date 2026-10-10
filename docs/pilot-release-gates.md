@@ -52,18 +52,19 @@ The portal repository is not nested source controlled by the main repository:
 its workflow and commit must be checked independently. A main-repository green
 run does not imply a portal green run, or vice versa.
 
-The main repository's pilot branch is published to GitHub as
-`codex/pilot-release-path` for a draft review PR. The separate portal source
-is published to its Sites Git service and mirrored to GitHub's
-`archive/orvessian-website` branch. Both workflows have run on GitHub; the
-pilot workflow checks out an exact portal mirror commit for the gateway tests.
-The public Site status correction was deployed separately through Sites.
-Source checks are not a deployment. GitHub `main` now requires successful
-`pilot` and `sdk` checks with strict up-to-date status, including for admins.
-The draft PR still needs review and merge before the pilot workflow source is
-on `main`. The portal mirror branch runs its own workflow but does not have a
-required GitHub check. Record the exact source revisions and hosted acceptance
-for every release.
+The main repository's release gate was merged through
+[PR 1](https://github.com/loftedplacebo/AIChain/pull/1) at commit
+`caa61f89be81d9093087c1afde5bf02c89f4c2da`. Its post-merge `pilot` and
+`sdk` checks passed. GitHub `main` requires those checks with strict
+up-to-date status, including for admins. The separate portal source is
+published to its Sites Git service and mirrored to GitHub's
+`archive/orvessian-website` branch at
+`85f71d9de1919cc6cd1d03111e098826bde5c244`; its workflow passed. The
+pilot workflow checks out that exact portal mirror commit for gateway tests.
+The public Site status correction was deployed separately through Sites as
+version 31. The portal mirror branch does not have a required GitHub check.
+Source checks are not a VPS deployment. Record exact source revisions and
+hosted acceptance for every release.
 
 The [capacity wave record](pilot-capacity-waves.md) names the measured
 two-project boundary and the admission checks required before each increase
