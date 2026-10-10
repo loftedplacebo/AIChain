@@ -1,5 +1,46 @@
 # Website and marketing plan — 27 September 2026
 
+## Pilot sign-up update — 8 October 2026
+
+The hosted synthetic pilot now permits verified-user sign-up with required MFA,
+automatically provisions project workers, and enforces a five-project cap. The
+portal's signed-out page offers account creation. The public `/status` route and
+local legal-page drafts have been updated in source to describe this boundary;
+the public Site still needs a separate publication step. A fresh-account first
+project journey remains open.
+
+## Earlier website checkpoint — 4 October 2026
+
+The public `orvessian.com` Site is at version 29. Its home page places **Sign
+in / Request access** beside **Explore demo**. The account action leads to the
+hosted `portal.orvessian.com/workspace` page, where existing users sign in and
+new visitors can request approval through the WorkOS waitlist. The synthetic
+demo remains public. The separate hosted portal/API admit only the operator
+email until an applicant is reviewed and added to the exact-email admission
+list. Sign-out returns to the portal's signed-out page, which links back to the
+marketing site. See the [hosted integration record](hosted-pilot-application-integration.md#public-request-and-approval-journey).
+
+Website work still open before broad partner promotion:
+
+- [x] Update `/status`. Site version 30, published 4 October from commit
+  `28e44d18db4dc80d0c05d0b87f927918c4aa8aac`, now describes managed
+  PostgreSQL, B2 backups and the precise same-cluster restore boundary. It is a
+  dated snapshot rather than live uptime monitoring.
+- [ ] Review the plan-page availability copy, preserving the distinction
+  between the operator-only test pilot and production access.
+- [ ] Publish a privacy notice and terms/support entry point for waitlist
+  visitors. `/privacy`, `/terms` and footer links are implemented as local
+  review drafts but **not deployed**. The operator identity and working inbound
+  contact address are not yet provided; see the
+  [publication checklist](public-legal-pages-review.md).
+- Keep proposed pricing, broader SDK adapters, agent heartbeats, configurable
+  alerts, incident ownership and automatic governance labelled as previews or
+  planned work. The visible synthetic demo is illustrative; it is not the
+  admitted partner workspace.
+
+The 27–29 September publication and route notes below are historical snapshots
+where they describe owner-only access or a portal without a hosted API.
+
 The website should introduce the governance platform through customer questions: which agents reported, what decisions and outcomes were recorded, how model cohorts compare and what evidence supports an investigation. The trust layer supports that workflow. Preserve the current visual language and narrative interactions.
 
 ## Route responsibilities
@@ -10,7 +51,7 @@ The website should introduce the governance platform through customer questions:
 | /product | Explain platform workflow and record detail | Planned rules/alerts separate from submitted incidents |
 | /products and /products/governance-preview | Indicative launch pricing and plan comparison | Label provisional GBP prices and allowances; no checkout or production SLA |
 | /portal | Public synthetic demonstration | Never imply private customer data or a live model benchmark |
-| /workspace | Provisioned authenticated pilot | Hosted website has no customer API connection; the earlier private VPS pilot uses a local SSH tunnel |
+| portal.orvessian.com/workspace | Hosted operator-only synthetic pilot and WorkOS sign-in/waitlist | Partner admission requires manual approval and exact-email API allowlist; no general production access |
 | /explorer | Public anchor checks | No private event reconstruction without authorized records |
 | /technology and /technical | Base application architecture and assurance | No own L1/L2 launch, universal correctness or Ethereum-finality claim |
 | /developers | Runnable local receipt example plus pilot context | Public managed API onboarding still gated |

@@ -1,0 +1,14 @@
+[Unit]
+Description=Orvessian pilot encrypted PostgreSQL backup to Backblaze B2
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+UMask=0077
+ExecStart=/usr/bin/python3 /opt/aichain/governance-pilot-db-setup/run-pilot-backup-once.py --scheduled
+TimeoutStartSec=20min
+NoNewPrivileges=true
+ProtectHome=true

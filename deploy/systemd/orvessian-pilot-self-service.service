@@ -1,0 +1,14 @@
+[Unit]
+Description=Reconcile newly created synthetic pilot projects with evidence workers
+After=network-online.target orvessian-pilot-portal.service aichain-governance-synthetic-api.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+UMask=0077
+ExecStart=/usr/bin/python3 /opt/aichain/governance-pilot-db-setup/reconcile-pilot-self-service.py
+TimeoutStartSec=25min
+NoNewPrivileges=true
+ProtectHome=true

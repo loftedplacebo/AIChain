@@ -1,5 +1,16 @@
 # Platform architecture and current capabilities
 
+> Hosted-pilot update — 7 October 2026: the public marketing Site and
+> admitted-user synthetic `test` portal/API run over HTTPS with DigitalOcean
+> managed PostgreSQL and daily encrypted Backblaze B2 backups. Two isolated
+> projects have separate hosted workers and independently verified Base
+> Sepolia evidence. A populated two-journal B2 set passed a closed restore in
+> the same managed cluster, and Stage C's supervised pilot limit is approved.
+> The dated local/VPS SQLite descriptions and “not deployed” statements below
+> describe earlier checkpoints; use the [current roadmap](roadmap-and-decisions.md#stage-c-development-update--6-october-2026)
+> and [hosted integration record](hosted-pilot-application-integration.md) for
+> launch status.
+
 Local review increment: workspace sessions can carry an explicit per-workspace
 review permission. The dedicated review API constructs immutable outcome or
 investigation records from the authenticated actor and original decision, then

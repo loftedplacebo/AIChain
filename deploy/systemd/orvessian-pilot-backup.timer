@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily Orvessian pilot encrypted backup
+
+[Timer]
+OnCalendar=*-*-* 03:00:00 UTC
+Persistent=true
+AccuracySec=1min
+Unit=orvessian-pilot-backup.service
+
+[Install]
+WantedBy=timers.target

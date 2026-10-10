@@ -1,0 +1,22 @@
+[Unit]
+Description=Orvessian pilot WorkOS session-revocation replay step
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+WorkingDirectory=/opt/aichain/governance-pilot-api
+EnvironmentFile=/etc/aichain-governance-synthetic-api.env
+ExecStart=/opt/aichain/.toolchains/node-v24.21.0-linux-x64/bin/node scripts/run-pilot-identity-replay.cjs
+TimeoutStartSec=90
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+UMask=0077

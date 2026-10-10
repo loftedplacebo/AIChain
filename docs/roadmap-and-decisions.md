@@ -1,6 +1,89 @@
-# Roadmap and decisions — updated 30 September 2026
+# Roadmap and decisions — current checkpoint 8 October 2026
 
-## Current priority — production foundations and customer onboarding, 30 September
+## Design-partner cohort decision — 8 October 2026
+
+Target **10 independent design-partner organisations** for the supervised
+programme, recruited and onboarded in measured waves beginning with one
+partner's synthetic workflow. Count an organisation only after it has its own
+agreed pilot scope and active integration; ten API keys, users or internal
+projects do not meet the target. This exact ten-partner target supersedes the
+archived founding-programme draft's initial three and later 10–15 range.
+Each partner needs isolated project access and its own support, backup,
+evidence and exit checks before invitation. The current hosted pilot has a
+five-project total cap with four internal/test projects in use, so the target
+requires a measured capacity and project-lifecycle change before onboarding
+the full cohort. Do not raise the live cap or claim ten-partner readiness from
+this planning decision alone. See the
+[partner transition roadmap](design-partner-to-production-roadmap.md) and the
+[ten-partner capacity checkpoint](pilot-ten-partner-capacity.md).
+
+## Environment strategy decision — 8 October 2026
+
+Keep the existing hosted synthetic `test` pilot and WorkOS Staging sign-in while
+the design-partner and production transition is prepared. After a separate
+production release has passed its own acceptance checks, use the free WorkOS
+Staging environment with the isolated local development database and loopback
+API/portal for routine development. The live platform will have **one hosted
+Production deployment** with its own WorkOS Production configuration, database,
+storage, secrets, signing/relayer keys, backups and monitoring. Do not retain a
+second always-on hosted staging stack by default. Use a short-lived isolated
+HTTPS preview only when a change needs real callbacks, webhooks or deployment
+testing that local automation cannot cover; never route that preview to live
+customer data or secrets.
+
+The release path is repository change, automated tests and build, reviewed
+production activation, public health/smoke checks and rollback. Keep the
+[repository release gates](pilot-release-gates.md) green in both source
+repositories; they do not themselves activate or validate the hosted service.
+Keep the
+current hosted pilot available until production identity, account/workspace
+access, evidence, backup and operational acceptance pass; then decide whether
+to retire or repurpose its VPS resources. WorkOS staging users and settings do
+not carry into Production automatically, and current pilot project ownership
+cannot be assumed to survive a client-ID switch. The free hosted WorkOS
+Production login may briefly show a WorkOS URL; defer the $99/month custom
+AuthKit domain until paying-customer demand justifies it. This environment
+decision does not waive the separate production release gates or authorize real
+customer data in the current synthetic pilot. See the
+[transition roadmap](design-partner-to-production-roadmap.md) and
+[production checklist](production-release-checklist.md).
+
+## Stage C development update — 6 October 2026
+
+The local code now supports deterministic per-project pilot worker provisioning,
+multi-journal encrypted backup/closed restore, and project-wide worker,
+backlog and missing-project checks. Native synthetic PostgreSQL tests passed
+two worker journals through recovery and synthetic object-storage transfer.
+See the [multi-project procedure](pilot-multi-project-workers.md). The
+[hosted rollout](deployments/stage-c-vps-rollout-2026-10-06.md) registered the
+existing worker, funded and activated a second internal synthetic project
+worker, passed a fresh version-2 B2 upload containing both journals and combined
+health check, and exercised missing-worker detection. An independent B2
+download and two-project closed restore passed. Both projects subsequently
+produced separately verified Base Sepolia evidence while their workers were
+active. A populated two-journal B2 set passed an independent same-cluster
+download and closed restore. Missing-worker detection and an injected
+stale-job threshold check passed. A bounded simultaneous load then accepted
+and independently verified 20 receipts across the two projects. The
+operator's final receipt waited for its ten-transaction rolling-hour
+worker limit and took 380 seconds to mine; the draft ten-receipt/hour pilot
+ceiling was revised to eight receipts per project per rolling hour, with at
+most two active projects and a 30-minute evidence target; Michael Grant
+approved that supervised synthetic pilot envelope on 6 October. A scheduled
+injected stale-evidence heartbeat delivered a labelled TEST ALERT to the owner
+chat and paused itself; the following healthy runtime check stayed quiet.
+Backup support coverage remains a first-partner trial gate. The 5 October partner
+credential gate remains separate.
+
+## Current design-partner readiness — 5 October 2026
+
+**Ready for outreach and scoping; not yet ready to issue the first partner credential.** The public marketing Site and synthetic demo are live. The Site's sign-in/request-access action opens the hosted pilot portal; a visitor can reach the WorkOS waitlist, but requests require operator approval. The hosted `test` portal and API run on the Contabo VPS over HTTPS, use the DigitalOcean managed PostgreSQL cluster with restricted runtime access, and currently admit the operator plus one owner-controlled second-account test email. That second address has an approved WorkOS waitlist entry, accepted invitation, completed sign-in, enrolled TOTP factor and owner-confirmed Orvessian workspace access. Operator sign-in with required TOTP, password reset and sign-out, a project key, one HTTP 201 synthetic record and its portal view have passed. A signed WorkOS webhook has reached the API. Daily encrypted Backblaze B2 upload, alerting, and a downloaded/authenticated fresh restore into a closed database in the same cluster have passed; the 4 October timed drill took 8.25 seconds. A read-only 4 October health check found portal, API and backup timer active, the last backup service successful, and the upload marker fresh. See the [hosted integration record](hosted-pilot-application-integration.md), [cluster setup](digitalocean-pilot-cluster-setup.md) and [owner queue](pilot-owner-actions.md).
+
+The [pilot brief](examples/design-partner-pilot-brief-template.md#start-decision) still gates partner credentials. The separate hosted worker now runs against the managed-PostgreSQL record; its signed export passed independent Base Sepolia verification at 19 confirmations, and the worker is active with its journal included in encrypted B2 backup. Hosted key revocation passed: one disposable write key returned HTTP 201 before revocation and HTTP 401 afterward. Basic Synthetic Validation resource, evidence-backlog and WorkOS replay monitoring is active under Michael Grant; a bounded API pause/resume rehearsal passed. The second-account request, API admission, WorkOS deny/approve transitions, invitation, TOTP enrollment and workspace sign-in passed on 5 October. Temporary removal of that exact email then blocked fresh workspace sign-in after provider authentication, and restored admission reopened the workspace. A short, supervised ingestion-only API test can use a separate partner project after its synthetic scope and access isolation are checked; signed evidence may remain pending. A full partner evidence trial needs that project's worker release, journal backup and monitoring. See the [staged partner-to-production roadmap](design-partner-to-production-roadmap.md). Agree one partner, synthetic workflow, exact fields, contacts, dates and success measures before access. The public status snapshot was corrected in Site version 30 on 4 October; privacy and terms drafts still need operator and contact details before publication. The same-cluster restore drill does not prove replacement of a lost cluster or full service activation; the 24-hour RPO/RTO values remain targets, not a proven service promise. The [production release checklist](production-release-checklist.md) now tracks the company, domain inboxes and public legal pages along with the remaining paid-service gates. A platform-operator Admin section is a later product task; the pilot uses the WorkOS waitlist and exact-email admission helper, while customer workspace Settings has separate permissions.
+
+The dated 29–30 September sections below are retained as historical implementation evidence. Their “current,” “next,” “not provisioned,” and “not deployed” statements describe those earlier checkpoints and are superseded by this checkpoint and its linked records. Staging/production release, paid service, mainnet, billing, broader SDK coverage, and configurable governance remain separate later work.
+
+## Historical priority snapshot — production foundations and customer onboarding, 30 September
 
 The SDK/integration pass is complete at local alpha scope; see [the audited SDK plan](sdk-integration-plan.md). The production-foundations/onboarding goal remains **active and incomplete**. Local implementation and synthetic/native validation do not establish hosted readiness. Staging and production startup remain hard-gated. Billing/checkout follows this package; website pricing is indicative.
 
@@ -84,7 +167,7 @@ Read-only WorkOS MCP queries (`authkitSettings` and `webhookEndpoints`) against 
 
 Real read-only HTTP Events API checks using the existing local WorkOS configuration also pass authenticated access and empty-page parsing. The observed one-hour and 24-hour windows contain zero revocations; live nonempty event/session-invalidation and webhook-delivery acceptance remain unproven. The [aggregate evidence](validation/workos-revocation-feed-live-2026-09-29.json) records exact observation windows and limitations. No provider or customer state was changed.
 
-### Next critical work and decisions
+### Historical next critical work and decisions — 29–30 September
 
 Shared-database browser preparation — 29 September: the local portal on `http://localhost:3001/workspace` now reaches the configured WorkOS staging sign-in page with the reviewed local callback. Aggregate inspection confirms the encrypted flow is in the fresh `dev` PostgreSQL database (one flow, zero identities before sign-in), rather than SQLite. Browser sign-in is awaiting the customer; callback, renewal, workspace/key lifecycle and evidence acceptance are not yet proven in this database. WorkOS/session regressions still pass 38 tests. The API/portal are loopback-only, with publishing disabled; no saved website environment or provider policy was changed. This supersedes the earlier stopped-service observation only while the current local processes remain live.
 

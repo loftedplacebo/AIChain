@@ -1,8 +1,8 @@
 'use strict';
 const fs=require('node:fs'),path=require('node:path');
-const roles=['worker','rules','indexer','relayer'];
+const {MAX_JOURNALS,validRole}=require('./journal-roles.cjs');
 async function checkBackupSet({environment,root,key,maxAgeHours=24,requiredJournalRoles=[],maxArchives=32},inspect=require('./postgres-backup.cjs').inspectBackup){
- if(!['dev','test'].includes(environment)||typeof root!=='string'||!path.isAbsolute(root)||!Number.isInteger(maxArchives)||maxArchives<1||maxArchives>64||!Number.isInteger(maxAgeHours)||maxAgeHours<1||maxAgeHours>720||!Array.isArray(requiredJournalRoles)||new Set(requiredJournalRoles).size!==requiredJournalRoles.length||requiredJournalRoles.some(role=>!roles.includes(role)))throw Error('Invalid backup monitoring configuration');
+ if(!['dev','test'].includes(environment)||typeof root!=='string'||!path.isAbsolute(root)||!Number.isInteger(maxArchives)||maxArchives<1||maxArchives>64||!Number.isInteger(maxAgeHours)||maxAgeHours<1||maxAgeHours>720||!Array.isArray(requiredJournalRoles)||requiredJournalRoles.length>MAX_JOURNALS||new Set(requiredJournalRoles).size!==requiredJournalRoles.length||requiredJournalRoles.some(role=>!validRole(role,{postgres:true})))throw Error('Invalid backup monitoring configuration');
  const state={status:'not-ready',environment,scope:'Authenticated archives only; no restore, off-host custody or release proof',scanned:0,invalidArchives:0,incompleteArchives:0,latest:null};
  const stat=fs.lstatSync(root);if(!stat.isDirectory()||stat.isSymbolicLink())throw Error('Regular backup root required');
  const entries=fs.readdirSync(root,{withFileTypes:true});

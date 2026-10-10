@@ -2,10 +2,10 @@
 const os=require('node:os');
 const {recoveryFiles:files}=require('./recovery.cjs');
 const {downloadBackupSet,validateTransferPolicy}=require('./backup-object-storage.cjs');
-const roles=['worker','rules','indexer','relayer'];
+const {MAX_JOURNALS,validRole}=require('./journal-roles.cjs');
 
 async function checkRemoteBackup({environment,bucket,keyPrefix,key,client,maxAgeHours=24,requiredJournalRoles=[]}){
- if(!Number.isInteger(maxAgeHours)||maxAgeHours<1||maxAgeHours>720||!Array.isArray(requiredJournalRoles)||new Set(requiredJournalRoles).size!==requiredJournalRoles.length||requiredJournalRoles.some(role=>!roles.includes(role)))throw Error('Invalid remote backup monitoring policy');
+ if(!Number.isInteger(maxAgeHours)||maxAgeHours<1||maxAgeHours>720||!Array.isArray(requiredJournalRoles)||requiredJournalRoles.length>MAX_JOURNALS||new Set(requiredJournalRoles).size!==requiredJournalRoles.length||requiredJournalRoles.some(role=>!validRole(role,{postgres:true})))throw Error('Invalid remote backup monitoring policy');
  validateTransferPolicy({environment,bucket,prefix:keyPrefix,key,client});
  const scratch=files.freshDirectory(os.tmpdir(),'ov-remote-check-');
  try{

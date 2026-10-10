@@ -1,0 +1,29 @@
+[Unit]
+Description=Orvessian internal project Base Sepolia watcher one-run test
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=orvessian-chain-watch
+Group=orvessian-chain-watch
+WorkingDirectory=/opt/aichain/orvessian-chain-watch
+EnvironmentFile=/etc/orvessian-chain-watch.env
+EnvironmentFile=/etc/orvessian-chain-watch-internal.env
+ExecStart=/usr/bin/python3 /opt/aichain/orvessian-chain-watch/periodic-base-health-agent.py --once
+TimeoutStartSec=180
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+ReadWritePaths=/var/lib/orvessian-chain-watch-internal
+MemoryMax=128M
+CPUQuota=10%
+TasksMax=32
+LimitNOFILE=256

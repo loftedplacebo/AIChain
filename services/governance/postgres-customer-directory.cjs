@@ -28,7 +28,7 @@ class PostgresCustomerDirectory {
   const c=await this.pool.connect();try{
    await c.query('BEGIN');await require('./postgres-recovery.cjs').assertActive(c);await c.query("SELECT set_config('statement_timeout','10000',true),set_config('lock_timeout','5000',true)");await this.context(c,context);
    const result=await fn(c);await c.query('COMMIT');return result;
-  }catch(e){await c.query('ROLLBACK');if(['57014','55P03','40P01','40001'].includes(e.code))throw fail(503,'Customer storage busy; retry with the same action ID');if(e.code==='23505')throw fail(409,'Customer operation identity conflict');throw e;}finally{c.release();}
+  }catch(e){await c.query('ROLLBACK');if(['57014','55P03','40P01','40001'].includes(e.code))throw fail(503,'Customer storage busy; retry with the same action ID');if(e.code==='23505')throw fail(409,'Customer operation identity conflict');if(e.code==='P0001'&&e.message==='Pilot project capacity reached')throw fail(429,'Pilot project capacity reached');throw e;}finally{c.release();}
  }
  async projectsIn(c,id){return (await c.query(`SELECT p.id,p.workspace tenant,p.id project,p.name AS "projectName",w.name AS "workspaceName",m.role FROM governance_customer_projects p JOIN governance_customer_workspaces w ON w.id=p.workspace JOIN governance_customer_memberships m ON m.workspace=w.id WHERE m.user_id=$1 ORDER BY w.created,p.created,p.id`,[id])).rows.map(p=>({...p,name:p.workspaceName+' / '+p.projectName}));}
  async identityIn(c,id,{lock=false}={}){

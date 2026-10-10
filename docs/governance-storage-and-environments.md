@@ -1,6 +1,6 @@
 # Governance storage and environment foundation — 2026-09-27
 
-> Current baseline — 28 September 2026: [Platform current state](platform-architecture.md) supersedes dated implementation and launch-status statements below. The synthetic 24-hour reliability run has concluded; it is not a production capacity claim. Production identity, operations and commercial release remain gated. Historical measurements and protocol semantics retain their original scope.
+> Current environment decision — 8 October 2026: [Roadmap environment strategy](roadmap-and-decisions.md#environment-strategy-decision--8-october-2026) supersedes the older four-environment steady-state topology below. Keep the hosted synthetic pilot for now, then use isolated local development with WorkOS Staging and one hosted Production platform. A permanent second hosted staging stack is not planned. The Contabo pilot portal/API, managed DigitalOcean `test` database, and encrypted Backblaze B2 backups remain in use until the production transition passes acceptance. Historical measurements and protocol semantics retain their original scope.
 
 ## Local launcher environment guards — 28 September 2026
 
@@ -64,7 +64,8 @@ secret-placement check; no replacement VPS is selected or authorised for this
 pilot. The owner selected DigitalOcean managed PostgreSQL for the pilot on
 30 September; no cluster has been provisioned. The owner selected Backblaze B2
 EU Central for independent encrypted pilot backups and accepted EU storage.
-No B2 account or bucket has been recorded or validated. The owner moved domain
+The B2 account and private pilot test bucket were validated on 4 October 2026;
+no encrypted upload or restore has yet passed. The owner moved domain
 purchase into pilot preparation and chose `orvessian.com`, subject to
 availability, price review and purchase.
 Recovery targets and retention are recorded below. Release approval remains
@@ -133,18 +134,20 @@ Before partner access, provision actual domains and isolated resources; review
 reverse-proxy path/rate/IP rules and secret placement; run the shared-PostgreSQL
 browser journey and one direct API-key submission; verify an exported receipt and
 Base Sepolia anchor; rehearse alerts, rollback and a synthetic restore. The
-existing Site remains owner-only until the marketing audience is deliberately
-set; the VPS portal admits only named pilot users after the hosted synthetic
-gate passes. Required authenticator-app MFA is selected but not enabled or
-verified in the pilot WorkOS environment.
+marketing Site is public. The VPS portal/API are publicly reachable for the
+single admitted operator email; partner admission remains closed. Required
+authenticator-app MFA is enabled in the pilot WorkOS staging environment, with
+operator enrollment and recovery still to verify.
 None of these controls is established by this topology record.
 
 #### Hosted synthetic API entry point
 
 `scripts/governance-hosted-synthetic-api.cjs` and
-`deploy/systemd/aichain-governance-synthetic-api.service` are a separate,
-uninstalled entry point for the first named synthetic-data design partner. They
-do not replace the running SQLite VPS demo service. The launcher accepts only
+`deploy/systemd/aichain-governance-synthetic-api.service` are a separate entry
+point for the first named synthetic-data design partner. The source and unit
+are running on the existing VPS with restricted PostgreSQL and WorkOS settings;
+see [the integration record](hosted-pilot-application-integration.md). They do
+not replace the running SQLite VPS demo service. The launcher accepts only
 an explicit `test` environment with PostgreSQL events, keys and customer
 control; a remote restricted database login using `sslmode=verify-full` and an
 absolute trusted CA file; WorkOS with an HTTPS portal callback, exact named
@@ -155,7 +158,7 @@ database environment marker before listening. Staging and production startup
 remain separately gated.
 
 For a reviewed deployment, install an appropriately versioned Node runtime and
-the new unit on a separate pilot VPS, with a dedicated service account. Put
+the new unit with a dedicated service account. Put
 provider and database credentials in a root-managed
 `/etc/aichain-governance-synthetic-api.env`; give that account read access only
 to the managed database CA file. Set `GOVERNANCE_ENV=test`, all three storage
@@ -163,8 +166,13 @@ selectors to `postgres`, `GOVERNANCE_DATABASE_URL` for the restricted API role,
 `GOVERNANCE_DATABASE_CA_FILE`, `PORT`, `GOVERNANCE_IDENTITY_PROVIDER=workos`,
 `WORKOS_API_KEY`, `WORKOS_CLIENT_ID`, `WORKOS_REDIRECT_URI`,
 `WORKOS_PILOT_ALLOWED_EMAILS`, `WORKOS_WEBHOOK_SECRET` and
-`GOVERNANCE_IDENTITY_SEAL_KEY`. Keep migration credentials, worker signing keys
-and backup keys out of this service. The unit's Node path and working directory
+`GOVERNANCE_IDENTITY_SEAL_KEY`. For hosted Base Sepolia evidence, also set
+`GOVERNANCE_RECEIPT_SIGNERS` to the explicit recording-service address allowlist
+and `GOVERNANCE_EVIDENCE_RPC_URL` to a read-only HTTPS Base Sepolia RPC endpoint.
+The synthetic pilot's configured recorder is
+`0x02B38234B2875f72835193241ecF56FB83098934`; adding its public address does not
+grant signing or transaction-broadcast access. Keep migration credentials,
+worker signing keys and backup keys out of this service. The unit's Node path and working directory
 must match the actual installation. Do not enable it until the managed database
 drill, HTTPS reverse-proxy rules, WorkOS URLs and isolated secrets are reviewed.
 The service listens on loopback only; its existence does not connect Sites or
@@ -208,17 +216,28 @@ not establish signed WorkOS delivery, provider policy, customer browser flow, da
 custody, signed evidence or release readiness. The example plan's local test
 origin deliberately fails this hosted check.
 
-### Selected pilot database and backup providers — updated 30 September
+### Selected pilot database and backup providers — updated 4 October
 
-The existing VPS is the selected application host for the synthetic pilot,
-subject to the checks above. The owner selected DigitalOcean managed PostgreSQL
-for the pilot, with London (`lon1`) the planned region pending order-page review.
+The existing VPS hosts the operator-only synthetic pilot. The owner selected
+DigitalOcean managed PostgreSQL in London (`lon1`) for the pilot.
 The owner selected a separate Backblaze B2 EU Central account for encrypted
-backup storage. A new DigitalOcean Droplet is only a
+backup storage. The London DigitalOcean cluster and private B2 bucket are now
+provisioned. A first encrypted PostgreSQL capture and B2 upload completed on
+4 October 2026. A fresh closed-database restore from the B2 copy passed on the
+same day. The root-owned `orvessian-pilot-backup.timer` is enabled for 03:00 UTC
+daily and a systemd-triggered dry run completed another encrypted upload.
+An active Codex heartbeat checks the timer, latest completed upload marker,
+last service result and portal/API state at 05:30 Europe/London, notifying the
+owner in this chat only on failure. A timed B2 download, authentication,
+fresh-database restore and review drill passed in 8.25 seconds on 4 October.
+It used the existing managed cluster and did not activate a restored service;
+it is not a measured full-cluster recovery time. A new
+DigitalOcean Droplet is only a
 fallback if the existing VPS fails the pilot suitability check, and requires a
-new owner decision. The portal is planned for the VPS `portal.` subdomain,
-with the marketing site on Sites if custom domains are available. This is a
-**provider selection, not a purchase or live backup**.
+new owner decision. The portal runs on the VPS `portal.` subdomain,
+with the marketing site on Sites. The selected backup provider is provisioned,
+and a failure alert in this chat is active. The restore was to a new
+database in the same managed cluster, not to a separate host or cluster.
 
 The [provider inventory template](../deploy/governance/provider-inventory.example.env)
 lists current vendors, login URLs, operator credential references and connection
@@ -269,7 +288,7 @@ sets. [Role attributes](https://docs.digitalocean.com/products/databases/postgre
 
 Backblaze's EU Central region stores data in Amsterdam, outside the UK. The
 owner accepted EU storage for the pilot. Its account region cannot be changed
-later; confirm the account is created in EU Central. Object Lock can protect a
+later; account settings confirmed EU Central on 4 October. Object Lock can protect a
 retained backup from deletion, but enabling it for a bucket cannot be undone;
 set the retention period only after the deletion policy is agreed. Encrypt
 backup sets before upload with a key held outside both providers, restrict
@@ -281,11 +300,16 @@ For the supervised synthetic pilot, the owner accepted one coordinated encrypted
 database-and-journal backup to B2 each day, 14 days of retention, a 24-hour
 recovery point target (RPO) and a 24-hour recovery time target (RTO). Check for
 missed daily backups, prove a full fresh-target restore before partner access,
-and repeat a restore check monthly. These are targets, not achieved service
-levels: no hosted schedule, B2 lifecycle rule, monitor, alert or timed restore
-has been configured. A B2 lifecycle rule can later expire old copies after
-14 days; optional Object Lock would separately prevent early deletion. Review
-both against the restore and deletion policy before enabling them. The
+and repeat a restore check monthly. These remain recovery targets rather than
+achieved service levels: the hosted daily timer and one fresh restore have
+passed, an app-level failure alert is active, and a timed same-cluster restore
+drill passed. Full-cluster recovery time is not yet measured.
+The private `orvessian-pilot-test-backups` bucket uses Backblaze-managed
+server-side encryption. Its custom rule hides files 14 days after upload and
+deletes hidden versions after at least one more day; lifecycle processing runs
+daily. Object Lock remains disabled because enabling it cannot be undone.
+Client-side archive encryption with a separately escrowed key is still required.
+The
 VPS/operator process must perform encryption and daily uploads. RPO comes
 from the complete backup cadence and monitoring, while RTO depends on an
 exercised restore procedure. Review retention and recovery targets again

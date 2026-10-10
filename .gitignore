@@ -12,6 +12,11 @@ build/
 /artifacts/zk/
 /orvessian-*.tar.gz
 /website/
+/site-publish/
+/website-signup/
+/website-portal-signup/
+/site-publish-*.tar.gz
+/portal-waitlist-*.tar.gz
 
 # Local network state and secrets
 /devnet/

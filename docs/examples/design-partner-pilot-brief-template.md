@@ -86,7 +86,9 @@ pass threshold. Record the observed result and the exact capture boundary.
 
 ## Start decision
 
-Do not issue a partner credential until the hosted synthetic-data acceptance
-check has passed: accessible portal and API, account/role/key lifecycle, first
-record, independently verified export, basic monitoring and named support.
-Record the approving owner, date and evidence links here.
+For a one-day, supervised ingestion-only API test, use the
+[provisional onboarding checklist](first-design-partner-synthetic-pilot-proposal.md#provisional-partner-onboarding-checklist)
+and clearly label evidence as pending. Before the full evidence trial, verify
+accessible portal/API, account/role/key lifecycle, first record, independently
+verified export, partner-project evidence worker, backup and monitoring, and
+named support. Record the approving owner, date and evidence links here.

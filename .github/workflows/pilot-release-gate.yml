@@ -1,0 +1,53 @@
+name: Pilot release gate
+
+concurrency:
+  group: pilot-release-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    paths:
+      - 'deploy/governance/**'
+      - 'services/governance/**'
+      - 'scripts/check-pilot-project-inventory*'
+      - 'package*.json'
+      - '.github/workflows/pilot-release-gate.yml'
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Checkout portal gateway test source
+        uses: actions/checkout@v4
+        with:
+          repository: loftedplacebo/AIChain
+          # Portal source is a separate Git history mirrored in this repo.
+          ref: 85f71d9de1919cc6cd1d03111e098826bde5c244
+          path: website
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci
+      - name: Customer authentication and keys
+        run: |
+          timeout --signal=TERM 120s npm run test:governance-workos
+          timeout --signal=TERM 120s npm run test:governance-project-keys
+      - name: Pilot project and backup inventory
+        run: |
+          node --test services/governance/pilot-worker-inventory.test.cjs services/governance/backup-object-pointer.test.cjs scripts/check-pilot-project-inventory.test.cjs
+          npm run test:governance-backup-object-storage
+          python deploy/governance/test_pilot_cohort_capacity.py
+          python deploy/governance/test_pilot_worker_registry.py
+          python deploy/governance/test_release_pilot_portal.py

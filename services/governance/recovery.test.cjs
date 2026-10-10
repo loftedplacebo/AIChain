@@ -1,6 +1,7 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),os=require('node:os'),path=require('node:path');
 const {randomBytes}=require('node:crypto'),{DatabaseSync}=require('node:sqlite');
 const {createBackup,restoreBackup,reviewRestore}=require('./recovery.cjs'),{bindSqlite}=require('./environment.cjs');
+const {projectWorkerRole}=require('./journal-roles.cjs');
 function temporary(){const directory=fs.mkdtempSync(path.join(os.tmpdir(),'ov-recovery-test-'));return {directory,file:path.join(directory,'source.sqlite'),output:path.join(directory,'backups'),restores:path.join(directory,'restores'),close(){fs.rmSync(directory,{recursive:true,force:true});}};}
 test('encrypted recovery preserves governance evidence, control plane and journal while revoking stale access',async()=>{
  const t=temporary();let store,journal;
@@ -92,5 +93,17 @@ test('read-only recovery review rejects restored access, gate changes and unexpe
   changed.exec('UPDATE customer_identities SET disabled=0');assert.throws(()=>reviewRestore(options),/identities/);changed.exec('UPDATE customer_identities SET disabled=1');
   changed.prepare('UPDATE project_api_keys SET revoked_at=?').run(Date.now()+60000);assert.throws(()=>reviewRestore(options),/API keys/);changed.prepare('UPDATE project_api_keys SET revoked_at=?').run(Date.now());
   changed.exec("UPDATE governance_recovery_gate SET state='approved'");assert.throws(()=>reviewRestore(options),/gate changed/);changed.close();
+ }finally{t.close();}
+});
+test('two project worker journals retain distinct authenticated identities through restore',async()=>{
+ const t=temporary();try{
+  const tenant='org-831aa048-b268-4fce-98f3-455429034ef8',projects=['prj-d9109260-1232-4561-ab4a-ab2e5c8f658f','prj-a9109260-1232-4561-ab4a-ab2e5c8f658f'];
+  const entries=projects.map((project,index)=>{const file=path.join(t.directory,`worker-${index}.sqlite`);bindSqlite(file,'test');const db=new DatabaseSync(file);db.exec('CREATE TABLE marker(value TEXT)');db.prepare('INSERT INTO marker VALUES(?)').run(project);db.close();return {role:projectWorkerRole(tenant,project),path:file};});
+  assert.notEqual(entries[0].role,entries[1].role);
+  const key=randomBytes(32),captured=await createBackup({environment:'test',files:entries,outputRoot:t.output,key,consistency:'quiesced'});
+  const restored=await restoreBackup({environment:'test',directory:captured.directory,outputRoot:t.restores,key});
+  assert.deepEqual(restored.files,entries.map(e=>e.role));assert.equal(reviewRestore({environment:'test',directory:restored.directory}).review,'passed');
+  for(const [index,entry] of entries.entries()){const db=new DatabaseSync(path.join(restored.directory,entry.role+'.sqlite'),{readOnly:true});assert.equal(db.prepare('SELECT value FROM marker').get().value,projects[index]);db.close();}
+  await assert.rejects(createBackup({environment:'test',files:[entries[0],{...entries[1],role:entries[0].role}],outputRoot:t.output,key,consistency:'quiesced'}),/unique/);
  }finally{t.close();}
 });

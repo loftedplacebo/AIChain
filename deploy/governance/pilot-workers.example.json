@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "environment": "test",
+  "workers": [
+    {
+      "tenant": "org-831aa048-b268-4fce-98f3-455429034ef8",
+      "project": "prj-d9109260-1232-4561-ab4a-ab2e5c8f658f",
+      "role": "worker",
+      "unit": "aichain-governance-pilot-evidence-worker.service",
+      "journal": "/var/lib/aichain-governance-pilot-worker/worker.sqlite",
+      "state": "active",
+      "recorder": "REPLACE_WITH_ACTUAL_RECORDING_ADDRESS",
+      "relayer": "REPLACE_WITH_ACTUAL_RELAYER_ADDRESS"
+    }
+  ]
+}

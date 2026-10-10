@@ -1,0 +1,11 @@
+[Unit]
+Description=Run Orvessian internal Responses receipt canary daily
+
+[Timer]
+OnCalendar=*-*-* 09:00:00 Europe/London
+Persistent=true
+AccuracySec=1min
+Unit=orvessian-internal-responses-canary.service
+
+[Install]
+WantedBy=timers.target
