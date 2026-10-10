@@ -51,3 +51,6 @@ jobs:
           python deploy/governance/test_pilot_cohort_capacity.py
           python deploy/governance/test_pilot_worker_registry.py
           python deploy/governance/test_release_pilot_portal.py
+          python deploy/governance/test_release_pilot_runtime.py
+          python deploy/governance/test_release_pilot_database.py
+          python deploy/governance/test_package_pilot_runtime.py

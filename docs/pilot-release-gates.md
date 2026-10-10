@@ -23,8 +23,9 @@ checksum-pinned `deploy/governance/release-pilot-portal.py` entry point. It
 rejects unsafe archive members, stages the standalone build, moves the former
 build to a release-specific previous directory, restarts the portal, checks
 loopback HTTP, and restores the previous build if that check fails. An explicit
-`rollback` command uses the retained previous directory. This covers the VPS
-portal only; API, worker and database releases need their own reviewed paths.
+`rollback` command uses the retained previous directory. The coupled API and
+worker runtime plus transactional database release paths are described in the
+[runtime and database release guide](pilot-runtime-database-release.md).
 
 After building a standalone portal archive and recording its SHA-256, copy it
 and the reviewed release script to the VPS. The release ID must be unique and
