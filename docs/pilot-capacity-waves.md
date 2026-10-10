@@ -19,6 +19,9 @@ operator-owned projects remain. This is a staged capacity plan for the hosted
   with confirmation and independent verification within thirty minutes.
 - There is no measured four-, seven-, ten- or fourteen-project workload yet.
   `pilot-cohort-capacity.py` deliberately reports `throughputMeasured:false`.
+- The operator selected the existing two-project measurement as the current
+  baseline. The five-project cap stays in force; no four-project synthetic
+  wave is scheduled merely to increase it.
 
 ## Advancement sequence
 
