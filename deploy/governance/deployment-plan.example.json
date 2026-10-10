@@ -1,9 +1,9 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "environments": [
     {
       "stage": "dev",
-      "hosting": {"appProvider": "local-dev", "appRegion": "local", "databaseProvider": "local-dev", "databaseRegion": "local", "backupProvider": "local-dev", "backupRegion": "local", "backupAccountRef": "replace/dev/backup-account", "operatorRef": "replace/dev/operator"},
+      "hosting": {"appProvider": "local-dev", "appRegion": "local", "appInstanceRef": "replace/dev/app", "databaseProvider": "local-dev", "databaseRegion": "local", "databaseClusterRef": "replace/dev/database", "backupProvider": "local-dev", "backupRegion": "local", "backupAccountRef": "replace/dev/backup-account", "operatorRef": "replace/dev/operator"},
       "portal": {"origin": "http://127.0.0.1:3002", "apiOrigin": "http://127.0.0.1:8790"},
       "database": {
         "host": "dev.db.example.test",
@@ -31,6 +31,7 @@
         "backupEncryption": "replace/dev/backupEncryption"
       },
       "evidence": {
+        "mode": "base-sepolia",
         "chainId": 84532,
         "recordingAddress": "0x0000000000000000000000000000000000000001",
         "relayerAddress": "0x0000000000000000000000000000000000000002",
@@ -46,7 +47,7 @@
     },
     {
       "stage": "test",
-      "hosting": {"appProvider": "local-test", "appRegion": "local", "databaseProvider": "local-test", "databaseRegion": "local", "backupProvider": "local-test", "backupRegion": "local", "backupAccountRef": "replace/test/backup-account", "operatorRef": "replace/test/operator"},
+      "hosting": {"appProvider": "local-test", "appRegion": "local", "appInstanceRef": "replace/test/app", "databaseProvider": "local-test", "databaseRegion": "local", "databaseClusterRef": "replace/test/database", "backupProvider": "local-test", "backupRegion": "local", "backupAccountRef": "replace/test/backup-account", "operatorRef": "replace/test/operator"},
       "portal": {"origin": "http://127.0.0.1:3003", "apiOrigin": "http://127.0.0.1:8791"},
       "database": {
         "host": "test.db.example.test",
@@ -74,6 +75,7 @@
         "backupEncryption": "replace/test/backupEncryption"
       },
       "evidence": {
+        "mode": "base-sepolia",
         "chainId": 84532,
         "recordingAddress": "0x0000000000000000000000000000000000000003",
         "relayerAddress": "0x0000000000000000000000000000000000000004",
@@ -88,51 +90,8 @@
       }
     },
     {
-      "stage": "staging",
-      "hosting": {"appProvider": "replace-staging-vps-provider", "appRegion": "replace-staging-app-region", "databaseProvider": "replace-staging-database-provider", "databaseRegion": "replace-staging-database-region", "backupProvider": "replace-staging-backup-provider", "backupRegion": "replace-staging-backup-region", "backupAccountRef": "replace/staging/backup-account", "operatorRef": "replace/staging/operator"},
-      "portal": {"origin": "https://staging.example.test", "apiOrigin": "https://api.staging.example.test"},
-      "database": {
-        "host": "staging.db.example.test",
-        "port": 5432,
-        "name": "governance_staging",
-        "apiRole": "governance_api",
-        "workerRole": "governance_evidence_worker",
-        "migrationRole": "governance_migrations",
-        "tls": "verify-full"
-      },
-      "identity": {
-        "environmentId": "replace_staging_environment",
-        "clientId": "replace_staging_client",
-        "callbackUrl": "https://staging.example.test/api/auth/callback",
-        "webhookUrl": "https://api.staging.example.test/v1/auth/workos-webhook"
-      },
-      "secrets": {
-        "apiDatabase": "replace/staging/apiDatabase",
-        "workerDatabase": "replace/staging/workerDatabase",
-        "workosApi": "replace/staging/workosApi",
-        "sessionEncryption": "replace/staging/sessionEncryption",
-        "webhookSigning": "replace/staging/webhookSigning",
-        "recordingSigner": "replace/staging/recordingSigner",
-        "relayer": "replace/staging/relayer",
-        "backupEncryption": "replace/staging/backupEncryption"
-      },
-      "evidence": {
-        "chainId": 84532,
-        "recordingAddress": "0x0000000000000000000000000000000000000005",
-        "relayerAddress": "0x0000000000000000000000000000000000000006",
-        "workerJournal": "replace/staging/worker-journal"
-      },
-      "backup": {
-        "destination": "replace/staging/backups",
-        "custody": "independent-storage",
-        "retentionDays": 7,
-        "rpoMinutes": 1440,
-        "rtoMinutes": 240
-      }
-    },
-    {
       "stage": "prod",
-      "hosting": {"appProvider": "replace-prod-vps-provider", "appRegion": "replace-prod-app-region", "databaseProvider": "replace-prod-database-provider", "databaseRegion": "replace-prod-database-region", "backupProvider": "replace-prod-backup-provider", "backupRegion": "replace-prod-backup-region", "backupAccountRef": "replace/prod/backup-account", "operatorRef": "replace/prod/operator"},
+      "hosting": {"appProvider": "digitalocean", "appRegion": "replace-prod-app-region", "appInstanceRef": "replace/prod/dedicated-app", "databaseProvider": "digitalocean", "databaseRegion": "replace-prod-database-region", "databaseClusterRef": "replace/prod/dedicated-db-cluster", "backupProvider": "replace-independent-backup-provider", "backupRegion": "replace-prod-backup-region", "backupAccountRef": "replace/prod/backup-account", "operatorRef": "replace/prod/operator"},
       "portal": {"origin": "https://prod.example.test", "apiOrigin": "https://api.prod.example.test"},
       "database": {
         "host": "prod.db.example.test",
@@ -160,9 +119,10 @@
         "backupEncryption": "replace/prod/backupEncryption"
       },
       "evidence": {
-        "chainId": 84532,
-        "recordingAddress": "0x0000000000000000000000000000000000000007",
-        "relayerAddress": "0x0000000000000000000000000000000000000008",
+        "mode": "undecided",
+        "chainId": null,
+        "recordingAddress": null,
+        "relayerAddress": null,
         "workerJournal": "replace/prod/worker-journal"
       },
       "backup": {

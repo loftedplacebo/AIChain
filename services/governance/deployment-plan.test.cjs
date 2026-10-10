@@ -2,16 +2,16 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),{spawnSync}=require('node:child_process');
 const {validatePlan}=require('./deployment-plan.cjs');
 const file=path.resolve(__dirname,'../../deploy/governance/deployment-plan.example.json'),fixture=()=>JSON.parse(fs.readFileSync(file,'utf8'));
-test('four-environment topology is reviewable but never release approval',()=>{
+test('three-environment topology is reviewable but never release approval',()=>{
  assert.deepEqual(validatePlan(fixture()),{valid:true,releaseReady:false,errors:[]});
  const result=spawnSync(process.execPath,[path.resolve(__dirname,'../../scripts/governance-deployment-plan.cjs'),file],{encoding:'utf8'});assert.equal(result.status,0);assert.equal(JSON.parse(result.stdout).releaseReady,false);
- for(const value of [null,{},[],{schemaVersion:4,environments:[]}])assert.equal(validatePlan(value).valid,false);
- const plan=fixture();plan.environments[3].stage='test';assert.equal(validatePlan(plan).valid,false);
+ for(const value of [null,{},[],{schemaVersion:5,environments:[]}])assert.equal(validatePlan(value).valid,false);
+ const plan=fixture();plan.environments[2].stage='test';assert.equal(validatePlan(plan).valid,false);
 });
 test('cross-environment state, identity, keys, wallets and backups cannot be shared',()=>{
- const mutations=[p=>p.environments[3].database=p.environments[2].database,p=>p.environments[3].identity=p.environments[2].identity,p=>p.environments[3].secrets=p.environments[2].secrets,p=>p.environments[3].evidence=p.environments[2].evidence,p=>p.environments[3].backup=p.environments[2].backup];
+ const mutations=[p=>p.environments[2].database=p.environments[1].database,p=>p.environments[2].identity=p.environments[1].identity,p=>p.environments[2].secrets=p.environments[1].secrets,p=>p.environments[2].backup=p.environments[1].backup,p=>p.environments[2].hosting.appInstanceRef=p.environments[1].hosting.appInstanceRef,p=>p.environments[2].hosting.databaseClusterRef=p.environments[1].hosting.databaseClusterRef];
  for(const mutate of mutations){const plan=fixture();mutate(plan);assert.equal(validatePlan(plan).valid,false);}
- const plan=fixture();plan.environments[2].evidence.relayerAddress=plan.environments[2].evidence.recordingAddress;assert.equal(validatePlan(plan).valid,false);
+ const plan=fixture();plan.environments[1].evidence.relayerAddress=plan.environments[1].evidence.recordingAddress;assert.equal(validatePlan(plan).valid,false);
  const roles=fixture();roles.environments[2].database.workerRole=roles.environments[2].database.apiRole;assert.equal(validatePlan(roles).valid,false);
 });
 test('hosted TLS, HTTPS, independent backup provider and bounded recovery objectives are required',()=>{
@@ -22,8 +22,8 @@ test('hosted TLS, HTTPS, independent backup provider and bounded recovery object
 test('portal, API, callback and webhook origins form one exact isolated route plan',()=>{
  const mutations=[e=>e.portal.origin='http://staging.example.test',e=>e.portal.apiOrigin='https://user:password@api.staging.example.test',e=>e.portal.origin='https://staging.example.test/path',e=>e.portal.apiOrigin=e.portal.origin,e=>e.identity.callbackUrl=e.portal.apiOrigin+'/api/auth/callback',e=>e.identity.webhookUrl=e.portal.origin+'/v1/auth/workos-webhook'];
  for(const mutate of mutations){const plan=fixture();mutate(plan.environments[2]);assert.equal(validatePlan(plan).valid,false);}
- const shared=fixture();shared.environments[3].portal.apiOrigin=shared.environments[2].portal.apiOrigin;assert.equal(validatePlan(shared).valid,false);
- const old=fixture();old.schemaVersion=1;assert.equal(validatePlan(old).valid,false);
+ const shared=fixture();shared.environments[2].portal.apiOrigin=shared.environments[1].portal.apiOrigin;assert.equal(validatePlan(shared).valid,false);
+ for(const version of [1,3]){const old=fixture();old.schemaVersion=version;assert.equal(validatePlan(old).valid,false);}
 });
 test('an HTTPS synthetic test pilot has hosted isolation and public DNS requirements',()=>{
  const hosted=fixture(),pilot=hosted.environments[1];
@@ -44,7 +44,18 @@ test('an HTTPS synthetic test pilot has hosted isolation and public DNS requirem
  ]){const plan=structuredClone(hosted);mutate(plan.environments[1]);assert.equal(validatePlan(plan).valid,false);}
 });
 test('unknown fields and inline credential objects are rejected without reflecting values',()=>{
- const plan=fixture();plan.environments[2].secrets.workosApi={value:'private-secret-value'};plan.environments[3].database.password='private-secret-value';const result=validatePlan(plan);assert.equal(result.valid,false);assert.ok(!JSON.stringify(result).includes('private-secret-value'));
+ const plan=fixture();plan.environments[1].secrets.workosApi={value:'private-secret-value'};plan.environments[2].database.password='private-secret-value';const result=validatePlan(plan);assert.equal(result.valid,false);assert.ok(!JSON.stringify(result).includes('private-secret-value'));
  const unknown=fixture();unknown.approved=true;assert.equal(validatePlan(unknown).valid,false);
- const sharedBackup=fixture();sharedBackup.environments[3].hosting.backupAccountRef=sharedBackup.environments[2].hosting.backupAccountRef;assert.equal(validatePlan(sharedBackup).valid,false);
+ const sharedBackup=fixture();sharedBackup.environments[2].hosting.backupAccountRef=sharedBackup.environments[1].hosting.backupAccountRef;assert.equal(validatePlan(sharedBackup).valid,false);
+});
+test('production evidence stays undecided until a separate chain and custody decision',()=>{
+ const plan=fixture(),prod=plan.environments[2];assert.equal(validatePlan(plan).valid,true);
+ prod.evidence.mode='base-mainnet';prod.evidence.chainId=8453;
+ prod.evidence.recordingAddress='0x0000000000000000000000000000000000000007';
+ prod.evidence.relayerAddress='0x0000000000000000000000000000000000000008';
+ assert.equal(validatePlan(plan).valid,true);
+ prod.evidence.chainId=84532;assert.equal(validatePlan(plan).valid,false);
+ prod.evidence.chainId=8453;
+ prod.evidence.recordingAddress=plan.environments[1].evidence.recordingAddress;
+ assert.equal(validatePlan(plan).valid,false);
 });

@@ -1,4 +1,15 @@
-# Roadmap and decisions — current checkpoint 8 October 2026
+# Roadmap and decisions — current checkpoint 10 October 2026
+
+## Production preparation decision — 10 October 2026
+
+Prepare a separate DigitalOcean production application instance and managed
+PostgreSQL cluster. Keep the synthetic pilot isolated and use local development
+with WorkOS Staging. The production evidence chain remains undecided; no
+production wallet, contract or Base Sepolia reuse is approved. The version-4
+deployment-plan example and validator now model these three environments and
+distinct app/database resources. The [production transition sequence](production-transition-sequence.md)
+lists the provisioning, identity, recovery, security and owner gates. This is
+planning and release preparation, not a purchase or production activation.
 
 ## Design-partner cohort decision — 8 October 2026
 

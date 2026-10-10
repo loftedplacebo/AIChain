@@ -335,10 +335,13 @@ private copy for real infrastructure identifiers. The checker reads at most 64 K
 prints only validation errors/status, opens no network connection and makes no
 configuration or database changes. A valid result always has `releaseReady:false`.
 
-The schema requires dev, test, staging and prod, each with a distinct database,
-provider environment/client, callback/webhook URL, credential references, recording/
-relayer addresses, worker journal and backup destination. API, worker and migration
-roles must differ within a database. Staging and production, plus a `test`
+The current schema version 4 requires local `dev`, the temporary hosted `test`
+pilot, and a separate hosted `prod`. It requires distinct application instances,
+database clusters, provider environments/clients, callback/webhook URLs,
+credential references, worker journals and backup destinations. API, worker and
+migration roles must differ within a database. Production evidence chain and
+wallets may remain explicitly undecided in a planning record; they must be
+selected and independently reviewed before release. Production, plus a `test`
 profile using HTTPS portal/API origins for a hosted synthetic pilot, require
 verified PostgreSQL TLS, HTTPS identity endpoints with public DNS names and
 independent backup storage. Every profile declares
@@ -348,7 +351,7 @@ prefixes may share a failure domain. Independent provisioning review must check
 actual resources, access policies, key material and restore results. The validator
 does not prove any of those properties. No existing secret files are imported.
 
-Schema version 2 adds exact portal and API origins for each environment. The
+The plan includes exact portal and API origins for each environment. The
 callback must be the portal origin plus `/api/auth/callback`; the signed WorkOS
 webhook must be the API origin plus `/v1/auth/workos-webhook`. Origins must be
 distinct across these routes and environments; hosted origins require HTTPS and

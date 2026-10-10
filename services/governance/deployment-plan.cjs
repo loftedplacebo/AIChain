@@ -1,6 +1,6 @@
 'use strict';
 // Non-secret topology review only. Does not resolve credentials or approve release.
-const stages=['dev','test','staging','prod'];
+const stages=['dev','test','prod'];
 const secretFields=['apiDatabase','workerDatabase','workosApi','sessionEncryption','webhookSigning','recordingSigner','relayer','backupEncryption'];
 const scalar=(value)=>typeof value==='string'&&/^[A-Za-z0-9][A-Za-z0-9_.:/-]{0,199}$/.test(value);
 const loopback=host=>['localhost','127.0.0.1','[::1]'].includes(host);
@@ -13,17 +13,19 @@ function exact(value,fields,location,errors){
 function validatePlan(plan){
  const errors=[],resources=new Map();
  const unique=(kind,value,stage)=>{const key=kind+':'+value;if(resources.has(key))errors.push(stage+': '+kind+' must be separate from '+resources.get(key));else resources.set(key,stage);};
- if(!exact(plan,['schemaVersion','environments'],'plan',errors)||plan.schemaVersion!==3){return {valid:false,releaseReady:false,errors:errors.length?errors:['plan: unsupported schema']};}
- if(!Array.isArray(plan.environments)||plan.environments.length!==4)return {valid:false,releaseReady:false,errors:['plan: exactly dev, test, staging and prod required']};
+ if(!exact(plan,['schemaVersion','environments'],'plan',errors)||plan.schemaVersion!==4){return {valid:false,releaseReady:false,errors:errors.length?errors:['plan: unsupported schema']};}
+ if(!Array.isArray(plan.environments)||plan.environments.length!==3)return {valid:false,releaseReady:false,errors:['plan: exactly dev, test and prod required']};
  const seen=new Set();
  for(const env of plan.environments){
   if(!exact(env,['stage','hosting','portal','database','identity','secrets','evidence','backup'],'environment',errors))continue;
   const stage=env.stage;if(!stages.includes(stage)||seen.has(stage)){errors.push('environment: invalid or repeated stage');continue;}seen.add(stage);
-  const hosted=['staging','prod'].includes(stage)||stage==='test'&&['origin','apiOrigin'].some(field=>typeof env.portal?.[field]==='string'&&env.portal[field].startsWith('https:'));
-  if(exact(env.hosting,['appProvider','appRegion','databaseProvider','databaseRegion','backupProvider','backupRegion','backupAccountRef','operatorRef'],'hosting',errors)){
+  const hosted=stage==='prod'||stage==='test'&&['origin','apiOrigin'].some(field=>typeof env.portal?.[field]==='string'&&env.portal[field].startsWith('https:'));
+  if(exact(env.hosting,['appProvider','appRegion','appInstanceRef','databaseProvider','databaseRegion','databaseClusterRef','backupProvider','backupRegion','backupAccountRef','operatorRef'],'hosting',errors)){
    const hosting=env.hosting;
-   for(const field of ['appProvider','appRegion','databaseProvider','databaseRegion','backupProvider','backupRegion','backupAccountRef','operatorRef'])if(!scalar(hosting[field]))errors.push(stage+': invalid hosting '+field);
+   for(const field of ['appProvider','appRegion','appInstanceRef','databaseProvider','databaseRegion','databaseClusterRef','backupProvider','backupRegion','backupAccountRef','operatorRef'])if(!scalar(hosting[field]))errors.push(stage+': invalid hosting '+field);
    if(hosted&&scalar(hosting.backupProvider)&&[hosting.appProvider,hosting.databaseProvider].some(provider=>scalar(provider)&&provider.toLowerCase()===hosting.backupProvider.toLowerCase()))errors.push(stage+': backup provider must be independent of application and database providers');
+   if(scalar(hosting.appInstanceRef))unique('application instance',hosting.appInstanceRef,stage);
+   if(scalar(hosting.databaseClusterRef))unique('database cluster',hosting.databaseClusterRef,stage);
    if(scalar(hosting.backupAccountRef))unique('backup account',hosting.backupAccountRef,stage);
   }
   let portalOrigin=null,apiOrigin=null;
@@ -55,9 +57,14 @@ function validatePlan(plan){
   if(exact(env.secrets,secretFields,'secrets',errors)){
    for(const field of secretFields)if(!scalar(env.secrets[field]))errors.push(stage+': invalid secret reference');else unique('secret reference',env.secrets[field],stage);
   }
-  if(exact(env.evidence,['chainId','recordingAddress','relayerAddress','workerJournal'],'evidence',errors)){
-   if(![84532,8453].includes(env.evidence.chainId)||stage!=='prod'&&env.evidence.chainId!==84532)errors.push(stage+': invalid Base chain selection');
-   for(const field of ['recordingAddress','relayerAddress'])if(typeof env.evidence[field]!=='string'||!/^0x[0-9a-fA-F]{40}$/.test(env.evidence[field])||/^0x0{40}$/i.test(env.evidence[field]))errors.push(stage+': invalid evidence address');else unique('signing address',env.evidence[field].toLowerCase(),stage);
+  if(exact(env.evidence,['mode','chainId','recordingAddress','relayerAddress','workerJournal'],'evidence',errors)){
+   const evidence=env.evidence,pending=stage==='prod'&&evidence.mode==='undecided';
+   if(pending){
+    if(evidence.chainId!==null||evidence.recordingAddress!==null||evidence.relayerAddress!==null)errors.push(stage+': undecided evidence must not declare a chain or keys');
+   }else{
+    if(evidence.mode!==(stage==='prod'?'base-mainnet':'base-sepolia')||evidence.chainId!==(stage==='prod'?8453:84532))errors.push(stage+': invalid Base chain selection');
+    for(const field of ['recordingAddress','relayerAddress'])if(typeof evidence[field]!=='string'||!/^0x[0-9a-fA-F]{40}$/.test(evidence[field])||/^0x0{40}$/i.test(evidence[field]))errors.push(stage+': invalid evidence address');else unique('signing address',evidence[field].toLowerCase(),stage);
+   }
    if(!scalar(env.evidence.workerJournal))errors.push(stage+': invalid worker journal reference');else unique('worker journal',env.evidence.workerJournal,stage);
   }
   if(exact(env.backup,['destination','custody','retentionDays','rpoMinutes','rtoMinutes'],'backup',errors)){
@@ -66,6 +73,6 @@ function validatePlan(plan){
    for(const field of ['retentionDays','rpoMinutes','rtoMinutes'])if(!Number.isSafeInteger(env.backup[field])||env.backup[field]<1||env.backup[field]>525600)errors.push(stage+': invalid backup objective');
   }
  }
- return {valid:errors.length===0&&seen.size===4,releaseReady:false,errors};
+ return {valid:errors.length===0&&seen.size===3,releaseReady:false,errors};
 }
 module.exports={validatePlan};
