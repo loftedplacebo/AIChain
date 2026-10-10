@@ -44,6 +44,7 @@ jobs:
         run: |
           timeout --signal=TERM 120s npm run test:governance-workos
           timeout --signal=TERM 120s npm run test:governance-project-keys
+          timeout --signal=TERM 120s npm run test:governance-deployment-plan
       - name: Pilot project and backup inventory
         run: |
           node --test services/governance/pilot-worker-inventory.test.cjs services/governance/backup-object-pointer.test.cjs scripts/check-pilot-project-inventory.test.cjs

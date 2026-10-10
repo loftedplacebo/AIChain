@@ -7,6 +7,12 @@ Completing the hosted `test` pilot does not complete this checklist.
 The [roadmap](roadmap-and-decisions.md) and linked evidence remain the detailed
 engineering record.
 
+On 10 October the owner selected a separate DigitalOcean production application
+instance and managed database, retained the hosted synthetic pilot, and deferred
+the production evidence-chain choice. The ordered preparation and indicative
+infrastructure budget are in the [production transition sequence](production-transition-sequence.md).
+These selections do not complete any release checkbox below.
+
 ## Business, identity and public information
 
 - [ ] Establish the legal person or company that will provide the service,
