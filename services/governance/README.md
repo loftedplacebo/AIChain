@@ -456,9 +456,13 @@ GOVERNANCE_CONTROL_STORAGE=postgres
 Prepare a non-secret local-development, hosted-pilot and production topology with
 `npm run governance:review-deployment-plan -- <plan.json>` before provisioning.
 The [example](../../deploy/governance/deployment-plan.example.json) uses dummy
-identifiers and schema version 4; validation is offline and never approves release.
+identifiers and schema version 5; validation is offline and never approves release.
 It requires separate declared backup providers for hosted resources and distinct
-application, database-cluster and backup-account references across environments.
+application and backup-account references across environments. The production
+database cluster may explicitly share the pilot cluster if the endpoint matches
+and database names and all runtime roles differ; a dedicated production cluster
+remains supported. Shared-cluster permissions, capacity and recovery require
+live review beyond this non-secret validator.
 Production chain and wallets may remain undecided in the plan. Provider identity and custody
 still need independent review. Hosted runtime
 gates remain unchanged. See the

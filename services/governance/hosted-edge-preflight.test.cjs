@@ -23,7 +23,12 @@ test('hosted test edge checks exact unauthenticated and internal route statuses 
 });
 test('unhosted or invalid plan never makes an external request',async()=>{
  let calls=0;
- await assert.rejects(checkEdge(fixture(),async()=>{calls++;throw Error('unreachable');}),/not configured for hosted acceptance/);
+ const unhosted=fixture(),pilot=unhosted.environments[1];
+ pilot.portal={origin:'http://127.0.0.1:3003',apiOrigin:'http://127.0.0.1:8791'};
+ pilot.identity.callbackUrl=pilot.portal.origin+'/api/auth/callback';
+ pilot.identity.webhookUrl=pilot.portal.apiOrigin+'/v1/auth/workos-webhook';
+ pilot.database.tls='local';pilot.backup.custody='local-synthetic';
+ await assert.rejects(checkEdge(unhosted,async()=>{calls++;throw Error('unreachable');}),/not configured for hosted acceptance/);
  const plan=hosted();plan.environments[1].hosting.backupProvider=plan.environments[1].hosting.appProvider;
  await assert.rejects(checkEdge(plan,async()=>{calls++;throw Error('unreachable');}),/failed offline review/);
  assert.equal(calls,0);

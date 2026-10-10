@@ -97,8 +97,11 @@ The existing hosted synthetic pilot remains the temporary staging/test service
 while partner and production acceptance is prepared. The long-term development
 environment is local: isolated development database, loopback API/portal,
 automated tests and WorkOS Staging. The live platform uses one hosted Production
-deployment and WorkOS Production, with separate data, credentials, evidence
-keys, backup and monitoring. An always-on second hosted staging stack is not a
+deployment and WorkOS Production, with a separate production database and
+restricted roles on the existing managed pilot cluster for the limited first
+release, plus separate credentials, evidence keys, backup and monitoring.
+This shares cluster capacity, maintenance, administrator and outage risk until
+a rehearsed move to a dedicated production cluster. An always-on second hosted staging stack is not a
 default requirement; use a short-lived isolated HTTPS preview for callbacks,
 webhooks or release tests that cannot be proved locally. Do not connect a
 preview to live data or secrets.

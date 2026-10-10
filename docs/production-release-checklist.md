@@ -8,9 +8,11 @@ The [roadmap](roadmap-and-decisions.md) and linked evidence remain the detailed
 engineering record.
 
 On 10 October the owner selected a separate DigitalOcean production application
-instance and managed database, retained the hosted synthetic pilot, and deferred
-the production evidence-chain choice. The ordered preparation and indicative
-infrastructure budget are in the [production transition sequence](production-transition-sequence.md).
+instance with a separate production database and roles on the existing managed
+pilot cluster for a limited initial release. A dedicated production cluster is
+deferred; the hosted synthetic pilot remains, and the production evidence-chain
+choice is deferred. The shared-cluster risks, ordered preparation and indicative
+budget are in the [production transition sequence](production-transition-sequence.md).
 These selections do not complete any release checkbox below.
 
 ## Business, identity and public information
@@ -30,7 +32,8 @@ These selections do not complete any release checkbox below.
 ## Production product and access
 
 - [ ] Deploy and accept one hosted Production environment with its own WorkOS
-  Production identity, database, storage, signing/relayer keys, secrets,
+  Production identity, database and non-owner roles on the existing managed
+  cluster, storage, signing/relayer keys, secrets,
   backups and provider configuration. Keep the existing hosted synthetic pilot
   until cutover evidence passes, then use isolated local development with WorkOS
   Staging for routine tests. Use short-lived isolated HTTPS previews only where
@@ -38,6 +41,11 @@ These selections do not complete any release checkbox below.
   Rehearse account/workspace transition and rollback; staging identities and
   pilot keys do not transfer automatically. Start with free hosted Production
   AuthKit; a paid custom login domain is deferred.
+- [ ] Before production access, prove bidirectional pilot/production database
+  role isolation, separate encrypted backup and journal coverage, and acceptable
+  combined cluster capacity. Record the shared cluster's common outage and
+  administrator risk; rehearse the later move to a dedicated cluster before
+  promising independent availability.
 - [ ] Pass the complete customer journey: registration/admission, MFA and
   recovery, organizations and roles, scoped API keys, first submission,
   revocation, signed evidence, independent export verification and deletion.

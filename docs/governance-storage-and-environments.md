@@ -335,11 +335,13 @@ private copy for real infrastructure identifiers. The checker reads at most 64 K
 prints only validation errors/status, opens no network connection and makes no
 configuration or database changes. A valid result always has `releaseReady:false`.
 
-The current schema version 4 requires local `dev`, the temporary hosted `test`
+The current schema version 5 requires local `dev`, the temporary hosted `test`
 pilot, and a separate hosted `prod`. It requires distinct application instances,
-database clusters, provider environments/clients, callback/webhook URLs,
-credential references, worker journals and backup destinations. API, worker and
-migration roles must differ within a database. Production evidence chain and
+database names, provider environments/clients, callback/webhook URLs,
+credential references, worker journals and backup destinations. An explicitly
+declared production/pilot cluster share is allowed only with the same endpoint
+and distinct API, worker and migration roles across both databases; a dedicated
+production cluster remains valid. Production evidence chain and
 wallets may remain explicitly undecided in a planning record; they must be
 selected and independently reviewed before release. Production, plus a `test`
 profile using HTTPS portal/API origins for a hosted synthetic pilot, require
@@ -347,7 +349,8 @@ verified PostgreSQL TLS, HTTPS identity endpoints with public DNS names and
 independent backup storage. Every profile declares
 retention and RPO/RTO targets. These are declared constraints: different references
 can still resolve to the same secret, hosts can be aliases, and separate backup
-prefixes may share a failure domain. Independent provisioning review must check
+prefixes may share a failure domain. A shared cluster also has one administrator,
+maintenance window and failure/capacity domain. Independent provisioning review must check
 actual resources, access policies, key material and restore results. The validator
 does not prove any of those properties. No existing secret files are imported.
 
@@ -356,7 +359,7 @@ callback must be the portal origin plus `/api/auth/callback`; the signed WorkOS
 webhook must be the API origin plus `/v1/auth/workos-webhook`. Origins must be
 distinct across these routes and environments; hosted origins require HTTPS and
 public DNS names rather than IP literals or local-only names. This catches a common Sites-to-VPS miswire before provider
-registration. Version 1 private plan copies must be updated to version 2 with
+registration. Older private plan copies must be updated to version 5 with
 these fields. The check compares declared strings only: it does not prove DNS,
 TLS, reverse-proxy routing, Sites runtime settings or provider registration.
 
@@ -365,7 +368,7 @@ Recommended release sequence:
 1. Select the database/backup hosting layout and agree recovery objectives. Record
    operators and ownership for identity, database, app, evidence publication and
    recovery; inventory protected secret references and failure domains. Prepare
-   all four profiles without copying customer data or signing keys between them.
+   dev, temporary pilot and production profiles without copying customer data or signing keys between them.
 2. Provision an isolated test database and provider configuration. Apply reviewed
    migrations with the migration owner, then the separate API/worker grants. Check
    native TLS, forced RLS, strict profiles and environment binding with actual
@@ -387,16 +390,16 @@ Recommended release sequence:
    exact application revision and migration checksums. Application rollback must
    be compatible with the current schema; destructive schema reversal or restoring
    over live data is not an automatic rollback strategy.
-6. Review the evidence and explicitly implement the staging release gate before
-   any hosted exposure. Staging then rehearses the complete deployment and rollback
-   with synthetic data. Production requires its own provider/database/keys/backup
-   custody and separate approval; a successful staging run is not production consent.
+6. Review the evidence and exercise the pilot release gate before production
+   exposure. The hosted synthetic pilot rehearses deployment and rollback.
+   Production requires its own provider identity, database roles, keys and backup
+   custody and separate approval, including shared-cluster isolation and load
+   checks; a successful pilot run is not production consent.
 
 Both hosted runtime stages remain hard-gated in code. This plan does not override
 those gates or authorise spending, deployments, provider changes, public exposure,
-mainnet publication or scheduled work. The pending infrastructure decision does
-not prevent further local implementation. Seven deployment/environment checks
-passed, including topology sharing rejection and preservation of hosted startup gates.
+mainnet publication or scheduled work. A valid shared-cluster plan still needs
+actual role-denial, capacity, backup and recovery evidence before release.
 
 ## Standalone validation update
 

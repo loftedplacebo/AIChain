@@ -2,12 +2,17 @@
 
 ## Production preparation decision — 10 October 2026
 
-Prepare a separate DigitalOcean production application instance and managed
-PostgreSQL cluster. Keep the synthetic pilot isolated and use local development
-with WorkOS Staging. The production evidence chain remains undecided; no
-production wallet, contract or Base Sepolia reuse is approved. The version-4
-deployment-plan example and validator now model these three environments and
-distinct app/database resources. The [production transition sequence](production-transition-sequence.md)
+Prepare a separate DigitalOcean production application instance with a separate
+production database and non-owner roles on the existing managed PostgreSQL
+pilot cluster for a limited first release. Keep the synthetic pilot's database,
+roles, keys, backup sets and worker journals distinct, and use local development
+with WorkOS Staging. A dedicated production database cluster can follow a
+rehearsed migration when capacity, recovery or customer commitments justify it.
+The production evidence chain remains undecided; no
+production wallet, contract or Base Sepolia reuse is approved. The version-5
+deployment-plan example and validator now model these three environments,
+distinct app/database resources and an explicitly shared cluster. The
+[production transition sequence](production-transition-sequence.md)
 lists the provisioning, identity, recovery, security and owner gates. This is
 planning and release preparation, not a purchase or production activation.
 
@@ -35,7 +40,8 @@ the design-partner and production transition is prepared. After a separate
 production release has passed its own acceptance checks, use the free WorkOS
 Staging environment with the isolated local development database and loopback
 API/portal for routine development. The live platform will have **one hosted
-Production deployment** with its own WorkOS Production configuration, database,
+Production deployment** with its own WorkOS Production configuration, database
+and restricted roles on the initially shared managed cluster,
 storage, secrets, signing/relayer keys, backups and monitoring. Do not retain a
 second always-on hosted staging stack by default. Use a short-lived isolated
 HTTPS preview only when a change needs real callbacks, webhooks or deployment
