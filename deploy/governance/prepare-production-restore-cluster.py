@@ -45,8 +45,8 @@ def preflight():
                 not any(line.split()[:4] == ['17', CLUSTER, '5441', 'down']
                         for line in clusters.splitlines()) or \
                 (existing / 'start.conf').read_text(encoding='ascii').strip().splitlines()[-1] != 'manual' or \
-                run('pg_conftool', VERSION, CLUSTER, 'show', 'listen_addresses') != \
-                'listen_addresses = 127.0.0.1':
+                run('pg_conftool', VERSION, CLUSTER, 'show', 'listen_addresses') not in \
+                ('listen_addresses = 127.0.0.1', "listen_addresses = '127.0.0.1'"):
             raise ValueError('Existing recovery cluster is not the exact paused setup')
         return True
     return False
@@ -60,7 +60,7 @@ def install(resume):
     verifier = module.scram_verifier(secret)
     if not resume:
         run('pg_createcluster', VERSION, CLUSTER, '--port=5441', '--start-conf=manual')
-        run('pg_conftool', VERSION, CLUSTER, 'set', 'listen_addresses', '127.0.0.1')
+    run('pg_conftool', VERSION, CLUSTER, 'set', 'listen_addresses', "'127.0.0.1'")
     # The distro systemd template cannot expand a hyphenated cluster name.
     # Direct pg_ctlcluster control keeps this manual-start drill isolated.
     run('pg_ctlcluster', '--skip-systemctl-redirect', VERSION, CLUSTER, 'start')
