@@ -28,9 +28,8 @@ def run(*args, input=None):
 
 
 def preflight():
-    if os.geteuid() != 0 or PASSWORD.exists() or PASSWORD.is_symlink() or \
-            pathlib.Path('/etc/postgresql/17/production-recovery').exists():
-        raise ValueError('Fresh root-only recovery cluster required')
+    if os.geteuid() != 0 or PASSWORD.exists() or PASSWORD.is_symlink():
+        raise ValueError('Root and absent recovery credential required')
     with socket.socket() as probe:
         probe.settimeout(1)
         if probe.connect_ex(('127.0.0.1', PORT)) == 0:
@@ -40,17 +39,31 @@ def preflight():
         raise ValueError('Existing pilot PostgreSQL 17 cluster not found')
     if not ROOT.is_dir():
         raise ValueError('Protected production backup root required')
+    existing = pathlib.Path('/etc/postgresql/17/production-recovery')
+    if existing.exists():
+        if not existing.is_dir() or existing.is_symlink() or \
+                not any(line.split()[:4] == ['17', CLUSTER, '5441', 'down']
+                        for line in clusters.splitlines()) or \
+                (existing / 'start.conf').read_text(encoding='ascii').strip().splitlines()[-1] != 'manual' or \
+                run('pg_conftool', VERSION, CLUSTER, 'show', 'listen_addresses') != \
+                'listen_addresses = 127.0.0.1':
+            raise ValueError('Existing recovery cluster is not the exact paused setup')
+        return True
+    return False
 
 
-def install():
+def install(resume):
     spec = importlib.util.spec_from_file_location('production_schema', MODULE)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     secret = secrets.token_hex(32)
     verifier = module.scram_verifier(secret)
-    run('pg_createcluster', VERSION, CLUSTER, '--port=5441', '--start-conf=manual')
-    run('pg_conftool', VERSION, CLUSTER, 'set', 'listen_addresses', '127.0.0.1')
-    run('pg_ctlcluster', VERSION, CLUSTER, 'start')
+    if not resume:
+        run('pg_createcluster', VERSION, CLUSTER, '--port=5441', '--start-conf=manual')
+        run('pg_conftool', VERSION, CLUSTER, 'set', 'listen_addresses', '127.0.0.1')
+    # The distro systemd template cannot expand a hyphenated cluster name.
+    # Direct pg_ctlcluster control keeps this manual-start drill isolated.
+    run('pg_ctlcluster', '--skip-systemctl-redirect', VERSION, CLUSTER, 'start')
     run('runuser', '-u', 'postgres', '--', PSQL, '-X', '-q', '-v', 'ON_ERROR_STOP=1',
         '-p', str(PORT), '-d', 'postgres', input=f"ALTER ROLE postgres PASSWORD '{verifier}';\n")
     fd = os.open(PASSWORD, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
@@ -76,11 +89,12 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--apply', action='store_true')
     args = parser.parse_args()
-    preflight()
+    resume = preflight()
     if args.apply:
-        install()
+        install(resume)
     else:
-        print('production_restore_cluster=ready_to_create;mode=read-only;port=5441')
+        print('production_restore_cluster=' + ('ready_to_resume' if resume else 'ready_to_create') +
+              ';mode=read-only;port=5441')
 
 
 if __name__ == '__main__':
