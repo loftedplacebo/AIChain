@@ -79,6 +79,13 @@ can create the non-login API identity, empty root-owned release directory and
 disabled unit earlier. Its default mode is read-only; `--apply` never starts a
 service or creates an HTTPS route. Install a pinned API artifact and complete
 the private preflight before enabling the unit.
+On 11 October its pinned unit hash and read-only preflight passed, then
+`--apply` staged `orvessian-prod-api` with `/usr/sbin/nologin`, the empty
+root-owned `/opt/aichain/orvessian-production-api` directory, and
+`orvessian-production-api.service`. Independent `systemctl show` reported
+`UnitFileState=disabled` and `ActiveState=inactive`; the synthetic pilot health
+check remained green. No production release artifact, environment file,
+database login, public route or customer traffic was activated.
 
 On 10 October, the existing isolated local `dev` PostgreSQL cluster started,
 the loopback API returned HTTP 200 for `/health` and `/ready` and HTTP 401 for
