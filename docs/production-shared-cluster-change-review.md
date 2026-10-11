@@ -104,9 +104,10 @@ backup support and the replacement-cluster drill remain release blockers.
   has a separate published 1,000-check free threshold. The owner explicitly
   chose to keep production Radar `Off` on 11 October to avoid that separate
   usage meter during preparation; authentication abuse detection is reduced
-  until it is reconsidered. A daily read-only WorkOS Production
-  `session.created` summary is scheduled for 09:00 Europe/London, including
-  zero-sign-in days. Keep customer traffic
+  until it is reconsidered. A daily read-only WorkOS Production monthly active
+  user report is scheduled for 09:00 Europe/London, including zero-user days.
+  It uses the WorkOS billing MAU quantity when exposed; otherwise it clearly
+  labels distinct completed sign-in users as a lower-bound proxy. Keep customer traffic
   closed until callbacks, signed webhooks, MFA/recovery and spend exposure are
   accepted. No SSO connection or paid custom domain is configured.
 - The runtime startup and several storage/recovery modules still deliberately
