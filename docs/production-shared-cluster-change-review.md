@@ -101,8 +101,12 @@ backup support and the replacement-cluster drill remain release blockers.
   $0 upcoming invoice, with zero SSO, Directory Sync, audit-stream, Radar-check
   and Radar-SMS usage at inspection time. This is a snapshot, not a spending cap.
   Hosted AuthKit includes the first 1 million monthly active users free; Radar
-  has a separate published 1,000-check free threshold. Production Radar remains
-  in `Log` mode while its billing behavior is clarified. Keep customer traffic
+  has a separate published 1,000-check free threshold. The owner explicitly
+  chose to keep production Radar `Off` on 11 October to avoid that separate
+  usage meter during preparation; authentication abuse detection is reduced
+  until it is reconsidered. A daily read-only WorkOS Production
+  `session.created` summary is scheduled for 09:00 Europe/London, including
+  zero-sign-in days. Keep customer traffic
   closed until callbacks, signed webhooks, MFA/recovery and spend exposure are
   accepted. No SSO connection or paid custom domain is configured.
 - The runtime startup and several storage/recovery modules still deliberately
