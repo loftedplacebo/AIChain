@@ -41,8 +41,9 @@ def run(*args: str, timeout: int = 300) -> subprocess.CompletedProcess:
 def main() -> None:
     if os.geteuid() != 0:
         raise SystemExit('Run as root')
-    if len(sys.argv) > 2 or len(sys.argv) == 2 and sys.argv[1] != '--scheduled':
-        raise SystemExit('Usage: run-pilot-backup-once.py [--scheduled]')
+    if len(sys.argv) > 2 or len(sys.argv) == 2 and sys.argv[1] not in ('--scheduled', '--offline-cutover'):
+        raise SystemExit('Usage: run-pilot-backup-once.py [--scheduled|--offline-cutover]')
+    offline_cutover = sys.argv[1:] == ['--offline-cutover']
     lock_fd = os.open(ROOT / 'backup.lock', os.O_WRONLY | os.O_CREAT, 0o600)
     try:
         fcntl.flock(lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
@@ -66,11 +67,13 @@ def main() -> None:
         verify_journal_binding(worker)
         active = subprocess.run(('systemctl', 'is-active', '--quiet', worker['unit']),
                                 check=False).returncode == 0
-        if worker['state'] == 'active' and not active:
+        if worker['state'] == 'active' and not active and not offline_cutover:
             raise SystemExit('Registered active worker unavailable: ' + worker['role'])
     ARCHIVES.mkdir(mode=0o700, parents=True, exist_ok=True)
     os.chmod(ARCHIVES, 0o700)
     binding = load_admin()
+    if offline_cutover and binding['profile'] != 'contabo-local':
+        raise SystemExit('Offline cutover capture requires local pilot database binding')
 
     with tempfile.TemporaryDirectory(prefix='pilot-backup-', dir='/run') as temporary:
         private = pathlib.Path(temporary)
@@ -87,6 +90,8 @@ def main() -> None:
         })
         active = [service for service in (*SERVICES, *(w['unit'] for w in workers)) if subprocess.run(
             ('systemctl', 'is-active', '--quiet', service), check=False).returncode == 0]
+        if offline_cutover and active:
+            raise SystemExit('Offline cutover requires all pilot API, portal and worker writers stopped')
         stopped = []
         try:
             print('Pausing pilot writers for a coordinated encrypted capture.', flush=True)
@@ -106,7 +111,8 @@ def main() -> None:
                     restart_failures.append(service)
             if restart_failures:
                 raise SystemExit('Pilot writer restart failed: ' + ', '.join(restart_failures))
-            print('Pilot writer services restarted.', flush=True)
+            print('Pilot writer services restarted.' if stopped else
+                  'Pilot writer services remained stopped for cutover.', flush=True)
         directory = result.get('directory')
         if result.get('operation') != 'backup' or not isinstance(directory, str) or \
                 not pathlib.Path(directory).is_dir():

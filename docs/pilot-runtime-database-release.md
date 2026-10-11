@@ -66,7 +66,7 @@ database, and record the restore review. SQL may not contain psql meta-commands
 or its own transaction controls.
 
 The database release script requires root-owned, SHA-256 pinned SQL files, the
-root-only scheduled database credential, a healthy completed B2 marker less
+protected local Contabo PostgreSQL 17 administrator binding, a healthy completed B2 marker less
 than fifteen minutes old, all registered workers active, and the backup and
 worker-registry locks. It stops the portal, API and workers, runs one PostgreSQL
 transaction, records the release and both SQL digests in the database, then

@@ -37,6 +37,10 @@ def main():
         if not path.is_file():
             raise RuntimeError('Reviewed grant script missing')
         call('governance_migrations', passwords['governance_migrations'], '-f', str(path))
+    call('governance_migrations', passwords['governance_migrations'], '-c',
+         'REVOKE ALL ON SCHEMA public FROM PUBLIC; '
+         'GRANT SELECT ON public.governance_pilot_project_capacity TO governance_api; '
+         'REVOKE ALL ON FUNCTION public.governance_pilot_project_limit() FROM PUBLIC')
     for role, table in (('governance_api', 'governance_customer_projects'),
                         ('governance_evidence_worker', 'governance_outbox')):
         actual = call(role, passwords[role], '-t', '-A', '-c',

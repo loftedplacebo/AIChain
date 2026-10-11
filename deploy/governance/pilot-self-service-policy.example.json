@@ -3,7 +3,7 @@
   "enabled": false,
   "maxProjects": 5,
   "databaseUrlFile": "/etc/aichain/governance-workers/pilot-evidence-database-url",
-  "databaseCaFile": "/etc/aichain/governance/digitalocean-ca.crt",
+  "databaseCaFile": "",
   "workerPolicy": {
     "batchSize": 100,
     "maxTransactionsPerHour": 10,

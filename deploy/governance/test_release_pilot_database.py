@@ -2,11 +2,13 @@
 import importlib.util
 import hashlib
 import pathlib
+import sys
 import tempfile
 import unittest
 from unittest import mock
 
 HERE = pathlib.Path(__file__).parent
+sys.path.insert(0, str(HERE))
 SPEC = importlib.util.spec_from_file_location(
     'release_pilot_database', HERE / 'release-pilot-database.py')
 RELEASE = importlib.util.module_from_spec(SPEC)
@@ -27,7 +29,7 @@ class DatabaseReleaseTests(unittest.TestCase):
 
     def patches(self):
         values = {'verify_sql': mock.Mock(), 'check_backup': mock.Mock(),
-                  'database_environment': mock.Mock(return_value={'PGPASSWORD': 'dummy'}),
+                  'database_connection': mock.Mock(return_value=({'PGPASSWORD': 'dummy'}, 'local-dsn')),
                   'units': mock.Mock(return_value=['portal', 'api', 'worker']),
                   'stop': mock.Mock(return_value=['portal', 'api', 'worker']),
                   'start': mock.Mock(), 'run_migration': mock.Mock(),
@@ -41,7 +43,7 @@ class DatabaseReleaseTests(unittest.TestCase):
         calls = self.patches()
         RELEASE.execute('apply', self.up, self.down, *self.hashes, 'r1', self.workers)
         calls['run_migration'].assert_called_once_with(
-            self.up, 'r1', *self.hashes, 'apply', mock.ANY)
+            self.up, 'r1', *self.hashes, 'apply', mock.ANY, 'local-dsn')
         calls['start'].assert_called_once()
 
     def test_failed_health_reverses_applied_schema_before_restart(self):
@@ -64,6 +66,7 @@ class DatabaseReleaseTests(unittest.TestCase):
     def test_release_record_guards_rollback_digests(self):
         preamble, postamble = RELEASE.sql_statements('r4', *self.hashes,
                                                      'rollback')
+        self.assertTrue(preamble.startswith('SET LOCAL ROLE governance_migrations;'))
         self.assertIn(self.hashes[0], preamble)
         self.assertIn(self.hashes[1], preamble)
         self.assertIn('Release record mismatch', preamble)
@@ -80,6 +83,20 @@ class DatabaseReleaseTests(unittest.TestCase):
                     with self.assertRaisesRegex(ValueError, 'transaction or psql'):
                         RELEASE.verify_sql(
                             self.up, hashlib.sha256(content.encode()).hexdigest())
+
+    def test_local_database_binding_required_for_release(self):
+        managed = {'profile': 'managed'}
+        with mock.patch.object(RELEASE, 'load_admin', return_value=managed):
+            with self.assertRaisesRegex(ValueError, 'local Contabo profile'):
+                RELEASE.database_connection()
+        local = {'profile': 'contabo-local', 'host': '127.0.0.1', 'port': 5433,
+                 'database': 'governance_test', 'user': 'postgres',
+                 'sslmode': 'disable', 'password': 'synthetic-secret'}
+        with mock.patch.object(RELEASE, 'load_admin', return_value=local), \
+                mock.patch.object(RELEASE, 'psql_environment', return_value={'PGPASSWORD': 'synthetic-secret'}):
+            environment, dsn = RELEASE.database_connection()
+        self.assertEqual(environment['PGPASSWORD'], 'synthetic-secret')
+        self.assertEqual(dsn, 'host=127.0.0.1 port=5433 dbname=governance_test user=postgres sslmode=disable')
 
 
 if __name__ == '__main__':

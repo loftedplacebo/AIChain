@@ -21,6 +21,13 @@ Decision: move the synthetic pilot database to self-managed PostgreSQL on the Co
 
 Retain the managed pilot database and credentials through the agreed rollback checkpoint and next scheduled local backup cycle. Production reuse of the managed cluster remains outstanding.
 
+## Operator code review and local paths
+
+- The staged cutover code retains the managed database as rollback and fails closed if a second cutover is attempted against the active local binding. The reviewed `--offline-cutover` backup mode requires the local profile and stopped writers; the coordinated B2 upload from that mode passed during the live cutover.
+- The active capacity installer, project-table ownership probe, database release helper, setup examples and B2 restore helper now target the protected Contabo local binding. The capacity installer read-only preflight reported four projects under the five-project cap; the ownership probe found `governance_migrations` as table owner and a restricted `governance_api` read.
+- The historical DigitalOcean bootstrap shell and direct Node entry points now refuse to run while the local pilot binding is active. The older managed backup credential helper also refuses that profile. The source and managed binding remain available for a reviewed rollback and later production repurposing.
+- The database release helper's six focused tests passed on the VPS. Updated Python scripts compiled, operator shell scripts passed `bash -n`, and the hosted-health check remained green after staging. No schema release or capacity mutation was run as part of this operator-code update.
+
 ## Sequence
 
 1. Inventory the pilot database, roles, worker registry, services, backup scripts, health checks, and connection strings.

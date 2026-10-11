@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
-"""Verify and install a root-only database credential for scheduled pilot backups."""
+"""Legacy managed-profile backup credential setup for explicit rollback only."""
 
 import getpass
+import json
 import os
 import pathlib
 import stat
 import subprocess
 import tempfile
+from pilot_db_binding import BINDING
 
 
 ROOT = pathlib.Path('/etc/aichain/pilot-backup')
@@ -17,6 +19,14 @@ HOST = 'orvessian-pilot-test-do-user-45565720-0.k.db.ondigitalocean.com'
 def main() -> None:
     if os.geteuid() != 0:
         raise SystemExit('Run as root')
+    if BINDING.exists() or BINDING.is_symlink():
+        info = BINDING.lstat()
+        if not stat.S_ISREG(info.st_mode) or info.st_uid != 0 or \
+                stat.S_IMODE(info.st_mode) != 0o600:
+            raise SystemExit('Protected managed pilot binding required')
+        current = json.loads(BINDING.read_text(encoding='utf-8'))
+        if not isinstance(current, dict) or current.get('profile') != 'managed':
+            raise SystemExit('Managed backup credential setup is disabled for the local pilot')
     password = getpass.getpass('1Password doadmin database password for daily backups: ')
     if not password or len(password) > 1024 or '\n' in password or '\r' in password:
         raise SystemExit('Invalid database credential; nothing installed')
@@ -49,5 +59,5 @@ def main() -> None:
 if __name__ == '__main__':
     try:
         main()
-    except (OSError, subprocess.TimeoutExpired):
+    except (OSError, json.JSONDecodeError, subprocess.TimeoutExpired):
         raise SystemExit('Daily backup credential setup failed; check server diagnostics') from None

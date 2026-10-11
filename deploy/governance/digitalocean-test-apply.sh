@@ -4,6 +4,20 @@
 set -euo pipefail
 umask 077
 
+# Historical bootstrap only. Never mutate the retained managed rollback copy
+# while the active pilot binding points to Contabo PostgreSQL.
+binding=/etc/aichain/pilot-database-binding.json
+if [[ -e "$binding" ]]; then
+ python3 - "$binding" <<'PY'
+import json
+import pathlib
+import sys
+binding = json.loads(pathlib.Path(sys.argv[1]).read_text(encoding='utf-8'))
+if binding.get('profile') != 'managed':
+    raise SystemExit('Managed test bootstrap is disabled after the Contabo cutover')
+PY
+fi
+
 stage=/opt/aichain/governance-pilot-db-setup
 host=orvessian-pilot-test-do-user-45565720-0.k.db.ondigitalocean.com
 ca=/etc/aichain/governance/digitalocean-ca.crt

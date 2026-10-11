@@ -1,5 +1,11 @@
 # Hosted pilot application integration
 
+Current operator state (11 October 2026): the synthetic pilot runs on Contabo
+PostgreSQL 17 at loopback port 5433. The dated DigitalOcean setup and drill
+records below describe the earlier managed pilot. Use the
+[production architecture cutover record](production-architecture-cutover-note.md)
+for the current database, receipt and closed B2 restore acceptance.
+
 ## Hosted evidence worker and anchor — 4 October 2026
 
 The accepted synthetic record `synthetic-first-d99e15cf63551a783a85b989229c99e9`
@@ -406,12 +412,15 @@ The timer runs at 03:00 UTC daily and catches a missed run after the VPS
 returns. Check `systemctl list-timers orvessian-pilot-backup.timer` and
 `systemctl status orvessian-pilot-backup.service` on the VPS. A successful
 service log includes `B2 encrypted upload completed` and a new backup ID;
-the portal and synthetic API must be active afterward. The backup database
-credential is in `/etc/aichain/pilot-backup/database-password` (root-only),
-the B2 upload credential and archive key are separate root-only files in that
-directory, and the B2 restore credential stays in 1Password. For a monthly
-restore drill, run `verify-pilot-b2-restore.py` with the restore key and
-`doadmin` password at hidden prompts; it creates a new closed database and
+the portal and synthetic API must be active afterward. The active database
+credential comes from the protected local pilot binding and its root-only
+password file under `/var/lib/aichain-pilot-db-migration/`. The older managed
+credential in `/etc/aichain/pilot-backup/database-password` is retained for
+rollback only. The B2 upload credential and archive key are separate root-only
+files in `/etc/aichain/pilot-backup/`, and the B2 restore credential stays in
+1Password. For a monthly restore drill, run `verify-pilot-b2-restore.py` with
+the separate B2 restore key at hidden prompts; it creates a new closed local
+database and
 does not activate a service. It prints discovery, download/authentication,
 restore/review and total elapsed seconds. Review old drill databases and their retention
 separately before deletion. An uploaded set alone does not prove the recovery

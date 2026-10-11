@@ -1,5 +1,11 @@
 # DigitalOcean pilot PostgreSQL setup
 
+Historical setup record. Since 11 October 2026 the live synthetic pilot uses
+Contabo PostgreSQL 17 on loopback port 5433. Do not rerun these managed test
+bootstrap commands against the retained DigitalOcean rollback copy. See the
+[production architecture cutover record](production-architecture-cutover-note.md)
+for the current pilot binding and the planned production reuse of that cluster.
+
 This is the operator record for the isolated, synthetic-data `test` cluster.
 Do not put database passwords, connection URIs, API tokens or the downloaded CA
 certificate in this file or Git. Partner data and access remain gated by the

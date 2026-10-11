@@ -14,16 +14,13 @@ import re
 import stat
 import subprocess
 import time
+from pilot_db_binding import load_admin, psql_environment
 
 BACKUP = pathlib.Path('/etc/aichain/pilot-backup')
-PASSWORD = BACKUP / 'database-password'
 LOCK = pathlib.Path('/opt/aichain/.governance-pilot-database-release.lock')
 HEALTH = '/opt/aichain/governance-pilot-db-setup/check-pilot-hosted-health.py'
 BACKUP_HEALTH = '/opt/aichain/governance-pilot-db-setup/check-pilot-backup-health.py'
-HOST = 'orvessian-pilot-test-do-user-45565720-0.k.db.ondigitalocean.com'
-CA = '/etc/aichain/governance/digitalocean-ca.crt'
-DSN = (f'host={HOST} port=25060 dbname=governance_test user=doadmin '
-       f'sslmode=verify-full sslrootcert={CA}')
+PSQL = '/usr/lib/postgresql/17/bin/psql'
 PORTAL_UNIT = 'orvessian-pilot-portal.service'
 API_UNIT = 'aichain-governance-synthetic-api.service'
 MAX_SQL_BYTES = 256 * 1024
@@ -59,15 +56,16 @@ def check_backup():
         raise ValueError('Fresh completed B2 backup required')
 
 
-def database_environment():
-    info = PASSWORD.lstat()
-    if not stat.S_ISREG(info.st_mode) or info.st_uid != 0 or \
-            info.st_mode & 0o077 or not 1 <= info.st_size <= 1025:
-        raise ValueError('Root-only database credential required')
-    password = PASSWORD.read_text(encoding='utf-8').rstrip('\n')
-    if not password or '\x00' in password:
-        raise ValueError('Invalid database credential')
-    return {**os.environ, 'PGPASSWORD': password}
+def database_connection():
+    binding = load_admin()
+    if binding['profile'] != 'contabo-local':
+        raise ValueError('Pilot database releases require the local Contabo profile')
+    environment = psql_environment(binding)
+    dsn = (f"host={binding['host']} port={binding['port']} "
+           f"dbname={binding['database']} user={binding['user']} "
+           f"sslmode={binding['sslmode']}")
+    binding['password'] = ''
+    return environment, dsn
 
 
 def units(workers):
@@ -97,7 +95,8 @@ def start(stopped):
 
 
 def sql_statements(release_id, up_hash, down_hash, operation):
-    preamble = (f'CREATE TABLE IF NOT EXISTS {TABLE} ('
+    preamble = ('SET LOCAL ROLE governance_migrations; '
+                f'CREATE TABLE IF NOT EXISTS {TABLE} ('
                 'release_id text PRIMARY KEY, up_sha256 text NOT NULL, '
                 'down_sha256 text NOT NULL, applied_at timestamptz NOT NULL '
                 'DEFAULT now()); '
@@ -118,10 +117,10 @@ def sql_statements(release_id, up_hash, down_hash, operation):
     return preamble, postamble
 
 
-def run_migration(sql, release_id, up_hash, down_hash, operation, environment):
+def run_migration(sql, release_id, up_hash, down_hash, operation, environment, dsn):
     preamble, postamble = sql_statements(release_id, up_hash, down_hash, operation)
-    result = subprocess.run(('psql', '-X', '-q', '-w', '-v', 'ON_ERROR_STOP=1',
-                             '--single-transaction', '-d', DSN, '-c', preamble,
+    result = subprocess.run((PSQL, '-X', '-q', '-w', '-v', 'ON_ERROR_STOP=1',
+                             '--single-transaction', '-d', dsn, '-c', preamble,
                              '-f', str(sql), '-c', postamble),
                             env=environment, capture_output=True, text=True,
                             timeout=180, check=False)
@@ -149,12 +148,12 @@ def execute(operation, up, down, up_hash, down_hash, release_id, workers):
     verify_sql(up, up_hash)
     verify_sql(down, down_hash)
     check_backup()
-    environment = database_environment()
+    environment, dsn = database_connection()
     stopped = stop(units(workers))
     applied = False
     try:
         run_migration(up if operation == 'apply' else down, release_id,
-                      up_hash, down_hash, operation, environment)
+                      up_hash, down_hash, operation, environment, dsn)
         applied = True
         start(stopped)
         if not check_runtime():
@@ -165,12 +164,12 @@ def execute(operation, up, down, up_hash, down_hash, release_id, workers):
             for unit in stopped:
                 subprocess.run(('systemctl', 'stop', unit), check=False, timeout=75)
             run_migration(down, release_id, up_hash, down_hash,
-                          'rollback', environment)
+                          'rollback', environment, dsn)
         elif applied and operation == 'rollback':
             for unit in stopped:
                 subprocess.run(('systemctl', 'stop', unit), check=False, timeout=75)
             run_migration(up, release_id, up_hash, down_hash,
-                          'apply', environment)
+                          'apply', environment, dsn)
         start(stopped)
         raise
     finally:

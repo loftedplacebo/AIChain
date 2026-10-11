@@ -42,7 +42,7 @@ For each approved synthetic project, create a root-owned `0600` JSON request:
   "tenant": "org-REPLACE_WITH_PROJECT_WORKSPACE_ID",
   "project": "prj-REPLACE_WITH_PROJECT_ID",
   "databaseUrlFile": "/etc/aichain/governance-workers/project-database-url",
-  "databaseCaFile": "/etc/aichain/governance/digitalocean-ca.crt",
+  "databaseCaFile": "",
   "rpcUrl": "https://sepolia.base.org",
   "workerPolicy": {
     "batchSize": 100,
@@ -56,8 +56,9 @@ For each approved synthetic project, create a root-owned `0600` JSON request:
 }
 ```
 
-The database URL file must also be root-owned `0600`, contain one verified-TLS
-PostgreSQL URL, and be readable only by the provisioner. The request is the
+The database URL file must also be root-owned `0600`, contain the reviewed
+`127.0.0.1:5433/governance_test?sslmode=disable` worker-role URL for the local
+pilot database, and be readable only by the provisioner. The request is the
 protected record of the reviewed gas policy, funding target and project
 binding; retain it in the operator's private inventory. Set values from the
 actual project and approved pilot spending limit, not by copying an example.

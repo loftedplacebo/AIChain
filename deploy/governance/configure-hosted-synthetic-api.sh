@@ -26,13 +26,13 @@ GOVERNANCE_ENV=test
 GOVERNANCE_STORAGE=postgres
 GOVERNANCE_KEY_STORAGE=postgres
 GOVERNANCE_CONTROL_STORAGE=postgres
-GOVERNANCE_DATABASE_URL=postgresql://governance_api:${encoded_password}@orvessian-pilot-test-do-user-45565720-0.k.db.ondigitalocean.com:25060/governance_test?sslmode=verify-full
-GOVERNANCE_DATABASE_CA_FILE=/etc/aichain/governance/digitalocean-ca.crt
+GOVERNANCE_DATABASE_URL=postgresql://governance_api:${encoded_password}@127.0.0.1:5433/governance_test?sslmode=disable
+GOVERNANCE_DATABASE_CA_FILE=
 GOVERNANCE_IDENTITY_PROVIDER=workos
 WORKOS_CLIENT_ID=client_01M415264WYTWS294EMP8CNJNT
 WORKOS_API_KEY=${api_key}
 WORKOS_REDIRECT_URI=https://portal.orvessian.com/api/auth/callback
-WORKOS_PILOT_ALLOWED_EMAILS=mjgrant@live.co.uk
+WORKOS_ADMISSION_MODE=open-pilot
 WORKOS_WEBHOOK_SECRET=${webhook_secret}
 GOVERNANCE_IDENTITY_SEAL_KEY=${seal_key}
 GOVERNANCE_RECEIPT_SIGNERS=["0x02B38234B2875f72835193241ecF56FB83098934"]

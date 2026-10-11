@@ -110,11 +110,12 @@ data and mainnet funding require later, separate go/no-go decisions.
 
 ## Database release conditions and standby review
 
-The pilot database must first be copied and accepted on Contabo, including its
-worker registry, key revocations, receipt proofs, encrypted off-host backup and
-closed restore. The managed pilot copy remains the rollback source until this
-acceptance completes. Only then may the managed test database and roles be
-retired, under a separate reviewed retention and access change. Rotate the
+The pilot database was copied and accepted on Contabo on 11 October 2026,
+including its worker registry, key revocations, fresh receipt proof, encrypted
+off-host backup and independent closed restore. The managed pilot copy remains
+the rollback source through the next scheduled local backup cycle and retention
+review. Only then may the managed test database and roles be retired, under a
+separate reviewed retention and access change. Rotate the
 managed administrator password before production use and restrict trusted
 sources to the production application and reviewed operator access.
 

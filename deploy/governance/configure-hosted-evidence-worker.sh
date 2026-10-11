@@ -29,8 +29,8 @@ trap 'rm -f -- "$tmp"' EXIT
 cat >"$tmp" <<EOF
 GOVERNANCE_ENV=test
 GOVERNANCE_STORAGE=postgres
-GOVERNANCE_DATABASE_URL=postgresql://governance_evidence_worker:${encoded_password}@orvessian-pilot-test-do-user-45565720-0.k.db.ondigitalocean.com:25060/governance_test?sslmode=verify-full
-GOVERNANCE_DATABASE_CA_FILE=/etc/aichain/governance/digitalocean-ca.crt
+GOVERNANCE_DATABASE_URL=postgresql://governance_evidence_worker:${encoded_password}@127.0.0.1:5433/governance_test?sslmode=disable
+GOVERNANCE_DATABASE_CA_FILE=
 GOVERNANCE_TENANT=org-831aa048-b268-4fce-98f3-455429034ef8
 GOVERNANCE_PROJECT=prj-d9109260-1232-4561-ab4a-ab2e5c8f658f
 GOVERNANCE_WORKER_JOURNAL=$state/worker.sqlite
