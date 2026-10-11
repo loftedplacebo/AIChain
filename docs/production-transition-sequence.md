@@ -185,12 +185,18 @@ over verified TLS and stores it under `/etc/aichain/production`; the managed
 inventory then prefers that production credential. Retire the obsolete pilot
 operator copy after dependent historical tools have been reviewed.
 
-The empty `governance_prod` database and restricted `NOLOGIN` API, worker and
-migration roles already exist on the reused cluster. Set distinct credentials,
-apply reviewed migrations and post-migration grants, and verify runtime grants
-and denials. Never put `doadmin` in a service. The reviewed production-only SQL
-bundle has already applied its bootstrap; its post-migration grant files remain
-pending. The historical shared-cluster bundle is not a release artifact here.
+The reused cluster has `governance_prod` and three restricted production roles.
+On 11 October the owner rotated the managed `doadmin` password and installed it
+through the protected VPS prompt, and installed a separate WorkOS Production API
+key through a second protected prompt. The guarded schema helper then applied
+all 19 pinned migrations and the reviewed API and worker grants. Its verification
+found the `prod` environment marker, active recovery gate and no `PUBLIC` table
+grants; it returned the migration role to `NOLOGIN` with no password. Independent
+inventory found zero production database connections and all three roles still
+`NOLOGIN`; the production API remained disabled and the synthetic pilot healthy.
+Distinct API and worker login credentials, restricted-role read/write/denial
+checks and the production backup remain open. Never put `doadmin` in a service.
+The historical shared-cluster SQL bundle is not a release artifact here.
 Use independent production encryption keys, backup destination, journals,
 completion marker and restore procedure. Rehearse a restore to a replacement
 cluster before production admission.

@@ -14,8 +14,10 @@ managed PostgreSQL cluster was repurposed exclusively for production. The
 synthetic pilot now uses local PostgreSQL on Contabo.
 The managed pilot databases and roles have been retired, and an empty
 production database with three restricted `NOLOGIN` roles has been verified.
-The production app, service credentials, independent backup and evidence-chain
-choice remain open. The ordered preparation and indicative budget are in the
+The reviewed production schema and runtime grants are installed; the three
+production roles remain `NOLOGIN` and the production API service remains off.
+Service credentials, independent backup and evidence-chain choice remain open.
+The ordered preparation and indicative budget are in the
 [production transition sequence](production-transition-sequence.md).
 
 ## Business, identity and public information
