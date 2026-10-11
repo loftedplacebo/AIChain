@@ -11,7 +11,7 @@ const tables=['identities','workspaces','projects','memberships','actions','invi
 class PostgresCustomerDirectory {
  constructor(pool,now=Date.now){this.pool=pool;this.now=now;}
  async ready(environment){
-  if(!['dev','test'].includes(environment))throw Error('Shared customer storage requires dev/test');
+  if(!['dev','test','prod'].includes(environment))throw Error('Customer storage requires an explicit environment');
   await verify(this.pool);
   await require('./postgres-recovery.cjs').assertActive(this.pool);
   const stage=(await this.pool.query('SELECT name FROM governance_environment')).rows;

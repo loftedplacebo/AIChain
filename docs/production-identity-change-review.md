@@ -44,9 +44,14 @@ environment and list, plus a rejected production sign-up start.
 
 ## Pending before an end-to-end production sign-in
 
-1. Provision the separate DigitalOcean production application host, DNS and
-   HTTPS edge. The `prod` API startup and database migrations are part of the
-   later runtime gate; the current hosted pilot launcher is test-only.
+1. Provision isolated production users, services, directories, ports, DNS and
+   HTTPS routes on the existing Contabo VPS. The `prod` API startup and
+   database migrations are part of the later runtime gate; the current hosted
+   pilot launcher is test-only. Check shared-host capacity and rollback before
+   enabling customer traffic. A dedicated production VM is a later migration.
+   The private production API launcher validates the exclusive managed database,
+   restricted API role, verified TLS, production WorkOS binding and loopback port;
+   its read-only preflight must pass after schema and grants are installed.
 2. Create a new WorkOS Production API key and install it on the production
    host through a hidden prompt. Generate a distinct 32-byte identity sealing
    key there. Do not copy the pilot WorkOS key, seal key, or user records.

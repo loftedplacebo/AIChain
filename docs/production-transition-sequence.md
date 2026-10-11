@@ -22,23 +22,24 @@ and three pilot roles, and the verified empty production-only bootstrap.
   Keep the managed pilot database as rollback until local service, backup and
   closed-restore acceptance pass. Keep the five-project cap until measured.
 - **Production:** repurpose the existing London DigitalOcean managed PostgreSQL
-  cluster exclusively for production after the pilot cutover, with a separate
-  DigitalOcean application instance. Use non-owner production
+  cluster exclusively for production after the pilot cutover. Initially run
+  isolated production application services on the existing Contabo VPS. Use non-owner production
   API, worker and migration roles, the separate WorkOS Production environment,
   and separate secrets,
   signing/relayer keys, worker journals, and independent encrypted backups.
   Start with WorkOS hosted sign-in. Keep production traffic closed until all
   release checks pass.
-- **Availability later:** the reused managed cluster is single-node at launch.
-  Reassess a standby after launch as paying customers and an availability target
-  justify its cost. Independent backups and replacement-cluster recovery remain
-  required.
+- **Availability later:** the reused managed cluster is single-node at launch,
+  and the initial application host is shared with the synthetic pilot. Reassess
+  a dedicated production VM and a database standby as users, measured capacity
+  and an availability target justify their cost. Independent backups and
+  replacement-cluster recovery remain required.
 - **Evidence chain:** undecided. Do not copy the Base Sepolia contract, chain
   setting, pilot wallet or test receipts into a production approval record.
   Production receipt acceptance remains blocked until chain, contract,
   custody, gas and verification are selected and tested.
 
-The [version-5 non-secret deployment plan](../deploy/governance/deployment-plan.example.json)
+The [version-6 non-secret deployment plan](../deploy/governance/deployment-plan.example.json)
 and its validator must be checked against the selected Contabo test database
 and exclusive DigitalOcean production cluster before production release.
 A valid result is still `releaseReady:false`:
@@ -63,7 +64,7 @@ for optional WorkOS meters and remaining configuration.
 | 2. Pilot database cutover | Install local PostgreSQL on Contabo, migrate the complete pilot database under a writer pause, repoint services and health checks, then verify backup and closed restore. Keep the managed copy as rollback until acceptance. | Receipts, projects, key revocations, worker journals, B2 backup, closed restore and health all pass. |
 | 3. Production cluster preparation | The reviewed on-demand coordinated B2 backup and independent closed restore passed. Six named managed pilot/restore databases and three pilot roles were retired. The empty `governance_prod` database and three restricted `NOLOGIN` roles were created and verified. Rotate the admin credential and restrict trusted sources when the production app endpoint exists. | No pilot object remains on the managed cluster; empty production bootstrap and restricted role checks passed. Admin rotation and network restriction remain open. |
 | 4. Production identity | Configure WorkOS Production hosted AuthKit, MFA, exact HTTPS callbacks and signed webhook; create new production API key and sealing key in protected storage. | Fresh production account passes sign-in, MFA, recovery, revocation and webhook replay tests; staging identities are not assumed to transfer. |
-| 5. Runtime and backup | Build pinned API, worker and portal artifacts; apply migrations and strict roles in the production database; deploy behind private readiness checks. Configure production-specific encrypted backup, journals, retention and alerts that do not silently reuse the pilot backup set. | Green release gates, hashes, scoped read/write/denial checks in both databases, current production backup marker and every worker registered. |
+| 5. Runtime and backup | Build pinned API, worker and portal artifacts; apply migrations and strict roles in the production database; deploy isolated production users, directories, units and loopback ports on Contabo behind private readiness checks. Configure production-specific encrypted backup, journals, retention and alerts that do not silently reuse the pilot backup set. | Green release gates, hashes, scoped read/write/denial checks in both databases, shared-host fault isolation, current production backup marker and every worker registered. |
 | 6. Recovery | Restore when the original managed DB cluster is unavailable, review every journal and access state, then activate an isolated replacement service. | Measured recovery point and time, revoked captured access, receipt proof preservation and successful post-restore customer journey. |
 | 7. Public acceptance | Finish abuse, security and privileged-access review; legal pages, support/privacy/security inboxes, real-data terms, capacity and incident rehearsal. Decide and test production evidence chain. | Owner go/no-go record and claims limited to tested capacity and recovery. |
 
@@ -81,27 +82,29 @@ host, credentials, webhook and account acceptance work. No production user or
 webhook exists yet.
 
 Keep the existing portal/API hostnames on the pilot during preparation. Use
-separate temporary production hostnames and register their exact WorkOS
-callbacks. Plan the eventual domain switch and rollback only after the new
-stack passes end-to-end acceptance. Do not import pilot users, workspaces,
+separate temporary production hostnames on Contabo and register their exact
+WorkOS callbacks. Plan the eventual domain switch and rollback only after the
+new services pass end-to-end acceptance. Do not import pilot users, workspaces,
 API keys or testnet evidence as live customer records by assumption.
 
-## Budget decision before provisioning
+## Budget and later VM decision
 
-An indicative separate 4 GiB/2 vCPU Basic Droplet is **$24/month**. The
-existing 2 GiB/1 vCPU managed PostgreSQL Standard single-node cluster costs
-about **$30.45/month** already and will be reused exclusively for production.
-The local PostgreSQL 17 test cluster uses spare Contabo VPS capacity; it does
-not add a managed database subscription. The incremental estimate excludes
-production backup storage, transfer, DNS, monitoring, taxes and other services.
-These are list-price estimates, not a capacity recommendation or an order.
-Measure production load before customer traffic. Sources:
+The initial plan adds **no DigitalOcean application VM**. The existing
+2 GiB/1 vCPU managed PostgreSQL Standard single-node cluster costs about
+**$30.45/month** already and is now exclusively for production. The local
+PostgreSQL 17 test cluster and initial production app services use existing
+Contabo VPS capacity. A separate 4 GiB/2 vCPU Basic Droplet remains a later
+**$24/month** list-price option. These estimates exclude production backup
+storage, transfer, DNS, monitoring, taxes and other services. Measure shared
+host and database load before customer traffic. Sources:
 [DigitalOcean Droplets](https://www.digitalocean.com/pricing/droplets) and
 [Managed Databases](https://www.digitalocean.com/pricing/managed-databases).
 
 The existing database is single-node, with 2 GiB RAM, 30 GiB storage and a
-displayed 47-connection limit. The pilot will no longer share its connections
-or cluster maintenance after the database cutover. DigitalOcean states that Standard
+displayed 47-connection limit. The pilot no longer shares its database
+connections or cluster maintenance. The production app initially shares the
+Contabo host's CPU, memory, disk and administrator failure domain with the
+pilot. DigitalOcean states that Standard
 Edition standby availability changes from 15 October 2026 for new accounts
 and 30 November for existing accounts; do not assume a low-cost Standard
 high-availability upgrade will remain available. A required availability SLA
@@ -114,9 +117,9 @@ configuration is separate from Staging. The optional branded custom login
 domain is deferred. [WorkOS environment guidance](https://workos.com/docs/authkit/environments)
 and [pricing](https://workos.com/pricing).
 
-The production app is a billable-account action. Prepare exact resource
-settings, budget and rollback record before purchase. Production traffic, real customer
-data and mainnet funding require later, separate go/no-go decisions.
+No new VM was ordered. Before a later VM purchase, prepare exact resource
+settings, budget and rollback record. Production traffic, real customer data
+and mainnet funding require later, separate go/no-go decisions.
 
 ## Database release conditions and standby review
 
@@ -131,8 +134,9 @@ the exact-object change review, and the empty production database created. Rotat
 managed administrator password before production use and restrict trusted
 sources to the production application and reviewed operator access.
 
-Create `governance_prod` and fresh non-owner API, worker and migration roles on
-the reused cluster. Revoke `PUBLIC` access, verify actual runtime grants and
+The empty `governance_prod` database and restricted `NOLOGIN` API, worker and
+migration roles already exist on the reused cluster. Set distinct credentials,
+apply reviewed grants and migrations, revoke `PUBLIC` access, and verify runtime grants and
 denials, and never put `doadmin` in a service. The existing shared-cluster SQL
 bundle is not a production release artifact for this topology; regenerate and
 review a production-only bootstrap and grant bundle before applying migrations.

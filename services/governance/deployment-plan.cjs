@@ -13,19 +13,21 @@ function exact(value,fields,location,errors){
 function validatePlan(plan){
  const errors=[],resources=new Map();
  const unique=(kind,value,stage)=>{const key=kind+':'+value;if(resources.has(key))errors.push(stage+': '+kind+' must be separate from '+resources.get(key));else resources.set(key,stage);};
- if(!exact(plan,['schemaVersion','environments'],'plan',errors)||plan.schemaVersion!==5){return {valid:false,releaseReady:false,errors:errors.length?errors:['plan: unsupported schema']};}
+ if(!exact(plan,['schemaVersion','environments'],'plan',errors)||plan.schemaVersion!==6){return {valid:false,releaseReady:false,errors:errors.length?errors:['plan: unsupported schema']};}
  if(!Array.isArray(plan.environments)||plan.environments.length!==3)return {valid:false,releaseReady:false,errors:['plan: exactly dev, test and prod required']};
  const seen=new Set();
  for(const env of plan.environments){
   if(!exact(env,['stage','hosting','portal','database','identity','secrets','evidence','backup'],'environment',errors))continue;
   const stage=env.stage;if(!stages.includes(stage)||seen.has(stage)){errors.push('environment: invalid or repeated stage');continue;}seen.add(stage);
   const hosted=stage==='prod'||stage==='test'&&['origin','apiOrigin'].some(field=>typeof env.portal?.[field]==='string'&&env.portal[field].startsWith('https:'));
-  if(exact(env.hosting,['appProvider','appRegion','appInstanceRef','databaseProvider','databaseRegion','databaseClusterRef','databaseTopology','backupProvider','backupRegion','backupAccountRef','operatorRef'],'hosting',errors)){
+  if(exact(env.hosting,['appProvider','appRegion','appInstanceRef','appTopology','appServiceRef','databaseProvider','databaseRegion','databaseClusterRef','databaseTopology','backupProvider','backupRegion','backupAccountRef','operatorRef'],'hosting',errors)){
    const hosting=env.hosting;
-   for(const field of ['appProvider','appRegion','appInstanceRef','databaseProvider','databaseRegion','databaseClusterRef','backupProvider','backupRegion','backupAccountRef','operatorRef'])if(!scalar(hosting[field]))errors.push(stage+': invalid hosting '+field);
+   for(const field of ['appProvider','appRegion','appInstanceRef','appServiceRef','databaseProvider','databaseRegion','databaseClusterRef','backupProvider','backupRegion','backupAccountRef','operatorRef'])if(!scalar(hosting[field]))errors.push(stage+': invalid hosting '+field);
+   if(!['own-instance','shared-with-test'].includes(hosting.appTopology)||stage!=='prod'&&hosting.appTopology!=='own-instance')errors.push(stage+': invalid application topology');
    if(!['own-cluster','shared-with-test'].includes(hosting.databaseTopology)||stage!=='prod'&&hosting.databaseTopology!=='own-cluster')errors.push(stage+': invalid database topology');
    if(hosted&&scalar(hosting.backupProvider)&&[hosting.appProvider,hosting.databaseProvider].some(provider=>scalar(provider)&&provider.toLowerCase()===hosting.backupProvider.toLowerCase()))errors.push(stage+': backup provider must be independent of application and database providers');
-   if(scalar(hosting.appInstanceRef))unique('application instance',hosting.appInstanceRef,stage);
+   if(scalar(hosting.appInstanceRef)&&hosting.appTopology!=='shared-with-test')unique('application instance',hosting.appInstanceRef,stage);
+   if(scalar(hosting.appServiceRef))unique('application service',hosting.appServiceRef,stage);
    if(scalar(hosting.databaseClusterRef)&&hosting.databaseTopology!=='shared-with-test')unique('database cluster',hosting.databaseClusterRef,stage);
    if(scalar(hosting.backupAccountRef))unique('backup account',hosting.backupAccountRef,stage);
   }
@@ -76,6 +78,14 @@ function validatePlan(plan){
   }
  }
  const test=plan.environments.find(env=>env?.stage==='test'),prod=plan.environments.find(env=>env?.stage==='prod');
+ if(prod?.hosting?.appTopology==='shared-with-test'){
+  if(!test?.hosting||test.hosting.appTopology!=='own-instance'||
+   prod.hosting.appInstanceRef!==test.hosting.appInstanceRef||
+   prod.hosting.appProvider!==test.hosting.appProvider||
+   prod.hosting.appRegion!==test.hosting.appRegion||
+   prod.hosting.appServiceRef===test.hosting.appServiceRef)
+   errors.push('prod: shared application host requires matching test instance and distinct service');
+ }
  if(prod?.hosting?.databaseTopology==='shared-with-test'){
   if(!test||!prod.database||!test.database||!test.hosting||test.hosting.databaseTopology!=='own-cluster'||
    prod.hosting.databaseClusterRef!==test.hosting.databaseClusterRef||

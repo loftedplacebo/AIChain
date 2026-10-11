@@ -10,6 +10,8 @@ test('environment defaults are repository-relative, isolated and hosted stages g
  assert.notEqual(dev.eventPath,testing.eventPath);assert.notEqual(dev.sessionPath,testing.sessionPath);
  assert.equal(testing.port,0);assert.equal(environmentConfig({GOVERNANCE_DB:':memory:'}).eventPath,':memory:');
  for(const GOVERNANCE_ENV of ['staging','prod'])assert.throws(()=>environmentConfig({GOVERNANCE_ENV}),/startup is gated/);
+ assert.throws(()=>environmentConfig({GOVERNANCE_ENV:'prod',GOVERNANCE_PRODUCTION_HOST:'contabo-shared'}),/PostgreSQL storage/);
+ assert.equal(environmentConfig({GOVERNANCE_ENV:'prod',GOVERNANCE_PRODUCTION_HOST:'contabo-shared',GOVERNANCE_STORAGE:'postgres',GOVERNANCE_KEY_STORAGE:'postgres',GOVERNANCE_CONTROL_STORAGE:'postgres',GOVERNANCE_IDENTITY_PROVIDER:'workos',WORKOS_ADMISSION_MODE:'production-list'}).stage,'prod');
  assert.throws(()=>environmentConfig({GOVERNANCE_ENV:'production'}),/Unknown environment/);
  for(const PORT of ['NaN','-1','65536','1.5'])assert.throws(()=>environmentConfig({PORT}),/port/);
  assert.throws(()=>environmentConfig({GOVERNANCE_ADOPT_UNBOUND_SQLITE:'yes'}),/adoption/);

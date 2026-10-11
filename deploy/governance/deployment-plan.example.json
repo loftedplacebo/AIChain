@@ -1,9 +1,9 @@
 {
-  "schemaVersion": 5,
+  "schemaVersion": 6,
   "environments": [
     {
       "stage": "dev",
-      "hosting": {"appProvider": "local-dev", "appRegion": "local", "appInstanceRef": "replace/dev/app", "databaseProvider": "local-dev", "databaseRegion": "local", "databaseClusterRef": "replace/dev/database", "databaseTopology": "own-cluster", "backupProvider": "local-dev", "backupRegion": "local", "backupAccountRef": "replace/dev/backup-account", "operatorRef": "replace/dev/operator"},
+      "hosting": {"appProvider": "local-dev", "appRegion": "local", "appInstanceRef": "replace/dev/app", "appTopology": "own-instance", "appServiceRef": "replace/dev/service", "databaseProvider": "local-dev", "databaseRegion": "local", "databaseClusterRef": "replace/dev/database", "databaseTopology": "own-cluster", "backupProvider": "local-dev", "backupRegion": "local", "backupAccountRef": "replace/dev/backup-account", "operatorRef": "replace/dev/operator"},
       "portal": {"origin": "http://127.0.0.1:3002", "apiOrigin": "http://127.0.0.1:8790"},
       "database": {
         "host": "dev.db.example.test",
@@ -47,7 +47,7 @@
     },
     {
       "stage": "test",
-      "hosting": {"appProvider": "contabo", "appRegion": "replace-test-app-region", "appInstanceRef": "replace/test/app", "databaseProvider": "contabo", "databaseRegion": "replace-test-app-region", "databaseClusterRef": "replace/test/contabo-postgresql-17", "databaseTopology": "own-cluster", "backupProvider": "backblaze", "backupRegion": "replace-test-backup-region", "backupAccountRef": "replace/test/backup-account", "operatorRef": "replace/test/operator"},
+      "hosting": {"appProvider": "contabo", "appRegion": "replace-contabo-region", "appInstanceRef": "replace/shared/contabo-vps", "appTopology": "own-instance", "appServiceRef": "replace/test/service", "databaseProvider": "contabo", "databaseRegion": "replace-contabo-region", "databaseClusterRef": "replace/test/contabo-postgresql-17", "databaseTopology": "own-cluster", "backupProvider": "backblaze", "backupRegion": "replace-test-backup-region", "backupAccountRef": "replace/test/backup-account", "operatorRef": "replace/test/operator"},
       "portal": {"origin": "https://pilot.example.test", "apiOrigin": "https://api.pilot.example.test"},
       "database": {
         "host": "127.0.0.1",
@@ -91,7 +91,7 @@
     },
     {
       "stage": "prod",
-      "hosting": {"appProvider": "digitalocean", "appRegion": "replace-prod-app-region", "appInstanceRef": "replace/prod/dedicated-app", "databaseProvider": "digitalocean", "databaseRegion": "lon1", "databaseClusterRef": "replace/prod/reused-managed-cluster", "databaseTopology": "own-cluster", "backupProvider": "backblaze", "backupRegion": "replace-prod-backup-region", "backupAccountRef": "replace/prod/backup-account", "operatorRef": "replace/prod/operator"},
+      "hosting": {"appProvider": "contabo", "appRegion": "replace-contabo-region", "appInstanceRef": "replace/shared/contabo-vps", "appTopology": "shared-with-test", "appServiceRef": "replace/prod/service", "databaseProvider": "digitalocean", "databaseRegion": "lon1", "databaseClusterRef": "replace/prod/reused-managed-cluster", "databaseTopology": "own-cluster", "backupProvider": "backblaze", "backupRegion": "replace-prod-backup-region", "backupAccountRef": "replace/prod/backup-account", "operatorRef": "replace/prod/operator"},
       "portal": {"origin": "https://prod.orvessian.com", "apiOrigin": "https://api-prod.orvessian.com"},
       "database": {
         "host": "production.db.example.test",

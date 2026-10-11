@@ -74,8 +74,8 @@ have no superuser, create-database, or create-role privileges. There is no
    `governance_prod` database. The three new roles remain `NOLOGIN` until
    separate protected production credentials are provisioned.
    Files `02` and `03` are post-migration grants for Step 4, not Step 3.
-5. Restrict DigitalOcean trusted sources to the reviewed production app and
-   operator access once the production app endpoint exists. Record the actual
+5. Restrict DigitalOcean trusted sources to the reviewed Contabo production
+   app endpoint and operator access once its service is staged. Record the actual
    resource IDs, firewall state, role denial checks and connection budget
    before calling the cluster production ready.
 

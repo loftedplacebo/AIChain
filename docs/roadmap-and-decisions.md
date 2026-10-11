@@ -1,17 +1,42 @@
-# Roadmap and decisions — current checkpoint 10 October 2026
+# Roadmap and decisions — current checkpoint 11 October 2026
+
+## Initial production application host — 11 October 2026
+
+Use the existing Contabo VPS for the first production application deployment
+while the founder validates customer demand. Keep production and synthetic
+pilot services in separate Unix users, directories, systemd units, protected
+environment files, loopback ports, public hostnames, WorkOS environments and
+release paths. Production uses the exclusive `governance_prod` database on the
+existing DigitalOcean managed cluster; the synthetic pilot uses local Contabo
+PostgreSQL 17. Keep their backup accounts, encryption keys, worker journals,
+signing keys and alert scopes distinct. Do not enable production customer
+traffic until the shared host's capacity, firewall, recovery and isolation
+checks pass.
+
+This avoids a new application VM charge at initial launch. It accepts a shared
+VPS outage and administrator boundary for test and production. Move the
+production app to a dedicated VM after real usage and revenue justify it, or
+earlier if measured capacity, security or availability requires separation.
+The later move changes application hosting and DNS while retaining the
+DigitalOcean production database; rehearse rollback before switching traffic.
+The [controlled app-VM migration plan](production-app-vm-migration-plan.md)
+records journal, relayer and trusted-source continuity checks.
+The unfinished DigitalOcean Droplet form was not submitted and no new SSH key
+was added to that account.
 
 ## Production preparation decision — 10 October 2026
 
-Prepare a separate DigitalOcean production application instance with a separate
-production database and non-owner roles on the existing managed PostgreSQL
-pilot cluster for a limited first release. Keep the synthetic pilot's database,
+The earlier separate DigitalOcean application instance proposal is superseded
+by the initial shared Contabo VPS decision above. Keep the production database
+and non-owner roles on the existing DigitalOcean managed PostgreSQL cluster
+for a limited first release. Keep the synthetic pilot's database,
 roles, keys, backup sets and worker journals distinct, and use local development
 with WorkOS Staging. A dedicated production database cluster can follow a
 rehearsed migration when capacity, recovery or customer commitments justify it.
 The production evidence chain remains undecided; no
-production wallet, contract or Base Sepolia reuse is approved. The version-5
+production wallet, contract or Base Sepolia reuse is approved. The version-6
 deployment-plan example and validator now model these three environments,
-distinct app/database resources and an explicitly shared cluster. The
+an explicitly shared app host with distinct services, and separate databases. The
 [production transition sequence](production-transition-sequence.md)
 lists the provisioning, identity, recovery, security and owner gates. This is
 planning and release preparation, not a purchase or production activation.
@@ -41,7 +66,7 @@ production release has passed its own acceptance checks, use the free WorkOS
 Staging environment with the isolated local development database and loopback
 API/portal for routine development. The live platform will have **one hosted
 Production deployment** with its own WorkOS Production configuration, database
-and restricted roles on the initially shared managed cluster,
+and restricted roles on the exclusive managed cluster,
 storage, secrets, signing/relayer keys, backups and monitoring. Do not retain a
 second always-on hosted staging stack by default. Use a short-lived isolated
 HTTPS preview only when a change needs real callbacks, webhooks or deployment

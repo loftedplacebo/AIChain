@@ -7,9 +7,11 @@ Completing the hosted `test` pilot does not complete this checklist.
 The [roadmap](roadmap-and-decisions.md) and linked evidence remain the detailed
 engineering record.
 
-On 11 October the owner selected a separate DigitalOcean production application
-instance and repurposed the existing managed PostgreSQL cluster exclusively
-for production. The synthetic pilot now uses local PostgreSQL on Contabo.
+On 11 October the owner selected isolated production application services on
+the existing Contabo VPS for the initial release, with a later migration to a
+dedicated VM when usage or revenue warrants it. The existing DigitalOcean
+managed PostgreSQL cluster was repurposed exclusively for production. The
+synthetic pilot now uses local PostgreSQL on Contabo.
 The managed pilot databases and roles have been retired, and an empty
 production database with three restricted `NOLOGIN` roles has been verified.
 The production app, service credentials, independent backup and evidence-chain
@@ -42,6 +44,11 @@ choice remain open. The ordered preparation and indicative budget are in the
   Rehearse account/workspace transition and rollback; staging identities and
   pilot keys do not transfer automatically. Start with free hosted Production
   AuthKit; a paid custom login domain is deferred.
+- [ ] On the shared Contabo host, verify separate production Unix users,
+  services, ports, protected files, edge routes and resource limits. Test that
+  a pilot release or fault cannot alter production state, and document the
+  shared host outage and administrator risk. Rehearse moving the production
+  app to a dedicated VM without moving its managed database.
 - [ ] Before production access, prove that pilot credentials cannot access
   production, and verify separate encrypted backup and journal coverage.
   Measure production cluster capacity and rehearse recovery to a replacement

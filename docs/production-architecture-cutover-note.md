@@ -2,6 +2,16 @@
 
 Decision: move the synthetic pilot database to self-managed PostgreSQL on the Contabo VPS. Reuse the existing DigitalOcean managed PostgreSQL cluster exclusively for production after the pilot cutover is verified. Keep the production cluster single-node at launch; review a standby once paying customers and an availability target justify it.
 
+Initial application hosting decision, 11 October: use isolated production
+services on the existing Contabo VPS, alongside the synthetic pilot, to avoid
+paying for a second VM before customer usage is established. Production has
+its own Unix users, systemd units, directories, protected settings, ports,
+HTTPS hostnames, WorkOS environment, backup sets, journals and keys. The
+production database remains on DigitalOcean. Review shared-host capacity and
+fault isolation before customer traffic. Migrate the production app to a
+dedicated VM later without moving its database; rehearse DNS cutover and
+rollback. No DigitalOcean Droplet was ordered in this change.
+
 ## Preparation verified 11 October 2026
 
 - Installed a separate PostgreSQL 17 cluster on the Contabo VPS at loopback port 5433. The existing PostgreSQL 16 cluster remains on port 5432. The pilot passed hosted-health after installation, before cutover.
@@ -36,7 +46,7 @@ The owner accelerated the rollback checkpoint with an on-demand coordinated B2 b
 4. Repoint pilot portal, API, workers, backup, and health checks. Run synthetic receipt and evidence verification, then complete an independent local-database restore drill.
 5. Preserve rollback until the local pilot has run cleanly through a backup cycle. Then remove test database credentials and access from DigitalOcean; remove its pilot database only after the verified retention checkpoint.
 6. Prepare the existing DigitalOcean cluster exclusively for production with fresh least-privilege roles, network restrictions, production backups, and replacement-cluster restore acceptance.
-7. Deploy production application services separately and run prelaunch capacity, security, and end-to-end acceptance checks before enabling customer sign-up.
+7. Deploy isolated production application services on Contabo and run prelaunch shared-host capacity, security, and end-to-end acceptance checks before enabling customer sign-up. Move the production app to a dedicated VM when usage or revenue warrants it, or sooner if capacity or isolation requires it.
 
 ## Launch gates
 

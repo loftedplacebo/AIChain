@@ -5,14 +5,25 @@ const file=path.resolve(__dirname,'../../deploy/governance/deployment-plan.examp
 test('three-environment topology is reviewable but never release approval',()=>{
  assert.deepEqual(validatePlan(fixture()),{valid:true,releaseReady:false,errors:[]});
  const result=spawnSync(process.execPath,[path.resolve(__dirname,'../../scripts/governance-deployment-plan.cjs'),file],{encoding:'utf8'});assert.equal(result.status,0);assert.equal(JSON.parse(result.stdout).releaseReady,false);
- for(const value of [null,{},[],{schemaVersion:6,environments:[]}])assert.equal(validatePlan(value).valid,false);
+ for(const value of [null,{},[],{schemaVersion:7,environments:[]}])assert.equal(validatePlan(value).valid,false);
  const plan=fixture();plan.environments[2].stage='test';assert.equal(validatePlan(plan).valid,false);
 });
 test('cross-environment state, identity, keys, wallets and backups cannot be shared',()=>{
- const mutations=[p=>p.environments[2].database=p.environments[1].database,p=>p.environments[2].identity=p.environments[1].identity,p=>p.environments[2].secrets=p.environments[1].secrets,p=>p.environments[2].backup=p.environments[1].backup,p=>p.environments[2].hosting.appInstanceRef=p.environments[1].hosting.appInstanceRef];
+ const mutations=[p=>p.environments[2].database=p.environments[1].database,p=>p.environments[2].identity=p.environments[1].identity,p=>p.environments[2].secrets=p.environments[1].secrets,p=>p.environments[2].backup=p.environments[1].backup,p=>p.environments[2].hosting.appServiceRef=p.environments[1].hosting.appServiceRef];
  for(const mutate of mutations){const plan=fixture();mutate(plan);assert.equal(validatePlan(plan).valid,false);}
  const plan=fixture();plan.environments[1].evidence.relayerAddress=plan.environments[1].evidence.recordingAddress;assert.equal(validatePlan(plan).valid,false);
  const roles=fixture();roles.environments[2].database.workerRole=roles.environments[2].database.apiRole;assert.equal(validatePlan(roles).valid,false);
+});
+test('production may share the Contabo host only with a distinct service and explicit topology',()=>{
+ assert.equal(validatePlan(fixture()).valid,true);
+ for(const mutate of [
+  p=>p.environments[2].hosting.appTopology='own-instance',
+  p=>p.environments[2].hosting.appProvider='digitalocean',
+  p=>p.environments[2].hosting.appRegion='lon1',
+  p=>p.environments[2].hosting.appInstanceRef='replace/prod/other-vps',
+  p=>p.environments[2].hosting.appServiceRef=p.environments[1].hosting.appServiceRef,
+  p=>p.environments[1].hosting.appTopology='shared-with-test'
+ ]){const plan=fixture();mutate(plan);assert.equal(validatePlan(plan).valid,false);}
 });
 test('test and production clusters remain distinct',()=>{
  assert.equal(validatePlan(fixture()).valid,true);
@@ -33,7 +44,7 @@ test('portal, API, callback and webhook origins form one exact isolated route pl
  const mutations=[e=>e.portal.origin='http://staging.example.test',e=>e.portal.apiOrigin='https://user:password@api.staging.example.test',e=>e.portal.origin='https://staging.example.test/path',e=>e.portal.apiOrigin=e.portal.origin,e=>e.identity.callbackUrl=e.portal.apiOrigin+'/api/auth/callback',e=>e.identity.webhookUrl=e.portal.origin+'/v1/auth/workos-webhook'];
  for(const mutate of mutations){const plan=fixture();mutate(plan.environments[2]);assert.equal(validatePlan(plan).valid,false);}
  const shared=fixture();shared.environments[2].portal.apiOrigin=shared.environments[1].portal.apiOrigin;assert.equal(validatePlan(shared).valid,false);
- for(const version of [1,3,4]){const old=fixture();old.schemaVersion=version;assert.equal(validatePlan(old).valid,false);}
+ for(const version of [1,3,4,5]){const old=fixture();old.schemaVersion=version;assert.equal(validatePlan(old).valid,false);}
 });
 test('an HTTPS synthetic test pilot has hosted isolation and public DNS requirements',()=>{
  const hosted=fixture(),pilot=hosted.environments[1];

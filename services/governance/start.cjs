@@ -3,6 +3,7 @@ const {GovernanceStore}=require('./store');
 const {PostgresGovernanceStore}=require('./postgres-store.cjs');
 const {createServer}=require('./server.cjs');
 async function start(env=process.env){
+ if(env.GOVERNANCE_ENV==='prod')require('../../scripts/governance-production-api.cjs').validate(env);
  const {environmentConfig,bindSqlite}=require('./environment.cjs');
  const config=environmentConfig(env),{stage,driver}=config;
  const projectRequestPolicy=config.controlDriver==='postgres'?require('./postgres-request-limits.cjs').requestPolicy({readRequests:Number(env.GOVERNANCE_PROJECT_READ_REQUESTS_PER_MINUTE??600),writeRequests:Number(env.GOVERNANCE_PROJECT_WRITE_REQUESTS_PER_MINUTE??6000)}):null;

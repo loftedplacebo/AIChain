@@ -5,8 +5,10 @@ const STAGES=['dev','test','staging','prod'];
 function environmentConfig(env){
  const stage=env.GOVERNANCE_ENV||'dev';
  if(!STAGES.includes(stage))throw new Error('Unknown environment');
- // Both hosted stages require managed identity and operational release evidence.
- if(stage==='prod'||stage==='staging')throw new Error(`${stage==='prod'?'Production':'Staging'} startup is gated until identity and operational readiness are approved`);
+ // Production is opened only for the reviewed isolated Contabo runtime profile.
+ // Public routing and customer admission remain separate release gates.
+ if(stage==='staging')throw new Error('Staging startup is gated until identity and operational readiness are approved');
+ if(stage==='prod'&&env.GOVERNANCE_PRODUCTION_HOST!=='contabo-shared')throw new Error('Production startup is gated to the reviewed Contabo runtime profile');
  const driver=env.GOVERNANCE_STORAGE||'sqlite';
  if(!['sqlite','postgres'].includes(driver))throw new Error('Unknown storage driver');
  const keyDriver=env.GOVERNANCE_KEY_STORAGE||'sqlite';
@@ -15,6 +17,7 @@ function environmentConfig(env){
  const controlDriver=env.GOVERNANCE_CONTROL_STORAGE||'sqlite';
  if(!['sqlite','postgres'].includes(controlDriver))throw new Error('Unknown customer control storage driver');
  if(controlDriver==='postgres'&&(driver!=='postgres'||keyDriver!=='postgres'))throw new Error('PostgreSQL control storage requires PostgreSQL events and keys');
+ if(stage==='prod'&&(driver!=='postgres'||keyDriver!=='postgres'||controlDriver!=='postgres'||env.GOVERNANCE_IDENTITY_PROVIDER!=='workos'||env.WORKOS_ADMISSION_MODE!=='production-list'))throw new Error('Production requires PostgreSQL storage and closed WorkOS admission');
  const port=Number(env.PORT??8790);
  if(!Number.isInteger(port)||port<0||port>65535)throw new Error('Invalid service port');
  if(env.GOVERNANCE_ADOPT_UNBOUND_SQLITE&&!['true','false'].includes(env.GOVERNANCE_ADOPT_UNBOUND_SQLITE))throw new Error('Invalid database adoption flag');

@@ -7,7 +7,7 @@ const ref=value=>{if(typeof value!=='string'||!/^[A-Za-z0-9._:-]{1,128}$/.test(v
 class PostgresProjectKeys{
  constructor(pool,{now=Date.now,authorize=null,authorizeSession=null}={}){this.pool=pool;this.now=now;this.authorize=authorize;this.authorizeSession=authorizeSession;}
  async ready(environment){
-  if(!['dev','test'].includes(environment))throw Error('Shared keys require a dev/test environment');
+  if(!['dev','test','prod'].includes(environment))throw Error('Project keys require an explicit environment');
   await verify(this.pool);
   await require('./postgres-recovery.cjs').assertActive(this.pool);
   const stage=(await this.pool.query('SELECT name FROM governance_environment')).rows;
