@@ -51,8 +51,9 @@ in the original Orvessian project, separate from the pilot project's Staging
 environment. The owner added billing information on 11 October and the workspace
 now reports `productionState: Active`. The hosted production application has
 password sign-in, required authenticator-app MFA and breached-password checks;
-public sign-up remains closed. No production API key or customer account has
-been created for this transition. The current $0 invoice estimate is not a
+public sign-up remains closed. A separate Production API key is now stored
+root-only on the VPS; no production customer account has been created. The
+current $0 invoice estimate is not a
 spending cap; see the [change review](production-shared-cluster-change-review.md)
 for optional WorkOS meters and remaining configuration.
 
@@ -62,7 +63,7 @@ for optional WorkOS meters and remaining configuration.
 | --- | --- | --- |
 | 1. Local development | Recheck the existing private PostgreSQL cluster, loopback API and WorkOS Staging configuration; run sign-in and one synthetic local customer journey. | No pilot or production credentials in local data; API readiness, scoped keys and session tests pass. |
 | 2. Pilot database cutover | Install local PostgreSQL on Contabo, migrate the complete pilot database under a writer pause, repoint services and health checks, then verify backup and closed restore. Keep the managed copy as rollback until acceptance. | Receipts, projects, key revocations, worker journals, B2 backup, closed restore and health all pass. |
-| 3. Production cluster preparation | The reviewed on-demand coordinated B2 backup and independent closed restore passed. Six named managed pilot/restore databases and three pilot roles were retired. The empty `governance_prod` database and three restricted `NOLOGIN` roles were created and verified. Rotate the admin credential and restrict trusted sources when the production app endpoint exists. | No pilot object remains on the managed cluster; empty production bootstrap and restricted role checks passed. Admin rotation and network restriction remain open. |
+| 3. Production cluster preparation | The reviewed on-demand coordinated B2 backup and independent closed restore passed. Six named managed pilot/restore databases and three pilot roles were retired. The `governance_prod` database and restricted roles were created and verified. The admin credential was rotated. Restrict trusted sources when the production app endpoint exists. | No pilot object remains on the managed cluster; production bootstrap and admin rotation passed. Network restriction remains open. |
 | 4. Production identity | Configure WorkOS Production hosted AuthKit, MFA, exact HTTPS callbacks and signed webhook; create new production API key and sealing key in protected storage. | Fresh production account passes sign-in, MFA, recovery, revocation and webhook replay tests; staging identities are not assumed to transfer. |
 | 5. Runtime and backup | Build pinned API, worker and portal artifacts; apply migrations and strict roles in the production database; deploy isolated production users, directories, units and loopback ports on Contabo behind private readiness checks. Configure production-specific encrypted backup, journals, retention and alerts that do not silently reuse the pilot backup set. | Green release gates, hashes, scoped read/write/denial checks in both databases, shared-host fault isolation, current production backup marker and every worker registered. |
 | 6. Recovery | Restore when the original managed DB cluster is unavailable, review every journal and access state, then activate an isolated replacement service. | Measured recovery point and time, revoked captured access, receipt proof preservation and successful post-restore customer journey. |
