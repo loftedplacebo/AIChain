@@ -17,9 +17,16 @@ class RetirementGateTests(unittest.TestCase):
         self.backup = {
             'healthy': True, 'marker_valid': True,
             'latest_due_backup_covered': True,
-            'last_completed_upload_utc': '2026-10-12T03:15:00+00:00',
+            'last_completed_upload_utc': '2026-10-11T14:40:49+00:00',
         }
         self.hosted = {'healthy': True}
+        self.recovery = {
+            'healthy': True,
+            'backupId': 'c79ba135-5b42-417e-b3bd-cd1955853f12',
+            'restoredDatabase': 'gov_restore_b2_a451c6e5b6b2',
+            'restoredDatabaseClosed': True,
+            'registeredJournalRoles': 4,
+        }
         self.inventory = {
             'databases': [{'name': name, 'connections': 0}
                           for name in PREFLIGHT.EXPECTED_DATABASES],
@@ -27,14 +34,19 @@ class RetirementGateTests(unittest.TestCase):
         }
 
     def assess(self):
-        return PREFLIGHT.assess(self.backup, self.hosted, self.inventory)
+        return PREFLIGHT.assess(self.backup, self.hosted, self.inventory,
+                                self.recovery)
 
-    def test_exact_healthy_post_checkpoint_inventory_passes(self):
+    def test_exact_healthy_on_demand_backup_and_restore_pass(self):
         self.assertTrue(self.assess()['ready'])
 
     def test_earlier_backup_blocks(self):
         self.backup['last_completed_upload_utc'] = '2026-10-11T09:16:58+00:00'
-        self.assertIn('scheduled_local_backup_checkpoint', self.assess()['blockers'])
+        self.assertIn('on_demand_backup_checkpoint', self.assess()['blockers'])
+
+    def test_unreviewed_restore_blocks(self):
+        self.recovery['backupId'] = 'another-backup'
+        self.assertIn('independent_closed_restore', self.assess()['blockers'])
 
     def test_unhealthy_local_pilot_blocks(self):
         self.hosted['healthy'] = False

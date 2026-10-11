@@ -19,7 +19,7 @@ Decision: move the synthetic pilot database to self-managed PostgreSQL on the Co
 - The B2 archive restored to new local database `gov_restore_b2_987218fb8b3a`. An independent second review passed with all four registered journals. The recovery gate is `review-required`, access is `revoked-and-disabled`, and no service was activated against the restore.
 - Post-acceptance hosted-health and backup-health checks both returned `healthy: true`: four projects and four workers covered, no stalled evidence, canary verified, and the latest due backup covered. The scheduled backup uploaded at `2026-10-11T09:16:58Z`.
 
-Retain the managed pilot database and credentials through the agreed rollback checkpoint and next scheduled local backup cycle. Production reuse of the managed cluster remains outstanding.
+The owner accelerated the rollback checkpoint with an on-demand coordinated B2 backup and independent closed restore on 11 October. The six managed pilot and historical restore databases and three old roles were retired after a green preflight. The exclusive empty production database and three restricted `NOLOGIN` roles were created and verified. The unattended next scheduled local backup remains a separate operational check; production service credentials, administrator rotation, backups, and app deployment remain outstanding.
 
 ## Operator code review and local paths
 

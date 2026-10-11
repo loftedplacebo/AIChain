@@ -40,7 +40,8 @@ def check(preflight):
     backup = preflight.read_check('check-pilot-backup-health.py')
     hosted = preflight.read_check('check-pilot-hosted-health.py')
     inventory = preflight.read_check('inspect-managed-cluster-for-production.py')
-    verdict = preflight.assess(backup, hosted, inventory)
+    recovery = preflight.read_check('inspect-accelerated-retirement-checkpoint.py')
+    verdict = preflight.assess(backup, hosted, inventory, recovery)
     if not verdict['ready']:
         raise ValueError('Retirement preflight blocked: ' + ','.join(verdict['blockers']))
     return verdict

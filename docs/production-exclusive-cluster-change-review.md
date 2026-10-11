@@ -1,19 +1,31 @@
 # Exclusive production cluster change review — 11 October 2026
 
-## Current hold
+## Accelerated checkpoint and completed retirement
 
-The hosted synthetic pilot now uses Contabo PostgreSQL 17 at loopback port
-5433. Its existing DigitalOcean managed database is held as rollback. The
-next scheduled local B2 backup begins **12 October 2026 at 03:00 UTC** and
-becomes due at **04:00 UTC**. The read-only retirement preflight currently
-fails only `scheduled_local_backup_checkpoint`; its last completed upload is
-`2026-10-11T09:16:58Z`. No managed database or credential has been retired.
+The hosted synthetic pilot uses Contabo PostgreSQL 17 at loopback port 5433.
+The owner requested an on-demand coordinated backup to advance the cutover.
+Backup `c79ba135-5b42-417e-b3bd-cd1955853f12` completed at 14:40:49 UTC
+on 11 October. Its B2 archive was independently authenticated and restored
+into closed local database `gov_restore_b2_a451c6e5b6b2`; all registered
+worker journals passed review. The read-only retirement preflight now checks
+this exact backup and restore. The unattended 12 October 03:00 UTC backup is
+a separate operational check and remains monitored.
 
 Run `python3 /opt/aichain/governance-pilot-db-setup/preflight-production-cluster-retirement.py`
-after 04:00 UTC on 12 October. It requires a healthy local pilot, a validated
-latest-due B2 completion marker after the checkpoint, the exact managed object
-inventory below, and zero connections to each retained database. A failed
-preflight is a stop, not a reason to relax the check.
+immediately before any change. It requires a healthy local pilot, a validated
+B2 completion marker for the reviewed backup, the closed restore, the exact
+managed object inventory below, and zero connections to each retained
+database. A failed preflight is a stop, not a reason to relax the check.
+
+The preflight and exact-object dry run passed on 11 October. The six named
+pilot and historical restore databases and three named pilot roles were then
+retired, with each deletion reported. The follow-up managed inventory contained
+no pilot database or role. The hash-pinned `00-create-empty.sql`,
+`01-bootstrap.sql`, and `04-verify-exclusive.sql` were applied successfully.
+The resulting `governance_prod` database has no connections and is owned by
+`doadmin`; its API, worker, and migration roles are restricted `NOLOGIN` roles.
+The independent production bootstrap verification and hosted synthetic-pilot
+health check passed. Customer access remains closed.
 
 ## Managed inventory, read-only at 14:00 UTC 11 October
 
@@ -35,11 +47,11 @@ The remaining application roles are `governance_api`,
 have no superuser, create-database, or create-role privileges. There is no
 `governance_prod` database or production role yet.
 
-## Exact change sequence after the hold clears
+## Exact change sequence and remaining controls
 
 1. Recheck Contabo hosted, backup, worker and canary health and the managed
-   object inventory. Confirm the B2 completion marker covers the 12 October
-   scheduled local backup and that the closed local restore evidence remains
+   object inventory. Confirm the B2 completion marker covers the reviewed
+   on-demand backup and that the closed local restore evidence remains
    available. Capture the preflight JSON and the current Git commit.
 2. Verify all pilot service bindings remain local. Retire the six **named**
    managed databases, then the three **named** old roles. Stop on any changed
@@ -50,16 +62,17 @@ have no superuser, create-database, or create-role privileges. There is no
    mode and a gated `--apply` mode. Review the preflight and exact object list
    before invoking `--apply`; it stops on the first SQL failure and records
    each completed deletion for partial-change review.
-3. Re-run the read-only managed inventory. It must show no pilot database,
-   restore database, or pilot application role. Rotate the managed `doadmin`
-   password in DigitalOcean and replace the retained root-only operator
-   credential. Do not copy this password into a service or the repository.
-4. Generate the non-secret bundle with
+3. The read-only managed inventory showed no pilot database, restore database,
+   or pilot application role before the production bootstrap. **Still open:**
+   rotate the managed `doadmin` password in DigitalOcean and replace the
+   retained root-only operator credential. Do not copy this password into a
+   service or the repository.
+4. The non-secret bundle was generated with
    `npm run governance:prepare-production-exclusive-db-sql`. Review the SQL
-   and hashes below. Apply `00-create-empty.sql` on `defaultdb` as `doadmin`,
-   then `01-bootstrap.sql` on the newly created `governance_prod` database.
-   Run `04-verify-exclusive.sql` on `governance_prod`. The three new roles
-   remain `NOLOGIN` until Step 4 provisions separate protected credentials.
+   and hashes below. `00-create-empty.sql` ran on `defaultdb` as `doadmin`,
+   then `01-bootstrap.sql` and `04-verify-exclusive.sql` ran on the new
+   `governance_prod` database. The three new roles remain `NOLOGIN` until
+   separate protected production credentials are provisioned.
    Files `02` and `03` are post-migration grants for Step 4, not Step 3.
 5. Restrict DigitalOcean trusted sources to the reviewed production app and
    operator access once the production app endpoint exists. Record the actual
@@ -77,8 +90,9 @@ The SQL generator emits these SHA-256 hashes on this revision:
 | `04-verify-exclusive.sql` | `dcf4247a9d142bfd5f4e79d700312a695908d095acc4eba0b8c5b5c4cddad853` |
 
 The old `production-shared-db-sql` bundle is historical and must not be
-applied to this exclusive-cluster topology. The current bundle is offline
-preparation only; it did not change DigitalOcean.
+applied to this exclusive-cluster topology. The production-only bundle changed
+the DigitalOcean cluster as recorded above. Production migrations and the
+post-migration grants have not yet been applied.
 
 ## Rollback and limits
 
