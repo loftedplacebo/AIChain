@@ -79,6 +79,12 @@ can create the non-login API identity, empty root-owned release directory and
 disabled unit earlier. Its default mode is read-only; `--apply` never starts a
 service or creates an HTTPS route. Install a pinned API artifact and complete
 the private preflight before enabling the unit.
+Build the production API artifact from a pinned Linux checkout using Node 24,
+`npm ci --omit=dev --ignore-scripts`, and the shared deterministic packager's
+`--component api` option. Record the Git SHA and archive SHA-256. Inspect the
+archive for `scripts/governance-production-api.cjs`, the PostgreSQL and WorkOS
+dependencies, and absence of secret files. Stage it in the root-owned release
+directory while the unit remains disabled.
 On 11 October its pinned unit hash and read-only preflight passed, then
 `--apply` staged `orvessian-prod-api` with `/usr/sbin/nologin`, the empty
 root-owned `/opt/aichain/orvessian-production-api` directory, and

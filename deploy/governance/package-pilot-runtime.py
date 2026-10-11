@@ -63,12 +63,14 @@ def main():
     parser.add_argument('--source', type=pathlib.Path, required=True)
     parser.add_argument('--output-dir', type=pathlib.Path, required=True)
     parser.add_argument('--release-id', required=True)
+    parser.add_argument('--component', choices=('api', 'worker', 'both'), default='both')
     args = parser.parse_args()
     if not re.fullmatch(r'[a-z0-9][a-z0-9-]{0,63}', args.release_id):
         raise ValueError('Invalid release ID')
     if not args.source.is_dir() or not args.output_dir.is_dir():
         raise ValueError('Existing source and output directories required')
-    for component in ('api', 'worker'):
+    components = ('api', 'worker') if args.component == 'both' else (args.component,)
+    for component in components:
         output = args.output_dir / (args.release_id + '-' + component + '.tar.gz')
         digest = package(args.source, output, component)
         print(f'{component}_archive={output};sha256={digest}')
