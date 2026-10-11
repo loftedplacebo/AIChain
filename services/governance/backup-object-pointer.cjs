@@ -9,7 +9,7 @@ const outside=(file,directory)=>{const source=fs.realpathSync(directory),target=
 function savePointer({file,environment,bucket,keyPrefix,sourceDirectory,journalRoles=[]}){
  if(typeof file!=='string'||!path.isAbsolute(file)||typeof sourceDirectory!=='string'||!path.isAbsolute(sourceDirectory))throw Error('Absolute backup pointer and source paths required');
  outside(file,sourceDirectory);
- if(!['dev','test'].includes(environment)||typeof bucket!=='string'||bucket.length<3||bucket.length>63||typeof keyPrefix!=='string'||!keyPrefix||keyPrefix.length>512)throw Error('Complete backup upload identity required');
+ if(!['dev','test','prod'].includes(environment)||typeof bucket!=='string'||bucket.length<3||bucket.length>63||typeof keyPrefix!=='string'||!keyPrefix||keyPrefix.length>512||environment==='prod'&&(!bucket.startsWith('orvessian-prod-')||!keyPrefix.startsWith('orvessian-production/prod/')))throw Error('Complete backup upload identity required');
  if(!Array.isArray(journalRoles)||journalRoles.length>MAX_JOURNALS||new Set(journalRoles).size!==journalRoles.length||journalRoles.some(role=>!validRole(role,{postgres:true})))throw Error('Invalid backup pointer journal inventory');
  const parent=path.dirname(file),parentStat=fs.lstatSync(parent);if(!parentStat.isDirectory()||parentStat.isSymbolicLink())throw Error('Regular private backup pointer directory required');
  if(fs.lstatSync(file,{throwIfNoEntry:false}))privateRegular(file);
@@ -28,7 +28,7 @@ function readPointer({file,environment,bucket}){
  const value=parseStrictJson(fs.readFileSync(file,'utf8'));
  const legacy=exact(value,['version','environment','bucket','keyPrefix'])&&value.version===1;
  const current=exact(value,['version','environment','bucket','keyPrefix','journalRoles'])&&value.version===2&&Array.isArray(value.journalRoles)&&value.journalRoles.length<=MAX_JOURNALS&&new Set(value.journalRoles).size===value.journalRoles.length&&value.journalRoles.every(role=>validRole(role,{postgres:true}));
- if(!(legacy||current)||value.environment!==environment||value.bucket!==bucket||typeof value.keyPrefix!=='string'||!value.keyPrefix)throw Error('Backup pointer does not match the selected bucket or environment');
+ if(!(legacy||current)||value.environment!==environment||value.bucket!==bucket||typeof value.keyPrefix!=='string'||!value.keyPrefix||environment==='prod'&&(!bucket.startsWith('orvessian-prod-')||!value.keyPrefix.startsWith('orvessian-production/prod/')))throw Error('Backup pointer does not match the selected bucket or environment');
  return value.keyPrefix;
 }
 module.exports={savePointer,readPointer};

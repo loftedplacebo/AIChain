@@ -10,6 +10,9 @@ const bucketName=value=>typeof value==='string'&&/^[a-z0-9][a-z0-9-]{1,61}[a-z0-
 const knownFiles=journalRoles=>['postgres.gcm','manifest.gcm',...(journalRoles.length?['journals/manifest.gcm',...journalRoles.map(role=>'journals/'+role+'.gcm'),'journals/complete.json']:[]),'complete.json'];
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 const generatedSetName=/^[a-f0-9-]{36}-[a-f0-9-]{36}$/;
+const productionScope=(environment,bucket,prefix)=>environment!=='prod'||
+  (bucket.startsWith('orvessian-prod-')&&
+   (prefix==='orvessian-production'||prefix.startsWith('orvessian-production/prod/')));
 
 function createStorageClient({endpoint,region,accessKeyId,secretAccessKey}){
  if(typeof endpoint!=='string'||typeof region!=='string'||!/^[a-z0-9-]{2,40}$/.test(region)||typeof accessKeyId!=='string'||!accessKeyId||typeof secretAccessKey!=='string'||!secretAccessKey)throw Error('Explicit object-storage endpoint, region and credentials required');
@@ -18,10 +21,10 @@ function createStorageClient({endpoint,region,accessKeyId,secretAccessKey}){
  return new S3Client({endpoint:url.origin,region,credentials:{accessKeyId,secretAccessKey},forcePathStyle:true,requestChecksumCalculation:'WHEN_REQUIRED',responseChecksumValidation:'WHEN_REQUIRED',maxAttempts:1});
 }
 function transferPolicy({environment,bucket,prefix,client,key}){
- if(!['dev','test'].includes(environment)||!bucketName(bucket)||!safePrefix(prefix)||!client||typeof client.send!=='function')throw Error('Explicit bounded object-storage transfer required');files.keyCheck(key);
+ if(!['dev','test','prod'].includes(environment)||!bucketName(bucket)||!safePrefix(prefix)||!productionScope(environment,bucket,prefix)||!client||typeof client.send!=='function')throw Error('Explicit bounded object-storage transfer required');files.keyCheck(key);
 }
 function discoveryPolicy({environment,bucket,prefix,client}){
- if(!['dev','test'].includes(environment)||!bucketName(bucket)||!safePrefix(prefix)||!client||typeof client.send!=='function')throw Error('Explicit bounded object-storage discovery required');
+ if(!['dev','test','prod'].includes(environment)||!bucketName(bucket)||!safePrefix(prefix)||!productionScope(environment,bucket,prefix)||!client||typeof client.send!=='function')throw Error('Explicit bounded object-storage discovery required');
 }
 async function discoverBackupPrefixes({environment,bucket,prefix,client}){
  discoveryPolicy({environment,bucket,prefix,client});
