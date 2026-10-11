@@ -84,7 +84,13 @@ Build the production API artifact from a pinned Linux checkout using Node 24,
 `--component api` option. Record the Git SHA and archive SHA-256. Inspect the
 archive for `scripts/governance-production-api.cjs`, the PostgreSQL and WorkOS
 dependencies, and absence of secret files. Stage it in the root-owned release
-directory while the unit remains disabled.
+directory while the unit remains disabled. The
+[release staging helper](../deploy/governance/stage-production-api-release.py)
+checks the pinned archive hash, allowed file types, size and required members;
+its default mode is read-only. `--apply` fills the empty production directory
+and writes a non-secret release manifest, then confirms the unit is still
+disabled and inactive. This initial staging operation does not enable the
+public route or replace a live production release.
 On 11 October its pinned unit hash and read-only preflight passed, then
 `--apply` staged `orvessian-prod-api` with `/usr/sbin/nologin`, the empty
 root-owned `/opt/aichain/orvessian-production-api` directory, and
