@@ -45,10 +45,13 @@ evidence need independent verification.
 
 Read-only WorkOS account inspection on 10 October found a Production environment
 in the original Orvessian project, separate from the pilot project's Staging
-environment. The workspace reports `productionState: Inactive` and
-`hasActiveBilling: false`. Production AuthKit cannot be activated until the
-owner adds billing information. No production API key or customer account has
-been created for this transition.
+environment. The owner added billing information on 11 October and the workspace
+now reports `productionState: Active`. The hosted production application has
+password sign-in, required authenticator-app MFA and breached-password checks;
+public sign-up remains closed. No production API key or customer account has
+been created for this transition. The current $0 invoice estimate is not a
+spending cap; see the [change review](production-shared-cluster-change-review.md)
+for optional WorkOS meters and remaining configuration.
 
 ## Execution order
 

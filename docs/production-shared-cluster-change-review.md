@@ -93,13 +93,18 @@ backup support and the replacement-cluster drill remain release blockers.
   deployment and rollback are not provisioned yet. The indicative starting
   Droplet is London Basic 2 vCPU/4 GiB/80 GiB at $24/month; this is a budget
   estimate, not capacity acceptance.
-- WorkOS Production was inspected separately from pilot Staging. It has no
-  callback or logout URLs, webhook endpoint or application key; password sign-in
-  and MFA are off. A control-plane change returned `FORBIDDEN` for the connected
-  admin role on 11 October. The owner must enable Production access/billing or
-  grant the necessary permission before settings can be applied. Keep sign-up
-  and customer traffic closed until MFA, hosted sign-in, callbacks, webhook
-  verification and recovery are accepted.
+- WorkOS Production was activated after the owner added a payment method on
+  11 October. The default application is named `Orvessian Production`.
+  Password sign-in, required authenticator-app MFA and breached-password checks
+  are enabled; public sign-up is closed. It still has no callback or logout
+  URLs, webhook endpoint or application key. The billing overview showed a
+  $0 upcoming invoice, with zero SSO, Directory Sync, audit-stream, Radar-check
+  and Radar-SMS usage at inspection time. This is a snapshot, not a spending cap.
+  Hosted AuthKit includes the first 1 million monthly active users free; Radar
+  has a separate published 1,000-check free threshold. Production Radar remains
+  in `Log` mode while its billing behavior is clarified. Keep customer traffic
+  closed until callbacks, signed webhooks, MFA/recovery and spend exposure are
+  accepted. No SSO connection or paid custom domain is configured.
 - The runtime startup and several storage/recovery modules still deliberately
   reject `prod`. Adding a production migration path does not lift those gates.
 - The production evidence chain, contract, wallet custody and funding are
