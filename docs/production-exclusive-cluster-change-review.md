@@ -49,6 +49,22 @@ have no superuser, create-database, or create-role privileges. There is no
 
 ## Exact change sequence and remaining controls
 
+### 11 October credential-rotation staging checkpoint
+
+The root-owned production admin installer was staged on Contabo at
+`/opt/aichain/governance-pilot-db-setup/configure-production-database-admin.py`
+with SHA-256 `deccafd3d5fffbb8ecd1d8bef178e860b8cda08229554fd92c1633cd88f8ddcf`.
+The managed inventory and empty-bootstrap verifier were updated to prefer its
+new production-only credential file after installation; their staged hashes
+match Git. Python syntax checks passed. The installer has **not** been run,
+and `/etc/aichain/production/database-admin-password` did not exist at the
+staging check. A read-only inventory still showed only `governance_prod`,
+zero database connections, and the three `NOLOGIN` production roles. The
+synthetic pilot health check remained green. The next database operation is
+the owner's DigitalOcean `doadmin` rotation followed by the hidden-prompt
+installer, then a fresh read-only inventory. No production role login,
+migration or service was activated at this checkpoint.
+
 1. Recheck Contabo hosted, backup, worker and canary health and the managed
    object inventory. Confirm the B2 completion marker covers the reviewed
    on-demand backup and that the closed local restore evidence remains
