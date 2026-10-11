@@ -4,10 +4,14 @@ const {createHash}=require('node:crypto');
 const directory=join(__dirname,'migrations');
 const migrations=()=>readdirSync(directory).filter(f=>/^\d+.*\.sql$/.test(f)).sort().map(name=>{const sql=readFileSync(join(directory,name),'utf8');return {name,sql,checksum:createHash('sha256').update(sql).digest('hex')};});
 async function migrate(pool,{environment='test'}={}){
- if(!['dev','test'].includes(environment))throw new Error('Explicit dev or test database environment required');
+ if(!['dev','test','prod'].includes(environment))throw new Error('Explicit dev, test or prod database environment required');
  const client=await pool.connect();
  try{
   await client.query('BEGIN');
+  if(environment==='prod'){
+   const binding=(await client.query('SELECT current_database() AS database, current_user AS role')).rows[0];
+   if(binding?.database!=='governance_prod'||binding?.role!=='governance_prod_migrations')throw new Error('Production migration requires the dedicated database and migration role');
+  }
   await client.query('SELECT pg_advisory_xact_lock(84532,20260927)');
   await client.query('CREATE TABLE IF NOT EXISTS governance_environment(singleton boolean PRIMARY KEY DEFAULT true CHECK(singleton),name text NOT NULL)');
   await client.query('INSERT INTO governance_environment(singleton,name) VALUES(true,$1) ON CONFLICT DO NOTHING',[environment]);
@@ -21,4 +25,4 @@ async function migrate(pool,{environment='test'}={}){
 }
 async function verify(pool){const applied=(await pool.query('SELECT name,checksum FROM governance_migrations')).rows;const expected=migrations();if(applied.length!==expected.length||expected.some(m=>!applied.some(a=>a.name===m.name&&a.checksum===m.checksum)))throw new Error('Run reviewed governance migrations before serving');}
 module.exports={migrate,verify,migrations};
-if(require.main===module){const {Pool}=require('pg');if(!process.env.GOVERNANCE_MIGRATION_URL||!['dev','test'].includes(process.env.GOVERNANCE_ENV))throw new Error('Set GOVERNANCE_ENV and GOVERNANCE_MIGRATION_URL for the intended database');const pool=new Pool(require('./postgres-connection.cjs').connectionOptions(process.env.GOVERNANCE_MIGRATION_URL,{caFile:process.env.GOVERNANCE_DATABASE_CA_FILE}));migrate(pool,{environment:process.env.GOVERNANCE_ENV}).then(()=>console.log('Governance migrations complete')).catch(()=>{console.error('Migration failed; check database access, environment and migration history');process.exitCode=1;}).finally(()=>pool.end());}
+if(require.main===module){const {Pool}=require('pg');if(!process.env.GOVERNANCE_MIGRATION_URL||!['dev','test','prod'].includes(process.env.GOVERNANCE_ENV))throw new Error('Set GOVERNANCE_ENV and GOVERNANCE_MIGRATION_URL for the intended database');const pool=new Pool(require('./postgres-connection.cjs').connectionOptions(process.env.GOVERNANCE_MIGRATION_URL,{caFile:process.env.GOVERNANCE_DATABASE_CA_FILE}));migrate(pool,{environment:process.env.GOVERNANCE_ENV}).then(()=>console.log('Governance migrations complete')).catch(()=>{console.error('Migration failed; check database access, environment and migration history');process.exitCode=1;}).finally(()=>pool.end());}

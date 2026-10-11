@@ -4,6 +4,10 @@ This is the next execution plan. The existing Contabo/DigitalOcean/B2 pilot
 remains a synthetic `test` service with four of five project slots in use. It
 does not become production by changing a hostname or WorkOS client ID.
 
+The [11 October shared-cluster change review](production-shared-cluster-change-review.md)
+records the latest read-only capacity snapshot, SQL hashes, rollback boundary,
+and current database, backup, application and WorkOS release blockers.
+
 ## Selected shape
 
 - **Local development:** private loopback PostgreSQL, API and portal with
