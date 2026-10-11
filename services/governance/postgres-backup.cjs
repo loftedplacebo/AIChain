@@ -6,8 +6,13 @@ const {assertOfflineAdministrator}=require('./postgres-offline-administrator.cjs
 const {databaseOptions,nativeEnv}=require('./postgres-backup-connection.cjs');
 const {MAX_JOURNALS,validRole}=require('./journal-roles.cjs');
 const ref=v=>typeof v==='string'&&/^[a-z][a-z0-9_]{0,62}$/.test(v);
+const PROD_HOST='orvessian-pilot-test-do-user-45565720-0.k.db.ondigitalocean.com';
+function productionSource(connection){
+ if(connection?.host!==PROD_HOST||connection.port!==25060||connection.database!=='governance_prod'||connection.user!=='doadmin'||connection.sslmode!=='verify-full'||connection.caFile!=='/etc/aichain/governance/digitalocean-ca.crt')throw Error('Production backup requires the exclusive managed database and verified TLS');
+}
 function configuration(environment,connection,binaries){
- if(!['dev','test'].includes(environment))throw Error('PostgreSQL backup tooling is limited to dev/test');
+ if(!['dev','test','prod'].includes(environment))throw Error('Explicit dev, test or reviewed production database required');
+ if(environment==='prod')productionSource(connection);
  databaseOptions(connection);
  if(typeof binaries!=='string'||!path.isAbsolute(binaries))throw Error('Explicit absolute PostgreSQL binary directory required');
  for(const binary of ['pg_dump','pg_restore'])files.regular(path.join(binaries,binary+(process.platform==='win32'?'.exe':'')));
@@ -19,11 +24,12 @@ async function sourceCheck(pool,environment){
  await verify(pool);await pg.assertActive(pool);
  await assertOfflineAdministrator(pool);
  const stage=(await pool.query('SELECT name FROM governance_environment')).rows;
- if(stage.length!==1||stage[0].name!==environment)throw Error('Offline dev/test database administrator and matching environment required');
+ if(stage.length!==1||stage[0].name!==environment)throw Error('Offline database administrator and matching environment required');
 }
 async function createBackup({environment,connection,binaries,journals=[],outputRoot,key,consistency}){
  configuration(environment,connection,binaries);files.keyCheck(key);
  if(consistency!=='quiesced')throw Error('Stop every API/worker/delivery writer and acknowledge quiesced capture');
+ if(environment==='prod'&&journals.length)throw Error('Production worker journals require a separately reviewed capture path');
  if(!Array.isArray(journals)||journals.length>MAX_JOURNALS||journals.some(j=>!validRole(j.role,{postgres:true}))||new Set(journals.map(j=>j.role)).size!==journals.length)throw Error('Only unique explicit worker/rules/indexer/relayer journal roles are allowed');
  const pool=new Pool(databaseOptions(connection)),destination=files.freshDirectory(outputRoot,'pg-backup-'),scratch=files.freshDirectory(os.tmpdir(),'ov-pg-backup-');let success=false,locker;
  try{
@@ -52,10 +58,11 @@ async function createBackup({environment,connection,binaries,journals=[],outputR
  }finally{try{if(locker){try{await locker.query('ROLLBACK');}finally{locker.release();}}await pool.end();}finally{try{files.clean(scratch);}finally{if(!success)files.clean(destination);}}}
 }
 async function readArchive({environment,directory,key,scratchDirectory,journalOutputRoot}){
- if(!['dev','test'].includes(environment))throw Error('Explicit dev/test archive environment required');files.keyCheck(key);
+ if(!['dev','test','prod'].includes(environment))throw Error('Explicit archive environment required');files.keyCheck(key);
  const header=marker(directory,'complete.json');if(header.version!==1||header.kind!=='postgres-coordinated'||header.environment!==environment||typeof header.id!=='string'||!/^[a-f0-9-]{36}$/.test(header.id))throw Error('Backup marker mismatch');
   const manifestFile=path.join(scratchDirectory,'manifest.json');await files.decryptFile(path.join(directory,'manifest.gcm'),manifestFile,key,header.id+':'+environment+':manifest',65536);const manifest=marker(scratchDirectory,'manifest.json');
  if(manifest.version!==1||manifest.kind!==header.kind||manifest.id!==header.id||manifest.environment!==environment||manifest.consistency!=='quiesced'||!ref(manifest.database)||!Array.isArray(manifest.journals)||manifest.journals.length>MAX_JOURNALS+2||!Number.isSafeInteger(manifest.postgres?.bytes)||manifest.postgres.bytes<1||manifest.postgres.bytes>files.MAX_BYTES||!/^[a-f0-9]{64}$/.test(manifest.postgres.sha256))throw Error('Invalid authenticated PostgreSQL manifest');
+ if(environment==='prod'&&(manifest.database!=='governance_prod'||manifest.journals.length))throw Error('Production backup database or journal scope mismatch');
   const created=Date.parse(manifest.createdAt);if(!Number.isFinite(created)||new Date(created).toISOString()!==manifest.createdAt||manifest.createdAt!==header.createdAt||created>Date.now()+300000)throw Error('Invalid authenticated backup timestamp');
   const expected=['complete.json','manifest.gcm','postgres.gcm',...(manifest.journals.length?['journals']:[])].sort();if(JSON.stringify(fs.readdirSync(directory).sort())!==JSON.stringify(expected))throw Error('Unexpected backup files');
   const dump=path.join(scratchDirectory,'postgres.dump');await files.decryptFile(path.join(directory,'postgres.gcm'),dump,key,header.id+':'+environment+':postgres');
@@ -110,4 +117,4 @@ async function reviewRestore({environment,connection,binaries,directory}){
  if(JSON.stringify(fs.readdirSync(directory).sort())!==JSON.stringify(expected.sort()))throw Error('Unexpected recovery files');
  const pool=new Pool(databaseOptions(connection));try{return {directory,...await pg.reviewRestore(pool,{environment,restoreId:result.restoreId}),journalRoles:result.journalRoles};}finally{await pool.end();}
 }
-module.exports={createBackup,restoreBackup,reviewRestore,inspectBackup};
+module.exports={createBackup,restoreBackup,reviewRestore,inspectBackup,productionSource};
