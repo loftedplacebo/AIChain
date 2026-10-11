@@ -8,9 +8,11 @@ import pathlib
 import re
 import secrets
 import subprocess
+import sys
 import tempfile
 import time
 from pilot_worker_registry import load_registry, verify_journal_binding
+from pilot_db_binding import load_admin, recovery_connection
 
 
 ROOT = pathlib.Path('/etc/aichain/pilot-backup')
@@ -51,6 +53,8 @@ def run(script: str, operation: str, config: pathlib.Path,
 def main() -> None:
     if os.geteuid() != 0:
         raise SystemExit('Run as root')
+    if sys.argv[1:] not in ([], ['--preflight']):
+        raise SystemExit('Usage: verify-pilot-b2-restore.py [--preflight]')
     workers = load_registry()
     required_roles = {worker['role'] for worker in workers}
     pointer = json.loads((ROOT / 'latest-upload.json').read_text(encoding='utf-8'))
@@ -65,12 +69,19 @@ def main() -> None:
             len(pointer['journalRoles']) != len(required_roles):
         raise SystemExit('No valid completed pilot B2 upload pointer')
 
+    binding = load_admin()
+    if binding['profile'] != 'contabo-local':
+        raise SystemExit('Closed B2 restore drill requires the local pilot database binding')
+    if sys.argv[1:] == ['--preflight']:
+        print('Local pilot B2 restore preflight: READY')
+        print('Registered journal roles:', len(required_roles))
+        print('Restore target: new closed database on Contabo PostgreSQL 17')
+        return
+
     key_id = input('1Password B2 restore keyID: ').strip()
     secret = getpass.getpass('1Password B2 restore applicationKey: ').strip()
-    password = getpass.getpass('1Password doadmin database password (one-time use): ')
     if not re.fullmatch(r'[A-Za-z0-9]{12,64}', key_id) or \
-            not re.fullmatch(r'[!-~]{20,128}', secret) or \
-            not password or len(password) > 1024:
+            not re.fullmatch(r'[!-~]{20,128}', secret):
         raise SystemExit('Invalid credential input; no restore attempted')
 
     started = time.monotonic()
@@ -98,13 +109,11 @@ def main() -> None:
             raise SystemExit('Completed B2 set was not discoverable')
         print('Completed B2 set: DISCOVERABLE', flush=True)
         discovered_at = time.monotonic()
-        connection = write_json(private, 'do-admin.json', {
-            'host': 'orvessian-pilot-test-do-user-45565720-0.k.db.ondigitalocean.com',
-            'port': 25060, 'database': 'defaultdb', 'user': 'doadmin',
-            'password': password, 'sslmode': 'verify-full',
-            'caFile': '/etc/aichain/governance/digitalocean-ca.crt',
-        })
-        password = ''
+        local_connection = recovery_connection(binding)
+        local_connection['database'] = 'postgres'
+        connection = write_json(private, 'local-admin.json', local_connection)
+        binding['password'] = ''
+        local_connection['password'] = ''
         transfer = write_json(private, 'download.json', {
             'environment': 'test', 'bucket': 'orvessian-pilot-test-backups',
             'keyPrefix': key_prefix, 'outputRoot': str(BASE / 'downloads'),
@@ -155,7 +164,7 @@ def main() -> None:
             'directory': restored['directory'],
         })
         run('scripts/governance-postgres-recovery.cjs', 'review', review)
-        print('Fresh hosted-pilot PostgreSQL restore: REVIEW PASSED')
+        print('Fresh local-pilot PostgreSQL restore: REVIEW PASSED')
         print('Registered evidence worker journals: RESTORED AND CLOSED')
         print('Restored database:', target)
         print('Restored access: REVOKED AND CLOSED')
@@ -166,7 +175,7 @@ def main() -> None:
         print('Timed drill fresh restore and review seconds:',
               round(time.monotonic() - downloaded_at, 2))
         print('Timed drill total seconds:', round(time.monotonic() - started, 2))
-        print('Drill scope: same DigitalOcean cluster; no service activation')
+        print('Drill scope: Contabo local PostgreSQL 17; no service activation')
 
 
 if __name__ == '__main__':

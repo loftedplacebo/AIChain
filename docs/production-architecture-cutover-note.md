@@ -4,14 +4,22 @@ Decision: move the synthetic pilot database to self-managed PostgreSQL on the Co
 
 ## Preparation verified 11 October 2026
 
-- Installed a separate PostgreSQL 17 cluster on the Contabo VPS at loopback port 5433. The existing PostgreSQL 16 cluster remains on port 5432. The live pilot still connects to the managed database and passed hosted-health after installation.
+- Installed a separate PostgreSQL 17 cluster on the Contabo VPS at loopback port 5433. The existing PostgreSQL 16 cluster remains on port 5432. The pilot passed hosted-health after installation, before cutover.
 - Created a **closed rehearsal copy** as `governance_test_candidate` using PostgreSQL 17 tools. All 31 public tables had the same aggregate row counts as the managed source at comparison time, and the restored environment marker was `test`.
-- Applied hash-matched API and evidence-worker grants to the closed copy. Restricted role reads passed. This is preparation only; no pilot service points at the candidate.
+- Applied hash-matched API and evidence-worker grants to the closed copy. Restricted role reads passed. The candidate remained isolated during preparation.
 - An encrypted local rehearsal capture passed, followed by a fresh closed restore to `gov_restore_contabo_rehearsal` with access revoked and disabled. This capture intentionally omitted live worker journals and was not uploaded to B2; the final coordinated off-host drill remains open.
-- Installed a protected administrator binding with the current managed profile, and updated the pilot backup, project inventory, canary key check, capacity probe and self-service provisioner to support the reviewed local profile. The managed-profile coordinated backup uploaded to B2 and all pilot health checks passed after the change. No runtime database URL has been switched.
-- The final cutover still requires a coordinated writer pause, fresh capture, final copy, service configuration and restart, off-host backup, closed restore, health and synthetic receipt acceptance. The existing managed database remains the rollback source.
+- Installed a protected administrator binding with the then-current managed profile, and updated the pilot backup, project inventory, canary key check, capacity probe and self-service provisioner to support the reviewed local profile. The managed-profile coordinated backup uploaded to B2 and all pilot health checks passed before the runtime database URLs were switched.
+- The final cutover required a coordinated writer pause, fresh capture, final copy, service configuration and restart, off-host backup, closed restore, health and synthetic receipt acceptance. These checks passed as recorded below. The existing managed database remains the rollback source.
 
-Do not retire the managed pilot database or credentials until the Contabo copy, services, backups, and a fresh restore have passed acceptance.
+## Local pilot cutover and acceptance verified 11 October 2026
+
+- The writer-paused cutover restored the pilot into local `governance_test` on PostgreSQL 17. All 31 public table fingerprints matched the managed source. Portal, API, four registered workers, canary, backup timer, and other pilot timers restarted against the local database. The managed source is retained as rollback.
+- The cutover capture coordinated local PostgreSQL and all four worker journals, encrypted the set, and uploaded it to the pilot B2 bucket. The completed set was discovered and authenticated with the separate B2 restore key; backup ID `dd673a2c-5023-4e91-b775-0799c2d907aa`.
+- A fresh event submitted through the public API, `contabo-cutover-smoke-2b8635e5ec1f7321103b5df379ee5b0c`, was independently read from local PostgreSQL and checked against Base Sepolia. The receipt signature, record commitment, batch membership, and trusted signer passed; state was `confirmed` with 7,971 confirmations against a 12-confirmation minimum at the acceptance check.
+- The B2 archive restored to new local database `gov_restore_b2_987218fb8b3a`. An independent second review passed with all four registered journals. The recovery gate is `review-required`, access is `revoked-and-disabled`, and no service was activated against the restore.
+- Post-acceptance hosted-health and backup-health checks both returned `healthy: true`: four projects and four workers covered, no stalled evidence, canary verified, and the latest due backup covered. The scheduled backup uploaded at `2026-10-11T09:16:58Z`.
+
+Retain the managed pilot database and credentials through the agreed rollback checkpoint and next scheduled local backup cycle. Production reuse of the managed cluster remains outstanding.
 
 ## Sequence
 
