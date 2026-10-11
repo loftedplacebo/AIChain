@@ -57,6 +57,10 @@ environment and list, plus a rejected production sign-up start.
    It writes a root-only environment file for the disabled production API unit
    and does not activate a service. Generate a distinct 32-byte identity sealing
    key there. Do not copy the pilot WorkOS key, seal key, or user records.
+   The owner created and entered the WorkOS Production key at that prompt.
+   File metadata showed `root:root 0600`, and the production API unit remained
+   disabled and inactive. The key value was not read into the change record;
+   its Production environment binding still needs live sign-in proof.
 3. When `https://api-prod.orvessian.com/v1/auth/workos-webhook` is live and
    rejects unsigned requests, create a WorkOS Production webhook endpoint
    subscribed only to `session.revoked`. Install its signing secret in the

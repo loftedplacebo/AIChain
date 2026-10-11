@@ -65,6 +65,15 @@ the owner's DigitalOcean `doadmin` rotation followed by the hidden-prompt
 installer, then a fresh read-only inventory. No production role login,
 migration or service was activated at this checkpoint.
 
+The owner subsequently reset the DigitalOcean `doadmin` password and entered
+the new value at the VPS hidden prompt. The installer verified access to
+`governance_prod` over verified TLS and stored the production credential as
+`root:root 0600` inside a `root:root 0700` directory. A fresh read-only
+inventory using it succeeded: only `governance_prod` remained, with zero
+connections and the same three restricted `NOLOGIN` roles. The production API
+unit remained disabled and inactive. The historical root-only credential copy
+still needs removal after its dependent tools are reviewed.
+
 1. Recheck Contabo hosted, backup, worker and canary health and the managed
    object inventory. Confirm the B2 completion marker covers the reviewed
    on-demand backup and that the closed local restore evidence remains
@@ -79,10 +88,10 @@ migration or service was activated at this checkpoint.
    before invoking `--apply`; it stops on the first SQL failure and records
    each completed deletion for partial-change review.
 3. The read-only managed inventory showed no pilot database, restore database,
-   or pilot application role before the production bootstrap. **Still open:**
-   rotate the managed `doadmin` password in DigitalOcean and replace the
-   retained root-only operator credential. Do not copy this password into a
-   service or the repository.
+   or pilot application role before the production bootstrap. The managed
+   `doadmin` password was rotated and verified through the new protected
+   production credential path. Do not copy this password into a service or
+   the repository; retire the obsolete operator copy after review.
 4. The non-secret bundle was generated with
    `npm run governance:prepare-production-exclusive-db-sql`. Review the SQL
    and hashes below. `00-create-empty.sql` ran on `defaultdb` as `doadmin`,
