@@ -4,11 +4,8 @@ import os
 import pathlib
 import stat
 import subprocess
+from pilot_db_binding import load_admin, psql_dsn, psql_environment
 
-PASSWORD = pathlib.Path('/etc/aichain/pilot-backup/database-password')
-DSN = ('host=orvessian-pilot-test-do-user-45565720-0.k.db.ondigitalocean.com '
-       'port=25060 dbname=governance_test user=doadmin sslmode=verify-full '
-       'sslrootcert=/etc/aichain/governance/digitalocean-ca.crt')
 SQL = """
 BEGIN;
 SET LOCAL ROLE governance_migrations;
@@ -36,15 +33,10 @@ ROLLBACK;
 def main():
     if os.geteuid() != 0:
         raise ValueError('Root required')
-    info = PASSWORD.lstat()
-    if not stat.S_ISREG(info.st_mode) or info.st_uid != 0 or \
-            stat.S_IMODE(info.st_mode) != 0o600:
-        raise ValueError('Protected database credential required')
-    env = {**os.environ, 'PGPASSWORD': PASSWORD.read_text(encoding='utf-8').strip()}
+    binding = load_admin()
     result = subprocess.run(('psql', '-X', '-q', '-w', '-v', 'ON_ERROR_STOP=1',
-                             '-d', DSN, '-c', SQL), env=env, capture_output=True,
+                             '-d', psql_dsn(binding), '-c', SQL), env=psql_environment(binding), capture_output=True,
                             text=True, timeout=30, check=False)
-    env.pop('PGPASSWORD', None)
     if result.returncode != 0:
         raise ValueError('Rollback-only capacity probe failed')
     print('pilot_capacity_boundary=passed;changes=rolled_back')

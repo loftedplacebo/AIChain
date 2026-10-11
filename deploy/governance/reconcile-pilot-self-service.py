@@ -14,6 +14,7 @@ import stat
 import subprocess
 import sys
 from pilot_worker_registry import load_registry
+from pilot_db_binding import load_admin
 
 POLICY = pathlib.Path('/etc/aichain/pilot-self-service-policy.json')
 REQUESTS = pathlib.Path('/etc/aichain/pilot-self-service-requests')
@@ -40,13 +41,15 @@ def protected_json(path, maximum=8192):
 
 def policy(require_enabled=True):
     value = protected_json(POLICY)
+    binding = load_admin()
+    expected_ca = '/etc/aichain/governance/digitalocean-ca.crt' if binding['profile'] == 'managed' else ''
     if set(value) != {'version', 'enabled', 'maxProjects', 'databaseUrlFile',
                       'databaseCaFile', 'workerPolicy', 'fundingTargetWei'} or \
             value['version'] != 1 or type(value['enabled']) is not bool or \
             (require_enabled and value['enabled'] is not True) or \
             type(value['maxProjects']) is not int or not 2 <= value['maxProjects'] <= 30 or \
             value['databaseUrlFile'] != '/etc/aichain/governance-workers/pilot-evidence-database-url' or \
-            value['databaseCaFile'] != '/etc/aichain/governance/digitalocean-ca.crt' or \
+            value['databaseCaFile'] != expected_ca or \
             not isinstance(value['workerPolicy'], dict) or \
             set(value['workerPolicy']) != POLICY_KEYS or \
             not re.fullmatch(r'[1-9][0-9]{0,17}', str(value['fundingTargetWei'])) or \

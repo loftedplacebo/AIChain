@@ -8,14 +8,11 @@ import subprocess
 import time
 import json
 import sys
+from pilot_db_binding import load_admin, psql_dsn, psql_environment
 
 ENV = pathlib.Path('/etc/orvessian-chain-watch-internal.env')
-PASSWORD = pathlib.Path('/etc/aichain/pilot-backup/database-password')
 TENANT = 'org-61f98eac-1218-439d-9e93-f3717e1dfe37'
 PROJECT = 'prj-1e8d2ecd-6bbf-4cb6-b49b-fb599ba9626c'
-DSN = ('host=orvessian-pilot-test-do-user-45565720-0.k.db.ondigitalocean.com '
-       'port=25060 dbname=governance_test user=doadmin sslmode=verify-full '
-       'sslrootcert=/etc/aichain/governance/digitalocean-ca.crt')
 
 
 def main():
@@ -31,9 +28,9 @@ def main():
     query = ("SELECT expires_at,COALESCE(revoked_at,0) FROM governance_project_keys "
              "WHERE tenant='" + TENANT + "' AND project='" + PROJECT +
              "' AND token_hash='" + digest + "'")
-    env = {**os.environ, 'PGPASSWORD': PASSWORD.read_text().strip()}
-    result = subprocess.run(('psql', DSN, '-t', '-A', '-F', ',', '-c', query),
-                            capture_output=True, text=True, env=env, timeout=20, check=True)
+    binding = load_admin()
+    result = subprocess.run(('psql', psql_dsn(binding), '-t', '-A', '-F', ',', '-c', query),
+                            capture_output=True, text=True, env=psql_environment(binding), timeout=20, check=True)
     rows = [line for line in result.stdout.splitlines() if line.strip()]
     if len(rows) != 1:
         if sys.argv[1:] == ['--json']:

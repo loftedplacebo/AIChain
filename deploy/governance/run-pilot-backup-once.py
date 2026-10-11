@@ -1,23 +1,21 @@
 #!/usr/bin/env python3
 """Quiesce pilot writers, capture an encrypted test backup, then upload to B2."""
 
-import getpass
 import fcntl
 import json
 import os
 import pathlib
-import stat
 import subprocess
 import sys
 import tempfile
 from pilot_worker_registry import LOCK, load_registry, verify_journal_binding
+from pilot_db_binding import load_admin, recovery_connection
 
 
 ROOT = pathlib.Path('/etc/aichain/pilot-backup')
 RUNNER = pathlib.Path('/opt/aichain/pilot-backup-runner')
 NODE = '/opt/aichain/.toolchains/node-v24.21.0-linux-x64/bin/node'
 ARCHIVES = pathlib.Path('/var/lib/aichain-pilot-backup/archives')
-SCHEDULED_PASSWORD = ROOT / 'database-password'
 SERVICES = (
     'orvessian-pilot-portal.service',
     'aichain-governance-synthetic-api.service',
@@ -45,7 +43,6 @@ def main() -> None:
         raise SystemExit('Run as root')
     if len(sys.argv) > 2 or len(sys.argv) == 2 and sys.argv[1] != '--scheduled':
         raise SystemExit('Usage: run-pilot-backup-once.py [--scheduled]')
-    scheduled = len(sys.argv) == 2
     lock_fd = os.open(ROOT / 'backup.lock', os.O_WRONLY | os.O_CREAT, 0o600)
     try:
         fcntl.flock(lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
@@ -73,27 +70,13 @@ def main() -> None:
             raise SystemExit('Registered active worker unavailable: ' + worker['role'])
     ARCHIVES.mkdir(mode=0o700, parents=True, exist_ok=True)
     os.chmod(ARCHIVES, 0o700)
-    if scheduled:
-        st = SCHEDULED_PASSWORD.lstat()
-        if not stat.S_ISREG(st.st_mode) or st.st_mode & 0o077 or \
-                st.st_uid != 0 or st.st_size < 1 or st.st_size > 1025:
-            raise SystemExit('Scheduled database credential is not a root-only file')
-        password = SCHEDULED_PASSWORD.read_text(encoding='utf-8').rstrip('\n')
-    else:
-        password = getpass.getpass('1Password doadmin database password (one-time use): ')
-    if not password or len(password) > 1024:
-        raise SystemExit('Invalid database password input')
+    binding = load_admin()
 
     with tempfile.TemporaryDirectory(prefix='pilot-backup-', dir='/run') as temporary:
         private = pathlib.Path(temporary)
         os.chmod(private, 0o700)
-        connection = write_json(private, 'source.json', {
-            'host': 'orvessian-pilot-test-do-user-45565720-0.k.db.ondigitalocean.com',
-            'port': 25060, 'database': 'governance_test', 'user': 'doadmin',
-            'password': password, 'sslmode': 'verify-full',
-            'caFile': '/etc/aichain/governance/digitalocean-ca.crt',
-        })
-        password = ''
+        connection = write_json(private, 'source.json', recovery_connection(binding))
+        binding['password'] = ''
         capture = write_json(private, 'capture.json', {
             'environment': 'test', 'connectionFile': str(connection),
             'binaries': '/usr/lib/postgresql/17/bin',
@@ -151,7 +134,7 @@ def main() -> None:
 if __name__ == '__main__':
     try:
         main()
-    except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired,
+    except (OSError, ValueError, subprocess.CalledProcessError, subprocess.TimeoutExpired,
             ValueError, KeyError) as error:
         print('Pilot backup or upload failed; inspect protected server diagnostics. '
               'No restore or activation was attempted.')

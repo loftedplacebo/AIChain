@@ -1,0 +1,1 @@
+{"profile":"contabo-local","host":"127.0.0.1","port":5433,"database":"governance_test","user":"postgres","sslmode":"disable","caFile":null,"passwordFile":"/var/lib/aichain-pilot-db-migration/local-postgres-password"}

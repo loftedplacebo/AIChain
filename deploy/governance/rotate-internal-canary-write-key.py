@@ -16,16 +16,13 @@ import stat
 import subprocess
 import tempfile
 import time
+from pilot_db_binding import load_admin, psql_dsn, psql_environment
 
 WATCHER = pathlib.Path('/etc/orvessian-chain-watch-internal.env')
 CANARY = pathlib.Path('/etc/orvessian-internal-responses-canary.env')
-PASSWORD = pathlib.Path('/etc/aichain/pilot-backup/database-password')
 CHECK = '/opt/aichain/governance-pilot-db-setup/check-internal-agent-write-key.py'
 TENANT = 'org-61f98eac-1218-439d-9e93-f3717e1dfe37'
 PROJECT = 'prj-1e8d2ecd-6bbf-4cb6-b49b-fb599ba9626c'
-DSN = ('host=orvessian-pilot-test-do-user-45565720-0.k.db.ondigitalocean.com '
-       'port=25060 dbname=governance_test user=doadmin sslmode=verify-full '
-       'sslrootcert=/etc/aichain/governance/digitalocean-ca.crt')
 
 
 def protected(path, mode, group=None):
@@ -72,18 +69,14 @@ def atomic_write(path, content, group):
 
 def verified_key(token):
     digest = hashlib.sha256(token.encode('ascii')).hexdigest()
-    password = ''.join(protected(PASSWORD, 0o600)).strip()
-    if not password:
-        raise ValueError('Protected database credential required')
+    binding = load_admin()
     query = ("SELECT id,scopes::text,expires_at,COALESCE(revoked_at,0) "
              "FROM public.governance_project_keys WHERE tenant='" + TENANT +
              "' AND project='" + PROJECT + "' AND token_hash='" + digest + "'")
-    env = {**os.environ, 'PGPASSWORD': password}
     result = subprocess.run(('psql', '-X', '-q', '-w', '-A', '-t', '-F', '|',
-                             '-v', 'ON_ERROR_STOP=1', '-d', DSN, '-c', query),
-                            env=env, capture_output=True, text=True,
+                             '-v', 'ON_ERROR_STOP=1', '-d', psql_dsn(binding), '-c', query),
+                            env=psql_environment(binding), capture_output=True, text=True,
                             timeout=20, check=False)
-    env.pop('PGPASSWORD', None)
     if result.returncode != 0:
         raise ValueError('Protected key validation unavailable')
     rows = [line.split('|') for line in result.stdout.splitlines() if line]

@@ -70,9 +70,11 @@ def request_plan(request: dict) -> dict:
         raise ValueError('Reviewed Base Sepolia funding and worker policy required')
     if int(request['fundingTargetWei']) < int(request['workerPolicy']['dailyReservationWei']):
         raise ValueError('Funding target must cover the daily reservation')
-    for name in ('databaseUrlFile', 'databaseCaFile'):
-        if not isinstance(request[name], str) or not pathlib.Path(request[name]).is_absolute():
-            raise ValueError('Absolute protected database input required')
+    if not isinstance(request['databaseUrlFile'], str) or \
+            not pathlib.Path(request['databaseUrlFile']).is_absolute() or \
+            not isinstance(request['databaseCaFile'], str) or \
+            request['databaseCaFile'] and not pathlib.Path(request['databaseCaFile']).is_absolute():
+        raise ValueError('Protected database input required')
     return {'instance': instance, 'role': 'worker_' + instance,
             'unit': f'aichain-governance-project-worker@{instance}.service',
             'journal': str(STATE / instance / 'worker.sqlite')}
@@ -150,12 +152,16 @@ def main() -> None:
     database_url = protected_file(pathlib.Path(request['databaseUrlFile']), 8192)
     ca_file = pathlib.Path(request['databaseCaFile'])
     parsed = urlsplit(database_url)
-    if not ca_file.is_file() or any(char.isspace() for char in database_url) or \
+    managed = (parsed.hostname == 'orvessian-pilot-test-do-user-45565720-0.k.db.ondigitalocean.com' and
+               parsed.port == 25060 and parsed.query == 'sslmode=verify-full' and
+               request['databaseCaFile'] == '/etc/aichain/governance/digitalocean-ca.crt' and ca_file.is_file())
+    local = (parsed.hostname == '127.0.0.1' and parsed.port == 5433 and
+             parsed.query == 'sslmode=disable' and request['databaseCaFile'] == '')
+    if not (managed or local) or any(char.isspace() for char in database_url) or \
             "'" in database_url or parsed.scheme != 'postgresql' or \
-            not parsed.username or not parsed.password or \
+            parsed.username != 'governance_evidence_worker' or not parsed.password or \
             parsed.path != '/governance_test' or \
-            parsed.hostname != 'orvessian-pilot-test-do-user-45565720-0.k.db.ondigitalocean.com' or \
-            parsed.port != 25060 or parsed.query != 'sslmode=verify-full' or parsed.fragment:
+            parsed.fragment:
         raise ValueError('Verified protected PostgreSQL connection required')
     if not (RUNTIME / 'scripts/governance-worker.cjs').is_file() or \
             not (RUNTIME / 'node_modules/ethers').is_dir() or \
@@ -201,7 +207,7 @@ def main() -> None:
     enabled = 'true' if existing and existing['state'] == 'active' else 'false'
     env = (f'GOVERNANCE_ENV=test\nGOVERNANCE_STORAGE=postgres\n'
            f'GOVERNANCE_DATABASE_URL={database_url}\n'
-           f'GOVERNANCE_DATABASE_CA_FILE={ca_file}\n'
+           f'GOVERNANCE_DATABASE_CA_FILE={request["databaseCaFile"]}\n'
            f'GOVERNANCE_TENANT={request["tenant"]}\n'
            f'GOVERNANCE_PROJECT={request["project"]}\n'
            f'GOVERNANCE_WORKER_JOURNAL={plan["journal"]}\n'

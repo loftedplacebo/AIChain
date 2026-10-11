@@ -14,7 +14,7 @@ function validate(env){
  const localPilot=url.hostname==='127.0.0.1'&&url.port==='5433'&&url.pathname==='/governance_test'&&url.searchParams.get('sslmode')==='disable'&&!env.GOVERNANCE_DATABASE_CA_FILE;
  if(!localPilot&&(!env.GOVERNANCE_DATABASE_CA_FILE||!isAbsolute(env.GOVERNANCE_DATABASE_CA_FILE)||url.searchParams.get('sslmode')!=='verify-full'))throw Error('Hosted synthetic API requires verified PostgreSQL TLS outside the reviewed local pilot');
  const db=connectionOptions(env.GOVERNANCE_DATABASE_URL,{caFile:env.GOVERNANCE_DATABASE_CA_FILE});
- if(!localPilot&&localHost(db.host)||db.user==='doadmin'||db.user==='postgres')throw Error('Hosted synthetic API requires a restricted database login');
+ if(!localPilot&&localHost(db.host)||db.user==='doadmin'||db.user==='postgres'||localPilot&&db.user!=='governance_api')throw Error('Hosted synthetic API requires a restricted database login');
  const auth=workosConfig(env),redirect=new URL(auth.redirectUri);
  if(redirect.protocol!=='https:'||localHost(redirect.hostname))throw Error('Hosted synthetic API requires an HTTPS portal callback');
  if(env.PORT===undefined||!Number.isInteger(Number(env.PORT))||Number(env.PORT)<1||Number(env.PORT)>65535)throw Error('Hosted synthetic API requires an explicit loopback service port');

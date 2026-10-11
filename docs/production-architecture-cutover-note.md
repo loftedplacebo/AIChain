@@ -8,6 +8,7 @@ Decision: move the synthetic pilot database to self-managed PostgreSQL on the Co
 - Created a **closed rehearsal copy** as `governance_test_candidate` using PostgreSQL 17 tools. All 31 public tables had the same aggregate row counts as the managed source at comparison time, and the restored environment marker was `test`.
 - Applied hash-matched API and evidence-worker grants to the closed copy. Restricted role reads passed. This is preparation only; no pilot service points at the candidate.
 - An encrypted local rehearsal capture passed, followed by a fresh closed restore to `gov_restore_contabo_rehearsal` with access revoked and disabled. This capture intentionally omitted live worker journals and was not uploaded to B2; the final coordinated off-host drill remains open.
+- Installed a protected administrator binding with the current managed profile, and updated the pilot backup, project inventory, canary key check, capacity probe and self-service provisioner to support the reviewed local profile. The managed-profile coordinated backup uploaded to B2 and all pilot health checks passed after the change. No runtime database URL has been switched.
 - The final cutover still requires a coordinated writer pause, fresh capture, final copy, service configuration and restart, off-host backup, closed restore, health and synthetic receipt acceptance. The existing managed database remains the rollback source.
 
 Do not retire the managed pilot database or credentials until the Contabo copy, services, backups, and a fresh restore have passed acceptance.

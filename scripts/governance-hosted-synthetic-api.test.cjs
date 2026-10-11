@@ -22,6 +22,7 @@ test('hosted synthetic launcher accepts only reviewed remote TLS or same-host pi
  const local={...env,GOVERNANCE_DATABASE_URL:'postgresql://governance_api:synthetic-password@127.0.0.1:5433/governance_test?sslmode=disable',GOVERNANCE_DATABASE_CA_FILE:undefined};
  assert.deepEqual(validate(local),{databaseHost:'127.0.0.1',portalOrigin:'https://portal.example.test',port:8796});
  assert.throws(()=>validate({...local,GOVERNANCE_DATABASE_URL:local.GOVERNANCE_DATABASE_URL.replace('5433','5432')}),/verified PostgreSQL TLS/);
+ assert.throws(()=>validate({...local,GOVERNANCE_DATABASE_URL:local.GOVERNANCE_DATABASE_URL.replace('governance_api','governance_migrations')}),/restricted database login/);
  assert.deepEqual(validate({...env,WORKOS_PILOT_ALLOWED_EMAILS:undefined,WORKOS_ADMISSION_MODE:'open-pilot'}),{databaseHost:'managed-db.example.test',portalOrigin:'https://portal.example.test',port:8796});
  const rejects=[
   [{GOVERNANCE_ENV:'staging'},/test-stage/],

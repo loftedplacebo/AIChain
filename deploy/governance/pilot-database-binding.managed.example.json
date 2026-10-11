@@ -1,0 +1,1 @@
+{"profile":"managed","host":"orvessian-pilot-test-do-user-45565720-0.k.db.ondigitalocean.com","port":25060,"database":"governance_test","user":"doadmin","sslmode":"verify-full","caFile":"/etc/aichain/governance/digitalocean-ca.crt","passwordFile":"/etc/aichain/pilot-backup/database-password"}
