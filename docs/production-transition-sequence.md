@@ -74,6 +74,11 @@ file and private loopback service. It is a deployment template only: install
 and start it after the production database migrations, restricted login,
 WorkOS credentials and private preflight pass. Keep the public route closed
 until the end-to-end and recovery gates pass.
+The [host staging helper](../deploy/governance/stage-production-api-host.sh)
+can create the non-login API identity, empty root-owned release directory and
+disabled unit earlier. Its default mode is read-only; `--apply` never starts a
+service or creates an HTTPS route. Install a pinned API artifact and complete
+the private preflight before enabling the unit.
 
 On 10 October, the existing isolated local `dev` PostgreSQL cluster started,
 the loopback API returned HTTP 200 for `/health` and `/ready` and HTTP 401 for
