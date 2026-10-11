@@ -8,6 +8,9 @@ The [11 October shared-cluster change review](production-shared-cluster-change-r
 records the earlier proposal and baseline. The owner has selected the
 [Contabo test / DigitalOcean production cutover](production-architecture-cutover-note.md)
 instead. Do not apply the shared-cluster proposal as written.
+The current [exclusive-cluster change review](production-exclusive-cluster-change-review.md)
+records the six retained databases, three pilot roles, next backup checkpoint,
+and reviewed production-only SQL bundle.
 
 ## Selected shape
 
@@ -36,9 +39,8 @@ instead. Do not apply the shared-cluster proposal as written.
   custody, gas and verification are selected and tested.
 
 The [version-5 non-secret deployment plan](../deploy/governance/deployment-plan.example.json)
-and its validator reflect the earlier shared-cluster proposal. Update the
-example and validator to the selected Contabo test database and exclusive
-DigitalOcean production cluster before production release.
+and its validator must be checked against the selected Contabo test database
+and exclusive DigitalOcean production cluster before production release.
 A valid result is still `releaseReady:false`:
 provider account ownership, actual resource IDs, permissions and restore
 evidence need independent verification.
@@ -59,11 +61,11 @@ for optional WorkOS meters and remaining configuration.
 | --- | --- | --- |
 | 1. Local development | Recheck the existing private PostgreSQL cluster, loopback API and WorkOS Staging configuration; run sign-in and one synthetic local customer journey. | No pilot or production credentials in local data; API readiness, scoped keys and session tests pass. |
 | 2. Pilot database cutover | Install local PostgreSQL on Contabo, migrate the complete pilot database under a writer pause, repoint services and health checks, then verify backup and closed restore. Keep the managed copy as rollback until acceptance. | Receipts, projects, key revocations, worker journals, B2 backup, closed restore and health all pass. |
-| 3. Production cluster preparation | After pilot cutover and retention review, remove pilot credentials and database from the managed cluster; create fresh production roles and database. Restrict network access to the production app and operator path. | No pilot runtime dependency or credential on the managed cluster; production grants and actual login denials pass. |
-| 3. Production identity | Owner enables WorkOS Production billing; configure free hosted AuthKit, MFA, exact HTTPS callbacks and signed webhook; create new production API key and sealing key in protected storage. | Fresh production account passes sign-in, MFA, recovery, revocation and webhook replay tests; staging identities are not assumed to transfer. |
-| 4. Runtime and backup | Build pinned API, worker and portal artifacts; apply migrations and strict roles in the production database; deploy behind private readiness checks. Configure production-specific encrypted backup, journals, retention and alerts that do not silently reuse the pilot backup set. | Green release gates, hashes, scoped read/write/denial checks in both databases, current production backup marker and every worker registered. |
-| 5. Recovery | Restore when the original managed DB cluster is unavailable, review every journal and access state, then activate an isolated replacement service. | Measured recovery point and time, revoked captured access, receipt proof preservation and successful post-restore customer journey. |
-| 6. Public acceptance | Finish abuse, security and privileged-access review; legal pages, support/privacy/security inboxes, real-data terms, capacity and incident rehearsal. Decide and test production evidence chain. | Owner go/no-go record and claims limited to tested capacity and recovery. |
+| 3. Production cluster preparation | After the 12 October scheduled local backup and retention review, retire the six named managed pilot/restore databases and three pilot roles; rotate the admin credential; create fresh restricted production roles and empty database. Restrict network access to the production app and operator path once the app endpoint exists. | No pilot runtime dependency or credential on the managed cluster; production bootstrap, grants and actual login denials pass. |
+| 4. Production identity | Configure WorkOS Production hosted AuthKit, MFA, exact HTTPS callbacks and signed webhook; create new production API key and sealing key in protected storage. | Fresh production account passes sign-in, MFA, recovery, revocation and webhook replay tests; staging identities are not assumed to transfer. |
+| 5. Runtime and backup | Build pinned API, worker and portal artifacts; apply migrations and strict roles in the production database; deploy behind private readiness checks. Configure production-specific encrypted backup, journals, retention and alerts that do not silently reuse the pilot backup set. | Green release gates, hashes, scoped read/write/denial checks in both databases, current production backup marker and every worker registered. |
+| 6. Recovery | Restore when the original managed DB cluster is unavailable, review every journal and access state, then activate an isolated replacement service. | Measured recovery point and time, revoked captured access, receipt proof preservation and successful post-restore customer journey. |
+| 7. Public acceptance | Finish abuse, security and privileged-access review; legal pages, support/privacy/security inboxes, real-data terms, capacity and incident rehearsal. Decide and test production evidence chain. | Owner go/no-go record and claims limited to tested capacity and recovery. |
 
 On 10 October, the existing isolated local `dev` PostgreSQL cluster started,
 the loopback API returned HTTP 200 for `/health` and `/ready` and HTTP 401 for

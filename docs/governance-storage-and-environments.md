@@ -1,6 +1,6 @@
 # Governance storage and environment foundation — 2026-09-27
 
-> Current environment decision — 8 October 2026: [Roadmap environment strategy](roadmap-and-decisions.md#environment-strategy-decision--8-october-2026) supersedes the older four-environment steady-state topology below. Keep the hosted synthetic pilot for now, then use isolated local development with WorkOS Staging and one hosted Production platform. A permanent second hosted staging stack is not planned. The Contabo pilot portal/API, managed DigitalOcean `test` database, and encrypted Backblaze B2 backups remain in use until the production transition passes acceptance. Historical measurements and protocol semantics retain their original scope.
+> Current environment decision — 11 October 2026: [Production transition sequence](production-transition-sequence.md) supersedes the older four-environment steady-state topology below. The synthetic pilot portal/API and PostgreSQL 17 database now run on Contabo; encrypted Backblaze B2 backups remain active. The old DigitalOcean managed pilot copy is retained only through the next scheduled local backup checkpoint, then the cluster will be reused exclusively for Production. Historical measurements and protocol semantics below retain their original scope.
 
 ## Local launcher environment guards — 28 September 2026
 
