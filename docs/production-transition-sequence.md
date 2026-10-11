@@ -96,8 +96,22 @@ On 11 October its pinned unit hash and read-only preflight passed, then
 root-owned `/opt/aichain/orvessian-production-api` directory, and
 `orvessian-production-api.service`. Independent `systemctl show` reported
 `UnitFileState=disabled` and `ActiveState=inactive`; the synthetic pilot health
-check remained green. No production release artifact, environment file,
-database login, public route or customer traffic was activated.
+check remained green. No production environment file, database login, public
+route or customer traffic was activated at that host staging checkpoint.
+
+The pinned Linux checkout `271c129f752cffd8095e9fbdc7b0339d3390f0d8`
+installed lockfile dependencies with npm install scripts disabled. Its API
+archive SHA-256 is
+`c266034f172a43e41b84ea405281a31193a6d0d9799fbbbff25968a601e00055`.
+The archive contains the production entry point and required runtime packages,
+and no secret-named files. The read-only release preflight accepted 5,877
+members before the archive was staged in the root-owned production release
+directory. The release manifest records both hashes; the production unit
+remained disabled and inactive, port 8791 stayed closed, and the synthetic
+pilot health check remained green. The targeted Linux API and WorkOS tests
+passed 38/38; two website gateway tests require the separate website checkout
+and were covered in the earlier local full suite. This staged artifact is
+private preparation, not production runtime or customer acceptance.
 
 On 10 October, the existing isolated local `dev` PostgreSQL cluster started,
 the loopback API returned HTTP 200 for `/health` and `/ready` and HTTP 401 for
