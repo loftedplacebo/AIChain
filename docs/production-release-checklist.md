@@ -17,7 +17,9 @@ production database with three restricted `NOLOGIN` roles has been verified.
 The reviewed production schema and runtime grants are installed. The restricted
 API role now has a verified login and a root-only configuration file; the
 migration and worker roles remain `NOLOGIN` and the production API service
-remains off. The worker credential, independent backup, WorkOS webhook and
+remains off. An encrypted local production database capture passed; its key
+still needs independent escrow, off-host upload and closed restore. The worker
+credential, independent backup acceptance, WorkOS webhook and
 evidence-chain choice remain open.
 The ordered preparation and indicative budget are in the
 [production transition sequence](production-transition-sequence.md).

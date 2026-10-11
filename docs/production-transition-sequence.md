@@ -204,9 +204,17 @@ disabled and inactive, and its environment file is deliberately incomplete
 until signed WorkOS webhooks and closed admission are configured. The worker
 login and production backup remain open. Never put `doadmin` in a service.
 The historical shared-cluster SQL bundle is not a release artifact here.
-Use independent production encryption keys, backup destination, journals,
-completion marker and restore procedure. Rehearse a restore to a replacement
-cluster before production admission.
+An isolated backup runner was staged from pinned commit `08774a1` with no
+service. A distinct 32-byte production archive key was generated on the VPS;
+the key and its directory are `root:root 0600` and `0700`. The key still needs
+independent escrow. A quiesced production database snapshot was encrypted and
+authenticated locally as backup `b864dbc2-20f1-40ef-864a-465ff7fab884`.
+This capture has no worker journals because no production worker exists yet.
+The production API stayed disabled and the synthetic pilot health check passed.
+This is local capture evidence only: off-host upload, separate completion
+marker, independent restore and replacement-cluster recovery remain open.
+Use a production-only B2 bucket and upload/restore credentials, completion
+marker, journal inventory and restore procedure before production admission.
 
 Measure production peak connections, memory, disk, query latency and evidence
 backlog under the proposed limited workload. Set a conservative connection
