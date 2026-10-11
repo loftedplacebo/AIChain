@@ -14,7 +14,8 @@ from pilot_db_binding import load_admin
 
 ROOT = pathlib.Path('/opt/aichain/governance-pilot-db-setup')
 SQL_DIR = ROOT / 'production-exclusive-db-sql'
-PASSWORD = pathlib.Path('/etc/aichain/pilot-backup/database-password')
+PRODUCTION_PASSWORD = pathlib.Path('/etc/aichain/production/database-admin-password')
+LEGACY_PASSWORD = pathlib.Path('/etc/aichain/pilot-backup/database-password')
 CA = pathlib.Path('/etc/aichain/governance/digitalocean-ca.crt')
 HOST = 'orvessian-pilot-test-do-user-45565720-0.k.db.ondigitalocean.com'
 PSQL = '/usr/lib/postgresql/17/bin/psql'
@@ -48,12 +49,14 @@ def check_sql():
 
 
 def connection_environment():
-    info = PASSWORD.lstat()
+    credential = (PRODUCTION_PASSWORD if PRODUCTION_PASSWORD.exists() or
+                  PRODUCTION_PASSWORD.is_symlink() else LEGACY_PASSWORD)
+    info = credential.lstat()
     if not stat.S_ISREG(info.st_mode) or info.st_uid != 0 or \
             info.st_mode & 0o077 or not 1 <= info.st_size <= 1025 or \
             not CA.is_file() or CA.is_symlink():
         raise ValueError('Protected administrator credential or CA required')
-    password = PASSWORD.read_text(encoding='utf-8').rstrip('\n')
+    password = credential.read_text(encoding='utf-8').rstrip('\n')
     if not password or '\n' in password or '\r' in password:
         raise ValueError('Invalid protected administrator credential')
     environment = {key: value for key, value in os.environ.items()

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Read-only inventory of the retained managed pilot cluster before reuse."""
+"""Read-only inventory of the reused managed production cluster."""
 
 import json
 import os
@@ -12,7 +12,8 @@ from pilot_db_binding import load_admin
 
 HOST = 'orvessian-pilot-test-do-user-45565720-0.k.db.ondigitalocean.com'
 CA = pathlib.Path('/etc/aichain/governance/digitalocean-ca.crt')
-PASSWORD = pathlib.Path('/etc/aichain/pilot-backup/database-password')
+PRODUCTION_PASSWORD = pathlib.Path('/etc/aichain/production/database-admin-password')
+LEGACY_PASSWORD = pathlib.Path('/etc/aichain/pilot-backup/database-password')
 PSQL = '/usr/lib/postgresql/17/bin/psql'
 SQL = """
 SELECT json_build_object(
@@ -51,7 +52,9 @@ def main() -> None:
     active['password'] = ''
     if not CA.is_file() or CA.is_symlink():
         raise ValueError('Managed-cluster CA required')
-    password = protected(PASSWORD, 1025)
+    credential = (PRODUCTION_PASSWORD if PRODUCTION_PASSWORD.exists() or
+                  PRODUCTION_PASSWORD.is_symlink() else LEGACY_PASSWORD)
+    password = protected(credential, 1025)
     environment = {key: value for key, value in os.environ.items() if not key.startswith('PG')}
     environment.update(PGPASSWORD=password, PGCONNECT_TIMEOUT='5')
     dsn = (f'host={HOST} port=25060 dbname=defaultdb user=doadmin '

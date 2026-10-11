@@ -140,6 +140,12 @@ six managed pilot databases and three old roles have now been retired under
 the exact-object change review, and the empty production database created. Rotate the
 managed administrator password before production use and restrict trusted
 sources to the production application and reviewed operator access.
+After rotating it in DigitalOcean, run the protected
+`configure-production-database-admin.py` installer on Contabo at a hidden
+terminal prompt. It verifies the new credential against `governance_prod`
+over verified TLS and stores it under `/etc/aichain/production`; the managed
+inventory then prefers that production credential. Retire the obsolete pilot
+operator copy after dependent historical tools have been reviewed.
 
 The empty `governance_prod` database and restricted `NOLOGIN` API, worker and
 migration roles already exist on the reused cluster. Set distinct credentials,
