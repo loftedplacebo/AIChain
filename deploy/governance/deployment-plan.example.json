@@ -92,7 +92,7 @@
     {
       "stage": "prod",
       "hosting": {"appProvider": "digitalocean", "appRegion": "replace-prod-app-region", "appInstanceRef": "replace/prod/dedicated-app", "databaseProvider": "digitalocean", "databaseRegion": "lon1", "databaseClusterRef": "replace/prod/reused-managed-cluster", "databaseTopology": "own-cluster", "backupProvider": "backblaze", "backupRegion": "replace-prod-backup-region", "backupAccountRef": "replace/prod/backup-account", "operatorRef": "replace/prod/operator"},
-      "portal": {"origin": "https://prod.example.test", "apiOrigin": "https://api.prod.example.test"},
+      "portal": {"origin": "https://prod.orvessian.com", "apiOrigin": "https://api-prod.orvessian.com"},
       "database": {
         "host": "production.db.example.test",
         "port": 25060,
@@ -103,10 +103,10 @@
         "tls": "verify-full"
       },
       "identity": {
-        "environmentId": "replace_prod_environment",
-        "clientId": "replace_prod_client",
-        "callbackUrl": "https://prod.example.test/api/auth/callback",
-        "webhookUrl": "https://api.prod.example.test/v1/auth/workos-webhook"
+        "environmentId": "environment_01M3MRQT3RWYTFAGZEVCFV0M0E",
+        "clientId": "client_01M3MRQT8SN9VYRYGQBJWDXAP1",
+        "callbackUrl": "https://prod.orvessian.com/api/auth/callback",
+        "webhookUrl": "https://api-prod.orvessian.com/v1/auth/workos-webhook"
       },
       "secrets": {
         "apiDatabase": "replace/prod/apiDatabase",

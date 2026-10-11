@@ -26,6 +26,16 @@ test('WorkOS configuration is opt-in, complete and restricts redirect destinatio
  for(const list of ['', 'alice@example.test,ALICE@example.test','*@example.test','alice@example.test,','not-an-email'])assert.throws(()=>workosConfig({...hosted,WORKOS_PILOT_ALLOWED_EMAILS:list}),/pilot admission list/);
 });
 
+test('production identity uses its own client, callback and explicit invite list',async()=>{
+ const env={GOVERNANCE_ENV:'prod',GOVERNANCE_IDENTITY_PROVIDER:'workos',WORKOS_CLIENT_ID:'client_01M3MRQT8SN9VYRYGQBJWDXAP1',WORKOS_API_KEY:'sk_synthetic_only',GOVERNANCE_IDENTITY_SEAL_KEY:'ab'.repeat(32),WORKOS_REDIRECT_URI:'https://prod.orvessian.com/api/auth/callback',WORKOS_ADMISSION_MODE:'production-list',WORKOS_PRODUCTION_ALLOWED_EMAILS:'founder@example.test'};
+ const production=workosConfig(env);
+ assert.equal(production.admissionMode,'production-list');
+ assert.deepEqual([...production.allowedEmails],['founder@example.test']);
+ for(const changes of [{GOVERNANCE_ENV:'test'},{WORKOS_CLIENT_ID:'client_pilot'},{WORKOS_REDIRECT_URI:'https://portal.orvessian.com/api/auth/callback'},{WORKOS_PILOT_ALLOWED_EMAILS:'founder@example.test'},{WORKOS_PRODUCTION_ALLOWED_EMAILS:undefined},{WORKOS_ADMISSION_MODE:'pilot-list'}])assert.throws(()=>workosConfig({...env,...changes}),/Production admission/);
+ const provider=new WorkosAuth(null,null,null,production,{sessions:{}});
+ await assert.rejects(provider.start({browser:'ab'.repeat(32),screen:'sign-up'}),e=>e.status===403);
+});
+
 test('pilot admission denies unknown verified accounts before identity or session creation',async()=>{
  const f=await fixture();try{
   f.provider.config={...config,allowedEmails:new Set(['partner@example.test'])};

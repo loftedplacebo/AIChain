@@ -72,6 +72,14 @@ the loopback API returned HTTP 200 for `/health` and `/ready` and HTTP 401 for
 an anonymous `/v1/session`, then both processes were stopped. This is a
 readiness check for Gate 1, not the full browser, MFA or receipt journey.
 
+On 11 October, the WorkOS Production AuthKit callback, logout return, web
+origin, homepage and initiate-login URL were configured for the temporary
+`prod.orvessian.com` preparation hostname. MFA remains required and public
+sign-up closed. The [production identity change review](production-identity-change-review.md)
+records the application-side closed-admission guard and the remaining live
+host, credentials, webhook and account acceptance work. No production user or
+webhook exists yet.
+
 Keep the existing portal/API hostnames on the pilot during preparation. Use
 separate temporary production hostnames and register their exact WorkOS
 callbacks. Plan the eventual domain switch and rollback only after the new

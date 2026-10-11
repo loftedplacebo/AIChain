@@ -10,15 +10,20 @@ function workosConfig(env){
  if(redirect.username||redirect.password||redirect.hash||redirect.search||redirect.pathname!=='/api/auth/callback'||(redirect.protocol!=='https:'&&!(redirect.protocol==='http:'&&['localhost','127.0.0.1'].includes(redirect.hostname))))throw new Error('Invalid WorkOS redirect URI');
  const pilotEmails=env.WORKOS_PILOT_ALLOWED_EMAILS;
  const admissionMode=env.WORKOS_ADMISSION_MODE||'pilot-list';
- if(!['pilot-list','open-pilot'].includes(admissionMode))throw new Error('Invalid WorkOS admission mode');
+ if(!['pilot-list','open-pilot','production-list'].includes(admissionMode))throw new Error('Invalid WorkOS admission mode');
+ if((env.GOVERNANCE_ENV==='prod'&&admissionMode!=='production-list')||(admissionMode!=='production-list'&&env.WORKOS_PRODUCTION_ALLOWED_EMAILS!==undefined))throw new Error('Production admission must use its separate allowlist');
  if(admissionMode==='open-pilot'&&(env.GOVERNANCE_ENV!=='test'||pilotEmails!==undefined))throw new Error('Open pilot admission requires test environment and no email list');
+ if(admissionMode==='production-list'&&(env.GOVERNANCE_ENV!=='prod'||pilotEmails!==undefined||env.WORKOS_CLIENT_ID!=='client_01M3MRQT8SN9VYRYGQBJWDXAP1'||redirect.href!=='https://prod.orvessian.com/api/auth/callback'))throw new Error('Production admission requires the reviewed production identity binding');
+ const sourceEmails=admissionMode==='production-list'?env.WORKOS_PRODUCTION_ALLOWED_EMAILS:pilotEmails;
+ const listName=admissionMode==='production-list'?'production':'pilot';
  let allowedEmails=null;
- if(pilotEmails!==undefined){
-  if(typeof pilotEmails!=='string'||!pilotEmails||pilotEmails.length>8192)throw new Error('Invalid pilot admission list');
-  const entries=pilotEmails.split(',').map(email=>email.trim().toLowerCase());
-  if(entries.length>100||entries.some(email=>email.length>254||!/^[^\s@,*]+@[^\s@,*]+\.[^\s@,*]+$/.test(email))||new Set(entries).size!==entries.length)throw new Error('Invalid pilot admission list');
+ if(sourceEmails!==undefined){
+  if(typeof sourceEmails!=='string'||!sourceEmails||sourceEmails.length>8192)throw new Error('Invalid '+listName+' admission list');
+  const entries=sourceEmails.split(',').map(email=>email.trim().toLowerCase());
+  if(entries.length>100||entries.some(email=>email.length>254||!/^[^\s@,*]+@[^\s@,*]+\.[^\s@,*]+$/.test(email))||new Set(entries).size!==entries.length)throw new Error('Invalid '+listName+' admission list');
   allowedEmails=new Set(entries);
  }
+ if(admissionMode==='production-list'&&!allowedEmails)throw new Error('Production admission list required');
  if(!['localhost','127.0.0.1'].includes(redirect.hostname)&&!allowedEmails&&admissionMode!=='open-pilot')throw new Error('Hosted WorkOS requires a pilot admission list');
  const webhookSecret=env.WORKOS_WEBHOOK_SECRET||null;
  if(webhookSecret&&(typeof webhookSecret!=='string'||webhookSecret.length<24||webhookSecret.length>512||/[\x00-\x20\x7f]/.test(webhookSecret)))throw new Error('Invalid WorkOS webhook secret');
@@ -96,7 +101,7 @@ class WorkosAuth {
   try{
    const result=await this.exchange({grant_type:'refresh_token',refresh_token:this.unseal(claimed.credential,'refresh:'+sessionHash)});
    const {user,payload}=await this.verifiedResult(result),currentIdentity=await this.directory.identity(row.user_id);
-   if(!this.admitted(user.email))throw fail(403,'Pilot access is by invitation');
+   if(!this.admitted(user.email))throw fail(403,'Account access is by invitation');
    if(user.id!==await this.sessions.subject(row.user_id)||payload.sid!==provider.session_id||!currentIdentity||row.version!=='provider:'+await this.auth.version(currentIdentity))throw fail(401,'Renewal identity changed');
    const credential=this.refreshCredential(result,sessionHash);
    if(await this.sessions.revocations.revoked(this.config.clientId,provider.session_id,user.id))throw fail(401,'Provider session revoked');
@@ -106,6 +111,7 @@ class WorkosAuth {
  }
  async start({browser,screen='sign-in',reauthenticate=false},previousToken=''){
   if(!/^[a-f0-9]{64}$/.test(browser||'')||!['sign-in','sign-up'].includes(screen))throw fail(400,'Invalid sign-in request');
+  if(this.config.admissionMode==='production-list'&&screen==='sign-up')throw fail(403,'Account creation is not open yet');
   if(typeof reauthenticate!=='boolean'||reauthenticate&&screen!=='sign-in')throw fail(400,'Invalid reauthentication request');
   if(this.startRequestLimits){const budget=await this.startRequestLimits.consume(this.config.clientId);if(!budget.allowed)throw Object.assign(fail(429,'Sign-in start limit reached'),{code:'auth-start-limit',retryAfter:budget.retryAfter});}
   const prior=reauthenticate?await this.resolve(previousToken):null;if(reauthenticate&&!prior?.customer)throw fail(401,'Sign in required');
@@ -124,7 +130,7 @@ class WorkosAuth {
   try{
    const verifier=this.unseal(row.verifier,hash(state));
    const result=await this.exchange({grant_type:'authorization_code',code,code_verifier:verifier}),{user,payload}=await this.verifiedResult(result);
-   if(!this.admitted(user.email))throw fail(403,'Pilot access is by invitation');
+   if(!this.admitted(user.email))throw fail(403,'Account access is by invitation');
    if(row.reauth_user_id&&(user.id!==await this.sessions.subject(row.reauth_user_id)||!Number.isSafeInteger(payload.auth_time)||this.now()-payload.auth_time*1000>=300000))throw fail(401,'Fresh authentication for the same customer is required');
    const identity=await this.directory.verifiedIdentity({provider:'workos:'+this.config.clientId,subject:user.id,email:user.email,emailVerified:true});
    if(await this.sessions.revocations.revoked(this.config.clientId,payload.sid,user.id))throw fail(401,'Provider session revoked');
