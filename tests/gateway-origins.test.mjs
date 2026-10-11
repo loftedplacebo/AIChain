@@ -42,3 +42,17 @@ test('hosted gateways use the configured API origin',async()=>{
  assert.equal((await workosGateway(new Request(origin+'/api/auth/status'),config,fetcher)).status,200);
  assert.deepEqual(seen,[api+'/v1/session',api+'/v1/auth/status']);
 });
+
+test('production portal refuses pilot signup and requires explicit production mode',async()=>{
+ const production={origin:'https://prod.orvessian.com',api:'https://api-prod.orvessian.com',environment:'prod'};
+ let calls=0;
+ const fetcher=async()=>{calls++;return Response.json({enabled:true,provider:'workos'});};
+ const status=await workosGateway(new Request(production.origin+'/api/auth/status'),production,fetcher);
+ assert.deepEqual(await status.json(),{enabled:true,environment:'prod'});
+ const signup=await workosGateway(new Request(production.origin+'/api/auth/start?screen=sign-up'),production,fetcher);
+ assert.equal(signup.status,403);
+ assert.equal(calls,1);
+ const unbound=await workosGateway(new Request(production.origin+'/api/auth/status'),{...production,environment:undefined},fetcher);
+ assert.equal(unbound.status,503);
+ assert.equal(calls,1);
+});
