@@ -143,10 +143,10 @@ sources to the production application and reviewed operator access.
 
 The empty `governance_prod` database and restricted `NOLOGIN` API, worker and
 migration roles already exist on the reused cluster. Set distinct credentials,
-apply reviewed grants and migrations, revoke `PUBLIC` access, and verify runtime grants and
-denials, and never put `doadmin` in a service. The existing shared-cluster SQL
-bundle is not a production release artifact for this topology; regenerate and
-review a production-only bootstrap and grant bundle before applying migrations.
+apply reviewed migrations and post-migration grants, and verify runtime grants
+and denials. Never put `doadmin` in a service. The reviewed production-only SQL
+bundle has already applied its bootstrap; its post-migration grant files remain
+pending. The historical shared-cluster bundle is not a release artifact here.
 Use independent production encryption keys, backup destination, journals,
 completion marker and restore procedure. Rehearse a restore to a replacement
 cluster before production admission.
