@@ -68,6 +68,13 @@ for optional WorkOS meters and remaining configuration.
 | 6. Recovery | Restore when the original managed DB cluster is unavailable, review every journal and access state, then activate an isolated replacement service. | Measured recovery point and time, revoked captured access, receipt proof preservation and successful post-restore customer journey. |
 | 7. Public acceptance | Finish abuse, security and privileged-access review; legal pages, support/privacy/security inboxes, real-data terms, capacity and incident rehearsal. Decide and test production evidence chain. | Owner go/no-go record and claims limited to tested capacity and recovery. |
 
+The disabled [production API unit](../deploy/systemd/orvessian-production-api.service)
+specifies a distinct Unix identity, release directory, protected environment
+file and private loopback service. It is a deployment template only: install
+and start it after the production database migrations, restricted login,
+WorkOS credentials and private preflight pass. Keep the public route closed
+until the end-to-end and recovery gates pass.
+
 On 10 October, the existing isolated local `dev` PostgreSQL cluster started,
 the loopback API returned HTTP 200 for `/health` and `/ready` and HTTP 401 for
 an anonymous `/v1/session`, then both processes were stopped. This is a
