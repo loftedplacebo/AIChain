@@ -14,7 +14,7 @@ import tempfile
 
 
 SETUP = pathlib.Path('/opt/aichain/governance-pilot-db-setup')
-RUNNER = pathlib.Path('/opt/aichain/orvessian-production-backup-runner')
+RUNNER = pathlib.Path('/opt/aichain/orvessian-production-backup-runner-8285df6')
 ROOT = pathlib.Path('/etc/aichain/production/backup')
 KEY = ROOT / 'backup.key'
 ADMIN = ROOT / 'restore-admin-password'

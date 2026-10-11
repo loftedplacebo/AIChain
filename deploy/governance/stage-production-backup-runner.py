@@ -12,10 +12,10 @@ import tarfile
 import tempfile
 
 
-ARCHIVE = pathlib.Path('/opt/aichain/releases/08774a1-production-backup-api.tar.gz')
-DESTINATION = pathlib.Path('/opt/aichain/orvessian-production-backup-runner')
-COMMIT = '08774a1'
-DIGEST = '8a37344bbf8aa09e893f4886710b9d4d921af0a88454a1af3006e65735445fd4'
+ARCHIVE = pathlib.Path('/opt/aichain/releases/8285df6-production-backup-api.tar.gz')
+DESTINATION = pathlib.Path('/opt/aichain/orvessian-production-backup-runner-8285df6')
+COMMIT = '8285df6'
+DIGEST = '1eb935f47e01d1d84802543bfe254157df0246927f22a6b4681427ea91a737ae'
 REQUIRED = {
     'scripts/governance-postgres-recovery.cjs',
     'scripts/governance-backup-object-storage.cjs',
