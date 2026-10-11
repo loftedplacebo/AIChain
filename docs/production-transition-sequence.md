@@ -194,8 +194,14 @@ found the `prod` environment marker, active recovery gate and no `PUBLIC` table
 grants; it returned the migration role to `NOLOGIN` with no password. Independent
 inventory found zero production database connections and all three roles still
 `NOLOGIN`; the production API remained disabled and the synthetic pilot healthy.
-Distinct API and worker login credentials, restricted-role read/write/denial
-checks and the production backup remain open. Never put `doadmin` in a service.
+The separate production API login was then generated on the VPS with a SCRAM
+verifier, and its own database URL and 32-byte identity sealing key were stored
+in `/etc/orvessian-production-api.env` as `root:root 0600`. The API role passed
+the runtime profile's exact grant and denial check. Only that API role has
+`LOGIN`; migration and worker roles remain `NOLOGIN`. The API unit is still
+disabled and inactive, and its environment file is deliberately incomplete
+until signed WorkOS webhooks and closed admission are configured. The worker
+login and production backup remain open. Never put `doadmin` in a service.
 The historical shared-cluster SQL bundle is not a release artifact here.
 Use independent production encryption keys, backup destination, journals,
 completion marker and restore procedure. Rehearse a restore to a replacement
