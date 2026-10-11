@@ -7,7 +7,7 @@ function hosted(){
  stage.portal={origin:'https://pilot.example.test',apiOrigin:'https://api.pilot.example.test'};
  stage.identity.callbackUrl=stage.portal.origin+'/api/auth/callback';
  stage.identity.webhookUrl=stage.portal.apiOrigin+'/v1/auth/workos-webhook';
- stage.database.tls='verify-full';
+ stage.database.tls='local';
  stage.backup.custody='independent-storage';
  stage.hosting.backupProvider='separate-object-provider';
  return plan;

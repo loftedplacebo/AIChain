@@ -47,16 +47,16 @@
     },
     {
       "stage": "test",
-      "hosting": {"appProvider": "contabo", "appRegion": "replace-test-app-region", "appInstanceRef": "replace/test/app", "databaseProvider": "digitalocean", "databaseRegion": "replace-shared-database-region", "databaseClusterRef": "replace/shared/pilot-and-prod-cluster", "databaseTopology": "own-cluster", "backupProvider": "backblaze", "backupRegion": "replace-test-backup-region", "backupAccountRef": "replace/test/backup-account", "operatorRef": "replace/test/operator"},
+      "hosting": {"appProvider": "contabo", "appRegion": "replace-test-app-region", "appInstanceRef": "replace/test/app", "databaseProvider": "contabo", "databaseRegion": "replace-test-app-region", "databaseClusterRef": "replace/test/contabo-postgresql-17", "databaseTopology": "own-cluster", "backupProvider": "backblaze", "backupRegion": "replace-test-backup-region", "backupAccountRef": "replace/test/backup-account", "operatorRef": "replace/test/operator"},
       "portal": {"origin": "https://pilot.example.test", "apiOrigin": "https://api.pilot.example.test"},
       "database": {
-        "host": "shared.db.example.test",
-        "port": 25060,
+        "host": "127.0.0.1",
+        "port": 5433,
         "name": "governance_test",
         "apiRole": "governance_api",
         "workerRole": "governance_evidence_worker",
         "migrationRole": "governance_migrations",
-        "tls": "verify-full"
+        "tls": "local"
       },
       "identity": {
         "environmentId": "replace_test_environment",
@@ -91,10 +91,10 @@
     },
     {
       "stage": "prod",
-      "hosting": {"appProvider": "digitalocean", "appRegion": "replace-prod-app-region", "appInstanceRef": "replace/prod/dedicated-app", "databaseProvider": "digitalocean", "databaseRegion": "replace-shared-database-region", "databaseClusterRef": "replace/shared/pilot-and-prod-cluster", "databaseTopology": "shared-with-test", "backupProvider": "backblaze", "backupRegion": "replace-prod-backup-region", "backupAccountRef": "replace/prod/backup-account", "operatorRef": "replace/prod/operator"},
+      "hosting": {"appProvider": "digitalocean", "appRegion": "replace-prod-app-region", "appInstanceRef": "replace/prod/dedicated-app", "databaseProvider": "digitalocean", "databaseRegion": "lon1", "databaseClusterRef": "replace/prod/reused-managed-cluster", "databaseTopology": "own-cluster", "backupProvider": "backblaze", "backupRegion": "replace-prod-backup-region", "backupAccountRef": "replace/prod/backup-account", "operatorRef": "replace/prod/operator"},
       "portal": {"origin": "https://prod.example.test", "apiOrigin": "https://api.prod.example.test"},
       "database": {
-        "host": "shared.db.example.test",
+        "host": "production.db.example.test",
         "port": 25060,
         "name": "governance_prod",
         "apiRole": "governance_prod_api",

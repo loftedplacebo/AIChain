@@ -41,10 +41,11 @@ function validatePlan(plan){
   }
   if(exact(env.database,['host','port','name','apiRole','workerRole','migrationRole','tls'],'database',errors)){
    const db=env.database;
-   if(typeof db.host!=='string'||!/^[a-z0-9.-]+$/.test(db.host)||hosted&&localDatabase(db.host)||!Number.isInteger(db.port)||db.port<1||db.port>65535||![db.name,db.apiRole,db.workerRole,db.migrationRole].every(v=>typeof v==='string'&&/^[a-z][a-z0-9_]{0,62}$/.test(v)))errors.push(stage+': invalid database endpoint or role');
+   const hostedLocalTest=stage==='test'&&db.host==='127.0.0.1'&&env.hosting?.appProvider==='contabo'&&env.hosting?.databaseProvider==='contabo'&&env.hosting?.databaseTopology==='own-cluster';
+   if(typeof db.host!=='string'||!/^[a-z0-9.-]+$/.test(db.host)||hosted&&localDatabase(db.host)&&!hostedLocalTest||!Number.isInteger(db.port)||db.port<1||db.port>65535||![db.name,db.apiRole,db.workerRole,db.migrationRole].every(v=>typeof v==='string'&&/^[a-z][a-z0-9_]{0,62}$/.test(v)))errors.push(stage+': invalid database endpoint or role');
    else unique('database',db.host+':'+db.port+'/'+db.name,stage);
    if(new Set([db.apiRole,db.workerRole,db.migrationRole]).size!==3)errors.push(stage+': API, worker and migration roles must differ');
-   if(!['local','verify-full'].includes(db.tls)||hosted&&db.tls!=='verify-full')errors.push(stage+': hosted PostgreSQL requires verified TLS');
+   if(!['local','verify-full'].includes(db.tls)||hosted&&db.tls!=='verify-full'&&!(hostedLocalTest&&db.tls==='local')||hostedLocalTest&&db.tls!=='local')errors.push(stage+': hosted PostgreSQL requires verified TLS outside same-host loopback');
   }
   if(exact(env.identity,['environmentId','clientId','callbackUrl','webhookUrl'],'identity',errors)){
    if(!scalar(env.identity.environmentId)||!scalar(env.identity.clientId))errors.push(stage+': invalid provider identifiers');

@@ -14,26 +14,15 @@ test('cross-environment state, identity, keys, wallets and backups cannot be sha
  const plan=fixture();plan.environments[1].evidence.relayerAddress=plan.environments[1].evidence.recordingAddress;assert.equal(validatePlan(plan).valid,false);
  const roles=fixture();roles.environments[2].database.workerRole=roles.environments[2].database.apiRole;assert.equal(validatePlan(roles).valid,false);
 });
-test('shared test and production cluster has explicit database, role and endpoint boundaries',()=>{
+test('test and production clusters remain distinct',()=>{
  assert.equal(validatePlan(fixture()).valid,true);
  const mutations=[
-  p=>p.environments[2].database.name=p.environments[1].database.name,
-  p=>p.environments[2].database.apiRole=p.environments[1].database.workerRole,
-  p=>p.environments[2].database.workerRole=p.environments[1].database.apiRole,
-  p=>p.environments[2].database.migrationRole=p.environments[1].database.migrationRole,
-  p=>p.environments[2].database.host='other.db.example.test',
-  p=>p.environments[2].database.port=5432,
-  p=>p.environments[2].hosting.databaseProvider='other-provider',
-  p=>p.environments[2].hosting.databaseRegion='other-region',
-  p=>p.environments[2].hosting.databaseClusterRef='replace/other/cluster',
   p=>p.environments[1].hosting.databaseTopology='shared-with-test',
   p=>p.environments[2].hosting.databaseTopology='unknown'
  ];
  for(const mutate of mutations){const plan=fixture();mutate(plan);assert.equal(validatePlan(plan).valid,false);}
- const dedicated=fixture();dedicated.environments[2].hosting.databaseTopology='own-cluster';dedicated.environments[2].hosting.databaseClusterRef='replace/prod/dedicated-cluster';dedicated.environments[2].hosting.databaseRegion='replace-prod-database-region';dedicated.environments[2].database.host='prod.db.example.test';
- assert.equal(validatePlan(dedicated).valid,true);
- dedicated.environments[2].hosting.databaseClusterRef=dedicated.environments[1].hosting.databaseClusterRef;
- assert.equal(validatePlan(dedicated).valid,false);
+ const reused=fixture();reused.environments[2].hosting.databaseClusterRef=reused.environments[1].hosting.databaseClusterRef;
+ assert.equal(validatePlan(reused).valid,false);
 });
 test('hosted TLS, HTTPS, independent backup provider and bounded recovery objectives are required',()=>{
  const mutations=[e=>e.database.tls='local',e=>e.identity.callbackUrl='http://staging.example.test/callback',e=>e.identity.webhookUrl='https://user:password@staging.example.test/webhook',e=>e.identity.callbackUrl='https://staging.example.test/callback?token=private',e=>e.backup.custody='local-synthetic',e=>e.hosting.backupProvider=e.hosting.appProvider,e=>e.hosting.backupProvider=e.hosting.databaseProvider,e=>e.hosting.backupProvider=e.hosting.appProvider.toUpperCase(),e=>e.hosting.backupRegion='',e=>e.backup.rpoMinutes=0,e=>e.evidence.chainId=1,e=>e.evidence.relayerAddress='0x'+'0'.repeat(40)];
@@ -54,7 +43,7 @@ test('an HTTPS synthetic test pilot has hosted isolation and public DNS requirem
   e=>e.portal.apiOrigin='https://[::1]',
   e=>e.portal.apiOrigin='https://api.localhost',
   e=>e.database.host='127.0.0.2',
-  e=>e.database.tls='local',
+  e=>e.database.tls='verify-full',
   e=>e.backup.custody='local-synthetic',
   e=>e.hosting.backupProvider=e.hosting.appProvider
  ]){const plan=structuredClone(hosted);mutate(plan.environments[1]);assert.equal(validatePlan(plan).valid,false);}

@@ -8,7 +8,8 @@ function testOrigin(plan){
  if(!review.valid)throw Error('Deployment plan failed offline review');
  const stage=plan.environments.find(environment=>environment.stage==='test');
  const url=new URL(stage.portal.apiOrigin);
- if(url.protocol!=='https:'||stage.database.tls!=='verify-full'||stage.backup.custody!=='independent-storage')throw Error('Synthetic test stage is not configured for hosted acceptance');
+ const localContaboTest=stage.hosting.appProvider==='contabo'&&stage.hosting.databaseProvider==='contabo'&&stage.hosting.databaseTopology==='own-cluster'&&stage.database.host==='127.0.0.1'&&stage.database.tls==='local';
+ if(url.protocol!=='https:'||stage.database.tls!=='verify-full'&&!localContaboTest||stage.backup.custody!=='independent-storage')throw Error('Synthetic test stage is not configured for hosted acceptance');
  return url.origin;
 }
 
