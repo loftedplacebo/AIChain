@@ -53,7 +53,9 @@ environment and list, plus a rejected production sign-up start.
    restricted API role, verified TLS, production WorkOS binding and loopback port;
    its read-only preflight must pass after schema and grants are installed.
 2. Create a new WorkOS Production API key and install it on the production
-   host through a hidden prompt. Generate a distinct 32-byte identity sealing
+   host through the hidden-prompt `configure-production-workos-key.py` installer.
+   It writes a root-only environment file for the disabled production API unit
+   and does not activate a service. Generate a distinct 32-byte identity sealing
    key there. Do not copy the pilot WorkOS key, seal key, or user records.
 3. When `https://api-prod.orvessian.com/v1/auth/workos-webhook` is live and
    rejects unsigned requests, create a WorkOS Production webhook endpoint

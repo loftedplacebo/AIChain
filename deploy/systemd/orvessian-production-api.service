@@ -9,6 +9,7 @@ User=orvessian-prod-api
 Group=orvessian-prod-api
 WorkingDirectory=/opt/aichain/orvessian-production-api
 EnvironmentFile=/etc/orvessian-production-api.env
+EnvironmentFile=/etc/aichain/production/workos.env
 ExecStart=/opt/aichain/.toolchains/node-v24.21.0-linux-x64/bin/node scripts/governance-production-api.cjs
 Restart=on-failure
 RestartSec=5
