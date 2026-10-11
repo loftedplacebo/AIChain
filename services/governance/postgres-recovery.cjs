@@ -21,7 +21,10 @@ async function operator(c){
 // A fresh destination issued by this process is the only invalidation target.
 // Arbitrary existing databases cannot be passed to invalidateRestore.
 async function createRestoreTarget(admin,{sourceDatabase,targetDatabase,environment,sourceMayBeAbsent=false}){
- if(!['dev','test'].includes(environment)||!name(sourceDatabase)||!name(targetDatabase)||!targetDatabase.startsWith('gov_restore_')||sourceDatabase===targetDatabase||typeof sourceMayBeAbsent!=='boolean')throw Error('Explicit dev/test source and fresh restore database required');
+ const production=environment==='prod';
+ if(!['dev','test','prod'].includes(environment)||!name(sourceDatabase)||!name(targetDatabase)||
+    (production?(sourceDatabase!=='governance_prod'||!/^gov_restore_prod_[a-f0-9]{12}$/.test(targetDatabase)||sourceMayBeAbsent!==true):!targetDatabase.startsWith('gov_restore_'))||
+    sourceDatabase===targetDatabase||typeof sourceMayBeAbsent!=='boolean')throw Error('Explicit source and fresh closed restore database required');
  const c=await admin.connect();try{
   await assertOfflineAdministrator(c,{createDatabase:true,requireDatabaseOwner:false});
   const source=(await c.query('SELECT oid FROM pg_database WHERE datname=$1',[sourceDatabase])).rows[0];if(!source&&!sourceMayBeAbsent)throw Error('Source database not found');
@@ -73,12 +76,12 @@ async function invalidateRestore(pool,handle,{approvedMigrations=[]}={}){
  }catch(e){await c.query('ROLLBACK');throw e;}finally{c.release();}
 }
 async function reviewRestore(pool,{environment,restoreId}){
- if(!['dev','test'].includes(environment)||typeof restoreId!=='string'||!/^[-a-f0-9]{36}$/.test(restoreId))throw Error('Explicit recovery review identity required');
+ if(!['dev','test','prod'].includes(environment)||typeof restoreId!=='string'||!/^[-a-f0-9]{36}$/.test(restoreId))throw Error('Explicit recovery review identity required');
  const c=await pool.connect();try{
   await c.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');await operator(c);await verify(c);
   await c.query("SELECT set_config('statement_timeout','30000',true),set_config('lock_timeout','5000',true)");
   const stage=(await c.query('SELECT name FROM governance_environment')).rows,gate=(await c.query('SELECT * FROM governance_recovery_gate')).rows;
-  if(stage.length!==1||stage[0].name!==environment||gate.length!==1||gate[0].state!=='review-required'||gate[0].restore_id!==restoreId||!Number.isSafeInteger(Number(gate[0].invalidated_at))||Number(gate[0].invalidated_at)<=0)throw Error('Recovery gate or environment mismatch');
+  if(stage.length!==1||stage[0].name!==environment||gate.length!==1||gate[0].state!=='review-required'||gate[0].restore_id!==restoreId||!Number.isSafeInteger(Number(gate[0].invalidated_at))||Number(gate[0].invalidated_at)<=0||environment==='prod'&&!/^gov_restore_prod_[a-f0-9]{12}$/.test((await c.query('SELECT current_database() name')).rows[0].name))throw Error('Recovery gate or environment mismatch');
   const now=Date.now();
   if(Number(gate[0].invalidated_at)>now+300000)throw Error('Recovery invalidation time is in the future');
   for(const table of ['governance_customer_sessions','governance_customer_auth_flows'])if(Number((await c.query('SELECT count(*) n FROM '+table)).rows[0].n)!==0)throw Error('Restored authentication state is not empty');

@@ -10,9 +10,12 @@ const PROD_HOST='orvessian-pilot-test-do-user-45565720-0.k.db.ondigitalocean.com
 function productionSource(connection){
  if(connection?.host!==PROD_HOST||connection.port!==25060||connection.database!=='governance_prod'||connection.user!=='doadmin'||connection.sslmode!=='verify-full'||connection.caFile!=='/etc/aichain/governance/digitalocean-ca.crt')throw Error('Production backup requires the exclusive managed database and verified TLS');
 }
-function configuration(environment,connection,binaries){
+function productionRestore(connection,targetDatabase,{review=false}={}){
+ if(connection?.host!=='127.0.0.1'||connection.port!==5441||connection.database!==(review?targetDatabase:'postgres')||connection.user!=='postgres'||connection.sslmode!==undefined||connection.caFile!==undefined||!/^gov_restore_prod_[a-f0-9]{12}$/.test(targetDatabase))throw Error('Production restore requires the isolated local recovery cluster and a fresh closed target');
+}
+function configuration(environment,connection,binaries,{restore=false,review=false,targetDatabase}={}){
  if(!['dev','test','prod'].includes(environment))throw Error('Explicit dev, test or reviewed production database required');
- if(environment==='prod')productionSource(connection);
+ if(environment==='prod')restore?productionRestore(connection,targetDatabase,{review}):productionSource(connection);
  databaseOptions(connection);
  if(typeof binaries!=='string'||!path.isAbsolute(binaries))throw Error('Explicit absolute PostgreSQL binary directory required');
  for(const binary of ['pg_dump','pg_restore'])files.regular(path.join(binaries,binary+(process.platform==='win32'?'.exe':'')));
@@ -90,7 +93,7 @@ async function inspectBackup({environment,directory,key,maxAgeHours=24}){
  }finally{files.clean(scratch);}
 }
 async function restoreBackup({environment,connection,binaries,directory,outputRoot,key,targetDatabase,approvedMigrations=[]}){
- configuration(environment,connection,binaries);files.keyCheck(key);
+ configuration(environment,connection,binaries,{restore:true,targetDatabase});files.keyCheck(key);
  if(!['postgres','defaultdb'].includes(connection.database))throw Error('Restore operator must connect to an approved maintenance database');
  const scratch=files.freshDirectory(os.tmpdir(),'ov-pg-restore-'),destination=files.freshDirectory(outputRoot,'pg-restore-');let success=false,targetPool,handle;
  const admin=new Pool(databaseOptions(connection));
@@ -110,11 +113,11 @@ async function restoreBackup({environment,connection,binaries,directory,outputRo
  }finally{try{await targetPool?.end();await admin.end();}finally{try{files.clean(scratch);}finally{if(!success)files.clean(destination);}}}
 }
 async function reviewRestore({environment,connection,binaries,directory}){
- configuration(environment,connection,binaries);const result=marker(directory,'recovery.json');
+ configuration(environment,connection,binaries,{restore:true,review:true,targetDatabase:connection.database});const result=marker(directory,'recovery.json');
  if(result.version!==1||result.kind!=='postgres-coordinated'||result.environment!==environment||result.targetDatabase!==connection.database||result.activation!=='review-required'||!Array.isArray(result.journalRoles))throw Error('Recovery marker mismatch');
  const expected=['recovery.json'];if(result.journalsDirectory){if(typeof result.journalsDirectory!=='string'||!/^restore-[A-Za-z0-9]+$/.test(result.journalsDirectory))throw Error('Invalid journal restore directory');expected.push(result.journalsDirectory);const journal=sqlite.reviewRestore({environment,directory:path.join(directory,result.journalsDirectory)});if(JSON.stringify(journal.files.map(f=>f.role))!==JSON.stringify(result.journalRoles))throw Error('Journal recovery roles mismatch');}
  else if(result.journalRoles.length)throw Error('Missing restored journals');
  if(JSON.stringify(fs.readdirSync(directory).sort())!==JSON.stringify(expected.sort()))throw Error('Unexpected recovery files');
  const pool=new Pool(databaseOptions(connection));try{return {directory,...await pg.reviewRestore(pool,{environment,restoreId:result.restoreId}),journalRoles:result.journalRoles};}finally{await pool.end();}
 }
-module.exports={createBackup,restoreBackup,reviewRestore,inspectBackup,productionSource};
+module.exports={createBackup,restoreBackup,reviewRestore,inspectBackup,productionSource,productionRestore};
