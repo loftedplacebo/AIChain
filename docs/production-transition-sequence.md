@@ -213,8 +213,22 @@ This capture has no worker journals because no production worker exists yet.
 The production API stayed disabled and the synthetic pilot health check passed.
 This is local capture evidence only: off-host upload, separate completion
 marker, independent restore and replacement-cluster recovery remain open.
-Use a production-only B2 bucket and upload/restore credentials, completion
-marker, journal inventory and restore procedure before production admission.
+On 12 October a separate private, encrypted-at-rest B2 bucket named
+`orvessian-prod-backups-2026` was created in `eu-central-003` at
+`https://s3.eu-central-003.backblazeb2.com`. It is empty with the default
+"keep all versions" lifecycle. Before production admission, configure its
+reviewed retention rules, bucket-scoped upload and separate restore credentials,
+completion marker, journal inventory and restore procedure. Creating the empty
+bucket adds no storage usage; future uploads count toward the account-wide
+10 GB free allowance and can create usage charges beyond it.
+The local capture `b864dbc2-20f1-40ef-864a-465ff7fab884` was authenticated
+and restored on 12 October into a separate manual-start PostgreSQL 17 cluster
+bound to `127.0.0.1:5441`. Fresh database `gov_restore_prod_e6fa3bf836a0`
+passed closed review with access revoked and disabled. The managed source was
+not touched, the production API remained disabled and inactive, and pilot
+health passed afterward. This drill used the **local** archive on the same
+Contabo host; it does not satisfy B2 download, independent key escrow, a
+different-host recovery, or production service activation acceptance.
 
 Measure production peak connections, memory, disk, query latency and evidence
 backlog under the proposed limited workload. Set a conservative connection

@@ -67,7 +67,9 @@ def preflight(backup_id):
     if not re.fullmatch(r'[a-f0-9]{64}', key) or not re.fullmatch(r'[a-f0-9]{64}', admin):
         raise ValueError('Separate protected recovery credentials required')
     start = pathlib.Path('/etc/postgresql/17/production-recovery/start.conf')
-    if start.read_text(encoding='ascii').strip() != 'manual':
+    active_start = [line.strip() for line in start.read_text(encoding='ascii').splitlines()
+                    if line.strip() and not line.lstrip().startswith('#')]
+    if active_start != ['manual']:
         raise ValueError('Manual-start recovery cluster required')
     clusters = subprocess.run(('pg_lsclusters', '-h'), capture_output=True,
                               text=True, timeout=15, check=False)

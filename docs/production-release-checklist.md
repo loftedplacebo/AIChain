@@ -18,7 +18,11 @@ The reviewed production schema and runtime grants are installed. The restricted
 API role now has a verified login and a root-only configuration file; the
 migration and worker roles remain `NOLOGIN` and the production API service
 remains off. An encrypted local production database capture passed; its key
-still needs independent escrow, off-host upload and closed restore. The worker
+still needs independent escrow, off-host upload and B2-based closed restore. A separate
+private production B2 bucket exists but is empty and still needs restricted
+keys and retention rules. A closed local restore of the encrypted production
+capture passed on an isolated loopback PostgreSQL cluster; off-host recovery
+remains untested. The worker
 credential, independent backup acceptance, WorkOS webhook and
 evidence-chain choice remain open.
 The ordered preparation and indicative budget are in the
