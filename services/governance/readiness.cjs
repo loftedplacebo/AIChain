@@ -7,8 +7,9 @@ const {assertRecoveryApproved}=require('./environment.cjs');
 // connection waiters under repeated health checks. Late completions are discarded.
 function createReadiness({environment,sqlite=[],pool=null,runtimeProfile='pilot',timeoutMs=1500,cacheMs=1000}){
  if(!['pilot','api','evidence-worker'].includes(runtimeProfile)||!pool&&runtimeProfile!=='pilot')throw Error('Invalid readiness runtime profile');
- if(!['dev','test'].includes(environment)||!Number.isInteger(timeoutMs)||timeoutMs<10||timeoutMs>5000||!Number.isInteger(cacheMs)||cacheMs<0||cacheMs>5000)throw Error('Invalid readiness configuration');
+ if(!['dev','test','prod'].includes(environment)||!Number.isInteger(timeoutMs)||timeoutMs<10||timeoutMs>5000||!Number.isInteger(cacheMs)||cacheMs<0||cacheMs>5000)throw Error('Invalid readiness configuration');
  const databases=[...new Set(sqlite.filter(Boolean))],expected=pool?migrations():[];
+ if(environment==='prod'&&(!pool||runtimeProfile==='pilot'||databases.length))throw Error('Production readiness requires a restricted PostgreSQL profile');
  if(!pool&&!databases.length)throw Error('Readiness requires configured storage');
  let pending=null,cached=null,draining=false;
  const failed=()=>({status:'not-ready'});

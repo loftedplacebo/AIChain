@@ -4,6 +4,14 @@ const {DatabaseSync}=require('node:sqlite');
 const {createReadiness}=require('./readiness.cjs');
 const {migrations}=require('./postgres-migrate.cjs');
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+test('production readiness requires restricted PostgreSQL storage',()=>{
+ const pool={connect(){throw Error('unused synthetic pool');}};
+ assert.ok(createReadiness({environment:'prod',pool,runtimeProfile:'api'}));
+ assert.ok(createReadiness({environment:'prod',pool,runtimeProfile:'evidence-worker'}));
+ assert.throws(()=>createReadiness({environment:'prod',pool}),/restricted PostgreSQL/);
+ assert.throws(()=>createReadiness({environment:'prod',sqlite:[{}]}),/restricted PostgreSQL/);
+ assert.throws(()=>createReadiness({environment:'prod',pool,runtimeProfile:'api',sqlite:[{}]}),/restricted PostgreSQL/);
+});
 test('readiness rejects mismatched environments, gated restores and closed SQLite storage',async()=>{
  const db=new DatabaseSync(':memory:');
  db.exec("CREATE TABLE governance_environment(name TEXT); INSERT INTO governance_environment VALUES('test')");
