@@ -217,10 +217,15 @@ On 12 October a separate private, encrypted-at-rest B2 bucket named
 `orvessian-prod-backups-2026` was created in `eu-central-003` at
 `https://s3.eu-central-003.backblazeb2.com`. It is empty with the default
 "keep all versions" lifecycle. Before production admission, configure its
-reviewed retention rules, bucket-scoped upload and separate restore credentials,
-completion marker, journal inventory and restore procedure. Creating the empty
+reviewed retention rules, completion marker, journal inventory and restore
+procedure, then test the separate upload and restore credentials. Creating the empty
 bucket adds no storage usage; future uploads count toward the account-wide
 10 GB free allowance and can create usage charges beyond it.
+On 13 October, bucket- and `orvessian-production/prod/`-scoped B2 keys were
+created: one Write Only upload key and one Read Only restore key. The upload
+credential was installed root-only on Contabo. The separate restore credential
+still needs hidden-prompt installation. An encrypted archive upload remains
+pending explicit owner approval for that exact off-host transfer.
 The local capture `b864dbc2-20f1-40ef-864a-465ff7fab884` was authenticated
 and restored on 12 October into a separate manual-start PostgreSQL 17 cluster
 bound to `127.0.0.1:5441`. Fresh database `gov_restore_prod_e6fa3bf836a0`
