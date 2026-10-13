@@ -221,6 +221,16 @@ disabled unit; its focused tests passed. Post-install inspection found
 `root:root 0600`, the expected variable names, an inactive/disabled production
 unit, and healthy pilot coverage. The WorkOS webhook signing secret is still
 absent, so private API preflight and service activation remain gated.
+The separate [hidden-prompt webhook installer](../deploy/governance/configure-production-workos-webhook.py)
+is staged but has not been run. Production has no webhook endpoint yet.
+Automatic approval review rejected creating one while the target remains a
+404-only preparation route. The production entry point now permits its
+**read-only private preflight** to verify the restricted database and closed
+identity binding without a webhook secret; normal service startup still
+requires the secret. The targeted production/WorkOS tests passed 31/31 with
+loopback access. Package and stage this newer artifact, run private preflight,
+then review the signed webhook activation sequence before registering the
+endpoint.
 The historical shared-cluster SQL bundle is not a release artifact here.
 An isolated backup runner was staged from pinned commit `08774a1` with no
 service. A distinct 32-byte production archive key was generated on the VPS;

@@ -33,6 +33,9 @@ test('production entry point requires isolated Contabo services and exclusive ma
  try{
   assert.equal(environmentConfig(env).stage,'prod');
   assert.equal(validate(env).databaseHost,'orvessian-pilot-test-do-user-45565720-0.k.db.ondigitalocean.com');
+  const withoutWebhook={...env,WORKOS_WEBHOOK_SECRET:''};
+  assert.equal(validate(withoutWebhook,{requireWebhook:false}).stage,'prod');
+  assert.throws(()=>validate(withoutWebhook),/signed revocations/);
   for(const changes of [
    {GOVERNANCE_PRODUCTION_HOST:'dedicated-vm'},
    {GOVERNANCE_DATABASE_URL:env.GOVERNANCE_DATABASE_URL.replace('governance_prod_api','doadmin')},

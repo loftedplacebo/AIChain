@@ -7,12 +7,12 @@ const {workosConfig}=require('../services/governance/workos-auth.cjs');
 
 const DATABASE_HOST='orvessian-pilot-test-do-user-45565720-0.k.db.ondigitalocean.com';
 
-function validate(env){
+function validate(env,{requireWebhook=true}={}){
  if(env.GOVERNANCE_ENV!=='prod'||env.GOVERNANCE_PRODUCTION_HOST!=='contabo-shared'||
     env.GOVERNANCE_STORAGE!=='postgres'||env.GOVERNANCE_KEY_STORAGE!=='postgres'||
     env.GOVERNANCE_CONTROL_STORAGE!=='postgres')throw Error('Production requires the reviewed Contabo and PostgreSQL runtime profile');
  if(env.GOVERNANCE_IDENTITY_PROVIDER!=='workos'||env.WORKOS_ADMISSION_MODE!=='production-list'||
-    !env.WORKOS_WEBHOOK_SECRET||!env.WORKOS_PRODUCTION_ALLOWED_EMAILS)throw Error('Production requires closed WorkOS admission and signed revocations');
+    (requireWebhook&&!env.WORKOS_WEBHOOK_SECRET)||!env.WORKOS_PRODUCTION_ALLOWED_EMAILS)throw Error('Production requires closed WorkOS admission and signed revocations');
  if(env.GOVERNANCE_USERS||env.GOVERNANCE_CREDENTIALS||env.GOVERNANCE_SESSION_DB||
     env.GOVERNANCE_DB||env.GOVERNANCE_RULES_DB||env.GOVERNANCE_ADOPT_UNBOUND_SQLITE||
     env.GOVERNANCE_RULE_PROCESSING_ENABLED==='true'||env.WORKOS_PILOT_ALLOWED_EMAILS!==undefined)throw Error('Production cannot reuse seeded, pilot or SQLite state');
@@ -29,7 +29,7 @@ function validate(env){
 }
 
 async function preflight(env=process.env){
- validate(env);
+ validate(env,{requireWebhook:false});
  const {Pool}=require('pg');
  const pool=new Pool({...connectionOptions(env.GOVERNANCE_DATABASE_URL,{caFile:env.GOVERNANCE_DATABASE_CA_FILE}),statement_timeout:10000,query_timeout:12000});
  try{
@@ -37,7 +37,7 @@ async function preflight(env=process.env){
   const directory=new (require('../services/governance/postgres-customer-directory.cjs').PostgresCustomerDirectory)(pool);
   await new (require('../services/governance/postgres-provider-sessions.cjs').PostgresProviderSessions)(pool,directory).ready('prod');
   await new (require('../services/governance/postgres-project-keys.cjs').PostgresProjectKeys)(pool).ready('prod');
-  return {status:'ready',stage:'prod',database:'verified',runtimeProfile:'api',identity:'configured',scope:'Read-only private preflight; no public edge, backup, evidence chain or release approval'};
+  return {status:'ready',stage:'prod',database:'verified',runtimeProfile:'api',identity:'closed-admission-prepared',webhook:env.WORKOS_WEBHOOK_SECRET?'configured':'pending',scope:'Read-only private preflight; no public edge, backup, evidence chain or release approval'};
  }finally{await pool.end();}
 }
 
