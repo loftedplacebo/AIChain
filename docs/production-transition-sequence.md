@@ -132,6 +132,13 @@ separate temporary production hostnames on Contabo and register their exact
 WorkOS callbacks. Plan the eventual domain switch and rollback only after the
 new services pass end-to-end acceptance. Do not import pilot users, workspaces,
 API keys or testnet evidence as live customer records by assumption.
+The authoritative DNS is currently at GoDaddy. `prod.orvessian.com` and
+`api-prod.orvessian.com` did not resolve at the 13 October check. Add only
+those two A records to the existing Contabo IPv4 address, then stage the
+[ACME-only Nginx preparation](../deploy/nginx/orvessian-production-preparation.conf).
+It serves HTTP challenges and 404 for every other path; it must not route
+customer traffic. Obtain and verify a separate certificate before adding
+the reviewed HTTPS production proxy and WorkOS webhook endpoint.
 
 ## Budget and later VM decision
 
