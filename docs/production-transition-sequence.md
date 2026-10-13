@@ -203,6 +203,14 @@ the runtime profile's exact grant and denial check. Only that API role has
 disabled and inactive, and its environment file is deliberately incomplete
 until signed WorkOS webhooks and closed admission are configured. The worker
 login and scheduled production backup remain open. Never put `doadmin` in a service.
+On 13 October the [guarded runtime installer](../deploy/governance/configure-production-api-runtime.py)
+added the reviewed `prod` PostgreSQL profile, Production client/callback,
+closed owner-only admission list and loopback port to that root-only environment
+file. The installer required an exact three-field base file and an inactive,
+disabled unit; its focused tests passed. Post-install inspection found
+`root:root 0600`, the expected variable names, an inactive/disabled production
+unit, and healthy pilot coverage. The WorkOS webhook signing secret is still
+absent, so private API preflight and service activation remain gated.
 The historical shared-cluster SQL bundle is not a release artifact here.
 An isolated backup runner was staged from pinned commit `08774a1` with no
 service. A distinct 32-byte production archive key was generated on the VPS;
