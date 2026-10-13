@@ -1,4 +1,4 @@
-# Production release checklist — 5 October 2026
+# Production release checklist — 13 October 2026
 
 This is the current owner-facing checklist for a future **paid production**
 service. It is separate from the [supervised synthetic design-partner gate](pilot-owner-actions.md#readiness-checkpoint--5-october-2026)
@@ -17,14 +17,14 @@ production database with three restricted `NOLOGIN` roles has been verified.
 The reviewed production schema and runtime grants are installed. The restricted
 API role now has a verified login and a root-only configuration file; the
 migration and worker roles remain `NOLOGIN` and the production API service
-remains off. An encrypted local production database capture passed; its key
-still needs independent escrow, off-host upload and B2-based closed restore. A separate
-private production B2 bucket exists but is empty and still needs restricted
-keys and retention rules. A closed local restore of the encrypted production
-capture passed on an isolated loopback PostgreSQL cluster; off-host recovery
-remains untested. The worker
-credential, independent backup acceptance, WorkOS webhook and
-evidence-chain choice remain open.
+remains off. An encrypted production database capture was uploaded to a
+separate private B2 bucket using a restricted write key. Its completion marker
+was discovered with a separate restricted read key, and the downloaded archive
+passed authentication and a fresh closed restore on the Contabo loopback
+recovery cluster. This capture has no worker journals because no production
+worker exists yet. The archive key still needs independent escrow; scheduled
+backups, reviewed retention, replacement-host recovery, the worker credential,
+WorkOS webhook and evidence-chain choice remain open.
 The ordered preparation and indicative budget are in the
 [production transition sequence](production-transition-sequence.md).
 

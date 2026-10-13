@@ -202,7 +202,7 @@ the runtime profile's exact grant and denial check. Only that API role has
 `LOGIN`; migration and worker roles remain `NOLOGIN`. The API unit is still
 disabled and inactive, and its environment file is deliberately incomplete
 until signed WorkOS webhooks and closed admission are configured. The worker
-login and production backup remain open. Never put `doadmin` in a service.
+login and scheduled production backup remain open. Never put `doadmin` in a service.
 The historical shared-cluster SQL bundle is not a release artifact here.
 An isolated backup runner was staged from pinned commit `08774a1` with no
 service. A distinct 32-byte production archive key was generated on the VPS;
@@ -211,29 +211,36 @@ independent escrow. A quiesced production database snapshot was encrypted and
 authenticated locally as backup `b864dbc2-20f1-40ef-864a-465ff7fab884`.
 This capture has no worker journals because no production worker exists yet.
 The production API stayed disabled and the synthetic pilot health check passed.
-This is local capture evidence only: off-host upload, separate completion
-marker, independent restore and replacement-cluster recovery remain open.
+The capture was subsequently uploaded to the separate production B2 bucket,
+discovered through its completion marker, downloaded with a separate read key,
+and authenticated in a fresh closed restore. Scheduled production backup,
+independent archive-key escrow and replacement-cluster recovery remain open.
 On 12 October a separate private, encrypted-at-rest B2 bucket named
 `orvessian-prod-backups-2026` was created in `eu-central-003` at
-`https://s3.eu-central-003.backblazeb2.com`. It is empty with the default
-"keep all versions" lifecycle. Before production admission, configure its
-reviewed retention rules, completion marker, journal inventory and restore
-procedure, then test the separate upload and restore credentials. Creating the empty
-bucket adds no storage usage; future uploads count toward the account-wide
-10 GB free allowance and can create usage charges beyond it.
+`https://s3.eu-central-003.backblazeb2.com`. It initially had the default
+"keep all versions" lifecycle. Before production admission, configure reviewed
+retention rules, scheduled upload and journal inventory. Stored objects count
+toward the account-wide 10 GB free allowance and can create usage charges
+beyond it.
 On 13 October, bucket- and `orvessian-production/prod/`-scoped B2 keys were
-created: one Write Only upload key and one Read Only restore key. The upload
-credential was installed root-only on Contabo. The separate restore credential
-still needs hidden-prompt installation. An encrypted archive upload remains
-pending explicit owner approval for that exact off-host transfer.
+created: one Write Only upload key and one Read Only restore key. The first
+restore key's one-time secret was not saved, so it was deleted and replaced
+with key ID ending `00005`. Both active credentials were installed root-only
+on Contabo. The owner approved the exact off-host transfer of snapshot
+`b864dbc2-20f1-40ef-864a-465ff7fab884`. Its authenticated upload wrote a
+completion marker to the private production bucket. The separate restore key
+downloaded and authenticated that B2 set, then a fresh closed restore passed
+as `gov_restore_prod_e0a19d786e0a` with access revoked and disabled. The
+managed source database was untouched and the production API stayed disabled.
 The local capture `b864dbc2-20f1-40ef-864a-465ff7fab884` was authenticated
 and restored on 12 October into a separate manual-start PostgreSQL 17 cluster
 bound to `127.0.0.1:5441`. Fresh database `gov_restore_prod_e6fa3bf836a0`
 passed closed review with access revoked and disabled. The managed source was
 not touched, the production API remained disabled and inactive, and pilot
 health passed afterward. This drill used the **local** archive on the same
-Contabo host; it does not satisfy B2 download, independent key escrow, a
-different-host recovery, or production service activation acceptance.
+Contabo host. The subsequent B2 drill proves off-host custody and an
+authenticated download, but still does not satisfy independent archive-key
+escrow, a different-host recovery, or production service activation acceptance.
 
 Measure production peak connections, memory, disk, query latency and evidence
 backlog under the proposed limited workload. Set a conservative connection
