@@ -92,6 +92,13 @@ its default mode is read-only. `--apply` fills the empty production directory
 and writes a non-secret release manifest, then confirms the unit is still
 disabled and inactive. This initial staging operation does not enable the
 public route or replace a live production release.
+For later inactive replacements, the
+[offline release helper](../deploy/governance/replace-production-api-release.py)
+requires the exact current commit, new commit, archive SHA-256 and a disabled,
+inactive unit. Its default mode is read-only. `--apply` retains the prior
+release under an exact-commit rollback path before switching directories;
+`--rollback --apply` reverses that swap while the unit remains off. It does
+not restart services or change public routing.
 On 11 October its pinned unit hash and read-only preflight passed, then
 `--apply` staged `orvessian-prod-api` with `/usr/sbin/nologin`, the empty
 root-owned `/opt/aichain/orvessian-production-api` directory, and
