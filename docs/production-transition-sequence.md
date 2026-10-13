@@ -133,12 +133,15 @@ WorkOS callbacks. Plan the eventual domain switch and rollback only after the
 new services pass end-to-end acceptance. Do not import pilot users, workspaces,
 API keys or testnet evidence as live customer records by assumption.
 The authoritative DNS is currently at GoDaddy. `prod.orvessian.com` and
-`api-prod.orvessian.com` did not resolve at the 13 October check. Add only
-those two A records to the existing Contabo IPv4 address, then stage the
-[ACME-only Nginx preparation](../deploy/nginx/orvessian-production-preparation.conf).
-It serves HTTP challenges and 404 for every other path; it must not route
-customer traffic. Obtain and verify a separate certificate before adding
-the reviewed HTTPS production proxy and WorkOS webhook endpoint.
+`api-prod.orvessian.com` were added on 13 October as A records pointing to
+the existing Contabo IPv4 address. Both resolved from the authoritative
+GoDaddy nameserver. The [closed Nginx preparation](../deploy/nginx/orvessian-production-preparation.conf)
+serves HTTP ACME challenges and returns 404 on every other HTTP or HTTPS
+path. A separate Let's Encrypt certificate was issued for both names, expiring
+11 January 2027, with automatic renewal registered. Nginx validation passed,
+both HTTPS names returned 404 with valid TLS, and pilot health remained green.
+This provides host and certificate preparation only: no production API, portal,
+customer traffic, HTTPS proxy or WorkOS webhook endpoint is active yet.
 
 ## Budget and later VM decision
 
