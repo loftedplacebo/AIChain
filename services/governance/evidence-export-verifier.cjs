@@ -8,10 +8,10 @@ function outcome(result){
  return {exportVerification:'invalid',exitCode:1};
 }
 
-async function verifyExport(exported,{trustedSigners,provider=null}={}){
+async function verifyExport(exported,{trustedSigners,provider=null,anchor}={}){
  if(!exported||typeof exported!=='object'||Array.isArray(exported)||!exported.event||typeof exported.event!=='object'||Array.isArray(exported.event)||!Object.hasOwn(exported,'evidence'))throw Error('Record-specific evidence export required');
  if(!Array.isArray(trustedSigners)||!trustedSigners.length||trustedSigners.some(s=>typeof s!=='string'||!/^0x[0-9a-fA-F]{40}$/.test(s)))throw Error('Explicit trusted recording-service addresses required');
- const result=await inspectEvidence(exported.event,exported.evidence,{trustedSigners,provider});
+ const result=await inspectEvidence(exported.event,exported.evidence,{trustedSigners,provider,anchor});
  return {...result,...outcome(result)};
 }
 module.exports={outcome,verifyExport};

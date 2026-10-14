@@ -112,6 +112,7 @@ function createServer(store, credentials, users=[], sessionDb=store.db, evidence
         if(url.pathname.startsWith('/v1/investigations/'))return send(200,await require('./reviews.cjs').investigation(store,principal,decodeURIComponent(url.pathname.slice('/v1/investigations/'.length))));
         if(url.pathname==='/v1/agents')return send(200,await agents.listAgents(store,principal,{limit:Number(url.searchParams.get('limit')||50),offset:Number(url.searchParams.get('offset')||0)}));
         if(url.pathname.startsWith('/v1/evidence/')){
+          if(services.environment==='prod'&&!evidenceOptions.anchor)return send(503,{error:'Production evidence chain is not configured'});
           const id=decodeURIComponent(url.pathname.slice('/v1/evidence/'.length));const event=await store.get(principal,id);if(!event)return send(404,{error:'Event not found'});
           const stored=await store.evidence(principal,id);
           const verification=await require('./evidence.cjs').inspectEvidence(event,stored,evidenceOptions);

@@ -11,7 +11,8 @@ async function main(){
   if(!arg1||arg2||extra.length)throw Error('Use verify <export.json>');
   const stat=fs.lstatSync(arg1);if(!stat.isFile()||stat.isSymbolicLink()||stat.size<1||stat.size>2*1024*1024)throw Error('Bounded regular evidence export required');
   const exported=require('../services/governance/server.cjs').parseStrictJson(fs.readFileSync(arg1,'utf8'));
-  const result=await require('../services/governance/evidence-export-verifier.cjs').verifyExport(exported,{trustedSigners:JSON.parse(process.env.GOVERNANCE_RECEIPT_SIGNERS||'[]'),provider:process.env.GOVERNANCE_EVIDENCE_RPC_URL?evidenceProvider(process.env.GOVERNANCE_EVIDENCE_RPC_URL):null});
+  const anchor=process.env.GOVERNANCE_EVIDENCE_ANCHOR_JSON?require('../services/governance/evidence.cjs').evidenceAnchor(JSON.parse(process.env.GOVERNANCE_EVIDENCE_ANCHOR_JSON)):undefined;
+  const result=await require('../services/governance/evidence-export-verifier.cjs').verifyExport(exported,{trustedSigners:JSON.parse(process.env.GOVERNANCE_RECEIPT_SIGNERS||'[]'),provider:process.env.GOVERNANCE_EVIDENCE_RPC_URL?evidenceProvider(process.env.GOVERNANCE_EVIDENCE_RPC_URL):null,anchor});
   console.log(JSON.stringify(result,null,2));process.exitCode=result.exitCode;return;
  }
  if(!['prepare','attach'].includes(command))throw new Error('Use prepare, attach <batchId> <txHash>, or verify <export.json>');

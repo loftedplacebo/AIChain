@@ -33,7 +33,9 @@ async function start(env=process.env){
   try{await store.ready(stage);}catch(e){await pool.end();throw e;}
   sessionDb=config.controlDriver==='sqlite'?new DatabaseSync(config.sessionPath):null;
  }else{store=new GovernanceStore(config.eventPath);sessionDb=store.db;}
- const evidenceOptions={trustedSigners:JSON.parse(env.GOVERNANCE_RECEIPT_SIGNERS||'[]'),provider:env.GOVERNANCE_EVIDENCE_RPC_URL?require('./evidence-provider.cjs').evidenceProvider(env.GOVERNANCE_EVIDENCE_RPC_URL):null};
+ const anchor=env.GOVERNANCE_EVIDENCE_ANCHOR_JSON?require('./evidence.cjs').evidenceAnchor(JSON.parse(env.GOVERNANCE_EVIDENCE_ANCHOR_JSON)):stage==='prod'?null:undefined;
+ if(stage==='prod'&&anchor&&anchor.chainId!==8453)throw Error('Production evidence must target Base mainnet');
+ const evidenceOptions={trustedSigners:JSON.parse(env.GOVERNANCE_RECEIPT_SIGNERS||'[]'),provider:env.GOVERNANCE_EVIDENCE_RPC_URL?require('./evidence-provider.cjs').evidenceProvider(env.GOVERNANCE_EVIDENCE_RPC_URL):null,anchor};
  let ruleJournal,services={};
  if(config.controlDriver==='postgres'){
   const directory=new (require('./postgres-customer-directory.cjs').PostgresCustomerDirectory)(store.pool);

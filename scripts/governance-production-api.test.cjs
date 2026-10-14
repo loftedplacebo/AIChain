@@ -33,6 +33,10 @@ test('production entry point requires isolated Contabo services and exclusive ma
  try{
   assert.equal(environmentConfig(env).stage,'prod');
   assert.equal(validate(env).databaseHost,'orvessian-pilot-test-do-user-45565720-0.k.db.ondigitalocean.com');
+  const anchor={chainId:8453,contract:'0x'+'11'.repeat(20),codeHash:'0x'+'22'.repeat(32)};
+  assert.equal(validate({...env,GOVERNANCE_EVIDENCE_ANCHOR_JSON:JSON.stringify(anchor)}).stage,'prod');
+  assert.throws(()=>validate({...env,GOVERNANCE_EVIDENCE_ANCHOR_JSON:JSON.stringify({...anchor,chainId:84532})}),/Base Sepolia anchor binding mismatch|Base mainnet/);
+  assert.throws(()=>validate({...env,GOVERNANCE_EVIDENCE_ANCHOR_JSON:JSON.stringify({...anchor,codeHash:'0x'+'00'.repeat(32)})}),/Reviewed Base anchor binding/);
   const withoutWebhook={...env,WORKOS_WEBHOOK_SECRET:''};
   assert.equal(validate(withoutWebhook,{requireWebhook:false}).stage,'prod');
   assert.throws(()=>validate(withoutWebhook),/signed revocations/);
