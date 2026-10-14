@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily closed Production database backup
+
+[Timer]
+OnCalendar=*-*-* 02:00:00 UTC
+Persistent=true
+AccuracySec=1min
+Unit=orvessian-production-prelaunch-backup.service
+
+[Install]
+WantedBy=timers.target

@@ -382,6 +382,21 @@ complete journal set, safely advances the private B2 pointer only after a
 completion marker, and checks each scheduled window. A production account
 with no project may be tested during closed preparation, but this gate still
 precedes open admission.
+A [prelaunch runner](../deploy/governance/run-production-prelaunch-backup.py)
+and [daily timer](../deploy/systemd/orvessian-production-prelaunch-backup.timer)
+have been prepared for the closed Production database with **zero projects**.
+The runner fails if a project or a named Production worker exists, stops the
+private API for the quiesced capture, restarts and checks it even after a
+capture failure, then uploads through the restricted production B2 key and
+advances the private pointer only after the remote completion marker. Its
+read-only preflight passed on the VPS; four guard, restart, upload-order and due-window
+tests passed, and the systemd templates passed verification. The timer is
+**not installed or enabled**, and this path has not uploaded a new set. It is
+not the journal-aware production backup needed once project creation opens.
+The [read-only health checker](../deploy/governance/check-production-prelaunch-backup-health.py)
+is prepared for the 02:00 UTC schedule with a 03:00 due threshold. Its
+scheduled off-host data transfer and brief daily webhook API pause require a
+separate owner review before activation.
 On 12 October a separate private, encrypted-at-rest B2 bucket named
 `orvessian-prod-backups-2026` was created in `eu-central-003` at
 `https://s3.eu-central-003.backblazeb2.com`. It initially had the default
