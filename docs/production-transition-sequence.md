@@ -411,6 +411,9 @@ named production workers.
 The [read-only health checker](../deploy/governance/check-production-prelaunch-backup-health.py)
 checks the 02:00 UTC schedule with a 03:00 due threshold. A fresh download with
 the separate Read Only B2 credential authenticated the first scheduled set.
+The health check now reads the protected Production database marker and project
+count and inspects both expected worker unit names; it reports unhealthy if a
+project or worker appears while the journal-free schedule is still installed.
 The closed restore into local database `gov_restore_prod_a84935dfc666` passed
 with restored access revoked and disabled. This tests the Contabo loopback
 recovery cluster; a replacement-host or replacement-managed-cluster activation

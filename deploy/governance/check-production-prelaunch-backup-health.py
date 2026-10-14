@@ -2,6 +2,7 @@
 """Read-only status of the closed, journal-free Production backup window."""
 
 import json
+import importlib.util
 import os
 import pathlib
 import stat
@@ -11,8 +12,11 @@ from datetime import datetime, timedelta, timezone
 
 
 POINTER = pathlib.Path('/var/lib/aichain-production-backup/latest-b2.json')
+SCHEMA = pathlib.Path('/opt/aichain/governance-pilot-db-setup/apply-production-schema.py')
 SERVICE = 'orvessian-production-prelaunch-backup.service'
 TIMER = 'orvessian-production-prelaunch-backup.timer'
+WORKERS = ('orvessian-production-worker.service',
+           'orvessian-production-evidence-worker.service')
 
 
 def latest_due(now):
@@ -28,6 +32,22 @@ def systemctl(*args):
                             text=True, timeout=15, check=False)
     value = result.stdout.strip()
     return value if value else 'unavailable'
+
+
+def closed_scope():
+    spec = importlib.util.spec_from_file_location('production_schema', SCHEMA)
+    schema = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(schema)
+    admin = schema.protected(schema.ADMIN, 1025)
+    marker = schema.psql('doadmin', admin,
+                         'SELECT name FROM governance_environment;')
+    count = schema.psql('doadmin', admin,
+                        'SELECT count(*) FROM governance_customer_projects;')
+    states = {unit: systemctl('show', '-p', 'UnitFileState',
+                              '-p', 'ActiveState', unit) for unit in WORKERS}
+    worker_absent = all(set(state.splitlines()) == {
+        'UnitFileState=', 'ActiveState=inactive'} for state in states.values())
+    return marker == 'prod', count == '0', worker_absent
 
 
 def main():
@@ -54,8 +74,10 @@ def main():
     last = systemctl('show', '-p', 'Result', '--value', SERVICE)
     api = systemctl('is-active', 'orvessian-production-api.service')
     portal = systemctl('is-active', 'orvessian-production-portal.service')
+    database_is_prod, projects_absent, workers_absent = closed_scope()
     healthy = (valid and covered and timer == 'active' and enabled == 'enabled' and
-               last == 'success' and api == 'active' and portal == 'inactive')
+               last == 'success' and api == 'active' and portal == 'inactive' and
+               database_is_prod and projects_absent and workers_absent)
     print(json.dumps({
         'healthy': healthy,
         'scope': 'closed Production database with zero projects and no worker journals',
@@ -69,6 +91,9 @@ def main():
         'last_service_result': last,
         'api': api,
         'portal': portal,
+        'database_is_prod': database_is_prod,
+        'projects_absent': projects_absent,
+        'workers_absent': workers_absent,
     }, sort_keys=True))
     if not healthy:
         raise SystemExit(1)

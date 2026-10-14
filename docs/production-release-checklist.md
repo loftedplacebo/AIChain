@@ -27,8 +27,11 @@ worker exists yet. The closed prelaunch database now has a daily 02:00 UTC
 encrypted B2 backup. Its first run passed an independent authenticated download
 and closed local restore on 14 October; the private API restarted and backup
 health passed. This zero-project schedule must be replaced with worker journal
-coverage before Production project creation. The archive key still needs
-independent escrow; reviewed retention, replacement-host recovery, the worker credential,
+coverage before Production project creation. The backup health check fails if
+a project or worker appears under the
+prelaunch schedule. A daily failure-only alert checks the completed window.
+The archive key still needs independent escrow; reviewed retention,
+replacement-host recovery, the worker credential,
 WorkOS webhook acceptance and evidence-chain choice remain open. A
 Production-only `session.revoked` endpoint was registered on 13 October with
 the owner's approval for a short 404 transition. Its signing secret is now

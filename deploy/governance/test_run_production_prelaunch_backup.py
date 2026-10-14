@@ -2,10 +2,13 @@
 
 import importlib.util
 import json
+import os
 import pathlib
 import tempfile
 import unittest
 from datetime import datetime, timezone
+from contextlib import redirect_stdout
+from io import StringIO
 from unittest import mock
 
 
@@ -40,6 +43,36 @@ class Schema:
 
 
 class ProductionPrelaunchBackupTests(unittest.TestCase):
+    def test_backup_health_rejects_project_or_worker_after_capture(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            pointer = pathlib.Path(temporary) / 'latest-b2.json'
+            pointer.write_text(json.dumps({
+                'version': 2, 'environment': 'prod',
+                'bucket': 'orvessian-prod-backups-2026',
+                'keyPrefix': 'orvessian-production/prod/example',
+                'journalRoles': []}), encoding='utf-8')
+            pointer.chmod(0o600)
+            now = datetime(2026, 10, 14, 2, 30, tzinfo=timezone.utc).timestamp()
+            os.utime(pointer, (now - 60, now - 60))
+            with mock.patch.object(HEALTH, 'POINTER', pointer), \
+                    mock.patch.object(HEALTH.os, 'geteuid', return_value=0), \
+                    mock.patch.object(HEALTH.time, 'time', return_value=now), \
+                    mock.patch.object(HEALTH, 'systemctl', side_effect=lambda *args:
+                                      'enabled' if args[0] == 'is-enabled' else
+                                      'success' if args[0] == 'show' else
+                                      'inactive' if 'portal' in args[-1] else 'active'):
+                for scope in ((True, True, True), (True, False, True),
+                              (True, True, False)):
+                    with mock.patch.object(HEALTH, 'closed_scope', return_value=scope), \
+                            redirect_stdout(StringIO()) as output:
+                        if all(scope):
+                            HEALTH.main()
+                        else:
+                            with self.assertRaises(SystemExit) as failure:
+                                HEALTH.main()
+                            self.assertEqual(failure.exception.code, 1)
+                    self.assertEqual(json.loads(output.getvalue())['healthy'], all(scope))
+
     def test_inactive_portal_status_is_not_unavailable(self):
         with mock.patch.object(HEALTH.subprocess, 'run',
                                return_value=mock.Mock(returncode=3, stdout='inactive\n')):
