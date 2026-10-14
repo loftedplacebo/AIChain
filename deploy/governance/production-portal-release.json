@@ -1,0 +1,9 @@
+{
+  "sourceCommit": "3da61c634d7fa0f359a44ca2ede5726fa2d0b946",
+  "sourceArchiveSha256": "c8dc5a08e6324bd795086dab5111ba429c6d7698522f0a19b5228272c5044c7c",
+  "releaseArchiveSha256": "55ca21e645dcaa670d25047338e0fbab0cc966613e89ace94e019b52c4cabfad",
+  "websiteTestsPassed": 44,
+  "service": "orvessian-production-portal.service",
+  "activation": "disabled",
+  "publicRoute": "closed"
+}

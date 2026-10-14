@@ -102,6 +102,12 @@ release suite passed (44/44 tests). The pinned Production portal archive SHA-256
 is `55ca21e645dcaa670d25047338e0fbab0cc966613e89ace94e019b52c4cabfad`.
 The [release helper](../deploy/governance/stage-production-portal-release.sh)
 verified its hash and staged it into the isolated Production portal directory.
+An independent [archive verifier](../deploy/governance/verify-production-portal-archive.py)
+checked 23,209 members, including 37 symlinks contained within the package,
+against the pinned hash and unpacked-size bound. The root-owned
+[provenance manifest](../deploy/governance/production-portal-release.json)
+was installed alongside the inactive artifact; the strengthened helper now
+requires both that manifest and the archive verifier on future staging runs.
 A private start served `/` and `/workspace` with HTTP 200 on loopback port
 3003; the public `prod.orvessian.com` route remained 404. The service was
 stopped after verification and remains disabled/inactive. A live WorkOS
