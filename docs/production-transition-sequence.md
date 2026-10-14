@@ -92,6 +92,17 @@ batch preparation, transaction signing and saved-byte retry review, with
 regression tests for pilot behavior and wrong-chain rejection. The Production
 worker launcher remains deliberately disabled, so this is not a live mainnet
 anchor or a working Production publisher.
+Compile the candidate contract with
+`node scripts/compile-base-sepolia-anchor.cjs --mainnet`; the resulting local
+artifact is ignored under `build/base-mainnet/`. Its reviewed runtime hash is
+`0x507e6fe47195ae115026837a14f7613537f29c11f0b798bda1abc0bda2eab10f`
+with Solidity 0.8.24, optimizer 200 runs and Paris EVM. After an independently
+approved mainnet deployment, set an HTTPS `GOVERNANCE_MAINNET_RPC_URL` and run
+`node scripts/verify-base-mainnet-deployment.cjs <contract-address> <deployment-tx-hash>`.
+The read-only verifier requires chain 8453, exact runtime bytes, successful
+contract creation, canonical block hash and at least 12 confirmations. A
+contract address alone only reports a runtime-code match and exits nonzero.
+No deployment transaction or production wallet has been created yet.
 
 The [production API unit](../deploy/systemd/orvessian-production-api.service)
 uses a distinct Unix identity, release directory, protected environment file

@@ -4,6 +4,8 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const solc = require('solc');
+const target = process.argv[2] === '--mainnet' ? 'base-mainnet' : 'base-sepolia';
+if (process.argv.length > 3 || (process.argv[2] && process.argv[2] !== '--mainnet')) throw new Error('Use --mainnet or no argument');
 
 const root = path.resolve(__dirname, '..');
 const sourceName = 'contracts/avr-anchor/src/ReceiptBatchAnchor.sol';
@@ -34,7 +36,7 @@ const result = {
   deployedBytecode: `0x${artifact.evm.deployedBytecode.object}`,
   metadata: artifact.metadata,
 };
-const outputFile = path.join(root, 'build', 'base-sepolia', 'ReceiptBatchAnchor.json');
+const outputFile = path.join(root, 'build', target, 'ReceiptBatchAnchor.json');
 fs.mkdirSync(path.dirname(outputFile), { recursive: true });
 fs.writeFileSync(outputFile, `${JSON.stringify(result, null, 2)}\n`);
 console.log(JSON.stringify({ outputFile, compiler: result.compiler, bytecodeBytes: artifact.evm.bytecode.object.length / 2, deployedBytecodeBytes: artifact.evm.deployedBytecode.object.length / 2 }, null, 2));
