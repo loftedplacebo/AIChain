@@ -456,6 +456,15 @@ restores them behind `review-required`. This is a core capability, not an
 activated backup schedule. The running prelaunch timer still rejects every
 Production project and worker. A separate coordinated runner, remote upload,
 closed restore and worker-by-worker review must pass before onboarding opens.
+The candidate `run-production-journal-backup.py` is separate from the active
+timer. It requires an exact Production project catalog, registered mainnet
+workers and matching private journals, checks the pinned journal-aware archive
+code, then quiesces the portal, every worker and API for one encrypted database
+and journal capture. It authenticates the archive before B2 upload and tries to
+restart every previously active writer even if capture fails. Synthetic Linux
+tests cover catalog rejection and the stop/capture/upload/restart sequence.
+It is not installed or scheduled; the worker-aware B2 restore drill and
+replacement-cluster recovery are still required.
 The [read-only health checker](../deploy/governance/check-production-prelaunch-backup-health.py)
 checks the 02:00 UTC schedule with a 03:00 due threshold. A fresh download with
 the separate Read Only B2 credential authenticated the first scheduled set.
