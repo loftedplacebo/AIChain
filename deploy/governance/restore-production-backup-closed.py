@@ -11,6 +11,7 @@ import secrets
 import stat
 import subprocess
 import tempfile
+from production_restore_service_state import require_closed_restore_services
 
 
 SETUP = pathlib.Path('/opt/aichain/governance-pilot-db-setup')
@@ -77,12 +78,7 @@ def preflight(backup_id):
                                       ['17', 'production-recovery', '5441', 'online']
                                       for line in clusters.stdout.splitlines()):
         raise ValueError('Closed loopback recovery cluster required')
-    unit = subprocess.run(('systemctl', 'show', 'orvessian-production-api.service',
-                           '-p', 'UnitFileState', '-p', 'ActiveState'),
-                          capture_output=True, text=True, timeout=15, check=False)
-    if unit.returncode or set(unit.stdout.splitlines()) != {
-            'UnitFileState=disabled', 'ActiveState=inactive'}:
-        raise ValueError('Production API must remain disabled')
+    require_closed_restore_services()
     if not (RUNNER / 'scripts/governance-postgres-recovery.cjs').is_file():
         raise ValueError('Isolated production recovery runner required')
     return source_archive(backup_id), admin

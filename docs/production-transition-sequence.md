@@ -69,12 +69,11 @@ for optional WorkOS meters and remaining configuration.
 | 6. Recovery | Restore when the original managed DB cluster is unavailable, review every journal and access state, then activate an isolated replacement service. | Measured recovery point and time, revoked captured access, receipt proof preservation and successful post-restore customer journey. |
 | 7. Public acceptance | Finish abuse, security and privileged-access review; legal pages, support/privacy/security inboxes, real-data terms, capacity and incident rehearsal. Decide and test production evidence chain. | Owner go/no-go record and claims limited to tested capacity and recovery. |
 
-The disabled [production API unit](../deploy/systemd/orvessian-production-api.service)
-specifies a distinct Unix identity, release directory, protected environment
-file and private loopback service. It is a deployment template only: install
-and start it after the production database migrations, restricted login,
-WorkOS credentials and private preflight pass. Keep the public route closed
-until the end-to-end and recovery gates pass.
+The [production API unit](../deploy/systemd/orvessian-production-api.service)
+uses a distinct Unix identity, release directory, protected environment file
+and private loopback port 8791. It is installed, active and enabled for signed
+WorkOS revocation delivery. Nginx exposes only the exact webhook route; other
+customer API routes remain closed until their release gates pass.
 The separate [production portal unit](../deploy/systemd/orvessian-production-portal.service)
 defines an isolated `orvessian-prod-portal` identity and
 loopback port 3003. It binds the exact Production portal/API origins and sets
@@ -371,11 +370,11 @@ the key and its directory are `root:root 0600` and `0700`. The key still needs
 independent escrow. A quiesced production database snapshot was encrypted and
 authenticated locally as backup `b864dbc2-20f1-40ef-864a-465ff7fab884`.
 This capture has no worker journals because no production worker exists yet.
-The production API stayed disabled and the synthetic pilot health check passed.
+The production API had not yet been activated and the synthetic pilot health check passed.
 The capture was subsequently uploaded to the separate production B2 bucket,
 discovered through its completion marker, downloaded with a separate read key,
-and authenticated in a fresh closed restore. Scheduled production backup,
-independent archive-key escrow and replacement-cluster recovery remain open.
+and authenticated in a fresh closed restore. Independent archive-key escrow and
+replacement-cluster recovery remain open.
 The existing `capture-production-backup.py` and
 `upload-production-backup-b2.py` are one-time, quiesced bootstrap tools:
 capture requires the production API disabled and zero database connections,
@@ -395,17 +394,27 @@ The runner fails if a project or a named Production worker exists, stops the
 private API for the quiesced capture, restarts and checks it even after a
 capture failure, then uploads through the restricted production B2 key and
 advances the private pointer only after the remote completion marker. Its
-read-only preflight passed on the VPS; four guard, restart, upload-order and due-window
-tests passed, and the systemd templates passed verification. The guarded
+read-only preflight passed on the VPS; five guard, restart, upload-order,
+due-window and inactive-portal status tests passed, and the systemd templates
+passed verification. The guarded
 [activation helper](../deploy/governance/activate-production-prelaunch-backup.sh)
 also passed its read-only VPS preflight, including pilot health and webhook
-isolation. The timer is
-**not installed or enabled**, and this path has not uploaded a new set. It is
-not the journal-aware production backup needed once project creation opens.
+isolation. On 14 October the owner approved the recurring off-host upload and
+brief API pause. The timer was installed, enabled and started for 02:00 UTC;
+the first run was started immediately. Backup
+`969f6ed6-86d6-4b62-a2c0-6089fbf28e24` uploaded successfully and the API
+restarted. The health check reported `healthy: true`, a valid completion marker,
+covered due window, successful service, active timer and API, and an inactive
+portal. This is not the journal-aware production backup needed once project
+creation opens; the prelaunch runner deliberately refuses nonzero projects or
+named production workers.
 The [read-only health checker](../deploy/governance/check-production-prelaunch-backup-health.py)
-is prepared for the 02:00 UTC schedule with a 03:00 due threshold. Its
-scheduled off-host data transfer and brief daily webhook API pause require a
-separate owner review before activation.
+checks the 02:00 UTC schedule with a 03:00 due threshold. A fresh download with
+the separate Read Only B2 credential authenticated the first scheduled set.
+The closed restore into local database `gov_restore_prod_a84935dfc666` passed
+with restored access revoked and disabled. This tests the Contabo loopback
+recovery cluster; a replacement-host or replacement-managed-cluster activation
+drill remains open.
 On 12 October a separate private, encrypted-at-rest B2 bucket named
 `orvessian-prod-backups-2026` was created in `eu-central-003` at
 `https://s3.eu-central-003.backblazeb2.com`. It initially had the default

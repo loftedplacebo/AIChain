@@ -26,7 +26,8 @@ def latest_due(now):
 def systemctl(*args):
     result = subprocess.run(('systemctl', *args), capture_output=True,
                             text=True, timeout=15, check=False)
-    return result.stdout.strip() if result.returncode == 0 else 'unavailable'
+    value = result.stdout.strip()
+    return value if value else 'unavailable'
 
 
 def main():

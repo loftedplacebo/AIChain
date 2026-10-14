@@ -40,6 +40,11 @@ class Schema:
 
 
 class ProductionPrelaunchBackupTests(unittest.TestCase):
+    def test_inactive_portal_status_is_not_unavailable(self):
+        with mock.patch.object(HEALTH.subprocess, 'run',
+                               return_value=mock.Mock(returncode=3, stdout='inactive\n')):
+            self.assertEqual(HEALTH.systemctl('is-active', BACKUP.PORTAL), 'inactive')
+
     def test_scheduled_window_is_due_after_one_hour(self):
         before = datetime(2026, 10, 14, 2, 59, tzinfo=timezone.utc).timestamp()
         after = datetime(2026, 10, 14, 3, 0, tzinfo=timezone.utc).timestamp()
