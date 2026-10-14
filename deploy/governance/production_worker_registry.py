@@ -105,11 +105,12 @@ def verify_catalog(workers, catalog):
         raise ValueError('Production project/worker coverage mismatch')
 
 
-def verify_journal_binding(worker, chain):
+def verify_journal_binding(worker, chain, *, journal_path=None,
+                           require_review_gate=False):
     chain_binding(chain)
     if chain is None:
         raise ValueError('Production journal requires a chain binding')
-    journal = Path(worker['journal'])
+    journal = Path(journal_path) if journal_path is not None else Path(worker['journal'])
     info = journal.lstat()
     if not stat.S_ISREG(info.st_mode) or (os.name != 'nt' and info.st_mode & 0o077):
         raise ValueError('Private Production worker journal required')
@@ -119,6 +120,14 @@ def verify_journal_binding(worker, chain):
                 db.execute('SELECT name FROM governance_environment').fetchone() != ('prod',):
             raise ValueError('Production journal integrity or environment mismatch')
         row = db.execute('SELECT body FROM config WHERE id=1').fetchone()
+        if require_review_gate:
+            present = db.execute("SELECT 1 FROM sqlite_master WHERE type='table' "
+                                 "AND name='governance_recovery_gate'").fetchone()
+            if present != (1,):
+                raise ValueError('Restored Production journal must remain closed')
+            gate = db.execute('SELECT state FROM governance_recovery_gate').fetchall()
+            if gate != [('review-required',)]:
+                raise ValueError('Restored Production journal must remain closed')
     if not row or not isinstance(row[0], str) or len(row[0]) > 4096:
         raise ValueError('Production journal identity missing')
     identity = json.loads(row[0])

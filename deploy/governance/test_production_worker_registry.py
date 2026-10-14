@@ -73,6 +73,15 @@ class ProductionRegistryTests(unittest.TestCase):
                 db.commit()
             journal.chmod(0o600)
             registry.verify_journal_binding(worker, CHAIN)
+            with self.assertRaisesRegex(ValueError, 'remain closed'):
+                registry.verify_journal_binding(worker, CHAIN,
+                    journal_path=journal, require_review_gate=True)
+            with closing(sqlite3.connect(journal)) as db:
+                db.execute('CREATE TABLE governance_recovery_gate(state TEXT)')
+                db.execute("INSERT INTO governance_recovery_gate VALUES('review-required')")
+                db.commit()
+            registry.verify_journal_binding(worker, CHAIN,
+                journal_path=journal, require_review_gate=True)
             with self.assertRaisesRegex(ValueError, 'chain binding'):
                 registry.validate_registry({'version': 1, 'environment': 'prod',
                                             'chain': {**CHAIN, 'chainId': 84532},

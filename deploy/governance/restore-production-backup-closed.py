@@ -12,6 +12,7 @@ import stat
 import subprocess
 import tempfile
 from production_restore_service_state import require_closed_restore_services
+from production_worker_registry import chain_binding, verify_journal_binding
 
 
 SETUP = pathlib.Path('/opt/aichain/governance-pilot-db-setup')
@@ -84,7 +85,13 @@ def preflight(backup_id):
     return source_archive(backup_id), admin
 
 
-def restore(archive, admin, backup_id):
+def restore(archive, admin, backup_id, *, expected_workers=None, chain=None):
+    workers = expected_workers or []
+    roles = [worker['role'] for worker in workers]
+    if workers:
+        chain_binding(chain)
+        if chain is None or len(set(roles)) != len(roles):
+            raise ValueError('Reviewed Production worker chain binding required')
     RESTORES.mkdir(mode=0o700, parents=True, exist_ok=True)
     info = RESTORES.lstat()
     if not stat.S_ISDIR(info.st_mode) or info.st_uid != 0 or info.st_mode & 0o077:
@@ -113,7 +120,7 @@ def restore(archive, admin, backup_id):
                 restored.get('targetDatabase') != target or \
                 restored.get('access') != 'revoked-and-disabled' or \
                 restored.get('activation') != 'review-required' or \
-                restored.get('journalRoles') != []:
+                restored.get('journalRoles') != roles:
             raise ValueError('Closed production restore state mismatch')
         reviewed_source = private_json(private, 'review-operator.json',
                                        {**connection, 'database': target})
@@ -131,10 +138,23 @@ def restore(archive, admin, backup_id):
         if verified.get('operation') != 'review' or verified.get('review') != 'passed' or \
                 verified.get('environment') != 'prod' or \
                 verified.get('activation') != 'review-required' or \
-                verified.get('journalRoles') != []:
+                verified.get('journalRoles') != roles:
             raise ValueError('Production restore review mismatch')
+        if workers:
+            directory = pathlib.Path(restored['directory'])
+            journal_name = restored.get('journalsDirectory')
+            if directory.parent != RESTORES or directory.is_symlink() or \
+                    not isinstance(journal_name, str) or \
+                    not re.fullmatch(r'restore-[A-Za-z0-9]+', journal_name):
+                raise ValueError('Restored Production journal directory mismatch')
+            for worker in workers:
+                verify_journal_binding(worker, chain,
+                    journal_path=directory / journal_name /
+                                 (worker['role'] + '.sqlite'),
+                    require_review_gate=True)
         print('production_restore=review_passed;access=revoked_and_disabled;'
-              f'target={target};source_managed_database=untouched;service=off')
+              f'target={target};journals={len(roles)};'
+              'source_managed_database=untouched;service=off')
 
 
 def main():

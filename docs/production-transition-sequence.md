@@ -465,6 +465,15 @@ restart every previously active writer even if capture fails. Synthetic Linux
 tests cover catalog rejection and the stop/capture/upload/restart sequence.
 It is not installed or scheduled; the worker-aware B2 restore drill and
 replacement-cluster recovery are still required.
+The candidate journal-aware B2 drill is
+`verify-production-journal-b2-restore.py`. It requires the latest Production
+completion pointer to name the exact registered worker set, authenticates the
+B2 download, restores to the manual-start loopback PostgreSQL recovery cluster,
+then checks each restored journal's project, signers, Base mainnet contract and
+`review-required` gate. The zero-journal prelaunch drill retains its existing
+scope. Synthetic Linux tests cover pointer rejection, download-to-restore
+scope forwarding and restored-journal identity. A real B2 worker-journal
+upload and closed restore has not yet occurred.
 The [read-only health checker](../deploy/governance/check-production-prelaunch-backup-health.py)
 checks the 02:00 UTC schedule with a 03:00 due threshold. A fresh download with
 the separate Read Only B2 credential authenticated the first scheduled set.

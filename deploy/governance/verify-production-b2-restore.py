@@ -81,7 +81,10 @@ def private_json(directory, name, value):
     return path
 
 
-def download_and_restore(backup_id, key_prefix):
+def download_and_restore(backup_id, key_prefix, *, expected_workers=None,
+                         chain=None):
+    workers = expected_workers or []
+    roles = [worker['role'] for worker in workers]
     DOWNLOADS.mkdir(mode=0o700, parents=True, exist_ok=True)
     info = DOWNLOADS.lstat()
     if not stat.S_ISDIR(info.st_mode) or info.st_uid != 0 or info.st_mode & 0o077:
@@ -105,7 +108,7 @@ def download_and_restore(backup_id, key_prefix):
                 downloaded.get('environment') != 'prod' or \
                 downloaded.get('id') != backup_id or \
                 downloaded.get('integrity') != 'verified' or \
-                downloaded.get('journalRoles') != [] or \
+                downloaded.get('journalRoles') != roles or \
                 directory.parent != DOWNLOADS or directory.is_symlink() or \
                 not directory.is_dir():
             raise ValueError('Authenticated production download state mismatch')
@@ -113,7 +116,8 @@ def download_and_restore(backup_id, key_prefix):
               flush=True)
         closed = import_module('production_closed_restore', CLOSED)
         admin = import_module('production_schema_closed', MODULE).protected(ADMIN, 1025)
-        closed.restore(directory, admin, backup_id)
+        closed.restore(directory, admin, backup_id,
+                       expected_workers=workers, chain=chain)
         print('production_b2_restore=review_passed;bucket=' + BUCKET +
               ';source_managed_database=untouched;service=off')
 
