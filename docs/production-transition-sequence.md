@@ -80,8 +80,9 @@ defines an isolated `orvessian-prod-portal` identity and
 loopback port 3003. It binds the exact Production portal/API origins and sets
 `WORKSPACE_ENVIRONMENT=prod`, which keeps public sign-up closed. Its non-login
 Unix account, root-owned empty release directory and disabled, inactive unit
-were staged on Contabo on 14 October. It has not been built or started; a pinned website artifact and
-private portal verification remain required before any `prod` customer route
+were staged on Contabo on 14 October. A pinned website artifact was then
+built and tested privately; live identity and API integration remain required
+before any `prod` customer route
 opens. The portal gateway deliberately refuses a public portal origin paired
 with a loopback API URL, so its private integration check must retain the
 reviewed HTTPS origin/Host boundary without exposing customer routes.
@@ -93,6 +94,18 @@ on the VPS, then `--apply` staged the unit. Independent checks found the unit
 disabled/inactive and `prod.orvessian.com` still returning 404; the pilot
 health check remained green. This did not deploy a portal artifact, start a
 listener or alter Nginx.
+The clean website source commit `3da61c634d7fa0f359a44ca2ede5726fa2d0b946`
+was archived with SHA-256
+`c8dc5a08e6324bd795086dab5111ba429c6d7698522f0a19b5228272c5044c7c`.
+On the VPS, `npm ci --ignore-scripts`, typecheck, build and the full website
+release suite passed (44/44 tests). The pinned Production portal archive SHA-256
+is `55ca21e645dcaa670d25047338e0fbab0cc966613e89ace94e019b52c4cabfad`.
+The [release helper](../deploy/governance/stage-production-portal-release.sh)
+verified its hash and staged it into the isolated Production portal directory.
+A private start served `/` and `/workspace` with HTTP 200 on loopback port
+3003; the public `prod.orvessian.com` route remained 404. The service was
+stopped after verification and remains disabled/inactive. A live WorkOS
+sign-in and API journey still need acceptance before opening customer routes.
 The [host staging helper](../deploy/governance/stage-production-api-host.sh)
 can create the non-login API identity, empty root-owned release directory and
 disabled unit earlier. Its default mode is read-only; `--apply` never starts a

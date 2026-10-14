@@ -1,4 +1,4 @@
-# Production release checklist — 13 October 2026
+# Production release checklist — 14 October 2026
 
 This is the current owner-facing checklist for a future **paid production**
 service. It is separate from the [supervised synthetic design-partner gate](pilot-owner-actions.md#readiness-checkpoint--5-october-2026)
@@ -33,6 +33,10 @@ the exact webhook path is public. Unsigned requests return 401, other
 Production routes return 404, and the synthetic pilot remains healthy. No
 Production user exists. A real signed WorkOS delivery and session-revocation
 journey are still required for identity acceptance.
+The isolated Production portal account, unit and pinned artifact are staged.
+Its private loopback home and workspace pages returned 200 after the website
+build and 44/44 release tests passed. The portal service is disabled and
+inactive after the private test, and its public hostname still returns 404.
 The ordered preparation and indicative budget are in the
 [production transition sequence](production-transition-sequence.md).
 
