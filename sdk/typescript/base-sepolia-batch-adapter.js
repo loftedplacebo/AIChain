@@ -8,8 +8,14 @@ const BASE_SEPOLIA_CHAIN_ID = 84532;
 const BATCH_ABI = new Interface(['function anchorBatch(bytes32 batchRoot, uint64 leafCount, string schemaVersion)']);
 const BYTES32 = /^0x[0-9a-fA-F]{64}$/;
 
+function batchIdForChain(chainId, contract, publisher, batchRoot) {
+  if (!Number.isSafeInteger(chainId) || chainId <= 0) throw new Error('Valid chain ID required');
+  if (!BYTES32.test(batchRoot)) throw new Error('Batch root must be bytes32');
+  return keccak256(AbiCoder.defaultAbiCoder().encode(['uint256', 'address', 'address', 'bytes32'], [chainId, getAddress(contract), getAddress(publisher), batchRoot]));
+}
+
 function baseBatchId(contract, publisher, batchRoot) {
-  return keccak256(AbiCoder.defaultAbiCoder().encode(['uint256', 'address', 'address', 'bytes32'], [BASE_SEPOLIA_CHAIN_ID, contract, publisher, batchRoot]));
+  return batchIdForChain(BASE_SEPOLIA_CHAIN_ID, contract, publisher, batchRoot);
 }
 
 class BaseSepoliaSyntheticBatchAdapter {
@@ -36,4 +42,4 @@ class BaseSepoliaSyntheticBatchAdapter {
   }
 }
 
-module.exports = { BASE_SEPOLIA_CHAIN_ID, BATCH_ABI, baseBatchId, BaseSepoliaSyntheticBatchAdapter };
+module.exports = { BASE_SEPOLIA_CHAIN_ID, BATCH_ABI, batchIdForChain, baseBatchId, BaseSepoliaSyntheticBatchAdapter };

@@ -1,6 +1,7 @@
 const assert = require('node:assert/strict');
 const test = require('node:test');
-const { BaseSepoliaSyntheticBatchAdapter, BATCH_ABI } = require('./base-sepolia-batch-adapter');
+const { BaseSepoliaSyntheticBatchAdapter, BATCH_ABI, batchIdForChain,
+  baseBatchId } = require('./base-sepolia-batch-adapter');
 const { createManifest } = require('./avr-event-indexer');
 
 const contract = '0x5781540E4682A9D35011C94A25F615e438E8E7aF';
@@ -22,4 +23,13 @@ test('refuses batches that are not explicitly synthetic or use another schema', 
   const manifest = createManifest([receipt], '0.4.0-alpha');
   assert.throws(() => adapter.prepare({ manifest }), /explicitly synthetic/);
   assert.throws(() => adapter.prepare({ synthetic: true, manifest: createManifest([receipt], '0.1.0-draft') }), /schema version/);
+});
+
+test('batch identity binds the chain, contract and publisher', () => {
+  const root = createManifest([receipt], '0.4.0-alpha').batchRoot;
+  assert.equal(batchIdForChain(84532, contract, publisher, root),
+    baseBatchId(contract, publisher, root));
+  assert.notEqual(batchIdForChain(8453, contract, publisher, root),
+    baseBatchId(contract, publisher, root));
+  assert.throws(() => batchIdForChain(0, contract, publisher, root), /chain ID/);
 });
