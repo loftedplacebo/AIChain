@@ -103,6 +103,10 @@ The read-only verifier requires chain 8453, exact runtime bytes, successful
 contract creation, canonical block hash and at least 12 confirmations. A
 contract address alone only reports a runtime-code match and exits nonzero.
 No deployment transaction or production wallet has been created yet.
+`node scripts/prepare-base-mainnet-deploy.cjs` produces the ignored
+`build/base-mainnet/deployment-manifest.json` with the exact unsigned creation
+bytes, source artifact digest and expected runtime hash for wallet review. It
+does not select a signer, access a wallet or broadcast a transaction.
 
 The [production API unit](../deploy/systemd/orvessian-production-api.service)
 uses a distinct Unix identity, release directory, protected environment file
