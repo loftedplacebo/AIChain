@@ -450,6 +450,12 @@ covered due window, successful service, active timer and API, and an inactive
 portal. This is not the journal-aware production backup needed once project
 creation opens; the prelaunch runner deliberately refuses nonzero projects or
 named production workers.
+The encrypted archive library now accepts only `worker_<24-hex>` SQLite
+journals for `prod`, checks the Production journal schema and marker, and
+restores them behind `review-required`. This is a core capability, not an
+activated backup schedule. The running prelaunch timer still rejects every
+Production project and worker. A separate coordinated runner, remote upload,
+closed restore and worker-by-worker review must pass before onboarding opens.
 The [read-only health checker](../deploy/governance/check-production-prelaunch-backup-health.py)
 checks the 02:00 UTC schedule with a 03:00 due threshold. A fresh download with
 the separate Read Only B2 credential authenticated the first scheduled set.

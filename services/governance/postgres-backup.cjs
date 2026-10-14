@@ -7,6 +7,7 @@ const {databaseOptions,nativeEnv}=require('./postgres-backup-connection.cjs');
 const {MAX_JOURNALS,validRole}=require('./journal-roles.cjs');
 const ref=v=>typeof v==='string'&&/^[a-z][a-z0-9_]{0,62}$/.test(v);
 const PROD_HOST='orvessian-pilot-test-do-user-45565720-0.k.db.ondigitalocean.com';
+const journalRole=(role,environment)=>validRole(role,{postgres:true})&&(environment!=='prod'||/^worker_[a-f0-9]{24}$/.test(role));
 function productionSource(connection){
  if(connection?.host!==PROD_HOST||connection.port!==25060||connection.database!=='governance_prod'||connection.user!=='doadmin'||connection.sslmode!=='verify-full'||connection.caFile!=='/etc/aichain/governance/digitalocean-ca.crt')throw Error('Production backup requires the exclusive managed database and verified TLS');
 }
@@ -32,8 +33,7 @@ async function sourceCheck(pool,environment){
 async function createBackup({environment,connection,binaries,journals=[],outputRoot,key,consistency}){
  configuration(environment,connection,binaries);files.keyCheck(key);
  if(consistency!=='quiesced')throw Error('Stop every API/worker/delivery writer and acknowledge quiesced capture');
- if(environment==='prod'&&journals.length)throw Error('Production worker journals require a separately reviewed capture path');
- if(!Array.isArray(journals)||journals.length>MAX_JOURNALS||journals.some(j=>!validRole(j.role,{postgres:true}))||new Set(journals.map(j=>j.role)).size!==journals.length)throw Error('Only unique explicit worker/rules/indexer/relayer journal roles are allowed');
+ if(!Array.isArray(journals)||journals.length>MAX_JOURNALS||journals.some(j=>!journalRole(j.role,environment))||new Set(journals.map(j=>j.role)).size!==journals.length)throw Error('Only unique explicit worker/rules/indexer/relayer journal roles are allowed');
  const pool=new Pool(databaseOptions(connection)),destination=files.freshDirectory(outputRoot,'pg-backup-'),scratch=files.freshDirectory(os.tmpdir(),'ov-pg-backup-');let success=false,locker;
  try{
   await sourceCheck(pool,environment);locker=await pool.connect();await locker.query('BEGIN');await locker.query("SET LOCAL lock_timeout='5000'");
@@ -65,20 +65,20 @@ async function readArchive({environment,directory,key,scratchDirectory,journalOu
  const header=marker(directory,'complete.json');if(header.version!==1||header.kind!=='postgres-coordinated'||header.environment!==environment||typeof header.id!=='string'||!/^[a-f0-9-]{36}$/.test(header.id))throw Error('Backup marker mismatch');
   const manifestFile=path.join(scratchDirectory,'manifest.json');await files.decryptFile(path.join(directory,'manifest.gcm'),manifestFile,key,header.id+':'+environment+':manifest',65536);const manifest=marker(scratchDirectory,'manifest.json');
  if(manifest.version!==1||manifest.kind!==header.kind||manifest.id!==header.id||manifest.environment!==environment||manifest.consistency!=='quiesced'||!ref(manifest.database)||!Array.isArray(manifest.journals)||manifest.journals.length>MAX_JOURNALS+2||!Number.isSafeInteger(manifest.postgres?.bytes)||manifest.postgres.bytes<1||manifest.postgres.bytes>files.MAX_BYTES||!/^[a-f0-9]{64}$/.test(manifest.postgres.sha256))throw Error('Invalid authenticated PostgreSQL manifest');
- if(environment==='prod'&&(manifest.database!=='governance_prod'||manifest.journals.length))throw Error('Production backup database or journal scope mismatch');
+ if(environment==='prod'&&manifest.database!=='governance_prod')throw Error('Production backup database scope mismatch');
   const created=Date.parse(manifest.createdAt);if(!Number.isFinite(created)||new Date(created).toISOString()!==manifest.createdAt||manifest.createdAt!==header.createdAt||created>Date.now()+300000)throw Error('Invalid authenticated backup timestamp');
   const expected=['complete.json','manifest.gcm','postgres.gcm',...(manifest.journals.length?['journals']:[])].sort();if(JSON.stringify(fs.readdirSync(directory).sort())!==JSON.stringify(expected))throw Error('Unexpected backup files');
   const dump=path.join(scratchDirectory,'postgres.dump');await files.decryptFile(path.join(directory,'postgres.gcm'),dump,key,header.id+':'+environment+':postgres');
   if(fs.statSync(dump).size!==manifest.postgres.bytes||await files.digestFile(dump)!==manifest.postgres.sha256)throw Error('PostgreSQL dump does not match authenticated manifest');
   let journalRestore;
   if(manifest.journals.length){
-   const names=manifest.journals.map(e=>e.file);if(new Set(names).size!==names.length||!names.includes('complete.json')||!names.includes('manifest.gcm')||names.some(n=>n!=='complete.json'&&n!=='manifest.gcm'&&!(n.endsWith('.gcm')&&validRole(n.slice(0,-4),{postgres:true})))||JSON.stringify(fs.readdirSync(path.join(directory,'journals')).sort())!==JSON.stringify([...names].sort()))throw Error('Invalid journal manifest');
+   const names=manifest.journals.map(e=>e.file);if(new Set(names).size!==names.length||!names.includes('complete.json')||!names.includes('manifest.gcm')||names.some(n=>n!=='complete.json'&&n!=='manifest.gcm'&&!(n.endsWith('.gcm')&&journalRole(n.slice(0,-4),environment)))||JSON.stringify(fs.readdirSync(path.join(directory,'journals')).sort())!==JSON.stringify([...names].sort()))throw Error('Invalid journal manifest');
    for(const entry of manifest.journals){
     if(!Number.isSafeInteger(entry.bytes)||entry.bytes<1||entry.bytes>files.MAX_BYTES+33||!/^[a-f0-9]{64}$/.test(entry.sha256))throw Error('Invalid journal entry');const file=path.join(directory,'journals',entry.file);files.regular(file);
     if(fs.statSync(file).size!==entry.bytes||await files.digestFile(file)!==entry.sha256)throw Error('Journal does not match authenticated manifest');
    }
    journalRestore=await sqlite.restoreBackup({environment,directory:path.join(directory,'journals'),outputRoot:journalOutputRoot,key});
-   if(journalRestore.files.some(r=>!validRole(r,{postgres:true})))throw Error('Unexpected restored journal role');
+   if(journalRestore.files.some(r=>!journalRole(r,environment)))throw Error('Unexpected restored journal role');
   }
   return {header,manifest,dump,journalRestore};
 }

@@ -62,7 +62,23 @@ test('capture refuses unbound/wrong-environment state, live capture claims and u
   bindSqlite(t.file,'dev',{adopt:true});await assert.rejects(createBackup(options),/mismatch/);
   await assert.rejects(createBackup({...options,consistency:'live'}),/Stop all writers/);
   await assert.rejects(createBackup({...options,files:[{role:'../escape',path:t.file}]}),/roles/);
-  await assert.rejects(createBackup({...options,environment:'prod'}),/gated/);
+  await assert.rejects(createBackup({...options,environment:'prod'}),/roles/);
+ }finally{t.close();}
+});
+test('production worker journal is encrypted and restores only behind review gate',async()=>{
+ const t=temporary(),role='worker_'+'a'.repeat(24),key=randomBytes(32);
+ try{
+  const db=new DatabaseSync(t.file);
+  db.exec("CREATE TABLE governance_environment(singleton INTEGER PRIMARY KEY,name TEXT); INSERT INTO governance_environment VALUES(1,'prod'); CREATE TABLE config(id INTEGER PRIMARY KEY,body TEXT NOT NULL); CREATE TABLE jobs(id TEXT PRIMARY KEY,body TEXT NOT NULL)");
+  db.prepare('INSERT INTO config VALUES(1,?)').run(JSON.stringify({scope:{tenant:'org-synthetic',project:'prj-synthetic'},publisher:'0x'+'11'.repeat(20),recorder:'0x'+'22'.repeat(20),contract:'0x'+'33'.repeat(20),chain:8453}));
+  db.close();
+  const options={environment:'prod',files:[{role,path:t.file}],outputRoot:t.output,key,consistency:'quiesced'};
+  const captured=await createBackup(options),restored=await restoreBackup({environment:'prod',directory:captured.directory,outputRoot:t.restores,key});
+  assert.deepEqual(restored.files,[role]);assert.equal(reviewRestore({environment:'prod',directory:restored.directory}).review,'passed');
+  const closed=new DatabaseSync(path.join(restored.directory,role+'.sqlite'),{readOnly:true});assert.equal(closed.prepare('SELECT state FROM governance_recovery_gate').get().state,'review-required');closed.close();
+  await assert.rejects(createBackup({...options,files:[{role:'worker',path:t.file}]}),/roles/);
+  const extra=new DatabaseSync(t.file);extra.exec('CREATE TABLE customer_identities(id TEXT)');extra.close();
+  await assert.rejects(createBackup(options),/worker journals only/);
  }finally{t.close();}
 });
 test('operator CLI completes encrypted capture/restore without printing encryption keys or stored data',async()=>{
