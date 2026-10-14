@@ -390,7 +390,10 @@ private API for the quiesced capture, restarts and checks it even after a
 capture failure, then uploads through the restricted production B2 key and
 advances the private pointer only after the remote completion marker. Its
 read-only preflight passed on the VPS; four guard, restart, upload-order and due-window
-tests passed, and the systemd templates passed verification. The timer is
+tests passed, and the systemd templates passed verification. The guarded
+[activation helper](../deploy/governance/activate-production-prelaunch-backup.sh)
+also passed its read-only VPS preflight, including pilot health and webhook
+isolation. The timer is
 **not installed or enabled**, and this path has not uploaded a new set. It is
 not the journal-aware production backup needed once project creation opens.
 The [read-only health checker](../deploy/governance/check-production-prelaunch-backup-health.py)
