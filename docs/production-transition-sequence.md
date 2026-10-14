@@ -75,6 +75,24 @@ file and private loopback service. It is a deployment template only: install
 and start it after the production database migrations, restricted login,
 WorkOS credentials and private preflight pass. Keep the public route closed
 until the end-to-end and recovery gates pass.
+The separate [production portal unit](../deploy/systemd/orvessian-production-portal.service)
+defines an isolated `orvessian-prod-portal` identity and
+loopback port 3003. It binds the exact Production portal/API origins and sets
+`WORKSPACE_ENVIRONMENT=prod`, which keeps public sign-up closed. Its non-login
+Unix account, root-owned empty release directory and disabled, inactive unit
+were staged on Contabo on 14 October. It has not been built or started; a pinned website artifact and
+private portal verification remain required before any `prod` customer route
+opens. The portal gateway deliberately refuses a public portal origin paired
+with a loopback API URL, so its private integration check must retain the
+reviewed HTTPS origin/Host boundary without exposing customer routes.
+The [portal host staging helper](../deploy/governance/stage-production-portal-host.sh)
+checks the exact unit hash and pilot service health, then creates only its
+non-login Unix identity, root-owned empty release directory and disabled,
+inactive unit on `--apply`. The shell syntax and read-only preflight passed
+on the VPS, then `--apply` staged the unit. Independent checks found the unit
+disabled/inactive and `prod.orvessian.com` still returning 404; the pilot
+health check remained green. This did not deploy a portal artifact, start a
+listener or alter Nginx.
 The [host staging helper](../deploy/governance/stage-production-api-host.sh)
 can create the non-login API identity, empty root-owned release directory and
 disabled unit earlier. Its default mode is read-only; `--apply` never starts a
@@ -131,8 +149,10 @@ origin, homepage and initiate-login URL were configured for the temporary
 `prod.orvessian.com` preparation hostname. MFA remains required and public
 sign-up closed. The [production identity change review](production-identity-change-review.md)
 records the application-side closed-admission guard and the remaining live
-host, credentials, webhook and account acceptance work. No production user or
-webhook exists yet.
+host, credentials, webhook and account acceptance work. No production user
+exists yet. The revocation-only webhook was registered on 13 October under
+the owner's approved short transition. Its signing secret and exact HTTPS
+route are now installed; a real signed delivery still needs to be accepted.
 
 Keep the existing portal/API hostnames on the pilot during preparation. Use
 separate temporary production hostnames on Contabo and register their exact
@@ -226,18 +246,105 @@ closed owner-only admission list and loopback port to that root-only environment
 file. The installer required an exact three-field base file and an inactive,
 disabled unit; its focused tests passed. Post-install inspection found
 `root:root 0600`, the expected variable names, an inactive/disabled production
-unit, and healthy pilot coverage. The WorkOS webhook signing secret is still
-absent, so private API preflight and service activation remain gated.
+unit, and healthy pilot coverage. At that checkpoint the WorkOS signing
+secret was absent and service activation remained gated.
 The separate [hidden-prompt webhook installer](../deploy/governance/configure-production-workos-webhook.py)
-is staged but has not been run. Production has no webhook endpoint yet.
-Automatic approval review rejected creating one while the target remains a
-404-only preparation route. The production entry point now permits its
+remains staged but was not used. After the owner approved a brief 404 delivery
+window, WorkOS Production endpoint `we_01M4VBTD55EZZQWYRHARZX79GN` was
+registered for `session.revoked` at
+`https://api-prod.orvessian.com/v1/auth/workos-webhook`. The public route
+initially remained 404 while the signing secret and edge were prepared;
+there were no Production users or sessions. An alternate guarded
+[API installer](../deploy/governance/install-production-workos-webhook-from-api.py)
+can fetch that exact endpoint's secret using the existing protected Production
+API key directly on the VPS and install it without printing or copying it to
+the operator laptop. It requires an inactive, disabled Production API unit,
+root-only key file, exact endpoint URL and event scope, and a usable signing
+secret. Its local tests passed. An account usage limit briefly delayed the
+SSH approval reviewer; deployment resumed when review became available. The
+[webhook-only Nginx config](../deploy/nginx/orvessian-production-webhook-only.conf)
+opens only the exact signed-revocation path after the API service starts;
+all other Production paths stay closed. The production entry point permits its
 **read-only private preflight** to verify the restricted database and closed
 identity binding without a webhook secret; normal service startup still
 requires the secret. The targeted production/WorkOS tests passed 31/31 with
-loopback access. Package and stage this newer artifact, run private preflight,
-then review the signed webhook activation sequence before registering the
-endpoint.
+loopback access. The pinned Linux replacement artifact from commit
+`f7987c1d0e23` has SHA-256
+`4e104c7fe98dd96c7fc37990191eedaccc66137d0bf16c34e26c7e206eb5bf60`.
+It passed the exact-commit/hash replacement preflight (5,878 members), then
+replaced the inactive API release with the previous `271c129f752c` release
+retained for offline rollback. A transient systemd preflight ran under the
+restricted `orvessian-prod-api` Unix user with protected environment files;
+it returned `status: ready`, `database: verified`,
+`identity: closed-admission-prepared`, and `webhook: pending`. The persistent
+API unit remained disabled; no production endpoint was proxied at that
+checkpoint.
+
+Later on 13 October, the API installer verified the exact WorkOS endpoint,
+event scope and active status, then installed its signing secret directly on
+the VPS. WorkOS returned an unmasked 25-character alphanumeric secret rather
+than the `whsec_` prefix assumed by the first installer version; a metadata-
+only diagnostic identified the format, and the corrected installer passed
+local tests before the one-time install. The secret value was never printed.
+The protected WorkOS file is `root:root 0600` with only the API key and webhook
+secret variable names. Private preflight returned `database: verified` and
+`webhook: configured`.
+
+The first normal API start exposed a code gap: `createReadiness` rejected
+the `prod` environment although private preflight accepted it. A restricted
+PostgreSQL-only Production readiness path was added in commit
+`ed1f0f7c389392511a145da54026203745b1b13d`; its Linux startup,
+readiness and signed-webhook tests passed 10/10. The Linux API archive SHA-256
+is `c58f5094ead77cbc4e80c50a2e7fc8327fd1c36810778da283af440384cf5228`.
+The guarded release helper accepted 5,878 members and replaced the inactive
+`f7987c1d0e23` release, retaining it for rollback. Private preflight passed
+again, then the Production API started on loopback. Local `/health` and
+`/ready` returned 200; anonymous `/v1/session` and an unsigned webhook POST
+returned 401.
+
+The [webhook-only Nginx config](../deploy/nginx/orvessian-production-webhook-only.conf)
+was applied with the [guarded edge helper](../deploy/governance/activate-production-webhook-edge.py).
+It retained the original 404-only config for rollback, passed `nginx -t`,
+and verified the exact public webhook path returns 401 for unsigned POSTs.
+Independent HTTPS checks confirmed HTTP 401 with a valid certificate, while
+the public API `/health` stayed 404. The pilot health check remained green.
+The Production API is active and enabled for reboot continuity; all customer
+API and portal routes remain closed. A real signed WorkOS delivery, replay
+and revocation test is still required before Production identity acceptance.
+
+### Revocation webhook activation and rollback
+
+The completed host change was limited to signed `session.revoked` delivery. Pin the
+source commit and copy the exact API installer and webhook-only Nginx template
+to the VPS. Before applying either, confirm the WorkOS endpoint ID, URL,
+active status and sole event, that the production API unit is inactive and
+disabled, and that the pilot health check is green. Run the installer as root;
+its only successful output states that the secret was installed and hidden.
+Check root ownership, mode `0600` and the presence of the two expected
+variable **names** in `workos.env` without printing their values. Then rerun
+the production API private preflight and require `webhook: configured`.
+
+Start the production API on loopback while its unit remains disabled. Require
+HTTP 200 from local `/health` and `/ready`, HTTP 401 from anonymous
+`/v1/session`, and HTTP 401 from an unsigned local POST to the WorkOS webhook.
+If any check fails, stop the unit and leave Nginx on its 404-only preparation
+config. After those checks pass, save the current Nginx config for rollback,
+install the webhook-only config, require `nginx -t`, then reload Nginx. With
+valid TLS and the intended Host/SNI, require an unsigned POST to the exact
+public webhook path to return HTTP 401; `api-prod` `/health`, every other API
+path and `prod` `/` must remain HTTP 404. Recheck pilot health and the API
+unit, then enable the API unit for reboot continuity while the customer routes
+remain closed. A production account/session must still prove a signed
+delivery, replay and revocation before admission opens.
+
+If the public route or pilot health check fails, restore the saved 404-only
+Nginx config, test and reload it, disable and stop the production API unit,
+then verify the webhook path is back to HTTP 404. The WorkOS endpoint can be
+disabled separately if delivery will remain unavailable; do not confuse that
+with revoking the signing secret. Record the before/after config hashes,
+checks, timestamps and service states. No test assertion on an unsigned
+request proves a valid signed WorkOS delivery.
+
 The historical shared-cluster SQL bundle is not a release artifact here.
 An isolated backup runner was staged from pinned commit `08774a1` with no
 service. A distinct 32-byte production archive key was generated on the VPS;
@@ -250,6 +357,18 @@ The capture was subsequently uploaded to the separate production B2 bucket,
 discovered through its completion marker, downloaded with a separate read key,
 and authenticated in a fresh closed restore. Scheduled production backup,
 independent archive-key escrow and replacement-cluster recovery remain open.
+The existing `capture-production-backup.py` and
+`upload-production-backup-b2.py` are one-time, quiesced bootstrap tools:
+capture requires the production API disabled and zero database connections,
+upload refuses an existing latest-upload pointer, and both require an empty
+worker-journal list. Do **not** attach them directly to a timer or describe
+their initial snapshot as ongoing protection. Before the API or worker becomes
+customer-facing, add a recurring runner that coordinates every production
+writer, reads a protected production worker registry, authenticates the
+complete journal set, safely advances the private B2 pointer only after a
+completion marker, and checks each scheduled window. A production account
+with no project may be tested during closed preparation, but this gate still
+precedes open admission.
 On 12 October a separate private, encrypted-at-rest B2 bucket named
 `orvessian-prod-backups-2026` was created in `eu-central-003` at
 `https://s3.eu-central-003.backblazeb2.com`. It initially had the default

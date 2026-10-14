@@ -1,4 +1,4 @@
-# Production identity change review — 11 October 2026
+# Production identity change review — 14 October 2026
 
 ## Configured in WorkOS Production
 
@@ -17,8 +17,10 @@ The default application now has exactly one callback,
 initiate-login URL is `https://prod.orvessian.com/api/auth/start`. These are
 temporary production preparation hostnames; the pilot continues at
 `portal.orvessian.com` and `api.orvessian.com`. The corresponding production
-API hostname is reserved as `api-prod.orvessian.com`; its DNS and service
-have not been created.
+API hostname is `api-prod.orvessian.com`. DNS and TLS are configured. The
+Production API runs on a separate private loopback service; Nginx exposes
+only the exact revocation webhook path. Customer API and portal routes still
+return 404.
 
 The [non-secret topology plan](../deploy/governance/deployment-plan.example.json)
 contains these URLs and the WorkOS Production identifiers. Its validator
@@ -44,34 +46,33 @@ environment and list, plus a rejected production sign-up start.
 
 ## Pending before an end-to-end production sign-in
 
-1. Provision isolated production users, services, directories, ports, DNS and
-   HTTPS routes on the existing Contabo VPS. The `prod` API startup and
-   database migrations are part of the later runtime gate; the current hosted
-   pilot launcher is test-only. Check shared-host capacity and rollback before
-   enabling customer traffic. A dedicated production VM is a later migration.
-   The private production API launcher validates the exclusive managed database,
-   restricted API role, verified TLS, production WorkOS binding and loopback port;
-   its read-only preflight must pass after schema and grants are installed.
-2. Create a new WorkOS Production API key and install it on the production
-   host through the hidden-prompt `configure-production-workos-key.py` installer.
-   It writes a root-only environment file for the disabled production API unit
-   and does not activate a service. Generate a distinct 32-byte identity sealing
-   key there. Do not copy the pilot WorkOS key, seal key, or user records.
-   The owner created and entered the WorkOS Production key at that prompt.
-   File metadata showed `root:root 0600`, and the production API unit remained
-   disabled and inactive. A distinct 32-byte identity sealing key was then
-   generated on the VPS into the separate root-only production API environment
-   file. Neither secret value was read into the change record; the WorkOS key's
-   Production environment binding still needs live sign-in proof.
-3. When `https://api-prod.orvessian.com/v1/auth/workos-webhook` is live and
-   rejects unsigned requests, create a WorkOS Production webhook endpoint
-   subscribed only to `session.revoked`. Install its signing secret in the
-   protected production runtime configuration. Verify a signed delivery,
-   duplicate handling and an authenticated missed-event replay.
+1. The restricted Production database role, schema, private API service and
+   exact DNS/TLS binding are configured. The service is active and enabled on
+   `127.0.0.1:8791`; `/health` and `/ready` passed privately. Nginx exposes
+   only the webhook path. A separate portal artifact, service and closed
+   customer routes remain to be prepared and tested before sign-in. Check
+   shared-host capacity and rollback before enabling customer traffic. A
+   dedicated production VM is a later migration.
+2. The owner installed a distinct WorkOS Production API key through the
+   hidden-prompt installer. A distinct 32-byte identity sealing key was
+   generated on the VPS. Protected files were `root:root 0600`; neither secret
+   value was read into the change record. The key's Production binding still
+   needs live sign-in proof. Pilot keys and users are not transferred.
+3. The owner approved a short transition with the HTTPS target returning 404.
+   On 13 October endpoint `we_01M4VBTD55EZZQWYRHARZX79GN` was created in
+   WorkOS Production at
+   `https://api-prod.orvessian.com/v1/auth/workos-webhook`, subscribed only to
+   `session.revoked`. Its signing secret was fetched directly on the VPS into
+   a protected file. The private API passed readiness and unsigned webhook
+   rejection; the exact public webhook path returns 401 for unsigned POSTs,
+   while customer routes remain 404. A signed delivery, duplicate handling,
+   authenticated missed-event replay and session revocation still require a
+   live Production account. There are no Production users or sessions yet.
 4. Invite a fresh production account on the initial allowlist and complete
    email verification, MFA, sign-in, session renewal, recovery and revocation
    checks. The Production environment currently has no users, so no live
    customer journey has yet passed.
 
-The callback, origin, and logout settings are configured, but Step 4 is not
-accepted until the pending host, secrets, webhook and live account checks pass.
+The callback, origin, logout, signing secret and restricted webhook route are
+configured. Step 4 is not accepted until the portal, signed delivery and live
+account checks pass.

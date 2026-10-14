@@ -1,0 +1,32 @@
+[Unit]
+Description=Orvessian production portal (private loopback)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=orvessian-prod-portal
+Group=orvessian-prod-portal
+WorkingDirectory=/opt/aichain/orvessian-production-portal
+Environment=NODE_ENV=production
+Environment=PORT=3003
+Environment=HOST=127.0.0.1
+Environment=VINEXT_TRUSTED_HOSTS=prod.orvessian.com
+Environment=WORKSPACE_ORIGIN=https://prod.orvessian.com
+Environment=GOVERNANCE_API_URL=https://api-prod.orvessian.com
+Environment=WORKSPACE_ENVIRONMENT=prod
+ExecStart=/opt/aichain/.toolchains/node-v24.21.0-linux-x64/bin/node server.js
+Restart=on-failure
+RestartSec=5
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+MemoryMax=512M
+CPUQuota=100%
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target

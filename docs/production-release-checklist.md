@@ -16,15 +16,23 @@ The managed pilot databases and roles have been retired, and an empty
 production database with three restricted `NOLOGIN` roles has been verified.
 The reviewed production schema and runtime grants are installed. The restricted
 API role now has a verified login and a root-only configuration file; the
-migration and worker roles remain `NOLOGIN` and the production API service
-remains off. An encrypted production database capture was uploaded to a
+migration and worker roles remain `NOLOGIN`. The production API now runs on
+its separate loopback service for WorkOS revocation delivery only; customer
+API and portal routes remain closed. An encrypted production database capture was uploaded to a
 separate private B2 bucket using a restricted write key. Its completion marker
 was discovered with a separate restricted read key, and the downloaded archive
 passed authentication and a fresh closed restore on the Contabo loopback
 recovery cluster. This capture has no worker journals because no production
 worker exists yet. The archive key still needs independent escrow; scheduled
 backups, reviewed retention, replacement-host recovery, the worker credential,
-WorkOS webhook and evidence-chain choice remain open.
+WorkOS webhook acceptance and evidence-chain choice remain open. A
+Production-only `session.revoked` endpoint was registered on 13 October with
+the owner's approval for a short 404 transition. Its signing secret is now
+stored root-only on Contabo; the private API is healthy and enabled, and only
+the exact webhook path is public. Unsigned requests return 401, other
+Production routes return 404, and the synthetic pilot remains healthy. No
+Production user exists. A real signed WorkOS delivery and session-revocation
+journey are still required for identity acceptance.
 The ordered preparation and indicative budget are in the
 [production transition sequence](production-transition-sequence.md).
 
