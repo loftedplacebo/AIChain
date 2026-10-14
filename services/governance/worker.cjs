@@ -2,13 +2,14 @@
 const fs=require('node:fs'),path=require('node:path');
 const {DatabaseSync}=require('node:sqlite');
 const {keccak256,Transaction}=require('ethers');
-const {prepareBatch,attachTransaction,inspectEvidence,CONTRACT,CODE_HASH}=require('./evidence.cjs');
+const {prepareBatch,attachTransaction,inspectEvidence,evidenceAnchor}=require('./evidence.cjs');
 const {BATCH_ABI}=require('../../sdk/typescript/base-sepolia-batch-adapter');
 class GovernanceWorker {
- constructor({store,principal,recorder,signer,provider,journal,policy={},clock=()=>Date.now(),codeHash=CODE_HASH}){
+ constructor({store,principal,recorder,signer,provider,journal,policy={},clock=()=>Date.now(),anchor,codeHash}){
   if(!principal?.tenant||!principal.project||!recorder||!signer||!provider)throw Error('Explicit scope, recorder, publisher signer and provider required');
   require('./environment.cjs').assertRecoveryApproved(store.db);
-  this.store=store;this.p=principal;this.recorder=recorder;this.signer=signer;this.provider=provider;this.clock=clock;this.codeHash=codeHash;
+  this.store=store;this.p=principal;this.recorder=recorder;this.signer=signer;this.provider=provider;this.clock=clock;this.anchor=evidenceAnchor(anchor);this.codeHash=codeHash??this.anchor.codeHash;
+  if(this.anchor.chainId===8453&&this.codeHash!==this.anchor.codeHash)throw Error('Production worker code hash must match reviewed anchor');
   this.policy=require('./worker-policy.cjs').workerPolicy(policy);
   fs.mkdirSync(path.dirname(path.resolve(journal)),{recursive:true});this.lock=journal+'.lock';
   // Never reclaim by age: a stalled process could still broadcast. Crash recovery requires a stopped owner.
@@ -21,7 +22,7 @@ class GovernanceWorker {
  save(job){this.db.prepare('INSERT INTO jobs VALUES(?,?) ON CONFLICT(id) DO UPDATE SET body=excluded.body').run(job.id,JSON.stringify(job));}
  signedRetryGate(job,batch,publisher,recorder){
   const now=this.clock(),validTime=v=>Number.isSafeInteger(v)&&v>=0&&v<=now,validReserve=v=>typeof v==='string'&&/^[1-9][0-9]{0,77}$/.test(v);
-  if(!Number.isSafeInteger(now)||now<0||require('./recovery-worker-review.cjs').inspectJob({id:job.id,body:JSON.stringify(job)},{...this.p,publisher,recorder}).kind!=='signed')throw Error('Stored signed transaction requires journal review');
+  if(!Number.isSafeInteger(now)||now<0||require('./recovery-worker-review.cjs').inspectJob({id:job.id,body:JSON.stringify(job)},{...this.p,publisher,recorder,anchor:this.anchor}).kind!=='signed')throw Error('Stored signed transaction requires journal review');
   const tx=Transaction.from(job.raw),decoded=BATCH_ABI.parseTransaction({data:tx.data});
   if(decoded.args[0]!==batch.root||Number(decoded.args[1])!==batch.leafCount||decoded.args[2]!==batch.schemaVersion||batch.publisher!==publisher)throw Error('Stored signed transaction differs from batch evidence');
   if(tx.maxFeePerGas>BigInt(this.policy.maxGasPriceWei))return 'fee-cap';
@@ -48,11 +49,11 @@ class GovernanceWorker {
  async run(){
   await this.checkPublisherAccess();
   const publisher=(await this.signer.getAddress()).toLowerCase();
-  const identity=JSON.stringify({scope:this.p,publisher,contract:CONTRACT,chain:84532,recorder:(await this.recorder.getAddress()).toLowerCase()});
+  const identity=JSON.stringify({scope:this.p,publisher,contract:this.anchor.contract,chain:this.anchor.chainId,recorder:(await this.recorder.getAddress()).toLowerCase()});
   const config=this.db.prepare('SELECT body FROM config WHERE id=1').get();
   if(config&&config.body!==identity)throw Error('Journal scope or signer changed');
   if(!config)this.db.prepare('INSERT INTO config VALUES(1,?)').run(identity);
-  if(Number((await this.provider.getNetwork()).chainId)!==84532||keccak256(await this.provider.getCode(CONTRACT))!==this.codeHash)throw Error('Unexpected chain or contract code');
+  if(Number((await this.provider.getNetwork()).chainId)!==this.anchor.chainId||keccak256(await this.provider.getCode(this.anchor.contract))!==this.codeHash)throw Error('Unexpected chain or contract code');
   // Rediscover evidence committed before an interruption between databases.
   for(const id of await this.store.evidenceBatchIds(this.p)){
    if(this.db.prepare('SELECT 1 FROM jobs WHERE id=?').get(id))continue;
@@ -65,7 +66,7 @@ class GovernanceWorker {
    const first=entries[0],b=first.bundle;
    if(job.hash){
     const candidate={...b,transactions:[job.hash]};
-    const v=await inspectEvidence(await this.store.get(this.p,first.id),candidate,{provider:this.provider,trustedSigners:[(await this.recorder.getAddress()).toLowerCase()],codeHash:this.codeHash});
+    const v=await inspectEvidence(await this.store.get(this.p,first.id),candidate,{provider:this.provider,trustedSigners:[(await this.recorder.getAddress()).toLowerCase()],anchor:this.anchor,codeHash:this.codeHash});
     job.verification=v.state;job.checkedAt=this.clock();
     if(v.state==='confirmed'||v.state==='confirming'){
      if(entries.some(e=>!e.bundle.transactions.includes(job.hash)))await attachTransaction(this.store,this.p,job.id,job.hash);
@@ -80,11 +81,11 @@ class GovernanceWorker {
    if(job.nextAttempt>this.clock())return {state:'backoff',batchId:job.id};
    if(!job.raw){
     if(entries.length!==b.batch.leafCount)throw Error('Incomplete batch');
-    for(const entry of entries){const event=await this.store.get(this.p,entry.id);if(!['test','demo'].includes(event.environment))throw Error('Synthetic/test records only');const v=await inspectEvidence(event,entry.bundle,{trustedSigners:[(await this.recorder.getAddress()).toLowerCase()]});if(v.state!=='batched')throw Error('Refused invalid or already submitted batch');}
+    for(const entry of entries){const event=await this.store.get(this.p,entry.id);const v=await inspectEvidence(event,entry.bundle,{trustedSigners:[(await this.recorder.getAddress()).toLowerCase()],anchor:this.anchor});if(v.state!=='batched')throw Error('Refused invalid or already submitted batch');}
     const now=this.clock(),recent=this.jobs().filter(j=>j.raw&&j.signedAt>now-86400000);
     if(recent.filter(j=>j.signedAt>now-3600000).length>=this.policy.maxTransactionsPerHour)return {state:'rate-limited'};
     const data=BATCH_ABI.encodeFunctionData('anchorBatch',[b.batch.root,b.batch.leafCount,b.batch.schemaVersion]);
-    const gas=(await this.provider.estimateGas({from:publisher,to:CONTRACT,value:0n,data}))*120n/100n;
+    const gas=(await this.provider.estimateGas({from:publisher,to:this.anchor.contract,value:0n,data}))*120n/100n;
     const fees=await this.provider.getFeeData(),fee=fees.maxFeePerGas??fees.gasPrice;
     if(fee==null||fee<=0n||fee>BigInt(this.policy.maxGasPriceWei))return {state:'fee-cap'};
     const reserve=gas*fee+BigInt(this.policy.l1AllowanceWei);
@@ -92,9 +93,9 @@ class GovernanceWorker {
     if(await this.provider.getBalance(publisher)<reserve)return {state:'needs-funding',publisher};
     const nonce=await this.provider.getTransactionCount(publisher,'pending');
     if(nonce!==await this.provider.getTransactionCount(publisher,'latest'))return {state:'external-pending',publisher};
-    const tx={chainId:84532,type:2,nonce,to:CONTRACT,data,value:0n,gasLimit:gas,maxFeePerGas:fee,maxPriorityFeePerGas:fees.maxPriorityFeePerGas??0n};
+    const tx={chainId:this.anchor.chainId,type:2,nonce,to:this.anchor.contract,data,value:0n,gasLimit:gas,maxFeePerGas:fee,maxPriorityFeePerGas:fees.maxPriorityFeePerGas??0n};
     const raw=await this.signer.signTransaction(tx),signed=Transaction.from(raw);
-    if(signed.from.toLowerCase()!==publisher||signed.to.toLowerCase()!==CONTRACT||signed.data!==data||signed.chainId!==84532n||signed.value!==0n||signed.nonce!==nonce||signed.gasLimit!==gas||signed.maxFeePerGas!==fee||signed.maxPriorityFeePerGas!==tx.maxPriorityFeePerGas)throw Error('Signer returned unexpected transaction');
+    if(signed.from.toLowerCase()!==publisher||signed.to.toLowerCase()!==this.anchor.contract||signed.data!==data||signed.chainId!==BigInt(this.anchor.chainId)||signed.value!==0n||signed.nonce!==nonce||signed.gasLimit!==gas||signed.maxFeePerGas!==fee||signed.maxPriorityFeePerGas!==tx.maxPriorityFeePerGas)throw Error('Signer returned unexpected transaction');
     Object.assign(job,{raw,hash:keccak256(raw),nonce,reserve:reserve.toString(),signedAt:now,state:'signed'});
     this.save(job); // Critical crash boundary: exact bytes and budget survive BEFORE network send.
    }
@@ -107,7 +108,7 @@ class GovernanceWorker {
    return {state:job.state,batchId:job.id,transactionHash:job.hash};
   }
   if(this.policy.paused)return {state:'paused'};
-  const prepared=await prepareBatch(this.store,this.p,this.recorder,{publisher,limit:this.policy.batchSize});
+  const prepared=await prepareBatch(this.store,this.p,this.recorder,{publisher,limit:this.policy.batchSize,anchor:this.anchor});
   return {state:prepared?'prepared':'idle',batchId:prepared?.batchId};
  }
  async close(){await this.tail;this.db.close();fs.unlinkSync(this.lock);}

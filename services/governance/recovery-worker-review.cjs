@@ -1,16 +1,17 @@
 'use strict';
 const fs=require('node:fs'),path=require('node:path'),{DatabaseSync}=require('node:sqlite'),{createHash}=require('node:crypto'),{Transaction,keccak256}=require('ethers');
-const {CONTRACT}=require('./evidence.cjs'),{BATCH_ABI,baseBatchId}=require('../../sdk/typescript/base-sepolia-batch-adapter'),{VERSION}=require('../../sdk/typescript/verification-receipt');
+const {CONTRACT,evidenceAnchor}=require('./evidence.cjs'),{BATCH_ABI,batchIdForChain}=require('../../sdk/typescript/base-sepolia-batch-adapter'),{VERSION}=require('../../sdk/typescript/verification-receipt');
 const address=v=>typeof v==='string'&&/^0x[0-9a-fA-F]{40}$/.test(v),ref=v=>typeof v==='string'&&/^[A-Za-z0-9._:-]{1,200}$/.test(v),hash=v=>typeof v==='string'&&/^0x[0-9a-f]{64}$/.test(v);
 function inspectJob(row,expected){
  try{
+  const anchor=evidenceAnchor(expected.anchor);
   if(typeof row.body!=='string'||Buffer.byteLength(row.body)>1048576)return {kind:'invalid'};
   const job=JSON.parse(row.body);if(job.id!==row.id||!hash(job.id)||!['prepared','external','signed','submitted','broadcast-uncertain','confirmed','confirming','blocked'].includes(job.state))return {kind:'invalid'};
   if(!job.raw){if(job.state==='prepared'&&!job.hash)return {kind:'unsigned'};return hash(job.hash)&&['external','submitted','confirmed','confirming','blocked'].includes(job.state)?{kind:'externalReference'}:{kind:'invalid'};}
   if(typeof job.raw!=='string'||job.raw.length>131074||!hash(job.hash)||keccak256(job.raw)!==job.hash)return {kind:'invalid'};
   const tx=Transaction.from(job.raw),decoded=BATCH_ABI.parseTransaction({data:tx.data});
-  if(tx.type!==2||tx.chainId!==84532n||tx.from?.toLowerCase()!==expected.publisher.toLowerCase()||tx.to?.toLowerCase()!==CONTRACT||tx.value!==0n||tx.nonce!==job.nonce||!tx.isSigned()||tx.gasLimit<=0n||!tx.maxFeePerGas||tx.maxPriorityFeePerGas===null||tx.maxPriorityFeePerGas>tx.maxFeePerGas||decoded?.name!=='anchorBatch')return {kind:'invalid'};
-  if(decoded.args[1]<1n||decoded.args[1]>1000n||decoded.args[2]!==VERSION||baseBatchId(CONTRACT,expected.publisher,decoded.args[0])!==job.id)return {kind:'invalid'};
+  if(tx.type!==2||tx.chainId!==BigInt(anchor.chainId)||tx.from?.toLowerCase()!==expected.publisher.toLowerCase()||tx.to?.toLowerCase()!==anchor.contract||tx.value!==0n||tx.nonce!==job.nonce||!tx.isSigned()||tx.gasLimit<=0n||!tx.maxFeePerGas||tx.maxPriorityFeePerGas===null||tx.maxPriorityFeePerGas>tx.maxFeePerGas||decoded?.name!=='anchorBatch')return {kind:'invalid'};
+  if(decoded.args[1]<1n||decoded.args[1]>1000n||decoded.args[2]!==VERSION||batchIdForChain(anchor.chainId,anchor.contract,expected.publisher,decoded.args[0])!==job.id)return {kind:'invalid'};
   return {kind:'signed',nonce:tx.nonce};
  }catch{return {kind:'invalid'};}
 }

@@ -87,7 +87,11 @@ accept an explicit reviewed chain, contract and runtime code hash binding.
 Production API startup rejects a configured Base Sepolia binding; without a
 mainnet binding its authenticated evidence route returns 503. The existing
 pilot defaults remain pinned to Base Sepolia. Synthetic mainnet proof tests
-pass, but this is not a live mainnet anchor or a working Production publisher.
+pass. The worker engine now uses the same explicit binding for provider checks,
+batch preparation, transaction signing and saved-byte retry review, with
+regression tests for pilot behavior and wrong-chain rejection. The Production
+worker launcher remains deliberately disabled, so this is not a live mainnet
+anchor or a working Production publisher.
 
 The [production API unit](../deploy/systemd/orvessian-production-api.service)
 uses a distinct Unix identity, release directory, protected environment file
