@@ -78,6 +78,8 @@ The ordered preparation and indicative budget are in the
   a pilot release or fault cannot alter production state, and document the
   shared host outage and administrator risk. Rehearse moving the production
   app to a dedicated VM without moving its managed database.
+  The [14 October baseline and credential audit](production-shared-host-capacity-and-isolation-2026-10-14.md)
+  passed the checked Unix boundaries; load, fault and move rehearsals remain.
 - [ ] Before production access, prove that pilot credentials cannot access
   production, and verify separate encrypted backup and journal coverage.
   Measure production cluster capacity and rehearse recovery to a replacement

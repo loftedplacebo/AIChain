@@ -85,6 +85,9 @@ before any `prod` customer route
 opens. The portal gateway deliberately refuses a public portal origin paired
 with a loopback API URL, so its private integration check must retain the
 reviewed HTTPS origin/Host boundary without exposing customer routes.
+The [shared-host baseline and isolation audit](production-shared-host-capacity-and-isolation-2026-10-14.md)
+records current VPS and managed-database headroom and checks cross-environment
+credential access. These point-in-time checks do not establish a load limit.
 The [portal host staging helper](../deploy/governance/stage-production-portal-host.sh)
 checks the exact unit hash and pilot service health, then creates only its
 non-login Unix identity, root-owned empty release directory and disabled,
