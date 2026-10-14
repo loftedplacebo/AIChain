@@ -9,6 +9,7 @@ import stat
 import subprocess
 import time
 from datetime import datetime, timedelta, timezone
+from production_worker_registry import load_registry
 
 
 POINTER = pathlib.Path('/var/lib/aichain-production-backup/latest-b2.json')
@@ -45,8 +46,10 @@ def closed_scope():
                         'SELECT count(*) FROM governance_customer_projects;')
     states = {unit: systemctl('show', '-p', 'UnitFileState',
                               '-p', 'ActiveState', unit) for unit in WORKERS}
+    _, registered = load_registry()
     worker_absent = all(set(state.splitlines()) == {
-        'UnitFileState=', 'ActiveState=inactive'} for state in states.values())
+        'UnitFileState=', 'ActiveState=inactive'} for state in states.values()) and \
+        not registered
     return marker == 'prod', count == '0', worker_absent
 
 

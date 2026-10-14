@@ -104,9 +104,10 @@ The ordered preparation and indicative budget are in the
 - [ ] Approve actual plans, prices, billing units, metering, overage/cap
   behavior, taxes, invoices, refunds and support terms; test checkout and
   cancellation. Current website prices are indicative.
-- [ ] If production evidence will use Base mainnet, separately approve the
+- [ ] For the selected Base mainnet evidence chain, separately approve the
   contract, wallet/key custody, gas budget, monitoring, recovery and
-  independent receipt verification. Base Sepolia pilot evidence is testnet only.
+  independent receipt verification. The current Base Sepolia publisher is
+  synthetic/testnet only; no mainnet contract or worker is active.
 - [ ] Obtain an explicit owner go/no-go decision backed by the release evidence,
   customer/support procedures and public claims review.
 

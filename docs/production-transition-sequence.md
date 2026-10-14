@@ -69,6 +69,20 @@ for optional WorkOS meters and remaining configuration.
 | 6. Recovery | Restore when the original managed DB cluster is unavailable, review every journal and access state, then activate an isolated replacement service. | Measured recovery point and time, revoked captured access, receipt proof preservation and successful post-restore customer journey. |
 | 7. Public acceptance | Finish abuse, security and privileged-access review; legal pages, support/privacy/security inboxes, real-data terms, capacity and incident rehearsal. Decide and test production evidence chain. | Owner go/no-go record and claims limited to tested capacity and recovery. |
 
+On 14 October the owner selected **Base mainnet** for the first real-customer
+Production receipts. The [Base JSON-RPC specification](https://docs.base.org/base-chain/api-reference/ethereum-json-rpc-api/eth_chainId)
+identifies mainnet chain ID `8453`. No mainnet anchor contract, funded relayer,
+RPC provider or publishing service has been activated. The current pilot
+publisher and receipt path are pinned to Base Sepolia chain ID `84532` and
+synthetic events, so reusing them unchanged would produce the wrong Production
+claim. Before the Production worker starts, implement and test mainnet-specific
+receipt IDs and presentation verification, deploy and fingerprint the reviewed
+anchor contract, bind the worker journal and database role, set bounded gas
+and nonce recovery policy, and verify an independently exported mainnet proof.
+The protected Production worker registry has been installed empty; its future
+entries are constrained to chain ID `8453` and must match the project catalog
+and each journal. The contract address and runtime code hash remain unbound.
+
 The [production API unit](../deploy/systemd/orvessian-production-api.service)
 uses a distinct Unix identity, release directory, protected environment file
 and private loopback port 8791. It is installed, active and enabled for signed

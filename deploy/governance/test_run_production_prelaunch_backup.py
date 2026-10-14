@@ -100,6 +100,15 @@ class ProductionPrelaunchBackupTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'journal-aware'):
                 BACKUP.preflight(Schema(projects='1'))
 
+    def test_preflight_fails_closed_when_worker_registry_is_nonempty(self):
+        with mock.patch.object(BACKUP.os, 'geteuid', return_value=0), \
+                mock.patch.object(BACKUP, 'status', side_effect=self.service), \
+                mock.patch.object(BACKUP.pathlib.Path, 'is_file', return_value=True), \
+                mock.patch.object(BACKUP, 'load_registry',
+                                  return_value=({}, [{'role': 'worker_example'}])):
+            with self.assertRaisesRegex(ValueError, 'journal-aware'):
+                BACKUP.preflight(Schema())
+
     def test_capture_failure_restarts_the_private_api(self):
         calls = []
         real_temporary = tempfile.TemporaryDirectory

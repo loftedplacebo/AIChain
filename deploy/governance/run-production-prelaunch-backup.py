@@ -17,6 +17,7 @@ import subprocess
 import sys
 import tempfile
 import time
+from production_worker_registry import LOCK as WORKER_LOCK, load_registry
 
 
 SETUP = pathlib.Path('/opt/aichain/governance-pilot-db-setup')
@@ -89,6 +90,9 @@ def preflight(schema):
     if schema.psql('doadmin', admin,
                    'SELECT count(*) FROM governance_customer_projects;') != '0':
         raise ValueError('Project exists; journal-aware Production backup required')
+    _, workers = load_registry()
+    if workers:
+        raise ValueError('Registered Production worker requires journal-aware backup')
     for unit in ('orvessian-production-worker.service',
                  'orvessian-production-evidence-worker.service'):
         if status(unit) != {'UnitFileState=', 'ActiveState=inactive'}:
@@ -175,17 +179,26 @@ def main():
     schema = module()
     lock = os.open(ROOT / 'prelaunch-backup.lock',
                    os.O_WRONLY | os.O_CREAT | os.O_NOFOLLOW, 0o600)
+    worker_lock = None
     try:
         info = os.fstat(lock)
         if not stat.S_ISREG(info.st_mode) or info.st_uid != 0 or info.st_mode & 0o077:
             raise ValueError('Protected Production backup lock required')
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        worker_lock = os.open(WORKER_LOCK, os.O_RDWR | os.O_NOFOLLOW)
+        worker_info = os.fstat(worker_lock)
+        if not stat.S_ISREG(worker_info.st_mode) or worker_info.st_uid != 0 or \
+                stat.S_IMODE(worker_info.st_mode) != 0o600:
+            raise ValueError('Protected Production worker registry lock required')
+        fcntl.flock(worker_lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         admin = preflight(schema)
         if sys.argv[1:]:
             capture_and_upload(schema, admin)
         else:
             print('production_prelaunch_backup=ready;mode=read-only;projects=0')
     finally:
+        if worker_lock is not None:
+            os.close(worker_lock)
         os.close(lock)
 
 
