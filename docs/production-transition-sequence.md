@@ -132,6 +132,23 @@ derives and displays only the public address, stores the key root-only under
 `/etc/aichain/production`, and leaves all services off. Its disposable-key
 Linux test passed. Contract deployment, funding and worker access remain
 separate reviewed steps.
+The [two-step mainnet deployment operator](../scripts/deploy-base-mainnet-anchor.cjs)
+now pins the reviewed creation hash
+`0xccf23437b086cba0f033a19c353ca582953b1e725e57c59798fb43531c06d1ce`
+and runtime hash
+`0x507e6fe47195ae115026837a14f7613537f29c11f0b798bda1abc0bda2eab10f`.
+`--quote` reads the protected wallet and HTTPS RPC without signing;
+`--prepare <max-fee-wei> <max-total-wei>` signs exactly one capped contract
+creation transaction into a root-only intent file without broadcasting;
+`--status` checks that hash; and `--broadcast` can transmit only the saved
+bytes. It checks chain 8453, balance, pending nonce, expected empty contract
+address and the returned transaction hash. Any uncertain broadcast result is
+reviewed by hash before a retry; a new nonce cannot be silently substituted.
+Its synthetic tests cover cap, chain, balance, nonce, intent tampering and
+idempotent broadcast behavior. This operator has not been staged or run on
+the VPS. A production-grade HTTPS RPC and reviewed fee caps are still needed,
+and the independent verifier still requires at least 12 canonical confirmations
+before binding the Production registry or admitting receipts.
 The per-project Production worker registry currently requires a distinct
 relayer address for each project to prevent independent workers from racing
 the same nonce. The chosen wallet can publish for the first project; admitting
