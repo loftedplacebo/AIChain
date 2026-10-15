@@ -19,6 +19,14 @@ test('closed, missing, oversized or duplicate recovery metadata stays closed',()
  }finally{x.close();}});
 test('environment mismatch, orphan approval and SQLite restored publisher are refused',()=>{const x=setup();try{
  assert.throws(()=>loadWorkerBinding({...x.options,environment:'dev'}),/environment mismatch/);assert.throws(()=>loadWorkerBinding({...x.options,storage:'sqlite'}),/requires PostgreSQL/);
- x.db.exec('DROP TABLE governance_recovery_gate');assert.throws(()=>loadWorkerBinding(x.options),/requires PostgreSQL/);assert.throws(()=>loadWorkerBinding({...x.options,environment:'prod'}),/not enabled/);
+ x.db.exec('DROP TABLE governance_recovery_gate');assert.throws(()=>loadWorkerBinding(x.options),/requires PostgreSQL/);assert.throws(()=>loadWorkerBinding({...x.options,environment:'prod'}),/environment mismatch/);
  }finally{x.close();}});
 test('original journals and a new absent journal retain the unbound startup path',()=>{const x=setup();try{x.db.exec('DROP TABLE governance_recovery_gate; DROP TABLE governance_publisher_release');assert.equal(loadWorkerBinding(x.options),null);assert.equal(loadWorkerBinding({...x.options,journal:path.join(path.dirname(x.options.journal),'absent.sqlite')}),null);assert.throws(()=>workerPolicy({batchSize:1001}),/Maximum/);}finally{x.close();}});
+test('fresh Production journal requires explicit marker, existing file and PostgreSQL',()=>{const x=setup();try{
+ x.db.exec("UPDATE governance_environment SET name='prod'; DROP TABLE governance_recovery_gate; DROP TABLE governance_publisher_release");
+ const prod={...x.options,environment:'prod'};
+ assert.equal(loadWorkerBinding(prod),null);
+ assert.throws(()=>loadWorkerBinding({...prod,storage:'sqlite'}),/requires PostgreSQL/);
+ assert.throws(()=>loadWorkerBinding({...prod,journal:path.join(path.dirname(prod.journal),'absent.sqlite')}),/Prebound/);
+ x.db.exec('DROP TABLE governance_environment');assert.throws(()=>loadWorkerBinding(prod),/marker/);
+ }finally{x.close();}});

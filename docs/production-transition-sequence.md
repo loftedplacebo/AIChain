@@ -90,9 +90,15 @@ mainnet binding its authenticated evidence route returns 503. The existing
 pilot defaults remain pinned to Base Sepolia. Synthetic mainnet proof tests
 pass. The worker engine now uses the same explicit binding for provider checks,
 batch preparation, transaction signing and saved-byte retry review, with
-regression tests for pilot behavior and wrong-chain rejection. The Production
-worker launcher remains deliberately disabled, so this is not a live mainnet
-anchor or a working Production publisher.
+regression tests for pilot behavior and wrong-chain rejection. The separate
+[Production worker launcher](../scripts/governance-production-worker.cjs) and
+[inactive service template](../deploy/systemd/orvessian-production-project-worker@.service)
+now require a prebound `prod` journal, exact mainnet anchor and expected signer
+addresses, verified TLS to `governance_prod` as `governance_prod_worker`, and a
+bounded policy. A `--preflight` path reads the database, RPC and contract code
+without writing the journal or sending a transaction. Focused launcher and
+recovery-binding tests pass. No Production worker release, key copy, worker
+login or unit has been activated, so this is not yet a live mainnet publisher.
 Compile the candidate contract with
 `node scripts/compile-base-sepolia-anchor.cjs --mainnet`; the resulting local
 artifact is ignored under `build/base-mainnet/`. Its reviewed runtime hash is

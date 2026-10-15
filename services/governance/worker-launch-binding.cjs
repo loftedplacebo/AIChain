@@ -4,14 +4,19 @@ const {DatabaseSync}=require('node:sqlite');
 const {validateBinding,policyDigest,sameBinding}=require('./publisher-release-binding.cjs');
 // Read metadata only. This never approves a journal or contacts a provider.
 function loadWorkerBinding({journal,environment,storage,principal,publisher,recorder,policy,codeHash}){
- if(!['dev','test'].includes(environment))throw Error('Worker environment is not enabled');
- if(!fs.existsSync(journal))return null;
+ if(!['dev','test','prod'].includes(environment))throw Error('Worker environment is not enabled');
+ if(environment==='prod'&&storage!=='postgres')throw Error('Production worker requires PostgreSQL');
+ if(!fs.existsSync(journal)){
+  if(environment==='prod')throw Error('Prebound Production worker journal required');
+  return null;
+ }
  const stat=fs.lstatSync(journal);if(!stat.isFile()||stat.isSymbolicLink())throw Error('Regular worker journal required');
  const db=new DatabaseSync(journal,{readOnly:true});
  try{
   db.exec('PRAGMA busy_timeout=5000');
   const table=name=>!!db.prepare("SELECT 1 FROM sqlite_master WHERE type='table' AND name=?").get(name);
   if(table('governance_environment')){const rows=db.prepare('SELECT name FROM governance_environment LIMIT 2').all();if(rows.length!==1||rows[0].name!==environment)throw Error('Worker journal environment mismatch');}
+  else if(environment==='prod')throw Error('Prebound Production worker journal marker required');
   const restored=table('governance_recovery_gate'),released=table('governance_publisher_release');
   require('./environment.cjs').assertRecoveryApproved(db);
   if(!restored&&!released)return null;
