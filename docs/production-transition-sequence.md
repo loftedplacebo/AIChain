@@ -150,6 +150,19 @@ unit template with SHA-256
 `b55aff6ce94a7f652f719f60afe6695282e70af9d900b8afbe2f053714b5e889`.
 The unit remains disabled with no instances; the Production prelaunch backup
 and synthetic pilot health checks were green after staging.
+The worker's read-only preflight was strengthened to compare an existing
+journal identity with the selected project, publisher, recorder and contract
+before it reports ready. An updated Linux artifact from commit
+`fa2b929e05f0a3069054b935e0c0aa28e2ba860f` passed 12 focused tests and
+has SHA-256
+`7c2f8cb49a8f62df43fac38f76e7a70bda14cdcb5bab61e6051ceadcf1ba549a`.
+The [offline replacement helper](../deploy/governance/replace-production-worker-release.py)
+pins both commits and archive hashes, requires a disabled template and empty
+worker inventory, and retains the prior artifact for exact rollback. On
+15 October it replaced the inactive release and retained
+`/opt/aichain/orvessian-production-worker.previous-76a89ae1b6ff`; the
+post-change Production backup and pilot checks were green. No worker instance,
+wallet key or public customer route was activated.
 
 The [production API unit](../deploy/systemd/orvessian-production-api.service)
 uses a distinct Unix identity, release directory, protected environment file
