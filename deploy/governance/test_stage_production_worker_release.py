@@ -8,6 +8,7 @@ import pathlib
 import tarfile
 import tempfile
 import unittest
+import sys
 from contextlib import redirect_stdout
 from types import SimpleNamespace
 from unittest import mock
@@ -21,6 +22,15 @@ SPEC.loader.exec_module(module)
 
 
 class StageTests(unittest.TestCase):
+    def test_one_time_helper_rejects_wrong_source_commit(self):
+        with mock.patch.object(sys, 'argv', ['stage-production-worker-release.py',
+             '--archive', '/synthetic/worker.tar.gz', '--sha256', module.ARCHIVE_SHA256,
+             '--commit', '0'*40]), \
+             mock.patch.object(module, 'preflight') as preflight:
+            with self.assertRaisesRegex(ValueError, 'Pinned Production worker'):
+                module.main()
+            preflight.assert_not_called()
+
     def test_exact_archive_and_inactive_template(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = pathlib.Path(temporary)

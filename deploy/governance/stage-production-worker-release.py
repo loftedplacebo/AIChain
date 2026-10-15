@@ -19,6 +19,8 @@ RELEASE = pathlib.Path('/opt/aichain/orvessian-production-worker')
 SOURCE_UNIT = pathlib.Path('/opt/aichain/governance-pilot-db-setup/orvessian-production-project-worker@.service')
 UNIT = pathlib.Path('/etc/systemd/system/orvessian-production-project-worker@.service')
 UNIT_SHA256 = 'b55aff6ce94a7f652f719f60afe6695282e70af9d900b8afbe2f053714b5e889'
+SOURCE_COMMIT = '76a89ae1b6ffca41c8a0b0ed6d9a834a67e19371'
+ARCHIVE_SHA256 = '11deabf3d1604edf6c18c6523b951ec9102b954848f4e7261e630d99883792c5'
 REQUIRED = {
     'scripts/governance-production-worker.cjs',
     'scripts/governance-worker-recover-lock.cjs',
@@ -124,8 +126,8 @@ def main():
     parser.add_argument('--commit', required=True)
     parser.add_argument('--apply', action='store_true')
     args = parser.parse_args()
-    if not re.fullmatch(r'[a-f0-9]{40}', args.commit):
-        raise ValueError('Exact source commit required')
+    if args.commit != SOURCE_COMMIT or args.sha256 != ARCHIVE_SHA256:
+        raise ValueError('Pinned Production worker source and archive required')
     count = preflight(args.archive, args.sha256)
     if args.apply:
         stage(args.archive, args.sha256, args.commit)
