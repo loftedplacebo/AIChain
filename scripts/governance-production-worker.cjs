@@ -49,13 +49,24 @@ function configuration(env,parseConnection=connectionOptions){
   rpc:rpc.href,anchor,database,policy};
 }
 
-function journalMarker(file,verifyFile=privateFile){
+function journalMarker(file,verifyFile=privateFile,expected=null){
  verifyFile(file);
  const db=new DatabaseSync(file,{readOnly:true});
  try{
   if(db.prepare('PRAGMA quick_check').get().quick_check!=='ok'||
    db.prepare('SELECT name FROM governance_environment LIMIT 2').all().length!==1||
    db.prepare('SELECT name FROM governance_environment').get().name!=='prod')throw Error('Production journal marker required');
+  const table=db.prepare("SELECT 1 FROM sqlite_master WHERE type='table' AND name='config'").get();
+  if(table){
+   const rows=db.prepare('SELECT id,body FROM config LIMIT 2').all();
+   if(rows.length>1||rows.some(row=>row.id!==1||typeof row.body!=='string'||Buffer.byteLength(row.body)>4096))throw Error('Production journal identity invalid');
+   if(rows.length&&expected){
+    const identity=JSON.parse(rows[0].body);
+    if(identity.scope?.tenant!==expected.principal.tenant||identity.scope?.project!==expected.principal.project||
+     identity.publisher!==expected.publisher.toLowerCase()||identity.recorder!==expected.recorder.toLowerCase()||
+     identity.contract!==expected.anchor.contract||identity.chain!==8453)throw Error('Production journal identity mismatch');
+   }
+  }
  }finally{db.close();}
 }
 
@@ -63,10 +74,11 @@ async function main(){
  const flags=process.argv.slice(2);
  if(flags.length>1||flags.length===1&&!['--preflight','--once'].includes(flags[0]))throw Error('Only --preflight or --once is supported');
  const config=configuration(process.env);
- journalMarker(config.journal);
  const recorder=new Wallet(fs.readFileSync(privateFile(config.recorderKey),'ascii').trim());
  const signer=new Wallet(fs.readFileSync(privateFile(config.relayerKey),'ascii').trim());
  if(recorder.address.toLowerCase()!==config.expectedRecorder||signer.address.toLowerCase()!==config.expectedRelayer)throw Error('Worker signer address mismatch');
+ journalMarker(config.journal,privateFile,{principal:config.principal,
+  publisher:signer.address,recorder:recorder.address,anchor:config.anchor});
  const recoveryPublisher=loadWorkerBinding({journal:config.journal,environment:'prod',storage:'postgres',principal:config.principal,publisher:signer.address,recorder:recorder.address,policy:config.policy,codeHash:config.anchor.codeHash});
  const provider=new JsonRpcProvider(config.rpc,8453,{staticNetwork:false,cacheTimeout:0});
  const pool=new Pool(config.database);

@@ -57,3 +57,21 @@ test('Production journal marker must exist and match the environment',()=>{
   assert.throws(()=>journalMarker(file,()=>file),/Production journal marker/);
  }finally{fs.rmSync(directory,{recursive:true,force:true});}
 });
+test('Production preflight refuses a journal bound to another signer or contract',()=>{
+ const directory=fs.mkdtempSync(path.join(os.tmpdir(),'production-worker-identity-'));
+ const file=path.join(directory,'worker.sqlite');
+ const expected={principal:{tenant,project},publisher:baseline.GOVERNANCE_EXPECTED_RELAYER,
+  recorder:baseline.GOVERNANCE_EXPECTED_RECORDER,
+  anchor:configuration(baseline,database).anchor};
+ try{
+  const db=new DatabaseSync(file);
+  db.exec("CREATE TABLE governance_environment(name TEXT); INSERT INTO governance_environment VALUES('prod'); CREATE TABLE config(id INTEGER PRIMARY KEY,body TEXT NOT NULL)");
+  db.prepare('INSERT INTO config VALUES(1,?)').run(JSON.stringify({scope:expected.principal,
+   publisher:expected.publisher.toLowerCase(),recorder:expected.recorder.toLowerCase(),
+   contract:expected.anchor.contract,chain:8453}));
+  db.close();
+  journalMarker(file,()=>file,expected);
+  assert.throws(()=>journalMarker(file,()=>file,{...expected,publisher:'0x'+'55'.repeat(20)}),/identity mismatch/);
+  assert.throws(()=>journalMarker(file,()=>file,{...expected,anchor:{...expected.anchor,contract:'0x'+'66'.repeat(20)}}),/identity mismatch/);
+ }finally{fs.rmSync(directory,{recursive:true,force:true});}
+});
