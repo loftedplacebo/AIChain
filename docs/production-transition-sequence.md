@@ -483,6 +483,16 @@ then checks each restored journal's project, signers, Base mainnet contract and
 scope. Synthetic Linux tests cover pointer rejection, download-to-restore
 scope forwarding and restored-journal identity. A real B2 worker-journal
 upload and closed restore has not yet occurred.
+The inactive [journal backup service](../deploy/systemd/orvessian-production-journal-backup.service)
+and [02:00 UTC timer](../deploy/systemd/orvessian-production-journal-backup.timer)
+are prepared for the handoff. The separate
+[journal backup health checker](../deploy/governance/check-production-journal-backup-health.py)
+requires the latest completion pointer to list every registered worker role,
+checks the complete Production project catalog and journal bindings, all
+worker units, the due upload window, the new timer and API, and confirms the
+prelaunch timer is disabled. Its synthetic Linux coverage and pointer-mismatch
+test passed. Neither timer has been switched: the prelaunch timer remains the
+active guard for the still-empty Production database.
 The [read-only health checker](../deploy/governance/check-production-prelaunch-backup-health.py)
 checks the 02:00 UTC schedule with a 03:00 due threshold. A fresh download with
 the separate Read Only B2 credential authenticated the first scheduled set.

@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily Production database and worker-journal backup
+
+[Timer]
+OnCalendar=*-*-* 02:00:00 UTC
+Persistent=true
+AccuracySec=1min
+Unit=orvessian-production-journal-backup.service
+
+[Install]
+WantedBy=timers.target
