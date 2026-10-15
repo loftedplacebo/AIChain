@@ -79,7 +79,7 @@ def preflight(backup_id):
     verify_catalog(workers, journal.catalog(schema, admin))
     journal.pinned_core()
     recovery_cluster()
-    if not (base.RUNNER / 'scripts/governance-backup-object-storage.cjs').is_file() or \
+    if not (journal.JOURNAL_RUNNER / 'scripts/governance-backup-object-storage.cjs').is_file() or \
             not base.CLOSED.is_file():
         raise ValueError('Pinned transfer and closed restore runners required')
     return pointer['keyPrefix'], workers, chain
@@ -93,7 +93,8 @@ def main():
     key_prefix, workers, chain = preflight(args.backup_id)
     if args.apply:
         base.download_and_restore(args.backup_id, key_prefix,
-                                  expected_workers=workers, chain=chain)
+                                  expected_workers=workers, chain=chain,
+                                  runner=journal.JOURNAL_RUNNER)
     else:
         print('production_journal_b2_restore=ready;mode=read-only;workers=' +
               str(len(workers)))

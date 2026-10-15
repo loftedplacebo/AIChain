@@ -463,8 +463,17 @@ code, then quiesces the portal, every worker and API for one encrypted database
 and journal capture. It authenticates the archive before B2 upload and tries to
 restart every previously active writer even if capture fails. Synthetic Linux
 tests cover catalog rejection and the stop/capture/upload/restart sequence.
-It is not installed or scheduled; the worker-aware B2 restore drill and
-replacement-cluster recovery are still required.
+On 15 October the journal-aware archive core was staged beside the live
+prelaunch runner in the immutable, root-only
+`/opt/aichain/orvessian-production-journal-backup-runner-61a063e` directory.
+[The staging helper](../deploy/governance/stage-production-journal-backup-runner.py)
+checks the base release manifest and old core hashes before overlaying the two
+reviewed journal-aware files, whose SHA-256 hashes were verified on the VPS.
+This staging does not switch the active 02:00 timer or enable a worker. The
+candidate operator runner and B2 drill point at this separate release;
+their synthetic Linux tests passed. A real worker-bearing capture, B2 upload,
+closed restore and replacement-cluster recovery are still required before
+the journal-aware schedule can replace the prelaunch timer.
 The candidate journal-aware B2 drill is
 `verify-production-journal-b2-restore.py`. It requires the latest Production
 completion pointer to name the exact registered worker set, authenticates the

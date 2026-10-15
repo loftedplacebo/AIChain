@@ -34,6 +34,9 @@ _SPEC = importlib.util.spec_from_file_location('production_prelaunch_backup',
                                                 _COMMON)
 common = importlib.util.module_from_spec(_SPEC)
 _SPEC.loader.exec_module(common)
+JOURNAL_RUNNER = pathlib.Path(
+    '/opt/aichain/orvessian-production-journal-backup-runner-61a063e')
+common.RUNNER = JOURNAL_RUNNER
 
 
 def pinned_core():

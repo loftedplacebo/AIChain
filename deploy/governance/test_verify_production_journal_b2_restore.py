@@ -67,7 +67,7 @@ class RestorePreflightTests(unittest.TestCase):
                      {'tenant': TENANT, 'project': PROJECT}]), \
                  mock.patch.object(module.journal, 'pinned_core'), \
                  mock.patch.object(module, 'recovery_cluster'), \
-                 mock.patch.object(module.base, 'RUNNER', runner), \
+                 mock.patch.object(module.journal, 'JOURNAL_RUNNER', runner), \
                  mock.patch.object(module.base, 'CLOSED', closed), \
                  mock.patch.object(module.base, 'download_and_restore') as download:
                 prefix, workers, chain = module.preflight(ID)
@@ -98,10 +98,12 @@ class RestorePreflightTests(unittest.TestCase):
                  redirect_stdout(io.StringIO()):
                 module.base.download_and_restore(ID,
                     'orvessian-production/prod/'+ID+'-synthetic',
-                    expected_workers=[WORKER],chain=CHAIN)
+                    expected_workers=[WORKER],chain=CHAIN,
+                    runner=module.journal.JOURNAL_RUNNER)
             self.assertEqual(closed.restore.call_args.args[2],ID)
             self.assertEqual(closed.restore.call_args.kwargs,
-                             {'expected_workers':[WORKER],'chain':CHAIN})
+                             {'expected_workers':[WORKER],'chain':CHAIN,
+                              'runner':module.journal.JOURNAL_RUNNER})
 
 
 if __name__ == '__main__':

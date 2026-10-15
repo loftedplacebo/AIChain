@@ -85,7 +85,8 @@ def preflight(backup_id):
     return source_archive(backup_id), admin
 
 
-def restore(archive, admin, backup_id, *, expected_workers=None, chain=None):
+def restore(archive, admin, backup_id, *, expected_workers=None, chain=None,
+            runner=RUNNER):
     workers = expected_workers or []
     roles = [worker['role'] for worker in workers]
     if workers:
@@ -110,7 +111,7 @@ def restore(archive, admin, backup_id, *, expected_workers=None, chain=None):
             'targetDatabase': target, 'approvedMigrations': [],
         })
         result = subprocess.run((NODE, 'scripts/governance-postgres-recovery.cjs',
-                                 'restore', str(config)), cwd=RUNNER,
+                                 'restore', str(config)), cwd=runner,
                                 capture_output=True, text=True, timeout=300, check=False)
         if result.returncode:
             raise ValueError('Closed production restore failed')
@@ -130,7 +131,7 @@ def restore(archive, admin, backup_id, *, expected_workers=None, chain=None):
             'directory': restored['directory'],
         })
         checked = subprocess.run((NODE, 'scripts/governance-postgres-recovery.cjs',
-                                  'review', str(review)), cwd=RUNNER,
+                                  'review', str(review)), cwd=runner,
                                  capture_output=True, text=True, timeout=120, check=False)
         if checked.returncode:
             raise ValueError('Closed production restore review failed')

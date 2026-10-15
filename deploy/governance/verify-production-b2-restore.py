@@ -82,7 +82,7 @@ def private_json(directory, name, value):
 
 
 def download_and_restore(backup_id, key_prefix, *, expected_workers=None,
-                         chain=None):
+                         chain=None, runner=RUNNER):
     workers = expected_workers or []
     roles = [worker['role'] for worker in workers]
     DOWNLOADS.mkdir(mode=0o700, parents=True, exist_ok=True)
@@ -98,7 +98,7 @@ def download_and_restore(backup_id, key_prefix, *, expected_workers=None,
             'credentialsFile': str(RESTORE), 'keyFile': str(KEY),
         })
         result = subprocess.run((NODE, 'scripts/governance-backup-object-storage.cjs',
-                                 'download', str(config)), cwd=RUNNER,
+                                 'download', str(config)), cwd=runner,
                                 capture_output=True, text=True, timeout=300, check=False)
         if result.returncode:
             raise ValueError('B2 download or authentication failed')
@@ -117,7 +117,7 @@ def download_and_restore(backup_id, key_prefix, *, expected_workers=None,
         closed = import_module('production_closed_restore', CLOSED)
         admin = import_module('production_schema_closed', MODULE).protected(ADMIN, 1025)
         closed.restore(directory, admin, backup_id,
-                       expected_workers=workers, chain=chain)
+                       expected_workers=workers, chain=chain, runner=runner)
         print('production_b2_restore=review_passed;bucket=' + BUCKET +
               ';source_managed_database=untouched;service=off')
 
