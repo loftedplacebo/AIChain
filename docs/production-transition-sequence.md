@@ -108,6 +108,16 @@ No deployment transaction or production wallet has been created yet.
 `build/base-mainnet/deployment-manifest.json` with the exact unsigned creation
 bytes, source artifact digest and expected runtime hash for wallet review. It
 does not select a signer, access a wallet or broadcast a transaction.
+The owner chose one owner-controlled wallet for deployment and unattended
+publishing and approved a hidden-prompt transfer to a protected VPS file.
+`ReceiptBatchAnchor` has no owner or administrator role: the deployer receives
+no persistent contract privilege. The same wallet still controls its ETH and
+publisher identity, so the key must not appear in chat, arguments or logs.
+The [wallet installer](../deploy/governance/configure-production-mainnet-wallet.py)
+derives and displays only the public address, stores the key root-only under
+`/etc/aichain/production`, and leaves all services off. Its disposable-key
+Linux test passed. Contract deployment, funding and worker access remain
+separate reviewed steps.
 
 The [production API unit](../deploy/systemd/orvessian-production-api.service)
 uses a distinct Unix identity, release directory, protected environment file
