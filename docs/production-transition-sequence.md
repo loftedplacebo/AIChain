@@ -145,8 +145,19 @@ bytes. It checks chain 8453, balance, pending nonce, expected empty contract
 address and the returned transaction hash. Any uncertain broadcast result is
 reviewed by hash before a retry; a new nonce cannot be silently substituted.
 Its synthetic tests cover cap, chain, balance, nonce, intent tampering and
-idempotent broadcast behavior. This operator has not been staged or run on
-the VPS. A production-grade HTTPS RPC and reviewed fee caps are still needed,
+idempotent broadcast behavior. On 15 October the public operator script, its
+manifest helper and the exact compiled artifact were staged in the separate
+root-owned `/opt/aichain/orvessian-mainnet-deploy` directory with source
+SHA-256 hashes
+`6f5f9f8a9141fa6c34f3fe769e201d30db731c1709bcc6cc9bd02d0fd7b709a4`,
+`43caaa32c590a50acd94121650c71a1aa1974be7efb9c2cd375c3a60a0edc08b`,
+and `1af5044041280f1177ee31eecc780aa8e057e09df8ba8bb4bf6743d87767872d`.
+The runtime dependencies were copied from the pinned, inactive Production worker
+artifact so this one-time operator does not depend on a future worker release
+replacement. Two focused synthetic Linux tests passed; the staged script
+passed Linux syntax checking. No wallet was installed, RPC was configured,
+intent was signed or transaction was broadcast. A production-grade HTTPS RPC
+and reviewed fee caps are still needed,
 and the independent verifier still requires at least 12 canonical confirmations
 before binding the Production registry or admitting receipts.
 The per-project Production worker registry currently requires a distinct
