@@ -97,8 +97,9 @@ now require a prebound `prod` journal, exact mainnet anchor and expected signer
 addresses, verified TLS to `governance_prod` as `governance_prod_worker`, and a
 bounded policy. A `--preflight` path reads the database, RPC and contract code
 without writing the journal or sending a transaction. Focused launcher and
-recovery-binding tests pass. No Production worker release, key copy, worker
-login or unit has been activated, so this is not yet a live mainnet publisher.
+recovery-binding tests pass. The worker release is staged, but no key copy,
+worker login or unit instance has been activated, so this is not yet a live
+mainnet publisher.
 The deterministic runtime packager has a `production-worker` mode that includes
 the locked Node dependencies without changing the pilot worker archive.
 [The initial worker release helper](../deploy/governance/stage-production-worker-release.py)
@@ -137,6 +138,18 @@ the same nonce. The chosen wallet can publish for the first project; admitting
 additional publishing projects requires separate relayer wallets or a reviewed
 shared transaction coordinator. This limit must be resolved before opening
 self-service Production project creation.
+The first Production worker artifact was built on Linux from source commit
+`76a89ae1b6ffca41c8a0b0ed6d9a834a67e19371` with locked runtime
+dependencies and install scripts disabled. Eleven focused Linux tests passed.
+The deterministic artifact SHA-256 is
+`11deabf3d1604edf6c18c6523b951ec9102b954848f4e7261e630d99883792c5`
+with 5,885 regular-file members. The [pinned staging helper](../deploy/governance/stage-production-worker-release.py)
+rejects a different source commit or artifact hash. On 15 October it staged
+the archive at `/opt/aichain/orvessian-production-worker` and installed the
+unit template with SHA-256
+`b55aff6ce94a7f652f719f60afe6695282e70af9d900b8afbe2f053714b5e889`.
+The unit remains disabled with no instances; the Production prelaunch backup
+and synthetic pilot health checks were green after staging.
 
 The [production API unit](../deploy/systemd/orvessian-production-api.service)
 uses a distinct Unix identity, release directory, protected environment file
