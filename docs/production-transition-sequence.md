@@ -1,4 +1,4 @@
-# Production transition sequence — 11 October 2026
+# Production transition sequence — 15 October 2026
 
 This is the next execution plan. The existing Contabo/DigitalOcean/B2 pilot
 remains a synthetic `test` service with four of five project slots in use. It
@@ -34,10 +34,11 @@ and three pilot roles, and the verified empty production-only bootstrap.
   a dedicated production VM and a database standby as users, measured capacity
   and an availability target justify their cost. Independent backups and
   replacement-cluster recovery remain required.
-- **Evidence chain:** undecided. Do not copy the Base Sepolia contract, chain
-  setting, pilot wallet or test receipts into a production approval record.
-  Production receipt acceptance remains blocked until chain, contract,
-  custody, gas and verification are selected and tested.
+- **Evidence chain:** Base mainnet, selected by the owner on 14 October. Do not
+  copy the Base Sepolia contract, pilot wallet or test receipts into a
+  production approval record. Production receipt acceptance remains blocked
+  until the mainnet contract, custody, gas policy and independent verification
+  are deployed and tested.
 
 The [version-6 non-secret deployment plan](../deploy/governance/deployment-plan.example.json)
 and its validator must be checked against the selected Contabo test database
