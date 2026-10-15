@@ -99,6 +99,13 @@ bounded policy. A `--preflight` path reads the database, RPC and contract code
 without writing the journal or sending a transaction. Focused launcher and
 recovery-binding tests pass. No Production worker release, key copy, worker
 login or unit has been activated, so this is not yet a live mainnet publisher.
+The deterministic runtime packager has a `production-worker` mode that includes
+the locked Node dependencies without changing the pilot worker archive.
+[The initial worker release helper](../deploy/governance/stage-production-worker-release.py)
+requires an exact archive SHA-256, the reviewed unit-template hash and an
+empty protected Production worker registry. It stages code and installs the
+template disabled; it does not create an instance, copy a wallet key or start
+publishing. Its synthetic Linux staging test and the packager tests pass.
 Compile the candidate contract with
 `node scripts/compile-base-sepolia-anchor.cjs --mainnet`; the resulting local
 artifact is ignored under `build/base-mainnet/`. Its reviewed runtime hash is

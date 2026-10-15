@@ -12,7 +12,7 @@ SOURCE_DIRS = ('scripts', 'services/governance', 'sdk/typescript')
 
 
 def members(source, component):
-    roots = (*SOURCE_DIRS, *(['node_modules'] if component == 'api' else []))
+    roots = (*SOURCE_DIRS, *(['node_modules'] if component in ('api', 'production-worker') else []))
     for root in roots:
         directory = source / root
         if not directory.is_dir() or directory.is_symlink():
@@ -63,7 +63,7 @@ def main():
     parser.add_argument('--source', type=pathlib.Path, required=True)
     parser.add_argument('--output-dir', type=pathlib.Path, required=True)
     parser.add_argument('--release-id', required=True)
-    parser.add_argument('--component', choices=('api', 'worker', 'both'), default='both')
+    parser.add_argument('--component', choices=('api', 'worker', 'production-worker', 'both'), default='both')
     args = parser.parse_args()
     if not re.fullmatch(r'[a-z0-9][a-z0-9-]{0,63}', args.release_id):
         raise ValueError('Invalid release ID')

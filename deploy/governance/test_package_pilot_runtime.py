@@ -50,6 +50,23 @@ class PackageTests(unittest.TestCase):
             self.assertTrue((root / 'production-test-api.tar.gz').is_file())
             self.assertFalse((root / 'production-test-worker.tar.gz').exists())
 
+    def test_production_worker_packages_dependencies_without_changing_pilot_worker(self):
+        with tempfile.TemporaryDirectory(dir=HERE) as temporary:
+            root = pathlib.Path(temporary)
+            for name in ('scripts', 'services/governance', 'sdk/typescript',
+                         'node_modules/ethers'):
+                directory = root / name
+                directory.mkdir(parents=True)
+                (directory / 'entry.cjs').write_text('source')
+            production = root / 'production-worker.tar.gz'
+            PACKAGE.package(root, production, 'production-worker')
+            with tarfile.open(production, 'r:gz') as archive:
+                self.assertIn('node_modules/ethers/entry.cjs', archive.getnames())
+            pilot = root / 'pilot-worker.tar.gz'
+            PACKAGE.package(root, pilot, 'worker')
+            with tarfile.open(pilot, 'r:gz') as archive:
+                self.assertNotIn('node_modules/ethers/entry.cjs', archive.getnames())
+
 
 if __name__ == '__main__':
     unittest.main()
