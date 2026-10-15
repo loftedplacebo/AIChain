@@ -105,6 +105,33 @@ class RestorePreflightTests(unittest.TestCase):
                              {'expected_workers':[WORKER],'chain':CHAIN,
                               'runner':module.journal.JOURNAL_RUNNER})
 
+    def test_only_successful_closed_restore_records_acceptance(self):
+        with tempfile.TemporaryDirectory(prefix='synthetic-prod-b2-accept-') as temp:
+            acceptance = pathlib.Path(temp) / 'journal-restore-acceptance.json'
+            prefix = 'orvessian-production/prod/' + ID + '-synthetic'
+            with mock.patch.object(module, 'ACCEPTANCE', acceptance), \
+                 mock.patch.object(module, 'preflight',
+                                   return_value=(prefix, [WORKER], CHAIN)), \
+                 mock.patch.object(sys, 'argv', ['drill', '--backup-id', ID,
+                                                '--apply']), \
+                 mock.patch.object(module.base, 'download_and_restore') as drill, \
+                 redirect_stdout(io.StringIO()):
+                drill.side_effect = ValueError('synthetic restore failure')
+                with self.assertRaisesRegex(ValueError, 'synthetic restore'):
+                    module.main()
+                self.assertFalse(acceptance.exists())
+
+                drill.side_effect = None
+                module.main()
+                recorded = json.loads(acceptance.read_text())
+                self.assertEqual(recorded['backupId'], ID)
+                self.assertEqual(recorded['keyPrefix'], prefix)
+                self.assertEqual(recorded['journalRoles'], [ROLE])
+                self.assertEqual(recorded['chain'], CHAIN)
+                self.assertEqual(recorded['result'],
+                                 'closed-restore-review-passed')
+                self.assertEqual(acceptance.stat().st_mode & 0o777, 0o600)
+
 
 if __name__ == '__main__':
     unittest.main()

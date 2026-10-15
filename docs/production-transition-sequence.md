@@ -539,6 +539,18 @@ then checks each restored journal's project, signers, Base mainnet contract and
 scope. Synthetic Linux tests cover pointer rejection, download-to-restore
 scope forwarding and restored-journal identity. A real B2 worker-journal
 upload and closed restore has not yet occurred.
+After a successful journal-bearing B2 download and closed restore review, the
+drill atomically writes the root-only
+`/var/lib/aichain-production-backup/journal-restore-acceptance.json` marker.
+It records the exact backup ID, B2 prefix, worker roles and Base mainnet chain
+binding, without credentials. The read-only
+[`check-production-journal-handoff.py`](../deploy/governance/check-production-journal-handoff.py)
+requires that marker to match the current B2 completion pointer and registered
+workers, and requires the prelaunch timer to be active while the journal timer
+is disabled. A newer upload invalidates an older acceptance. This checker
+prepares the operator review; it does not switch either timer. Its Linux
+synthetic tests cover successful acceptance, failed-restore non-acceptance,
+changed worker scope, stale acceptance and incorrect timer state.
 The inactive [journal backup service](../deploy/systemd/orvessian-production-journal-backup.service)
 and [02:00 UTC timer](../deploy/systemd/orvessian-production-journal-backup.timer)
 are prepared for the handoff. The separate

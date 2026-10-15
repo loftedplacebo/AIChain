@@ -8,12 +8,16 @@ import os
 import pathlib
 import re
 import subprocess
+import tempfile
+from datetime import datetime, timezone
 
 from production_worker_registry import load_registry, verify_catalog
 
 
 HERE = pathlib.Path(__file__).resolve().parent
 SETUP = pathlib.Path('/opt/aichain/governance-pilot-db-setup')
+ACCEPTANCE = pathlib.Path(
+    '/var/lib/aichain-production-backup/journal-restore-acceptance.json')
 
 
 def import_script(name, path):
@@ -85,6 +89,47 @@ def preflight(backup_id):
     return pointer['keyPrefix'], workers, chain
 
 
+def record_acceptance(backup_id, key_prefix, workers, chain):
+    """Record a successful closed B2 drill without storing credentials."""
+    directory = ACCEPTANCE.parent
+    info = directory.lstat()
+    if not directory.is_dir() or directory.is_symlink() or \
+            info.st_uid != 0 or info.st_mode & 0o077:
+        raise ValueError('Protected Production backup state directory required')
+    value = {
+        'version': 1,
+        'environment': 'prod',
+        'backupId': backup_id,
+        'keyPrefix': key_prefix,
+        'journalRoles': [worker['role'] for worker in workers],
+        'chain': chain,
+        'result': 'closed-restore-review-passed',
+        'completedAt': datetime.now(timezone.utc).isoformat(),
+    }
+    temporary = None
+    try:
+        fd, name = tempfile.mkstemp(prefix='.journal-restore-acceptance-',
+                                    dir=directory)
+        temporary = pathlib.Path(name)
+        with os.fdopen(fd, 'w', encoding='utf-8') as handle:
+            os.fchmod(handle.fileno(), 0o600)
+            json.dump(value, handle, sort_keys=True, separators=(',', ':'))
+            handle.write('\n')
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary, ACCEPTANCE)
+        temporary = None
+        directory_fd = os.open(directory, os.O_RDONLY | os.O_DIRECTORY |
+                               os.O_NOFOLLOW)
+        try:
+            os.fsync(directory_fd)
+        finally:
+            os.close(directory_fd)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--backup-id', required=True)
@@ -95,6 +140,9 @@ def main():
         base.download_and_restore(args.backup_id, key_prefix,
                                   expected_workers=workers, chain=chain,
                                   runner=journal.JOURNAL_RUNNER)
+        record_acceptance(args.backup_id, key_prefix, workers, chain)
+        print('production_journal_b2_restore=accepted;backup_id=' +
+              args.backup_id + ';workers=' + str(len(workers)))
     else:
         print('production_journal_b2_restore=ready;mode=read-only;workers=' +
               str(len(workers)))
