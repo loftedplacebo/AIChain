@@ -118,6 +118,12 @@ derives and displays only the public address, stores the key root-only under
 `/etc/aichain/production`, and leaves all services off. Its disposable-key
 Linux test passed. Contract deployment, funding and worker access remain
 separate reviewed steps.
+The per-project Production worker registry currently requires a distinct
+relayer address for each project to prevent independent workers from racing
+the same nonce. The chosen wallet can publish for the first project; admitting
+additional publishing projects requires separate relayer wallets or a reviewed
+shared transaction coordinator. This limit must be resolved before opening
+self-service Production project creation.
 
 The [production API unit](../deploy/systemd/orvessian-production-api.service)
 uses a distinct Unix identity, release directory, protected environment file
