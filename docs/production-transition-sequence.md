@@ -247,11 +247,11 @@ project, including the first ten design partners. The owner-controlled wallet
 will deploy the contract and fund each relayer with a small capped amount under
 a reviewed funding policy; its private key must not be copied into a worker.
 This prevents independent workers from racing the same transaction nonce.
-Production project creation is now denied by default in the API source until
-the per-project provisioning, funding, worker registration and journal-aware
-backup handoff have passed acceptance. This source gate is not yet deployed;
-the customer routes at the public edge remain closed. A later reviewed release
-must provide an explicit admission switch with a verified readiness check.
+Production project creation is denied by default in the deployed private API
+until per-project provisioning, funding, worker registration and journal-aware
+backup handoff pass acceptance. Customer routes at the public edge remain
+closed. A later reviewed release must provide an explicit admission switch
+with a verified readiness check.
 The [first-cohort worker preparer](../deploy/governance/provision-production-project-worker.py)
 now has a candidate operator path for an **existing** Production project. It
 requires the exact current project catalog and pinned worker release, creates
