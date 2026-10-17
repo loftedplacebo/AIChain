@@ -21,6 +21,12 @@ still has zero projects. The portal and customer API routes remain closed, and
 the API's project-creation gate is closed in the deployed release. The current
 02:00 UTC backup schedule intentionally rejects any Production project or
 worker until the journal-aware handoff passes.
+The same private API now has the reviewed Base mainnet contract and public RPC
+binding installed through a guarded configuration restart. The read-only RPC
+check verified chain `8453`, exact deployed runtime hash and canonical
+deployment receipt with 10,091 confirmations before installation. The API,
+backup and webhook-only edge passed again afterward. This prepares evidence
+inspection; no Production signer, worker, project or receipt has been admitted.
 
 The [11 October shared-cluster change review](production-shared-cluster-change-review.md)
 records the earlier proposal and baseline. The owner has selected the
