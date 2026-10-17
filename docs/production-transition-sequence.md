@@ -703,6 +703,14 @@ worker units, the due upload window, the new timer and API, and confirms the
 prelaunch timer is disabled. Its synthetic Linux coverage and pointer-mismatch
 test passed. Neither timer has been switched: the prelaunch timer remains the
 active guard for the still-empty Production database.
+The guarded [timer handoff helper](../deploy/governance/activate-production-journal-backup.py)
+requires the exact latest journal-bearing B2 set, its closed restore
+acceptance, and pinned service and timer units before switching from the
+zero-project timer. It checks the new timer and complete journal backup
+health, then attempts to restore the prior timer if acceptance fails.
+Synthetic Linux tests cover the switch and failed-health rollback. This
+helper has not been applied: Production still has no project, worker journal
+or accepted journal-bearing restore.
 The [read-only health checker](../deploy/governance/check-production-prelaunch-backup-health.py)
 checks the 02:00 UTC schedule with a 03:00 due threshold. A fresh download with
 the separate Read Only B2 credential authenticated the first scheduled set.
