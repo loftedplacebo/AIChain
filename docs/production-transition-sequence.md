@@ -4,6 +4,24 @@ This is the next execution plan. The existing Contabo/DigitalOcean/B2 pilot
 remains a synthetic `test` service with four of five project slots in use. It
 does not become production by changing a hostname or WorkOS client ID.
 
+## Current release checkpoint
+
+On 17 October the private Production API was advanced to pinned source commit
+`44252f2a12f6f584ecf17af60caa6a29467d8158` with the guarded active
+release helper. The previous `ed1f0f7c389392511a145da54026203745b1b13d`
+release remains available for rollback. A first candidate correctly rolled
+back when its SQL migration files acquired Windows CRLF line endings and no
+longer matched the 19 applied migration checksums. The runtime packager now
+normalizes SQL migration bytes to LF; its reproducibility test passed, all 19
+packaged migrations matched the running release byte for byte, and the
+corrected candidate started on a private diagnostic port before activation.
+After the switch, the private API, daily Production B2 backup, public
+webhook-only edge, and four-worker synthetic pilot checks passed. Production
+still has zero projects. The portal and customer API routes remain closed, and
+the API's project-creation gate is closed in the deployed release. The current
+02:00 UTC backup schedule intentionally rejects any Production project or
+worker until the journal-aware handoff passes.
+
 The [11 October shared-cluster change review](production-shared-cluster-change-review.md)
 records the earlier proposal and baseline. The owner has selected the
 [Contabo test / DigitalOcean production cutover](production-architecture-cutover-note.md)
