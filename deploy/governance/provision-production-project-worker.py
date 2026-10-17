@@ -39,8 +39,8 @@ RPC = 'https://mainnet.base.org'
 POLICY_KEYS = {'batchSize', 'maxTransactionsPerHour', 'maxGasPriceWei',
                'dailyReservationWei', 'l1AllowanceWei'}
 UNIT_SHA256 = 'b55aff6ce94a7f652f719f60afe6695282e70af9d900b8afbe2f053714b5e889'
-RELEASE_ID = {'sourceCommit': 'fa2b929e05f0a3069054b935e0c0aa28e2ba860f',
-              'archiveSha256': '7c2f8cb49a8f62df43fac38f76e7a70bda14cdcb5bab61e6051ceadcf1ba549a',
+RELEASE_ID = {'sourceCommit': 'ba47cb8140c7ea7ecb12e57bd52c52007f6a43d2',
+              'archiveSha256': '382b1987af4e15300ae40b7078f26086d5901b4f5e4b2a4edfa081b3eaf8635f',
               'serviceTemplate': TEMPLATE.name, 'activation': 'disabled'}
 ORDER = int('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141', 16)
 ADDRESS_SCRIPT = ("const fs=require('node:fs');const {Wallet}=require('ethers');"

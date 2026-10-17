@@ -232,6 +232,22 @@ identity checks. This tool does not create the customer project, enable a
 worker, or switch backups. The first project must be handled in a supervised
 window, followed by a journal-bearing B2 upload, closed restore, timer handoff,
 and independent receipt acceptance before general project admission.
+An integration test found that the staged Production worker rejected every
+SQLite journal larger than 4 KiB because it reused the private-key file limit.
+The reviewed fix keeps keys at 4 KiB and permits a bounded worker-owned journal.
+The corrected Linux worker artifact from commit
+`ba47cb8140c7ea7ecb12e57bd52c52007f6a43d2` has SHA-256
+`382b1987af4e15300ae40b7078f26086d5901b4f5e4b2a4edfa081b3eaf8635f`.
+Five worker tests and five provisioner tests passed on Linux, including the
+actual staged worker journal reader. The pinned replacement preflight accepted
+5,889 archive members and replaced the **inactive** worker release on 17 October.
+The prior `fa2b929e05f0` artifact remains available; the staged protected
+rollback helper passed its read-only rollback preflight. The root-only
+provisioner was staged with matching SHA-256
+`41b66b7decc23d8d9cb8d243b55626b16fb350f7b1e2440b6b0aad79a46bb9c9`.
+Production prelaunch backup, private API and synthetic pilot health stayed green;
+there are still zero Production projects, zero worker instances and no funding
+transaction.
 The first Production worker artifact was built on Linux from source commit
 `76a89ae1b6ffca41c8a0b0ed6d9a834a67e19371` with locked runtime
 dependencies and install scripts disabled. Eleven focused Linux tests passed.
