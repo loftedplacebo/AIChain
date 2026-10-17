@@ -3,12 +3,17 @@
 // Two-step Base mainnet deployment. Prepare persists one signed transaction;
 // broadcast can only resend those same bytes, so a retry cannot change nonce.
 const fs=require('node:fs'),path=require('node:path');
-const {JsonRpcProvider,Wallet,Transaction,getCreateAddress,keccak256}=require('ethers');
+const {JsonRpcProvider,Wallet,Transaction,Interface,getCreateAddress}=require('ethers');
 const {prepare}=require('./prepare-base-mainnet-deploy.cjs');
 
 const CHAIN=8453;
 const CREATION_HASH='0xccf23437b086cba0f033a19c353ca582953b1e725e57c59798fb43531c06d1ce';
 const RUNTIME_HASH='0x507e6fe47195ae115026837a14f7613537f29c11f0b798bda1abc0bda2eab10f';
+const GAS_ORACLE='0x420000000000000000000000000000000000000F';
+const ORACLE_ABI=new Interface([
+ 'function getL1Fee(bytes) view returns (uint256)',
+ 'function getOperatorFee(uint256) view returns (uint256)',
+]);
 const ROOT=path.resolve(__dirname,'../build/base-mainnet');
 const KEY='/etc/aichain/production/mainnet-publisher.key';
 const STATE='/var/lib/aichain-production-deployment';
@@ -32,6 +37,16 @@ function protectedDirectory(dir){
  const info=fs.lstatSync(dir);
  if(!info.isDirectory()||info.isSymbolicLink()||info.uid!==0||(info.mode&0o777)!==0o700)throw Error('Root-only deployment directory required');
 }
+async function extraFees(provider,unsignedTransaction,gasLimit){
+ const l1=ORACLE_ABI.decodeFunctionResult('getL1Fee',await provider.call({
+  to:GAS_ORACLE,data:ORACLE_ABI.encodeFunctionData('getL1Fee',[unsignedTransaction]),
+ }))[0];
+ const operator=ORACLE_ABI.decodeFunctionResult('getOperatorFee',await provider.call({
+  to:GAS_ORACLE,data:ORACLE_ABI.encodeFunctionData('getOperatorFee',[gasLimit]),
+ }))[0];
+ if(typeof l1!=='bigint'||typeof operator!=='bigint'||l1<0n||operator<0n)throw Error('Valid Base fee-oracle quote required');
+ return {l1DataFee:l1,operatorFee:operator};
+}
 async function quote({provider,address,manifest}){
  if(Number((await provider.getNetwork()).chainId)!==CHAIN)throw Error('Base mainnet RPC required');
  const [nonce,gasEstimate,fees,balance]=await Promise.all([
@@ -41,15 +56,21 @@ async function quote({provider,address,manifest}){
  ]);
  if(!Number.isSafeInteger(nonce)||nonce<0||gasEstimate<=0n||fees.maxFeePerGas==null||fees.maxPriorityFeePerGas==null||fees.maxFeePerGas<fees.maxPriorityFeePerGas)throw Error('Valid mainnet nonce and EIP-1559 fee quote required');
  const gasLimit=(gasEstimate*125n+99n)/100n;
+ const unsigned=Transaction.from({type:2,chainId:CHAIN,nonce,to:null,value:0n,
+  data:manifest.creation.data,gasLimit,maxFeePerGas:fees.maxFeePerGas,
+  maxPriorityFeePerGas:fees.maxPriorityFeePerGas}).unsignedSerialized;
+ const extras=await extraFees(provider,unsigned,gasLimit);
+ const l2Maximum=gasLimit*fees.maxFeePerGas;
  return {address,nonce,gasEstimate,gasLimit,maxFeePerGas:fees.maxFeePerGas,
   maxPriorityFeePerGas:fees.maxPriorityFeePerGas,balance,
-  maximumCost:gasLimit*fees.maxFeePerGas};
+  l2Maximum,l1DataFee:extras.l1DataFee,operatorFee:extras.operatorFee,
+  estimatedTotal:l2Maximum+extras.l1DataFee+extras.operatorFee};
 }
 async function prepareIntent({provider,signer,manifest,maxFeeWei,maxTotalWei}){
  const review=await quote({provider,address:signer.address,manifest});
  if(review.maxFeePerGas>positive(maxFeeWei,'fee cap')||
-    review.maximumCost>positive(maxTotalWei,'total spend cap')||
-    review.balance<review.maximumCost)throw Error('Mainnet fee, total spend or balance limit exceeded');
+    review.estimatedTotal>positive(maxTotalWei,'estimated spend cap')||
+    review.balance<review.estimatedTotal)throw Error('Mainnet fee, estimated spend or balance limit exceeded');
  const raw=await signer.signTransaction({type:2,chainId:CHAIN,nonce:review.nonce,
   to:null,value:0n,data:manifest.creation.data,gasLimit:review.gasLimit,
   maxFeePerGas:review.maxFeePerGas,
@@ -59,14 +80,20 @@ async function prepareIntent({provider,signer,manifest,maxFeeWei,maxTotalWei}){
  return {version:1,chainId:CHAIN,contract:'ReceiptBatchAnchor',
   from:signer.address,nonce:review.nonce,contractAddress:getCreateAddress({from:signer.address,nonce:review.nonce}),
   transactionHash:tx.hash,rawTransaction:raw,creationDataHash:CREATION_HASH,
-  runtimeCodeHash:RUNTIME_HASH,maximumCostWei:review.maximumCost.toString(),
+  runtimeCodeHash:RUNTIME_HASH,l2MaximumWei:review.l2Maximum.toString(),
+  l1DataFeeAtPrepareWei:review.l1DataFee.toString(),
+  operatorFeeAtPrepareWei:review.operatorFee.toString(),
+  estimatedTotalAtPrepareWei:review.estimatedTotal.toString(),
+  approvedEstimatedTotalCapWei:positive(maxTotalWei,'estimated spend cap').toString(),
   maxFeePerGasWei:review.maxFeePerGas.toString(),gasLimit:review.gasLimit.toString()};
 }
 function validateIntent(intent,manifest){
  if(!intent||typeof intent!=='object'||Object.keys(intent).sort().join(',')!==[
   'version','chainId','contract','from','nonce','contractAddress',
   'transactionHash','rawTransaction','creationDataHash','runtimeCodeHash',
-  'maximumCostWei','maxFeePerGasWei','gasLimit'].sort().join(',')||
+  'l2MaximumWei','l1DataFeeAtPrepareWei','operatorFeeAtPrepareWei',
+  'estimatedTotalAtPrepareWei','approvedEstimatedTotalCapWei',
+  'maxFeePerGasWei','gasLimit'].sort().join(',')||
   intent.version!==1||intent.chainId!==CHAIN||intent.contract!=='ReceiptBatchAnchor'||
   intent.creationDataHash!==CREATION_HASH||intent.runtimeCodeHash!==RUNTIME_HASH)throw Error('Exact reviewed deployment intent required');
  const tx=Transaction.from(intent.rawTransaction);
@@ -75,7 +102,10 @@ function validateIntent(intent,manifest){
   tx.data.toLowerCase()!==manifest.creation.data.toLowerCase()||
   tx.nonce!==intent.nonce||tx.gasLimit.toString()!==intent.gasLimit||
   tx.maxFeePerGas.toString()!==intent.maxFeePerGasWei||
-  (tx.gasLimit*tx.maxFeePerGas).toString()!==intent.maximumCostWei||
+  (tx.gasLimit*tx.maxFeePerGas).toString()!==intent.l2MaximumWei||
+  BigInt(intent.l2MaximumWei)+BigInt(intent.l1DataFeeAtPrepareWei)+
+   BigInt(intent.operatorFeeAtPrepareWei)!==BigInt(intent.estimatedTotalAtPrepareWei)||
+  BigInt(intent.estimatedTotalAtPrepareWei)>BigInt(intent.approvedEstimatedTotalCapWei)||
   getCreateAddress({from:tx.from,nonce:tx.nonce}).toLowerCase()!==intent.contractAddress.toLowerCase())throw Error('Signed deployment intent mismatch');
  return tx;
 }
@@ -101,7 +131,10 @@ async function broadcastIntent({provider,intent,manifest}){
  if(await provider.getTransaction(tx.hash))return {status:'pending',transactionHash:tx.hash,contractAddress:intent.contractAddress};
  if(await provider.getCode(intent.contractAddress)!=='0x')throw Error('Expected contract address already contains code');
  if(await provider.getTransactionCount(intent.from,'pending')!==intent.nonce)throw Error('Wallet nonce changed; do not create another deployment intent');
- if(await provider.getBalance(intent.from)<BigInt(intent.maximumCostWei))throw Error('Wallet balance below signed maximum spend');
+ const extras=await extraFees(provider,tx.unsignedSerialized,tx.gasLimit);
+ const estimatedTotal=tx.gasLimit*tx.maxFeePerGas+extras.l1DataFee+extras.operatorFee;
+ if(estimatedTotal>BigInt(intent.approvedEstimatedTotalCapWei))throw Error('Current Base fee estimate exceeds reviewed cap');
+ if(await provider.getBalance(intent.from)<estimatedTotal)throw Error('Wallet balance below current estimated spend');
  const sent=await provider.broadcastTransaction(intent.rawTransaction);
  if(sent.hash!==tx.hash)throw Error('RPC returned a different transaction hash');
  return {status:'broadcast-awaiting-independent-verification',transactionHash:tx.hash,contractAddress:intent.contractAddress};
@@ -129,14 +162,18 @@ async function main(){
     const result=await quote({provider,address:signer.address,manifest});
     console.log(JSON.stringify({status:'quote-only',chainId:CHAIN,address:signer.address,
      nonce:result.nonce,gasEstimate:result.gasEstimate.toString(),gasLimit:result.gasLimit.toString(),
-     maxFeePerGasWei:result.maxFeePerGas.toString(),maximumCostWei:result.maximumCost.toString(),
+     maxFeePerGasWei:result.maxFeePerGas.toString(),l2MaximumWei:result.l2Maximum.toString(),
+     l1DataFeeWei:result.l1DataFee.toString(),operatorFeeWei:result.operatorFee.toString(),
+     estimatedTotalWei:result.estimatedTotal.toString(),
      balanceWei:result.balance.toString(),creationDataHash:CREATION_HASH}));
    }else{
     const intent=await prepareIntent({provider,signer,manifest,maxFeeWei:args[0],maxTotalWei:args[1]});
     saveIntent(intent,manifest);
     console.log(JSON.stringify({status:'signed-not-broadcast',chainId:CHAIN,
      from:intent.from,nonce:intent.nonce,contractAddress:intent.contractAddress,
-     transactionHash:intent.transactionHash,maximumCostWei:intent.maximumCostWei}));
+     transactionHash:intent.transactionHash,
+     estimatedTotalAtPrepareWei:intent.estimatedTotalAtPrepareWei,
+     approvedEstimatedTotalCapWei:intent.approvedEstimatedTotalCapWei}));
    }
   }else{
    protectedDirectory(STATE);

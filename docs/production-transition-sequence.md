@@ -117,7 +117,7 @@ approved mainnet deployment, set an HTTPS `GOVERNANCE_MAINNET_RPC_URL` and run
 The read-only verifier requires chain 8453, exact runtime bytes, successful
 contract creation, canonical block hash and at least 12 confirmations. A
 contract address alone only reports a runtime-code match and exits nonzero.
-No deployment transaction or production wallet has been created yet.
+No deployment transaction has been signed or broadcast.
 `node scripts/prepare-base-mainnet-deploy.cjs` produces the ignored
 `build/base-mainnet/deployment-manifest.json` with the exact unsigned creation
 bytes, source artifact digest and expected runtime hash for wallet review. It
@@ -129,23 +129,32 @@ no persistent contract privilege. The same wallet still controls its ETH and
 publisher identity, so the key must not appear in chat, arguments or logs.
 The [wallet installer](../deploy/governance/configure-production-mainnet-wallet.py)
 derives and displays only the public address, stores the key root-only under
-`/etc/aichain/production`, and leaves all services off. Its disposable-key
-Linux test passed. Contract deployment, funding and worker access remain
-separate reviewed steps.
+`/etc/aichain/production`, and leaves all services off. On 17 October the
+owner-installed wallet resolved to public address
+`0xec502b5f4D1925138a7409D9a7b55Fba20e13cc3`; the VPS file was checked
+as root-owned, regular and mode `0600` without reading its contents. Its
+disposable-key Linux test passed. Contract deployment, funding and worker
+access remain separate reviewed steps.
 The [two-step mainnet deployment operator](../scripts/deploy-base-mainnet-anchor.cjs)
 now pins the reviewed creation hash
 `0xccf23437b086cba0f033a19c353ca582953b1e725e57c59798fb43531c06d1ce`
 and runtime hash
 `0x507e6fe47195ae115026837a14f7613537f29c11f0b798bda1abc0bda2eab10f`.
 `--quote` reads the protected wallet and HTTPS RPC without signing;
-`--prepare <max-fee-wei> <max-total-wei>` signs exactly one capped contract
+`--prepare <max-fee-wei> <max-total-wei>` signs exactly one contract
 creation transaction into a root-only intent file without broadcasting;
 `--status` checks that hash; and `--broadcast` can transmit only the saved
-bytes. It checks chain 8453, balance, pending nonce, expected empty contract
-address and the returned transaction hash. Any uncertain broadcast result is
+bytes. `max-fee-wei` bounds the signed L2 gas price; `max-total-wei` is a
+review threshold for the estimated L2 maximum plus Base L1 data and operator
+fees, checked again immediately before broadcast. The additional fees can
+change before inclusion, so this is **not** an absolute on-chain spend cap.
+The operator fails closed if the Base fee oracle cannot be queried. It checks
+chain 8453, balance, pending nonce, expected empty contract address and the
+returned transaction hash. Any uncertain broadcast result is
 reviewed by hash before a retry; a new nonce cannot be silently substituted.
-Its synthetic tests cover cap, chain, balance, nonce, intent tampering and
-idempotent broadcast behavior. On 15 October the public operator script, its
+Its synthetic tests cover fee estimates and fee changes, chain, balance,
+nonce, intent tampering and idempotent broadcast behavior. On 15 October the
+initial public operator script, its
 manifest helper and the exact compiled artifact were staged in the separate
 root-owned `/opt/aichain/orvessian-mainnet-deploy` directory with source
 SHA-256 hashes
@@ -154,10 +163,16 @@ SHA-256 hashes
 and `1af5044041280f1177ee31eecc780aa8e057e09df8ba8bb4bf6743d87767872d`.
 The runtime dependencies were copied from the pinned, inactive Production worker
 artifact so this one-time operator does not depend on a future worker release
-replacement. Two focused synthetic Linux tests passed; the staged script
-passed Linux syntax checking. No wallet was installed, RPC was configured,
-intent was signed or transaction was broadcast. A production-grade HTTPS RPC
-and reviewed fee caps are still needed,
+replacement. The fee-aware revision supersedes the initial staged operator
+script. Its staged SHA-256 is
+`7ba64ac6da1cbc367aee2b5360fbf928d3cd17c2037c12471f9ef542b873a704`;
+all three focused synthetic Linux tests passed on 17 October. A read-only
+Base mainnet quote through the public RPC at that time returned wallet nonce
+52, estimated total `7558831199679` wei (about 0.00000756 ETH), and balance
+`1059226824141` wei (about 0.00000106 ETH). The wallet is underfunded for
+that quote, which is time-sensitive and not a guaranteed maximum cost. No
+intent has been signed or transaction broadcast. A reliable production HTTPS
+RPC, sufficient mainnet ETH and a freshly reviewed fee estimate remain needed,
 and the independent verifier still requires at least 12 canonical confirmations
 before binding the Production registry or admitting receipts.
 The per-project Production worker registry currently requires a distinct
