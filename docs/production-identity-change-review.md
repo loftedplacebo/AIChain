@@ -95,10 +95,14 @@ private start returned HTTP 200 after the application had time to initialize.
 The helper now waits up to five seconds for that private response. After the
 bounded readiness fix, the read-only preflight passed and the preview activated.
 Public checks returned 200 for the workspace and AuthKit status, and 404 for
-project APIs. Production still has zero users. The journal-free backup health
-checker reported unhealthy solely because it required the portal to be off;
-the checker and scheduled runner are being updated to recognize the exact
-reviewed preview and quiesce/restart it around a backup.
+project, key and health APIs. WorkOS Production user count is zero, with no
+pending invite for the allowlisted owner email. The journal-free health checker
+now accepts only the exact webhook-only configuration with the portal off or
+the exact owner-preview configuration with the portal active and route checks
+passing. The scheduled backup runner now pauses and restarts the preview around
+its database snapshot. Its read-only preflight passed; no extra backup was run.
+The regular Production backup health check is green with `portal_mode` set to
+`owner-preview`.
 
 The callback, origin, logout, signing secret and restricted webhook route are
 configured. Step 4 is not accepted until the portal, signed delivery and live

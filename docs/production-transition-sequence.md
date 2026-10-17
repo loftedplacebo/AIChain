@@ -22,6 +22,12 @@ project/key APIs and all publishing routes remain closed, and
 the API's project-creation gate is closed in the deployed release. The current
 02:00 UTC backup schedule intentionally rejects any Production project or
 worker until the journal-aware handoff passes.
+The owner preview returns 200 for the workspace and WorkOS status while the
+project, key and health API routes return 404. The journal-free backup checker
+and runner now accept only the pinned preview edge; the runner will pause and
+restart the portal around the scheduled database capture. Its read-only
+preflight and post-preview backup health check passed; no extra backup was
+triggered. WorkOS Production still has zero users and no pending owner invite.
 The same private API now has the reviewed Base mainnet contract and public RPC
 binding installed through a guarded configuration restart. The read-only RPC
 check verified chain `8453`, exact deployed runtime hash and canonical
