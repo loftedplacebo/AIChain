@@ -701,6 +701,8 @@ code, then quiesces the portal, every worker and API for one encrypted database
 and journal capture. It authenticates the archive before B2 upload and tries to
 restart every previously active writer even if capture fails. Synthetic Linux
 tests cover catalog rejection and the stop/capture/upload/restart sequence.
+It also recognizes the disabled-at-boot owner preview, verifies its pinned
+Nginx configuration, and stops/restarts it with the writers during capture.
 On 15 October the journal-aware archive core was staged beside the live
 prelaunch runner in the immutable, root-only
 `/opt/aichain/orvessian-production-journal-backup-runner-61a063e` directory.

@@ -60,9 +60,21 @@ def preflight(schema):
             'UnitFileState=enabled', 'ActiveState=active'}:
         raise ValueError('Active isolated Production API required')
     portal = common.status(common.PORTAL)
-    if portal not in ({'UnitFileState=disabled', 'ActiveState=inactive'},
-                      {'UnitFileState=enabled', 'ActiveState=active'}):
+    portal_off = portal == {'UnitFileState=disabled', 'ActiveState=inactive'}
+    owner_preview = portal == {'UnitFileState=disabled',
+                               'ActiveState=active'}
+    production_active = portal == {'UnitFileState=enabled',
+                                   'ActiveState=active'}
+    if not (portal_off or owner_preview or production_active):
         raise ValueError('Reviewed Production portal state required')
+    if portal_off and not common.edge_matches(common.WEBHOOK_ONLY_SHA256):
+        raise ValueError('Closed Production edge required with portal off')
+    if owner_preview and (
+            not common.edge_matches(common.OWNER_PREVIEW_SHA256) or
+            not common.run('nginx', '-t')):
+        raise ValueError('Pinned Production owner preview edge required')
+    if production_active and not common.run('nginx', '-t'):
+        raise ValueError('Production customer edge failed Nginx validation')
     pinned_core()
     key = schema.protected(common.ROOT / 'backup.key', 65)
     if not re.fullmatch(r'[a-f0-9]{64}', key):
@@ -86,8 +98,7 @@ def preflight(schema):
                 'UnitFileState=enabled', 'ActiveState=active'}:
             raise ValueError('Registered Production worker is unavailable')
         verify_journal_binding(worker, chain)
-    return admin, workers, chain, portal == {
-        'UnitFileState=enabled', 'ActiveState=active'}
+    return admin, workers, chain, not portal_off
 
 
 def capture_and_upload(schema, admin, workers, chain, portal_active):
