@@ -104,13 +104,17 @@ def replace_with(source):
 
 
 def private_portal_ready():
-    result = subprocess.run(
-        ['curl', '--silent', '--show-error', '--max-time', '8',
-         '--output', '/dev/null', '--write-out', '%{http_code}',
-         '--header', 'Host: prod.orvessian.com',
-         'http://127.0.0.1:3003/workspace'],
-        capture_output=True, text=True, timeout=10, check=False)
-    return result.returncode == 0 and result.stdout == '200'
+    for _ in range(10):
+        result = subprocess.run(
+            ['curl', '--silent', '--show-error', '--max-time', '3',
+             '--output', '/dev/null', '--write-out', '%{http_code}',
+             '--header', 'Host: prod.orvessian.com',
+             'http://127.0.0.1:3003/workspace'],
+            capture_output=True, text=True, timeout=5, check=False)
+        if result.returncode == 0 and result.stdout == '200':
+            return True
+        time.sleep(0.5)
+    return False
 
 
 def apply():
