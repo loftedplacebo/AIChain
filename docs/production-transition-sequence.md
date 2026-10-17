@@ -711,6 +711,12 @@ health, then attempts to restore the prior timer if acceptance fails.
 Synthetic Linux tests cover the switch and failed-health rollback. This
 helper has not been applied: Production still has no project, worker journal
 or accepted journal-bearing restore.
+The journal backup runner and restore/handoff checks are staged on Contabo.
+The missing journal health checker was staged and its synthetic test passed;
+the reviewed service and timer templates passed `systemd-analyze verify` and
+were installed with the timer **disabled and inactive**. The existing
+prelaunch timer remained enabled and active, and its coverage check was green
+after installation. Installing these unit files did not run a journal backup.
 The [read-only health checker](../deploy/governance/check-production-prelaunch-backup-health.py)
 checks the 02:00 UTC schedule with a 03:00 due threshold. A fresh download with
 the separate Read Only B2 credential authenticated the first scheduled set.
