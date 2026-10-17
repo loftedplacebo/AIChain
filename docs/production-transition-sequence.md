@@ -96,8 +96,12 @@ anchor contract, bind the worker journal and database role, set bounded gas
 and nonce recovery policy, and verify an independently exported mainnet proof.
 The protected Production worker registry has been installed empty; its future
 entries are constrained to chain ID `8453` and must match the project catalog
-and each journal. The verified contract address and runtime code hash still
-need binding into the protected registry and first project journal.
+and each journal. The verified contract address and runtime code hash were
+bound to the still-empty protected registry on 17 October by the
+[read-only-check-first binder](../deploy/governance/bind-production-mainnet-anchor.py).
+It independently rechecked the deployment (160 confirmations), used the
+registry lock and an atomic root-only replacement, and left zero workers.
+The first project journal and worker environment still need this exact binding.
 The receipt preparation, API inspection and independent export verifier now
 accept an explicit reviewed chain, contract and runtime code hash binding.
 Production API startup rejects a configured Base Sepolia binding; without a
@@ -195,6 +199,8 @@ reader limit was corrected to 64 KB for the root-only intent; all four
 synthetic Linux tests passed. The exact saved transaction was then broadcast
 through the public RPC and independently verified after 17 confirmations.
 No Production worker was activated by the deployment.
+The Production prelaunch backup and private API health check remained healthy
+after the registry binding, with zero projects and no worker journals.
 The per-project Production worker registry currently requires a distinct
 relayer address for each project to prevent independent workers from racing
 the same nonce. The chosen wallet can publish for the first project; admitting
