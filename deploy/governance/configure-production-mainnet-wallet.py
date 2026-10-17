@@ -38,6 +38,15 @@ def address_for(secret):
     return json.loads(result.stdout)['address']
 
 
+def normalize_key(value):
+    secret = value.strip()
+    if secret.startswith('0x'):
+        secret = secret[2:]
+    if not re.fullmatch(r'[0-9a-fA-F]{64}', secret):
+        raise ValueError('wallet_key_format')
+    return '0x' + secret
+
+
 def protected_key():
     info = KEY.lstat()
     if not stat.S_ISREG(info.st_mode) or info.st_uid != 0 or \
@@ -61,9 +70,8 @@ def main():
         print('production_mainnet_wallet=already_installed;address=' + address +
               ';service=off')
         return
-    secret = getpass.getpass('Base mainnet wallet private key (0x...): ').strip()
-    if not re.fullmatch(r'0x[0-9a-fA-F]{64}', secret):
-        raise ValueError('Valid Base mainnet wallet key required')
+    secret = normalize_key(getpass.getpass(
+        'Base mainnet wallet private key (64 hex characters, 0x optional): '))
     address = address_for(secret)
     fd = os.open(KEY, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
     try:
@@ -82,6 +90,13 @@ def main():
 if __name__ == '__main__':
     try:
         main()
-    except (OSError, ValueError, TypeError, subprocess.TimeoutExpired):
+    except ValueError as error:
+        if str(error) == 'wallet_key_format':
+            raise SystemExit('Production mainnet wallet installation failed: '
+                             'key must be 64 hexadecimal characters; '
+                             '0x prefix is optional. No key was printed.') from None
+        raise SystemExit('Production mainnet wallet installation failed; '
+                         'no key printed and no service activated') from None
+    except (OSError, TypeError, subprocess.TimeoutExpired):
         raise SystemExit('Production mainnet wallet installation failed; '
                          'no key printed and no service activated') from None
