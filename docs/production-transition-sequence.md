@@ -277,8 +277,15 @@ a root-only intent without broadcasting; `--broadcast` can only resend those
 saved bytes after rechecking nonce, destination balance and current Base fees.
 A protected lock and outstanding-intent check prevent two local transfers
 from racing the same owner-wallet nonce. Synthetic wallet/RPC tests passed on
-Linux. There is no Production relayer yet, so no quote, signature or transfer
-has been made with the real wallet.
+Linux. The root-only operator was staged on the VPS on 17 October from pinned
+source commit `3d01f0fac6bf2fbeabc2db98b2b80207f5e4e6c5` and archive SHA-256
+`7499549174a13f50ea2ce2ef0d4d83ac81eff3d1cfc90e5e3860fb047dc1083d`.
+Its protected source, manifest and wrapper permissions were checked; the
+wrapper's archived CRLF line endings were normalized and Bash/Node syntax
+checks passed. This stage does not read the owner key or send ETH. The private
+API and prelaunch backup health check remained healthy. There is no Production
+relayer yet, so no quote, signature or transfer has been made with the real
+wallet.
 An integration test found that the staged Production worker rejected every
 SQLite journal larger than 4 KiB because it reused the private-key file limit.
 The reviewed fix keeps keys at 4 KiB and permits a bounded worker-owned journal.
