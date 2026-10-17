@@ -63,7 +63,10 @@ def stage(archive, digest, commit):
                 target = temporary.joinpath(*pathlib.PurePosixPath(item.name).parts)
                 target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
                 with source.extractfile(item) as reader, target.open('xb') as writer:
-                    shutil.copyfileobj(reader, writer)
+                    contents = reader.read()
+                    if item.name.endswith('.sh'):
+                        contents = contents.replace(b'\r\n', b'\n')
+                    writer.write(contents)
                 target.chmod(0o700 if item.name.endswith('.sh') else 0o600)
         manifest = temporary / 'PRODUCTION-FUNDING-RELEASE.json'
         manifest.write_text(json.dumps({'sourceCommit': commit,
@@ -78,13 +81,52 @@ def stage(archive, digest, commit):
     print('production_funding=staged;transactions=none;wallet_key=unread')
 
 
+def repair_shell(archive, digest, commit):
+    """Normalize the exact staged source wrapper after an older CRLF install."""
+    archive_info = archive.lstat()
+    if os.geteuid() != 0 or not re.fullmatch(r'[a-f0-9]{64}', digest) or \
+            not re.fullmatch(r'[a-f0-9]{40}', commit) or \
+            not archive.is_absolute() or not stat.S_ISREG(archive_info.st_mode) or \
+            archive_info.st_uid != 0 or archive_info.st_mode & 0o022 or \
+            not 1 <= archive_info.st_size <= 1048576 or \
+            hashlib.sha256(archive.read_bytes()).hexdigest() != digest:
+        raise ValueError('Reviewed archive required')
+    manifest = RELEASE / 'PRODUCTION-FUNDING-RELEASE.json'
+    target = RELEASE / 'deploy/governance/production-funding.sh'
+    if RELEASE.is_symlink() or manifest.is_symlink() or target.is_symlink() or \
+            not manifest.is_file() or not target.is_file() or \
+            manifest.stat().st_uid != 0 or target.stat().st_uid != 0 or \
+            target.stat().st_mode & 0o777 != 0o700:
+        raise ValueError('Protected funding release required')
+    expected_manifest = {'sourceCommit': commit, 'archiveSha256': digest,
+                         'activation': 'operator-only'}
+    if json.loads(manifest.read_text(encoding='utf-8')) != expected_manifest:
+        raise ValueError('Funding release manifest mismatch')
+    with tarfile.open(archive, 'r:') as source:
+        original = source.extractfile('deploy/governance/production-funding.sh').read()
+    normalized = original.replace(b'\r\n', b'\n')
+    if target.read_bytes() not in (original, normalized):
+        raise ValueError('Funding wrapper differs from reviewed archive')
+    if target.read_bytes() != normalized:
+        temporary = target.with_name(target.name + '.normalized')
+        with temporary.open('xb') as output:
+            output.write(normalized)
+        temporary.chmod(0o700)
+        temporary.replace(target)
+    print('production_funding_wrapper=normalized;transactions=none;wallet_key=unread')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--archive', type=pathlib.Path, required=True)
     parser.add_argument('--sha256', required=True)
     parser.add_argument('--commit', required=True)
     parser.add_argument('--apply', action='store_true')
+    parser.add_argument('--repair-shell', action='store_true')
     args = parser.parse_args()
+    if args.repair_shell:
+        repair_shell(args.archive, args.sha256, args.commit)
+        return
     count = inspect(args.archive, args.sha256, args.commit)
     if args.apply:
         stage(args.archive, args.sha256, args.commit)

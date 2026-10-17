@@ -29,7 +29,7 @@ class FundingStageTests(unittest.TestCase):
                     directory.type = tarfile.DIRTYPE
                     output.addfile(directory)
                 for name in MODULE.REQUIRED:
-                    content = b'example source\n'
+                    content = b'#!/bin/bash\r\necho staged\r\n' if name.endswith('.sh') else b'example source\n'
                     info = tarfile.TarInfo(name)
                     info.size = len(content)
                     output.addfile(info, io.BytesIO(content))
@@ -43,7 +43,12 @@ class FundingStageTests(unittest.TestCase):
                 MODULE.stage(archive, digest, COMMIT)
                 self.assertEqual((release / 'scripts/fund-production-relayer.cjs').stat().st_mode & 0o777, 0o600)
                 self.assertEqual((release / 'deploy/governance/production-funding.sh').stat().st_mode & 0o777, 0o700)
+                wrapper = release / 'deploy/governance/production-funding.sh'
+                self.assertEqual(wrapper.read_bytes(), b'#!/bin/bash\necho staged\n')
                 self.assertEqual((release / 'PRODUCTION-FUNDING-RELEASE.json').stat().st_mode & 0o777, 0o600)
+                wrapper.write_bytes(b'#!/bin/bash\r\necho staged\r\n')
+                MODULE.repair_shell(archive, digest, COMMIT)
+                self.assertEqual(wrapper.read_bytes(), b'#!/bin/bash\necho staged\n')
 
     def test_modified_or_extra_archive_is_rejected(self):
         with tempfile.TemporaryDirectory() as temporary:
