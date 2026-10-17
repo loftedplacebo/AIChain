@@ -27,6 +27,17 @@ check verified chain `8453`, exact deployed runtime hash and canonical
 deployment receipt with 10,091 confirmations before installation. The API,
 backup and webhook-only edge passed again afterward. This prepares evidence
 inspection; no Production signer, worker, project or receipt has been admitted.
+On 17 October the API was advanced again to pinned commit
+`ef7ecdd0d1cb79f8aaaa0553f60e216684a37389`. Production evidence
+inspection now accepts only the recorder address mapped to that exact
+workspace/project; a signer from another project is untrusted even if it can
+sign a valid receipt. The protected recorder-map sync reads the root-only
+worker registry and restarts the private API with rollback. Its empty map was
+installed while Production still has zero projects. Focused signer isolation,
+API and evidence tests passed, and the private API, daily Production backup
+and synthetic pilot health remained green after activation. The first real
+project will require a reviewed registry entry and map sync before evidence
+inspection can claim its recorder is trusted.
 
 The [11 October shared-cluster change review](production-shared-cluster-change-review.md)
 records the earlier proposal and baseline. The owner has selected the
