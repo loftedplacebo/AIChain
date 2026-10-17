@@ -1,6 +1,6 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict');
-const {configuration,journalMarker}=require('./governance-production-worker.cjs');
+const {configuration,journalMarker,privateFile}=require('./governance-production-worker.cjs');
 const fs=require('node:fs'),os=require('node:os'),path=require('node:path');
 const {DatabaseSync}=require('node:sqlite');
 
@@ -55,6 +55,25 @@ test('Production journal marker must exist and match the environment',()=>{
   changed.exec("UPDATE governance_environment SET name='test'");
   changed.close();
   assert.throws(()=>journalMarker(file,()=>file),/Production journal marker/);
+ }finally{fs.rmSync(directory,{recursive:true,force:true});}
+});
+test('Production journal may exceed key-file size while signer keys stay bounded',
+ {skip:process.platform!=='linux'},()=>{
+ const directory=fs.mkdtempSync(path.join(os.tmpdir(),'production-worker-journal-size-'));
+ const journal=path.join(directory,'worker.sqlite');
+ const key=path.join(directory,'relayer.key');
+ try{
+  const db=new DatabaseSync(journal);
+  db.exec("CREATE TABLE governance_environment(name TEXT); INSERT INTO governance_environment VALUES('prod')");
+  db.close();
+  fs.chmodSync(journal,0o600);
+  assert.ok(fs.statSync(journal).size>4096);
+  assert.equal(journalMarker(journal),undefined);
+  assert.throws(()=>privateFile(journal),/Worker-owned private file/);
+  fs.writeFileSync(key,'0x'+'11'.repeat(32)+'\n',{mode:0o600});
+  assert.equal(privateFile(key),key);
+  fs.chmodSync(journal,0o644);
+  assert.throws(()=>journalMarker(journal),/Worker-owned private file/);
  }finally{fs.rmSync(directory,{recursive:true,force:true});}
 });
 test('Production preflight refuses a journal bound to another signer or contract',()=>{

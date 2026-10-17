@@ -217,6 +217,21 @@ the per-project provisioning, funding, worker registration and journal-aware
 backup handoff have passed acceptance. This source gate is not yet deployed;
 the customer routes at the public edge remain closed. A later reviewed release
 must provide an explicit admission switch with a verified readiness check.
+The [first-cohort worker preparer](../deploy/governance/provision-production-project-worker.py)
+now has a candidate operator path for an **existing** Production project. It
+requires the exact current project catalog and pinned worker release, creates
+separate worker-owned recorder and relayer keys, prebinds a private mainnet
+journal, and registers a paused worker. It refuses to run if another project is
+uncovered or the target worker unit is active. The default mode is a read-only
+preflight; `--apply` prepares the paused worker. The candidate funding policy
+caps the target balance at **0.0002 ETH per relayer** (at most 0.002 ETH of
+targets for ten projects, plus transfer fees); no funding transaction has been
+sent. The private owner wallet never enters a worker environment. Five offline
+Linux tests passed, including actual disposable key generation and journal
+identity checks. This tool does not create the customer project, enable a
+worker, or switch backups. The first project must be handled in a supervised
+window, followed by a journal-bearing B2 upload, closed restore, timer handoff,
+and independent receipt acceptance before general project admission.
 The first Production worker artifact was built on Linux from source commit
 `76a89ae1b6ffca41c8a0b0ed6d9a834a67e19371` with locked runtime
 dependencies and install scripts disabled. Eleven focused Linux tests passed.

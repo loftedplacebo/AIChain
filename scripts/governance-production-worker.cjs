@@ -19,10 +19,10 @@ const JOURNAL=/^\/var\/lib\/orvessian-production-workers\/[a-f0-9]{24}\/worker\.
 const SCOPE=/^(org|prj)-[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/;
 const ADDRESS=/^0x[0-9a-fA-F]{40}$/;
 
-function privateFile(file){
+function privateFile(file,maxBytes=4096){
  if(typeof file!=='string'||!file.startsWith('/'))throw Error('Absolute private file required');
  const info=fs.lstatSync(file);
- if(!info.isFile()||info.isSymbolicLink()||info.uid!==process.getuid()||(info.mode&0o777)!==0o600||info.size<1||info.size>4096)throw Error('Worker-owned private file required');
+ if(!info.isFile()||info.isSymbolicLink()||info.uid!==process.getuid()||(info.mode&0o777)!==0o600||info.size<1||info.size>maxBytes)throw Error('Worker-owned private file required');
  return file;
 }
 
@@ -50,7 +50,7 @@ function configuration(env,parseConnection=connectionOptions){
 }
 
 function journalMarker(file,verifyFile=privateFile,expected=null){
- verifyFile(file);
+ verifyFile(file,1024*1024*1024);
  const db=new DatabaseSync(file,{readOnly:true});
  try{
   if(db.prepare('PRAGMA quick_check').get().quick_check!=='ok'||
