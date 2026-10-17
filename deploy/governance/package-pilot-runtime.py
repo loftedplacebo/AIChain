@@ -3,6 +3,7 @@
 import argparse
 import gzip
 import hashlib
+import io
 import os
 import pathlib
 import re
@@ -41,13 +42,23 @@ def package(source, output, component):
                 with tarfile.open(fileobj=compressed, mode='w') as archive:
                     for path, name in members(source, component):
                         info = tarfile.TarInfo(name)
-                        info.size = path.stat().st_size
                         info.uid = info.gid = 0
                         info.uname = info.gname = ''
                         info.mode = 0o644
                         info.mtime = 0
-                        with path.open('rb') as content:
-                            archive.addfile(info, content)
+                        if name.startswith('services/governance/migrations/') and name.endswith('.sql'):
+                            # Migration checksums are over SQL bytes. A Windows
+                            # checkout can expand LF to CRLF even when the
+                            # reviewed migration and live database use LF.
+                            sql = path.read_bytes().replace(b'\r\n', b'\n')
+                            if b'\r' in sql:
+                                raise ValueError('Unsupported SQL line ending')
+                            info.size = len(sql)
+                            archive.addfile(info, io.BytesIO(sql))
+                        else:
+                            info.size = path.stat().st_size
+                            with path.open('rb') as content:
+                                archive.addfile(info, content)
         checksum = hashlib.sha256()
         with output.open('rb') as content:
             for block in iter(lambda: content.read(1024 * 1024), b''):

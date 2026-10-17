@@ -67,6 +67,24 @@ class PackageTests(unittest.TestCase):
             with tarfile.open(pilot, 'r:gz') as archive:
                 self.assertNotIn('node_modules/ethers/entry.cjs', archive.getnames())
 
+    def test_migration_bytes_are_stable_across_checkout_line_endings(self):
+        with tempfile.TemporaryDirectory(dir=HERE) as temporary:
+            root = pathlib.Path(temporary)
+            for name in ('scripts', 'services/governance/migrations',
+                         'sdk/typescript', 'node_modules/pg'):
+                (root / name).mkdir(parents=True)
+            sql = root / 'services/governance/migrations/001-test.sql'
+            sql.write_bytes(b'SELECT 1;\r\nSELECT 2;\r\n')
+            windows = root / 'windows.tar.gz'
+            first_hash = PACKAGE.package(root, windows, 'api')
+            with tarfile.open(windows, 'r:gz') as archive:
+                self.assertEqual(archive.extractfile(
+                    'services/governance/migrations/001-test.sql').read(),
+                    b'SELECT 1;\nSELECT 2;\n')
+            sql.write_bytes(b'SELECT 1;\nSELECT 2;\n')
+            linux = root / 'linux.tar.gz'
+            self.assertEqual(first_hash, PACKAGE.package(root, linux, 'api'))
+
 
 if __name__ == '__main__':
     unittest.main()
