@@ -73,6 +73,19 @@ environment and list, plus a rejected production sign-up start.
    checks. The Production environment currently has no users, so no live
    customer journey has yet passed.
 
+The reviewed [owner sign-in preview edge](../deploy/nginx/orvessian-production-owner-preview.conf)
+serves the staged portal while proxying only the WorkOS sign-in, session and
+account-session API paths. Project, key and health API paths keep returning
+404. The portal itself is public during this preview, but Production admission
+is limited to the protected owner email list and project creation remains
+closed. The [activation helper](../deploy/governance/activate-production-owner-preview.py)
+requires the exact webhook-only edge, healthy Production backup and pilot,
+an inactive portal, and exact configuration hashes. It starts the portal,
+switches the edge, checks the exposed and denied paths, and restores the
+webhook-only edge if any check fails. The portal unit stays disabled until
+the full Production release is accepted. Opening this preview does not
+constitute customer or project admission.
+
 The callback, origin, logout, signing secret and restricted webhook route are
 configured. Step 4 is not accepted until the portal, signed delivery and live
 account checks pass.
