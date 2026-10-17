@@ -7,6 +7,7 @@ journal-aware runner must replace it before customer onboarding opens.
 """
 
 import fcntl
+import hashlib
 import importlib.util
 import json
 import os
@@ -32,6 +33,10 @@ PORTAL = 'orvessian-production-portal.service'
 BUCKET = 'orvessian-prod-backups-2026'
 ENDPOINT = 'https://s3.eu-central-003.backblazeb2.com'
 REGION = 'eu-central-003'
+SITE = pathlib.Path('/etc/nginx/sites-available/orvessian-production-preparation')
+ENABLED = pathlib.Path('/etc/nginx/sites-enabled/orvessian-production-preparation')
+WEBHOOK_ONLY_SHA256 = 'be2f4fc7b79516a2bbb658260d19067035d934a1d6fce4abb904affd2d86c933'
+OWNER_PREVIEW_SHA256 = '8ecaa31f22691e23d83723c5b77254ac0e36c8c11410d6bad90444d2528ede4d'
 
 
 def module():
@@ -58,6 +63,33 @@ def run(*args, timeout=600):
     return result
 
 
+def edge_matches(digest):
+    if not ENABLED.is_symlink() or os.readlink(ENABLED) != str(SITE):
+        return False
+    try:
+        info = SITE.lstat()
+        return stat.S_ISREG(info.st_mode) and info.st_uid == 0 and \
+            not info.st_mode & 0o022 and \
+            hashlib.sha256(SITE.read_bytes()).hexdigest() == digest
+    except OSError:
+        return False
+
+
+def portal_ready():
+    for _ in range(20):
+        probe = subprocess.run(('curl', '--silent', '--show-error',
+                                '--max-time', '2', '--output', '/dev/null',
+                                '--write-out', '%{http_code}', '--header',
+                                'Host: prod.orvessian.com',
+                                'http://127.0.0.1:3003/workspace'),
+                               capture_output=True, text=True, timeout=5,
+                               check=False)
+        if probe.returncode == 0 and probe.stdout == '200':
+            return True
+        time.sleep(0.5)
+    return False
+
+
 def private_json(directory, name, value):
     path = directory / name
     fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
@@ -70,10 +102,19 @@ def private_json(directory, name, value):
 
 
 def preflight(schema):
-    if os.geteuid() != 0 or status(API) != {'UnitFileState=enabled',
-                                           'ActiveState=active'} or \
-            status(PORTAL) != {'UnitFileState=disabled', 'ActiveState=inactive'}:
-        raise ValueError('Closed Production API and portal state required')
+    api_state = status(API)
+    portal_state = status(PORTAL)
+    portal_active = portal_state == {'UnitFileState=disabled',
+                                     'ActiveState=active'}
+    portal_inactive = portal_state == {'UnitFileState=disabled',
+                                       'ActiveState=inactive'}
+    expected_edge = OWNER_PREVIEW_SHA256 if portal_active else WEBHOOK_ONLY_SHA256
+    if os.geteuid() != 0 or api_state != {'UnitFileState=enabled',
+                                          'ActiveState=active'} or \
+            not (portal_active or portal_inactive) or not edge_matches(expected_edge):
+        raise ValueError('Reviewed closed Production service and edge state required')
+    if portal_active and not run('nginx', '-t'):
+        raise ValueError('Production owner preview edge failed Nginx validation')
     for path in (RUNNER / 'scripts/governance-postgres-recovery.cjs',
                  RUNNER / 'scripts/governance-backup-object-storage.cjs'):
         if not path.is_file():
@@ -97,10 +138,10 @@ def preflight(schema):
                  'orvessian-production-evidence-worker.service'):
         if status(unit) != {'UnitFileState=', 'ActiveState=inactive'}:
             raise ValueError('Production worker service requires reviewed journal coverage')
-    return admin
+    return admin, portal_active
 
 
-def capture_and_upload(schema, admin):
+def capture_and_upload(schema, admin, portal_active):
     with tempfile.TemporaryDirectory(prefix='production-prelaunch-backup-',
                                      dir='/run') as temporary:
         private = pathlib.Path(temporary)
@@ -118,7 +159,14 @@ def capture_and_upload(schema, admin):
         })
         admin = ''
         stopped = False
+        portal_stopped = False
         try:
+            if portal_active:
+                portal_stopped = True
+                run('systemctl', 'stop', PORTAL, timeout=45)
+                if status(PORTAL) != {'UnitFileState=disabled',
+                                       'ActiveState=inactive'}:
+                    raise ValueError('Production portal did not quiesce')
             stopped = True
             run('systemctl', 'stop', API, timeout=45)
             if status(API) != {'UnitFileState=enabled', 'ActiveState=inactive'}:
@@ -148,6 +196,11 @@ def capture_and_upload(schema, admin):
                     time.sleep(0.5)
                 if not ready:
                     raise ValueError('Production API private readiness failed after restart')
+            if portal_stopped:
+                run('systemctl', 'start', PORTAL, timeout=45)
+                if status(PORTAL) != {'UnitFileState=disabled',
+                                      'ActiveState=active'} or not portal_ready():
+                    raise ValueError('Production portal restart requires operator review')
         backup_id = captured.get('id')
         directory = pathlib.Path(captured.get('directory', ''))
         if captured.get('operation') != 'backup' or captured.get('environment') != 'prod' or \
@@ -191,9 +244,9 @@ def main():
                 stat.S_IMODE(worker_info.st_mode) != 0o600:
             raise ValueError('Protected Production worker registry lock required')
         fcntl.flock(worker_lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        admin = preflight(schema)
+        admin, portal_active = preflight(schema)
         if sys.argv[1:]:
-            capture_and_upload(schema, admin)
+            capture_and_upload(schema, admin, portal_active)
         else:
             print('production_prelaunch_backup=ready;mode=read-only;projects=0')
     finally:

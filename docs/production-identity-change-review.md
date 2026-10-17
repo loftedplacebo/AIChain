@@ -18,9 +18,9 @@ initiate-login URL is `https://prod.orvessian.com/api/auth/start`. These are
 temporary production preparation hostnames; the pilot continues at
 `portal.orvessian.com` and `api.orvessian.com`. The corresponding production
 API hostname is `api-prod.orvessian.com`. DNS and TLS are configured. The
-Production API runs on a separate private loopback service; Nginx exposes
-only the exact revocation webhook path. Customer API and portal routes still
-return 404.
+Production API runs on a separate private loopback service. The owner sign-in
+preview serves the portal and exposes only WorkOS sign-in/session routes.
+Project, key and general API routes remain 404.
 
 The [non-secret topology plan](../deploy/governance/deployment-plan.example.json)
 contains these URLs and the WorkOS Production identifiers. Its validator
@@ -46,13 +46,13 @@ environment and list, plus a rejected production sign-up start.
 
 ## Pending before an end-to-end production sign-in
 
-1. The restricted Production database role, schema, private API service and
-   exact DNS/TLS binding are configured. The service is active and enabled on
-   `127.0.0.1:8791`; `/health` and `/ready` passed privately. Nginx exposes
-   only the webhook path. A separate portal artifact, service and closed
-   customer routes remain to be prepared and tested before sign-in. Check
-   shared-host capacity and rollback before enabling customer traffic. A
-   dedicated production VM is a later migration.
+1. The restricted Production database role, schema, private API service,
+   portal artifact and exact DNS/TLS binding are configured. The API is
+   active and enabled on `127.0.0.1:8791`; `/health` and `/ready` passed
+   privately. The portal is active but disabled for boot, and the owner
+   preview exposes only sign-in/session routes. Project and key routes remain
+   404. Check shared-host capacity and rollback before enabling customer
+   traffic. A dedicated production VM is a later migration.
 2. The owner installed a distinct WorkOS Production API key through the
    hidden-prompt installer. A distinct 32-byte identity sealing key was
    generated on the VPS. Protected files were `root:root 0600`; neither secret
@@ -65,7 +65,7 @@ environment and list, plus a rejected production sign-up start.
    `session.revoked`. Its signing secret was fetched directly on the VPS into
    a protected file. The private API passed readiness and unsigned webhook
    rejection; the exact public webhook path returns 401 for unsigned POSTs,
-   while customer routes remain 404. A signed delivery, duplicate handling,
+   while project, key and general API routes remain 404. A signed delivery, duplicate handling,
    authenticated missed-event replay and session revocation still require a
    live Production account. There are no Production users or sessions yet.
 4. Invite a fresh production account on the initial allowlist and complete
@@ -82,9 +82,23 @@ closed. The [activation helper](../deploy/governance/activate-production-owner-p
 requires the exact webhook-only edge, healthy Production backup and pilot,
 an inactive portal, and exact configuration hashes. It starts the portal,
 switches the edge, checks the exposed and denied paths, and restores the
-webhook-only edge if any check fails. The portal unit stays disabled until
-the full Production release is accepted. Opening this preview does not
-constitute customer or project admission.
+webhook-only edge if any check fails. The unit remains disabled for boot;
+the preview is currently active. Opening it does not constitute customer or
+project admission.
+
+On 17 October the candidate Nginx configuration passed an isolated syntax
+check and the read-only activation preflight passed. The first activation
+attempt stopped at the private portal readiness check and restored the
+webhook-only edge. Independent checks confirmed the portal inactive and
+disabled and `prod.orvessian.com/workspace` still returning 404. A later
+private start returned HTTP 200 after the application had time to initialize.
+The helper now waits up to five seconds for that private response. After the
+bounded readiness fix, the read-only preflight passed and the preview activated.
+Public checks returned 200 for the workspace and AuthKit status, and 404 for
+project APIs. Production still has zero users. The journal-free backup health
+checker reported unhealthy solely because it required the portal to be off;
+the checker and scheduled runner are being updated to recognize the exact
+reviewed preview and quiesce/restart it around a backup.
 
 The callback, origin, logout, signing secret and restricted webhook route are
 configured. Step 4 is not accepted until the portal, signed delivery and live

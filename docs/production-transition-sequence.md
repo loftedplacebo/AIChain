@@ -17,7 +17,8 @@ packaged migrations matched the running release byte for byte, and the
 corrected candidate started on a private diagnostic port before activation.
 After the switch, the private API, daily Production B2 backup, public
 webhook-only edge, and four-worker synthetic pilot checks passed. Production
-still has zero projects. The portal and customer API routes remain closed, and
+still has zero projects. A bounded owner sign-in preview is active, while
+project/key APIs and all publishing routes remain closed, and
 the API's project-creation gate is closed in the deployed release. The current
 02:00 UTC backup schedule intentionally rejects any Production project or
 worker until the journal-aware handoff passes.
@@ -596,9 +597,12 @@ It retained the original 404-only config for rollback, passed `nginx -t`,
 and verified the exact public webhook path returns 401 for unsigned POSTs.
 Independent HTTPS checks confirmed HTTP 401 with a valid certificate, while
 the public API `/health` stayed 404. The pilot health check remained green.
-The Production API is active and enabled for reboot continuity; all customer
-API and portal routes remain closed. A real signed WorkOS delivery, replay
-and revocation test is still required before Production identity acceptance.
+The Production API is active and enabled for reboot continuity. As of
+17 October the bounded owner sign-in preview serves `prod.orvessian.com`;
+the production API exposes only WorkOS sign-in/session routes and still
+returns 404 for project, key and health routes. A real signed WorkOS delivery,
+replay and revocation test is still required before Production identity
+acceptance.
 
 ### Revocation webhook activation and rollback
 

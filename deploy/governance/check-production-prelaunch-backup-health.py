@@ -2,9 +2,11 @@
 """Read-only status of the closed, journal-free Production backup window."""
 
 import json
+import hashlib
 import importlib.util
 import os
 import pathlib
+import re
 import stat
 import subprocess
 import time
@@ -16,6 +18,10 @@ POINTER = pathlib.Path('/var/lib/aichain-production-backup/latest-b2.json')
 SCHEMA = pathlib.Path('/opt/aichain/governance-pilot-db-setup/apply-production-schema.py')
 SERVICE = 'orvessian-production-prelaunch-backup.service'
 TIMER = 'orvessian-production-prelaunch-backup.timer'
+SITE = pathlib.Path('/etc/nginx/sites-available/orvessian-production-preparation')
+ENABLED = pathlib.Path('/etc/nginx/sites-enabled/orvessian-production-preparation')
+WEBHOOK_ONLY_SHA256 = 'be2f4fc7b79516a2bbb658260d19067035d934a1d6fce4abb904affd2d86c933'
+OWNER_PREVIEW_SHA256 = '8ecaa31f22691e23d83723c5b77254ac0e36c8c11410d6bad90444d2528ede4d'
 WORKERS = ('orvessian-production-worker.service',
            'orvessian-production-evidence-worker.service')
 
@@ -33,6 +39,44 @@ def systemctl(*args):
                             text=True, timeout=15, check=False)
     value = result.stdout.strip()
     return value if value else 'unavailable'
+
+
+def http_status(host, path, *, post=False):
+    args = ['curl', '--silent', '--show-error', '--max-time', '5',
+            '--output', '/dev/null', '--write-out', '%{http_code}',
+            '--resolve', host + ':443:127.0.0.1']
+    if post:
+        args.extend(('--header', 'Content-Type: application/json', '--data', '{}'))
+    result = subprocess.run((*args, 'https://' + host + path),
+                            capture_output=True, text=True, timeout=8,
+                            check=False)
+    if result.returncode or not re.fullmatch(r'[1-5][0-9]{2}', result.stdout):
+        return 0
+    return int(result.stdout)
+
+
+def portal_profile(portal):
+    if systemctl('is-enabled', 'orvessian-production-portal.service') != 'disabled' or \
+            not ENABLED.is_symlink() or os.readlink(ENABLED) != str(SITE):
+        return 'unexpected'
+    info = SITE.lstat()
+    if not stat.S_ISREG(info.st_mode) or info.st_uid != 0 or \
+            info.st_mode & 0o022:
+        return 'unexpected'
+    digest = hashlib.sha256(SITE.read_bytes()).hexdigest()
+    if portal == 'inactive' and digest == WEBHOOK_ONLY_SHA256:
+        return 'webhook-only'
+    if portal == 'active' and digest == OWNER_PREVIEW_SHA256:
+        observed = (http_status('prod.orvessian.com', '/workspace'),
+                    http_status('api-prod.orvessian.com', '/v1/auth/status'),
+                    http_status('api-prod.orvessian.com', '/v1/workspaces'),
+                    http_status('api-prod.orvessian.com', '/v1/keys'),
+                    http_status('api-prod.orvessian.com', '/health'),
+                    http_status('api-prod.orvessian.com',
+                                '/v1/auth/workos-webhook', post=True))
+        if observed == (200, 200, 404, 404, 404, 401):
+            return 'owner-preview'
+    return 'unexpected'
 
 
 def closed_scope():
@@ -77,9 +121,11 @@ def main():
     last = systemctl('show', '-p', 'Result', '--value', SERVICE)
     api = systemctl('is-active', 'orvessian-production-api.service')
     portal = systemctl('is-active', 'orvessian-production-portal.service')
+    portal_mode = portal_profile(portal)
     database_is_prod, projects_absent, workers_absent = closed_scope()
     healthy = (valid and covered and timer == 'active' and enabled == 'enabled' and
-               last == 'success' and api == 'active' and portal == 'inactive' and
+               last == 'success' and api == 'active' and
+               portal_mode in ('webhook-only', 'owner-preview') and
                database_is_prod and projects_absent and workers_absent)
     print(json.dumps({
         'healthy': healthy,
@@ -94,6 +140,7 @@ def main():
         'last_service_result': last,
         'api': api,
         'portal': portal,
+        'portal_mode': portal_mode,
         'database_is_prod': database_is_prod,
         'projects_absent': projects_absent,
         'workers_absent': workers_absent,
