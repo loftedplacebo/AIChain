@@ -44,3 +44,21 @@ test('asynchronous repository rejection fails HTTP requests without premature su
   assert.equal(response.status,503);assert.equal((await response.json()).error,'Customer storage busy');assert.equal(directory.projects(owner.id).length,0);
  }finally{await new Promise(r=>server.close(r));store.close();}
 });
+test('Production refuses new project admission before worker and backup coverage is enabled',async()=>{
+ const store=new GovernanceStore(':memory:'),directory=new CustomerDirectory(store.db),auth=new WorkspaceAuth(store.db,[],Date.now,directory);
+ const owner=directory.verifiedIdentity({provider:'synthetic',subject:'production-owner',email:'production-owner@example.test',emailVerified:true});
+ const session=auth.loginVerified(owner.id);
+ const server=createServer(store,[],[],store.db,{}, {directory,auth,environment:'prod'});
+ await new Promise(r=>server.listen(0,'127.0.0.1',r));
+ const base=`http://127.0.0.1:${server.address().port}`;
+ const post=(path,token)=>fetch(base+path,{method:'POST',headers:{'content-type':'application/json',...(token?{'x-workspace-session':token}:{})},body:JSON.stringify({actionId:'new',name:'Uncovered',projectName:'Project'})});
+ try{
+  assert.equal((await post('/v1/workspaces')).status,401);
+  const response=await post('/v1/workspaces',session.token);
+  assert.equal(response.status,503);
+  assert.match((await response.json()).error,/backup coverage/);
+  assert.equal(directory.projects(owner.id).length,0);
+  assert.equal((await post('/v1/workspaces/org-synthetic/projects',session.token)).status,503);
+  assert.equal((await fetch(base+'/v1/session',{headers:{'x-workspace-session':session.token}})).status,200);
+ }finally{await new Promise(r=>server.close(r));store.close();}
+});

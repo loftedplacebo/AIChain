@@ -51,6 +51,10 @@ function createServer(store, credentials, users=[], sessionDb=store.db, evidence
       }
       if(url.pathname==='/v1/session' && req.method==='DELETE'){return send(200,{signedOut:true,...await auth.logout(sessionToken)});}
       const user=sessionToken?await (identityProvider?identityProvider.resolve(sessionToken):auth.resolve(sessionToken)):null;
+      const productionProjectRequest=services.environment==='prod'&&req.method==='POST'&&
+        (url.pathname==='/v1/workspaces'||/^\/v1\/workspaces\/[^/]+\/projects$/.test(url.pathname));
+      if(productionProjectRequest&&user&&services.productionProjectAdmission!==true)
+        return send(503,{error:'Production project creation is temporarily closed while evidence and backup coverage are prepared'});
       if(user?.customer&&services.customerRequestLimits){const budget=await services.customerRequestLimits.consume(user.id,req.method==='GET'?'read':'write');if(!budget.allowed){res.setHeader('retry-after',String(budget.retryAfter));return send(429,{error:'Customer request limit reached',code:'customer-request-limit',retryAfter:budget.retryAfter});}}
       if(url.pathname==='/v1/session' && req.method==='GET')return send(user?200:401,user?await auth.publicUser(user):{error:'Sign in required'});
       if(await require('./account-sessions.cjs').accountSessionRoutes({req,url,send,auth,user,sessionToken,parse:parseRequestJson}))return;

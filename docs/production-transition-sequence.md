@@ -207,12 +207,16 @@ through the public RPC and independently verified after 17 confirmations.
 No Production worker was activated by the deployment.
 The Production prelaunch backup and private API health check remained healthy
 after the registry binding, with zero projects and no worker journals.
-The per-project Production worker registry currently requires a distinct
-relayer address for each project to prevent independent workers from racing
-the same nonce. The chosen wallet can publish for the first project; admitting
-additional publishing projects requires separate relayer wallets or a reviewed
-shared transaction coordinator. This limit must be resolved before opening
-self-service Production project creation.
+The owner approved a distinct restricted relayer wallet for each Production
+project, including the first ten design partners. The owner-controlled wallet
+will deploy the contract and fund each relayer with a small capped amount under
+a reviewed funding policy; its private key must not be copied into a worker.
+This prevents independent workers from racing the same transaction nonce.
+Production project creation is now denied by default in the API source until
+the per-project provisioning, funding, worker registration and journal-aware
+backup handoff have passed acceptance. This source gate is not yet deployed;
+the customer routes at the public edge remain closed. A later reviewed release
+must provide an explicit admission switch with a verified readiness check.
 The first Production worker artifact was built on Linux from source commit
 `76a89ae1b6ffca41c8a0b0ed6d9a834a67e19371` with locked runtime
 dependencies and install scripts disabled. Eleven focused Linux tests passed.
