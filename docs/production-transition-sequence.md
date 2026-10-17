@@ -248,6 +248,14 @@ provisioner was staged with matching SHA-256
 Production prelaunch backup, private API and synthetic pilot health stayed green;
 there are still zero Production projects, zero worker instances and no funding
 transaction.
+The [restricted worker database installer](../deploy/governance/configure-production-worker-database.py)
+passed a read-only live preflight and two offline success/rollback tests. On
+17 October it changed `governance_prod_worker` from `NOLOGIN` to a restricted
+login after verifying the Production schema and grants. Its generated database
+URL is stored in a root-owned `0600` file on Contabo; the secret was not printed.
+The worker service remains off and the prelaunch backup health check stayed
+green. The worker login is ready for per-project protected environments, but
+no project or evidence publisher has been activated.
 The first Production worker artifact was built on Linux from source commit
 `76a89ae1b6ffca41c8a0b0ed6d9a834a67e19371` with locked runtime
 dependencies and install scripts disabled. Eleven focused Linux tests passed.
