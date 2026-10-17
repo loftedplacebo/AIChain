@@ -32,7 +32,7 @@ function configuration(env,parseConnection=connectionOptions){
  if(!SCOPE.test(tenant||'')||!tenant.startsWith('org-')||!SCOPE.test(project||'')||!project.startsWith('prj-'))throw Error('Exact Production project scope required');
  if(!JOURNAL.test(env.GOVERNANCE_WORKER_JOURNAL||''))throw Error('Scoped Production journal path required');
  const rpc=new URL(env.GOVERNANCE_MAINNET_RPC_URL);
- if(rpc.protocol!=='https:'||rpc.username||rpc.password||rpc.hash||!rpc.hostname)throw Error('Private HTTPS Base mainnet RPC required');
+ if(rpc.protocol!=='https:'||rpc.username||rpc.password||rpc.hash||!rpc.hostname)throw Error('HTTPS Base mainnet RPC required');
  const anchor=evidenceAnchor(JSON.parse(env.GOVERNANCE_MAINNET_ANCHOR));
  if(anchor.chainId!==8453)throw Error('Base mainnet anchor required');
  if(!ADDRESS.test(env.GOVERNANCE_EXPECTED_RELAYER||'')||!ADDRESS.test(env.GOVERNANCE_EXPECTED_RECORDER||'')||env.GOVERNANCE_EXPECTED_RELAYER.toLowerCase()===env.GOVERNANCE_EXPECTED_RECORDER.toLowerCase())throw Error('Distinct reviewed signer addresses required');

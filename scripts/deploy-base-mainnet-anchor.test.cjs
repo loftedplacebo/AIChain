@@ -1,7 +1,8 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict');
+const fs=require('node:fs'),os=require('node:os'),path=require('node:path');
 const {Wallet,Interface,getCreateAddress}=require('ethers');
-const {quote,prepareIntent,validateIntent,broadcastIntent}=require('./deploy-base-mainnet-anchor.cjs');
+const {quote,prepareIntent,validateIntent,broadcastIntent,protectedFile}=require('./deploy-base-mainnet-anchor.cjs');
 
 const manifest={creation:{data:'0x60016000'}};
 const oracle=new Interface([
@@ -89,4 +90,16 @@ test('broadcast refuses increased Base fee estimate or unavailable oracle',async
  assert.equal(increased.broadcasts(),0);
  await assert.rejects(broadcastIntent({provider:fixture({call:async()=>{throw Error('oracle unavailable');}}).provider,
   intent,manifest}),/oracle unavailable/);
+});
+
+test('protected signed intent can exceed the smaller wallet-key file limit',
+ {skip:process.platform==='win32'||process.getuid?.()!==0},()=>{
+ const directory=fs.mkdtempSync(path.join(os.tmpdir(),'anchor-intent-size-'));
+ const file=path.join(directory,'intent.json');
+ try{
+  const content='x'.repeat(5501);
+  fs.writeFileSync(file,content,{mode:0o600});
+  assert.throws(()=>protectedFile(file),/Root-only file required/);
+  assert.equal(protectedFile(file,65536),content);
+ }finally{fs.rmSync(directory,{recursive:true,force:true});}
 });

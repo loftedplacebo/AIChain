@@ -28,9 +28,9 @@ function positive(value,label){
  if(!/^[1-9][0-9]*$/.test(String(value||'')))throw Error('Positive '+label+' required');
  return BigInt(value);
 }
-function protectedFile(file){
+function protectedFile(file,maxSize=4096){
  const info=fs.lstatSync(file);
- if(!info.isFile()||info.isSymbolicLink()||info.uid!==0||(info.mode&0o777)!==0o600||info.size<1||info.size>4096)throw Error('Root-only file required');
+ if(!info.isFile()||info.isSymbolicLink()||info.uid!==0||(info.mode&0o777)!==0o600||info.size<1||info.size>maxSize)throw Error('Root-only file required');
  return fs.readFileSync(file,'utf8').trim();
 }
 function protectedDirectory(dir){
@@ -177,7 +177,7 @@ async function main(){
    }
   }else{
    protectedDirectory(STATE);
-   const intent=JSON.parse(protectedFile(INTENT));
+   const intent=JSON.parse(protectedFile(INTENT,65536));
    const tx=validateIntent(intent,manifest);
    if(Number((await provider.getNetwork()).chainId)!==CHAIN)throw Error('Base mainnet RPC required');
    if(mode==='--status'){
@@ -191,4 +191,4 @@ async function main(){
  }finally{provider.destroy();}
 }
 if(require.main===module)main().catch(()=>{console.error('Mainnet deployment step failed; no key or raw transaction printed.');process.exitCode=1;});
-module.exports={reviewedArtifact,quote,prepareIntent,validateIntent,broadcastIntent};
+module.exports={reviewedArtifact,quote,prepareIntent,validateIntent,broadcastIntent,protectedFile};

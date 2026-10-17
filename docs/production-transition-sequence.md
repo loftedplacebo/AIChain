@@ -1,4 +1,4 @@
-# Production transition sequence — 15 October 2026
+# Production transition sequence — 17 October 2026
 
 This is the next execution plan. The existing Contabo/DigitalOcean/B2 pilot
 remains a synthetic `test` service with four of five project slots in use. It
@@ -39,6 +39,15 @@ and three pilot roles, and the verified empty production-only bootstrap.
   production approval record. Production receipt acceptance remains blocked
   until the mainnet contract, custody, gas policy and independent verification
   are deployed and tested.
+- **Initial RPC:** use Base's public HTTPS mainnet endpoint
+  `https://mainnet.base.org` for the first limited-volume customers, including
+  the contract deployment. Monitor RPC failures, rate-limit responses and
+  evidence delay against the approved 30-minute publishing target. Pause new
+  receipt admission if the endpoint cannot support that target. Move the
+  production worker to a private provider endpoint before sustained high
+  receipt volume, or earlier if public-endpoint reliability or rate limits
+  affect publishing. This changes only the RPC transport, not chain ID,
+  contract, receipt identities or signed evidence.
 
 The [version-6 non-secret deployment plan](../deploy/governance/deployment-plan.example.json)
 and its validator must be checked against the selected Contabo test database
@@ -72,8 +81,13 @@ for optional WorkOS meters and remaining configuration.
 
 On 14 October the owner selected **Base mainnet** for the first real-customer
 Production receipts. The [Base JSON-RPC specification](https://docs.base.org/base-chain/api-reference/ethereum-json-rpc-api/eth_chainId)
-identifies mainnet chain ID `8453`. No mainnet anchor contract, funded relayer,
-RPC provider or publishing service has been activated. The current pilot
+identifies mainnet chain ID `8453`. The owner funded the production wallet and
+deployed the reviewed anchor contract on 17 October. No Production publishing
+service has been activated. The owner selected the public Base mainnet RPC for the first
+limited-volume production phase, with the move to a private endpoint governed
+by the monitoring trigger above. Base describes the public endpoint as
+[free, best-effort and subject to lower read rate limits](https://status.base.org/).
+The current pilot
 publisher and receipt path are pinned to Base Sepolia chain ID `84532` and
 synthetic events, so reusing them unchanged would produce the wrong Production
 claim. Before the Production worker starts, implement and test mainnet-specific
@@ -82,7 +96,8 @@ anchor contract, bind the worker journal and database role, set bounded gas
 and nonce recovery policy, and verify an independently exported mainnet proof.
 The protected Production worker registry has been installed empty; its future
 entries are constrained to chain ID `8453` and must match the project catalog
-and each journal. The contract address and runtime code hash remain unbound.
+and each journal. The verified contract address and runtime code hash still
+need binding into the protected registry and first project journal.
 The receipt preparation, API inspection and independent export verifier now
 accept an explicit reviewed chain, contract and runtime code hash binding.
 Production API startup rejects a configured Base Sepolia binding; without a
@@ -117,7 +132,13 @@ approved mainnet deployment, set an HTTPS `GOVERNANCE_MAINNET_RPC_URL` and run
 The read-only verifier requires chain 8453, exact runtime bytes, successful
 contract creation, canonical block hash and at least 12 confirmations. A
 contract address alone only reports a runtime-code match and exits nonzero.
-No deployment transaction has been signed or broadcast.
+The deployed contract is
+`0xcF3A904b433c50E2d4F6E2a0d692E855d33910f2`, transaction
+`0xa32ab8f5a704ecf300b3b4a1de943952f33d1efd6dceed201a16b98191e27626`
+in Base mainnet block `52719601`. The read-only verifier checked the
+canonical block hash, creation receipt, exact reviewed runtime code hash and
+17 confirmations (minimum 12) on 17 October. The Production receipt path is
+still closed.
 `node scripts/prepare-base-mainnet-deploy.cjs` produces the ignored
 `build/base-mainnet/deployment-manifest.json` with the exact unsigned creation
 bytes, source artifact digest and expected runtime hash for wallet review. It
@@ -133,8 +154,8 @@ derives and displays only the public address, stores the key root-only under
 owner-installed wallet resolved to public address
 `0xec502b5f4D1925138a7409D9a7b55Fba20e13cc3`; the VPS file was checked
 as root-owned, regular and mode `0600` without reading its contents. Its
-disposable-key Linux test passed. Contract deployment, funding and worker
-access remain separate reviewed steps.
+disposable-key Linux test passed. Worker access remains a separate reviewed
+step.
 The [two-step mainnet deployment operator](../scripts/deploy-base-mainnet-anchor.cjs)
 now pins the reviewed creation hash
 `0xccf23437b086cba0f033a19c353ca582953b1e725e57c59798fb43531c06d1ce`
@@ -164,17 +185,16 @@ and `1af5044041280f1177ee31eecc780aa8e057e09df8ba8bb4bf6743d87767872d`.
 The runtime dependencies were copied from the pinned, inactive Production worker
 artifact so this one-time operator does not depend on a future worker release
 replacement. The fee-aware revision supersedes the initial staged operator
-script. Its staged SHA-256 is
-`7ba64ac6da1cbc367aee2b5360fbf928d3cd17c2037c12471f9ef542b873a704`;
-all three focused synthetic Linux tests passed on 17 October. A read-only
-Base mainnet quote through the public RPC at that time returned wallet nonce
-52, estimated total `7558831199679` wei (about 0.00000756 ETH), and balance
-`1059226824141` wei (about 0.00000106 ETH). The wallet is underfunded for
-that quote, which is time-sensitive and not a guaranteed maximum cost. No
-intent has been signed or transaction broadcast. A reliable production HTTPS
-RPC, sufficient mainnet ETH and a freshly reviewed fee estimate remain needed,
-and the independent verifier still requires at least 12 canonical confirmations
-before binding the Production registry or admitting receipts.
+script. The deployed staged script's SHA-256 is
+`1c071f476c759e0e2be0b1ef0b882896f1b90dd3165bcc4622c14793132390aa`.
+A read-only quote before funding returned nonce 52 and an estimated total
+near 0.00000756 ETH. The wallet was funded to about 0.01000009 ETH. The
+original signed intent was 5.5 KB and exceeded the operator's 4 KB private
+file reader limit, so the first broadcast attempt never reached the RPC. The
+reader limit was corrected to 64 KB for the root-only intent; all four
+synthetic Linux tests passed. The exact saved transaction was then broadcast
+through the public RPC and independently verified after 17 confirmations.
+No Production worker was activated by the deployment.
 The per-project Production worker registry currently requires a distinct
 relayer address for each project to prevent independent workers from racing
 the same nonce. The chosen wallet can publish for the first project; admitting
