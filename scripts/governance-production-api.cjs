@@ -23,6 +23,7 @@ function validate(env,{requireWebhook=true}={}){
  const db=connectionOptions(env.GOVERNANCE_DATABASE_URL,{caFile:env.GOVERNANCE_DATABASE_CA_FILE});
  if(db.user!=='governance_prod_api')throw Error('Production API requires its restricted database role');
  const auth=workosConfig(env);
+ require('../services/governance/production-recorder-map.cjs').productionRecorderMap(env.GOVERNANCE_PRODUCTION_RECORDER_MAP||'[]');
  if(env.GOVERNANCE_EVIDENCE_ANCHOR_JSON&&require('../services/governance/evidence.cjs').evidenceAnchor(JSON.parse(env.GOVERNANCE_EVIDENCE_ANCHOR_JSON)).chainId!==8453)throw Error('Production evidence must target Base mainnet');
  if(new URL(auth.redirectUri).origin!=='https://prod.orvessian.com')throw Error('Production callback origin mismatch');
  if(env.PORT!=='8791')throw Error('Production requires its reviewed loopback port');

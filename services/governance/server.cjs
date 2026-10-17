@@ -117,9 +117,11 @@ function createServer(store, credentials, users=[], sessionDb=store.db, evidence
         if(url.pathname==='/v1/agents')return send(200,await agents.listAgents(store,principal,{limit:Number(url.searchParams.get('limit')||50),offset:Number(url.searchParams.get('offset')||0)}));
         if(url.pathname.startsWith('/v1/evidence/')){
           if(services.environment==='prod'&&!evidenceOptions.anchor)return send(503,{error:'Production evidence chain is not configured'});
+          const productionRecorder=services.environment==='prod'?require('./production-recorder-map.cjs').recorderForProject(services.productionRecorders,principal.tenant,principal.project):null;
+          if(services.environment==='prod'&&!productionRecorder)return send(503,{error:'Production recording service is not configured for this project'});
           const id=decodeURIComponent(url.pathname.slice('/v1/evidence/'.length));const event=await store.get(principal,id);if(!event)return send(404,{error:'Event not found'});
           const stored=await store.evidence(principal,id);
-          const verification=await require('./evidence.cjs').inspectEvidence(event,stored,evidenceOptions);
+          const verification=await require('./evidence.cjs').inspectEvidence(event,stored,services.environment==='prod'?{...evidenceOptions,trustedSigners:[productionRecorder]}:evidenceOptions);
           return send(200,{event,verification,evidence:stored?.bundle||null});
         }
         const range={from:url.searchParams.get('from')||'',to:url.searchParams.get('to')||'9999',deployment:url.searchParams.get('deployment')||''};

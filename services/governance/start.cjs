@@ -36,6 +36,7 @@ async function start(env=process.env){
  const anchor=env.GOVERNANCE_EVIDENCE_ANCHOR_JSON?require('./evidence.cjs').evidenceAnchor(JSON.parse(env.GOVERNANCE_EVIDENCE_ANCHOR_JSON)):stage==='prod'?null:undefined;
  if(stage==='prod'&&anchor&&anchor.chainId!==8453)throw Error('Production evidence must target Base mainnet');
  const evidenceOptions={trustedSigners:JSON.parse(env.GOVERNANCE_RECEIPT_SIGNERS||'[]'),provider:env.GOVERNANCE_EVIDENCE_RPC_URL?require('./evidence-provider.cjs').evidenceProvider(env.GOVERNANCE_EVIDENCE_RPC_URL):null,anchor};
+ const productionRecorders=stage==='prod'?require('./production-recorder-map.cjs').productionRecorderMap(env.GOVERNANCE_PRODUCTION_RECORDER_MAP||'[]'):null;
  let ruleJournal,services={};
  if(config.controlDriver==='postgres'){
   const directory=new (require('./postgres-customer-directory.cjs').PostgresCustomerDirectory)(store.pool);
@@ -54,7 +55,7 @@ async function start(env=process.env){
   services={...services,ruleEngine:new (require('./governance-rules.cjs').RuleEngine)(ruleJournal),notificationDestinations};
  }
  const readiness=require('./readiness.cjs').createReadiness({environment:stage,pool:store.pool,runtimeProfile:store.runtimeProfile||'pilot',sqlite:[store.db,sessionDb,ruleJournal?.db]});
- const server=createServer(store,credentials,users,sessionDb,evidenceOptions,{...services,workosConfig,readiness,environment:stage});
+ const server=createServer(store,credentials,users,sessionDb,evidenceOptions,{...services,workosConfig,readiness,environment:stage,productionRecorders});
  const ruleProcessor=processingEnabled?new (require('./rule-processing.cjs').RuleProcessor)({engine:services.ruleEngine,store,projects:ruleProjects,intervalMs:ruleInterval}):null;
  server.listen(config.port,'127.0.0.1',()=>console.log(`Governance ${stage} service ready (${driver}); loopback only`));
  ruleProcessor?.start();
