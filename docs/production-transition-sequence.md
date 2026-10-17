@@ -47,7 +47,13 @@ and three pilot roles, and the verified empty production-only bootstrap.
   production worker to a private provider endpoint before sustained high
   receipt volume, or earlier if public-endpoint reliability or rate limits
   affect publishing. This changes only the RPC transport, not chain ID,
-  contract, receipt identities or signed evidence.
+  contract, receipt identities or signed evidence. The staged
+  [read-only RPC checker](../scripts/check-production-mainnet-rpc.cjs) verifies
+  chain ID, deployed code hash, canonical deployment receipt, confirmations
+  and response time without a wallet key. It passed on the VPS against the
+  public endpoint on 17 October (225 confirmations, 262 ms). Add an alert for
+  failures and rate limits when the first Production worker is activated;
+  monitor actual receipt publishing delay from the worker journal as well.
 
 The [version-6 non-secret deployment plan](../deploy/governance/deployment-plan.example.json)
 and its validator must be checked against the selected Contabo test database
