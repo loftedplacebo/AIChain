@@ -18,6 +18,7 @@ REQUIRED = {
     'scripts/fund-production-relayer.test.cjs',
     'deploy/governance/production-funding.sh',
 }
+DIRECTORIES = {'deploy/', 'deploy/governance/', 'scripts/'}
 ETHERS = pathlib.Path('/opt/aichain/orvessian-production-api/node_modules/ethers/package.json')
 
 
@@ -35,13 +36,18 @@ def inspect(archive, digest, commit):
         raise ValueError('Existing funding release or missing pinned dependency')
     with tarfile.open(archive, 'r:') as source:
         members = source.getmembers()
-        if {item.name for item in members} != REQUIRED or any(
-                not item.isfile() or item.size < 1 or item.size > 131072 or
+        files = [item for item in members if item.isfile()]
+        directories = [item for item in members if item.isdir()]
+        if {item.name for item in files} != REQUIRED or \
+                len(files) != len(REQUIRED) or \
+                not {item.name.rstrip('/') + '/' for item in directories}.issubset(DIRECTORIES) or \
+                len(files) + len(directories) != len(members) or any(
+                item.size < 1 or item.size > 131072 or
                 pathlib.PurePosixPath(item.name).is_absolute() or
                 '..' in pathlib.PurePosixPath(item.name).parts
-                for item in members):
+                for item in files):
             raise ValueError('Exact root-only funding archive members required')
-    return len(members)
+    return len(files)
 
 
 def stage(archive, digest, commit):
@@ -52,6 +58,8 @@ def stage(archive, digest, commit):
     try:
         with tarfile.open(archive, 'r:') as source:
             for item in source:
+                if item.isdir():
+                    continue
                 target = temporary.joinpath(*pathlib.PurePosixPath(item.name).parts)
                 target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
                 with source.extractfile(item) as reader, target.open('xb') as writer:

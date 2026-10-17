@@ -24,6 +24,10 @@ class FundingStageTests(unittest.TestCase):
             root = pathlib.Path(temporary)
             archive = root / 'funding.tar'
             with tarfile.open(archive, 'w:') as output:
+                for name in MODULE.DIRECTORIES:
+                    directory = tarfile.TarInfo(name)
+                    directory.type = tarfile.DIRTYPE
+                    output.addfile(directory)
                 for name in MODULE.REQUIRED:
                     content = b'example source\n'
                     info = tarfile.TarInfo(name)
