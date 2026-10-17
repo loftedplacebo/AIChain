@@ -267,6 +267,18 @@ identity checks. This tool does not create the customer project, enable a
 worker, or switch backups. The first project must be handled in a supervised
 window, followed by a journal-bearing B2 upload, closed restore, timer handoff,
 and independent receipt acceptance before general project admission.
+The [mainnet relayer funder](../scripts/fund-production-relayer.cjs) is a
+separate operator tool. It requires the same protected project request, a
+paused registered worker, a successful project/catalog preflight and Base
+mainnet RPC. It tops up only to the reviewed **0.0002 ETH** project target,
+with a maximum **0.00002 ETH** fee allowance per transfer. `--quote` does not
+read the owner wallet key; `--prepare` signs one capped EIP-1559 transfer into
+a root-only intent without broadcasting; `--broadcast` can only resend those
+saved bytes after rechecking nonce, destination balance and current Base fees.
+A protected lock and outstanding-intent check prevent two local transfers
+from racing the same owner-wallet nonce. Synthetic wallet/RPC tests passed on
+Linux. There is no Production relayer yet, so no quote, signature or transfer
+has been made with the real wallet.
 An integration test found that the staged Production worker rejected every
 SQLite journal larger than 4 KiB because it reused the private-key file limit.
 The reviewed fix keeps keys at 4 KiB and permits a bounded worker-owned journal.
