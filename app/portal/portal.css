@@ -3,3 +3,50 @@
 .gp-live-workspace select{display:block;width:100%;margin-top:10px;color:#183345;padding:8px}.gp-live-workspace{display:grid!important}
 .gp-live-workspace select{background:#fff;border:1px solid #cdd9de;border-radius:4px}.gp-live-workspace label{min-width:0}
 .gp-shell button.gp-evidence-action{background:#e9f3ef;border-color:#a8cbbb;color:#205847;font-weight:700;white-space:nowrap}.gp-shell button.gp-evidence-action:hover{background:#d8ebe2;border-color:#75ae94}.gp-shell button.gp-evidence-action span{margin-left:8px}
+
+/* Shared platform navigation and action hierarchy. */
+.gp-mobile-sections{display:none}
+.gp-sidebar .gp-desktop-sections{display:grid}
+.gp-sidebar .gp-desktop-sections button:hover,.gp-sidebar .gp-mobile-sections nav button:hover{background:#24475a;color:#fff}
+.gp-sidebar .gp-desktop-sections button[aria-current],.gp-sidebar .gp-mobile-sections nav button[aria-current]{background:#31566a;color:#fff;font-weight:700;box-shadow:inset 3px 0 #ffbd63}
+.gp-sidebar .gp-desktop-sections button,.gp-sidebar .gp-mobile-sections nav button{min-height:44px}
+.gp-sidebar .gp-desktop-signout{margin-top:24px;text-align:left;background:transparent;border-color:#527183;color:#eef5f7}
+.gp-sidebar .gp-desktop-signout:hover{background:#24475a}
+.gp-shell .gp-primary,.gp-shell a.gp-primary{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:11px 17px;border:1px solid #183e50;border-radius:7px;background:#183e50;color:#fff;font-size:13px;font-weight:700;text-decoration:none}
+.gp-shell .gp-primary:hover,.gp-shell a.gp-primary:hover{background:#285d73;border-color:#285d73}
+.gp-shell .gp-link{display:inline-flex;align-items:center;justify-content:center;min-height:36px;padding:7px 11px;border:1px solid #a9c6bd;border-radius:6px;background:#eef6f2;color:#205847;font-size:13px;font-weight:700;line-height:1.35;text-decoration:none}
+.gp-shell .gp-link:hover{background:#dbece4;border-color:#7da995}
+.gp-side-bottom a{display:flex;align-items:center;min-height:40px;margin-top:8px;padding:8px 10px;border:1px solid #527183;border-radius:6px;color:#eef5f7;font-weight:600;text-decoration:none}
+.gp-side-bottom a:hover{background:#24475a}
+.gp-shell .gp-panel p,.gp-shell .gp-header p:not(.gp-eyebrow),.gp-shell .gp-kpis p,.gp-shell .gp-incident details,.gp-shell dl{font-size:14px}
+.gp-shell .gp-demo-banner,.gp-shell .gp-toolbar>span,.gp-shell .gp-filters label,.gp-shell .gp-search,.gp-shell .gp-kpis small,.gp-shell .gp-footnote,.gp-shell .gp-chart-data{font-size:12px!important;line-height:1.5}
+.gp-shell table{font-size:13px}
+.gp-shell th{font-size:12px;font-weight:700}
+.gp-shell td small{font-size:11px;line-height:1.45}
+.gp-shell button:focus-visible,.gp-shell a:focus-visible,.gp-shell select:focus-visible,.gp-shell input:focus-visible,.gp-shell summary:focus-visible{outline:3px solid #f6b454;outline-offset:3px}
+
+@media(max-width:700px){
+  .gp-sidebar{padding:17px 18px 18px}
+  .gp-sidebar .gp-desktop-sections,.gp-sidebar .gp-desktop-signout{display:none}
+  .gp-workspace{display:grid;margin:14px 0 12px;padding:12px 0;gap:4px}
+  .gp-workspace strong{font-size:13px}
+  .gp-workspace>span{font-size:12px}
+  .gp-live-workspace{margin:12px 0!important}
+  .gp-live-workspace label{font-size:12px}
+  .gp-live-workspace select{margin-top:6px;min-height:42px}
+  .gp-mobile-sections{display:block}
+  .gp-mobile-sections summary{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px;padding:10px 14px;border:1px solid #688697;border-radius:8px;color:#fff;cursor:pointer;list-style:none;font-size:13px}
+  .gp-mobile-sections summary::-webkit-details-marker{display:none}
+  .gp-mobile-sections summary span:first-child{display:flex;align-items:center;gap:9px;min-width:0}
+  .gp-mobile-sections summary strong{color:#ffbd63;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .gp-menu-indicator{width:9px;height:9px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);flex:none;transition:transform .18s}
+  .gp-mobile-sections[open] .gp-menu-indicator{transform:rotate(225deg)}
+  .gp-sidebar .gp-mobile-sections nav{display:grid;overflow:visible;margin:8px 0 0;gap:3px;padding:7px 0;border-bottom:1px solid #345060}
+  .gp-sidebar .gp-mobile-sections nav button{width:100%;padding:11px 13px;font-size:14px;white-space:normal}
+  .gp-sidebar .gp-mobile-sections nav button>span{display:inline}
+  .gp-mobile-sections-extra{display:grid;gap:4px;padding:10px 0 0}
+  .gp-mobile-sections-extra a,.gp-sidebar .gp-mobile-sections-extra button{display:block;width:100%;min-height:44px;padding:11px 13px;border:1px solid #527183;border-radius:7px;background:transparent;color:#eef5f7;text-align:left;font-size:13px;font-weight:600;text-decoration:none}
+  .gp-mobile-sections-extra a:hover,.gp-sidebar .gp-mobile-sections-extra button:hover{background:#24475a}
+  .gp-header .gp-primary{min-height:44px;font-size:12px;padding:10px 12px}
+  .gp-shell .gp-panel p{font-size:13px}
+}
